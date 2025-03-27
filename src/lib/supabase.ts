@@ -2,9 +2,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { toast } from "sonner";
 
-// Initialize with Supabase project URL and anon key
-const supabaseUrl = 'https://your-project-id.supabase.co';
-const supabaseKey = 'your-anon-key';
+// We'll initialize these with empty strings and let the user connect to Supabase
+const supabaseUrl = '';
+const supabaseKey = '';
 
 // Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseKey);
