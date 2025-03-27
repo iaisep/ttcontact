@@ -66,7 +66,7 @@ const AgentsSection = () => {
   const fetchAgents = async () => {
     setLoading(true);
     try {
-      const data = await fetchWithAuth('/list-agents');
+      const data = await fetchWithAuth('/agents');
       setAgents(data);
     } catch (error) {
       toast.error('Failed to fetch agents');
@@ -78,7 +78,7 @@ const AgentsSection = () => {
 
   const createAgent = async (formData: any) => {
     try {
-      const newAgent = await fetchWithAuth('/create-agent', {
+      const newAgent = await fetchWithAuth('/agents', {
         method: 'POST',
         body: JSON.stringify(formData),
       });
@@ -93,8 +93,8 @@ const AgentsSection = () => {
 
   const updateAgent = async (id: string, formData: any) => {
     try {
-      const updatedAgent = await fetchWithAuth(`/update-agent/${id}`, {
-        method: 'PATCH',
+      const updatedAgent = await fetchWithAuth(`/agents/${id}`, {
+        method: 'PUT',
         body: JSON.stringify(formData),
       });
       setAgents(agents.map(agent => agent.id === id ? updatedAgent : agent));
