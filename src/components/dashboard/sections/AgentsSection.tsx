@@ -39,7 +39,7 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 
 interface Agent {
-  id: string;
+  agent_id: string;
   name: string;
   description: string;
   voice_id: string;
@@ -93,11 +93,11 @@ const AgentsSection = () => {
 
   const updateAgent = async (id: string, formData: any) => {
     try {
-      const updatedAgent = await fetchWithAuth(`/update-agent/${id}`, {
+      const updatedAgent = await fetchWithAuth(`/update-agent/${agent_id}`, {
         method: 'PATCH',
         body: JSON.stringify(formData),
       });
-      setAgents(agents.map(agent => agent.id === id ? updatedAgent : agent));
+      setAgents(agents.map(agent => agent.agent_id === id ? updatedAgent : agent));
       toast.success('Agent updated successfully');
       setDialogOpen(false);
     } catch (error) {
@@ -111,7 +111,7 @@ const AgentsSection = () => {
       await fetchWithAuth(`/agents/${id}`, {
         method: 'DELETE',
       });
-      setAgents(agents.filter(agent => agent.id !== id));
+      setAgents(agents.filter(agent => agent.agent_id !== id));
       toast.success('Agent deleted successfully');
     } catch (error) {
       toast.error('Failed to delete agent');
@@ -211,7 +211,7 @@ const AgentsSection = () => {
                 </TableRow>
               ) : (
                 filteredAgents.map((agent) => (
-                  <TableRow key={agent.id}>
+                  <TableRow key={agent.agent_id}>
                     <TableCell className="font-medium">{agent.agent_name}</TableCell>
                     <TableCell>{agent.description ? agent.description.substring(0, 50) + '...' : '-'}</TableCell>
                     <TableCell>{agent.folder || '-'}</TableCell>
@@ -239,7 +239,7 @@ const AgentsSection = () => {
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction 
                                 className="bg-destructive text-destructive-foreground"
-                                onClick={() => deleteAgent(agent.id)}
+                                onClick={() => deleteAgent(agent.agent_id)}
                               >
                                 Delete
                               </AlertDialogAction>
