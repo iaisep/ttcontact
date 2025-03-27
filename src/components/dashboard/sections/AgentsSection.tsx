@@ -66,7 +66,7 @@ const AgentsSection = () => {
   const fetchAgents = async () => {
     setLoading(true);
     try {
-      const data = await fetchWithAuth('/lists-agents');
+      const data = await fetchWithAuth('/list-agents');
       setAgents(data);
     } catch (error) {
       toast.error('Failed to fetch agents');
