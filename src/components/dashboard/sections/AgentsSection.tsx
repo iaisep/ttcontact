@@ -41,7 +41,7 @@ import { useForm } from 'react-hook-form';
 interface Agent {
   agent_id: string;
   name: string;
-  Agent_Type: string;
+  agent_type: string;
   voice_id: string;
   folder?: string;
   last_modification_timestamp: string;
@@ -122,7 +122,7 @@ const AgentsSection = () => {
   const filteredAgents = agents.filter(agent => {
     // Safeguard against undefined properties
     const agentName = agent.name || '';
-    const agentDescription = agent.Agent_Type || '';
+    const agentDescription = agent.agent_type || '';
     const agentFolder = agent.folder || '';
     
     const matchesSearch = agentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -213,7 +213,7 @@ const AgentsSection = () => {
                 filteredAgents.map((agent) => (
                   <TableRow key={agent.agent_id}>
                     <TableCell className="font-medium">{agent.agent_name}</TableCell>
-                    <TableCell>{agent.Agent_Type ? agent.Agent_Type.substring(0, 50) + '...' : '-'}</TableCell>
+                    <TableCell>{agent.agent_type ? agent.agent_type.substring(0, 50) + '...' : '-'}</TableCell>
                     <TableCell>{agent.folder || '-'}</TableCell>
                     <TableCell>{agent.voice_id}</TableCell>
                     <TableCell>{new Date(agent.last_modification_timestamp).toLocaleDateString()}</TableCell>
@@ -285,7 +285,7 @@ const AgentForm: React.FC<AgentFormProps> = ({ agent, onSubmit }) => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       name: agent?.name || '',
-      description: agent?.Agent_Type || '',
+      description: agent?.agent_type || '',
       voice_id: agent?.voice_id || 'eleven_labs_emily',
       folder: agent?.folder || '',
     }
