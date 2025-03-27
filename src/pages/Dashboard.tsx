@@ -117,7 +117,7 @@ const Dashboard = () => {
                   <AvatarImage src="/placeholder.svg" />
                   <AvatarFallback>RA</AvatarFallback>
                 </Avatar>
-                <h1 className="text-lg font-semibold">Retell AI</h1>
+                <h1 className="text-lg font-semibold">UISEP_IA</h1>
               </div>
             </div>
             <div className="flex items-center justify-between">
