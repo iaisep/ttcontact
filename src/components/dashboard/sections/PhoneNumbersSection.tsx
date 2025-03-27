@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -17,7 +16,8 @@ import {
   DialogDescription, 
   DialogFooter, 
   DialogHeader, 
-  DialogTitle 
+  DialogTitle, 
+  DialogTrigger
 } from '@/components/ui/dialog';
 import { 
   Card,
@@ -202,11 +202,11 @@ const PhoneNumbersSection = () => {
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Dialog>
-                          <Dialog.Trigger asChild>
+                          <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
                               Assign Agent
                             </Button>
-                          </Dialog.Trigger>
+                          </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
                               <DialogTitle>Assign Agent to {phone.number}</DialogTitle>

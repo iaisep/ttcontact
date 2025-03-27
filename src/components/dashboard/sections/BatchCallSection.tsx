@@ -130,7 +130,7 @@ const BatchCallSection = () => {
       */
 
       // Mock success for UI demonstration
-      const newBatch = {
+      const newBatch: BatchCall = {
         id: `batch_${Date.now()}`,
         status: 'pending',
         total_calls: Math.floor(Math.random() * 50) + 50,

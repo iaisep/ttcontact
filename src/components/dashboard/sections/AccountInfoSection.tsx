@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -19,12 +18,13 @@ import {
   DialogFooter, 
   DialogHeader, 
   DialogTitle, 
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, UserCircle, Building, Users, Upload, Save, CloudUpload } from 'lucide-react';
+import { Loader2, UserCircle, Building, Users, Upload, Save, CloudUpload, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface User {
@@ -67,7 +67,6 @@ const AccountInfoSection = () => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
-  // Mock data for UI demonstration
   const mockWorkspace: Workspace = {
     id: 'ws_1',
     name: 'My Organization',
@@ -106,7 +105,6 @@ const AccountInfoSection = () => {
     ],
   };
 
-  // Use mock data for UI demonstration
   useEffect(() => {
     setWorkspace(mockWorkspace);
     setCurrentUser(mockWorkspace.members[0]);
@@ -127,11 +125,6 @@ const AccountInfoSection = () => {
   const fetchAccountInfo = async () => {
     setLoading(true);
     try {
-      // In a real app, these would be API calls
-      // const workspaceData = await fetchWithAuth('/workspace');
-      // const userData = await fetchWithAuth('/user');
-      
-      // Simulate API calls with mock data
       await new Promise(resolve => setTimeout(resolve, 1000));
       setWorkspace(mockWorkspace);
       setCurrentUser(mockWorkspace.members[0]);
@@ -155,18 +148,10 @@ const AccountInfoSection = () => {
 
   const updateUserProfile = async () => {
     try {
-      // In a real app, this would be an API call
-      // await fetchWithAuth('/user', {
-      //   method: 'PUT',
-      //   body: JSON.stringify(userFormData),
-      // });
-      
-      // Update the UI with the new values
       if (currentUser && workspace) {
         const updatedUser = { ...currentUser, ...userFormData };
         setCurrentUser(updatedUser);
         
-        // Update the user in the workspace members array
         const updatedMembers = workspace.members.map(member => 
           member.id === currentUser.id ? updatedUser : member
         );
@@ -183,13 +168,6 @@ const AccountInfoSection = () => {
 
   const updateWorkspace = async () => {
     try {
-      // In a real app, this would be an API call
-      // await fetchWithAuth('/workspace', {
-      //   method: 'PUT',
-      //   body: JSON.stringify(workspaceFormData),
-      // });
-      
-      // Update the UI with the new values
       if (workspace) {
         setWorkspace({ 
           ...workspace, 
@@ -213,12 +191,6 @@ const AccountInfoSection = () => {
     }
 
     try {
-      // In a real app, this would be an API call
-      // await fetchWithAuth('/workspace/members/invite', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ email: inviteEmail }),
-      // });
-      
       toast.success(`Invitation sent to ${inviteEmail}`);
       setInviteEmail('');
       setInviteDialogOpen(false);
@@ -230,12 +202,6 @@ const AccountInfoSection = () => {
 
   const removeMember = async (userId: string) => {
     try {
-      // In a real app, this would be an API call
-      // await fetchWithAuth(`/workspace/members/${userId}`, {
-      //   method: 'DELETE',
-      // });
-      
-      // Update the UI by removing the member
       if (workspace) {
         const updatedMembers = workspace.members.filter(member => member.id !== userId);
         setWorkspace({ ...workspace, members: updatedMembers });
@@ -250,13 +216,6 @@ const AccountInfoSection = () => {
 
   const changeMemberRole = async (userId: string, newRole: string) => {
     try {
-      // In a real app, this would be an API call
-      // await fetchWithAuth(`/workspace/members/${userId}`, {
-      //   method: 'PUT',
-      //   body: JSON.stringify({ role: newRole }),
-      // });
-      
-      // Update the UI with the new role
       if (workspace) {
         const updatedMembers = workspace.members.map(member => 
           member.id === userId ? { ...member, role: newRole } : member
@@ -717,7 +676,6 @@ const AccountInfoSection = () => {
   );
 };
 
-// For copying to clipboard
 const Copy = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
