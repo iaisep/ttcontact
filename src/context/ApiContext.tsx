@@ -12,6 +12,7 @@ interface ApiContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   setApiKey: (key: string) => void;
+  setBaseURL: (url: string) => void;  // Nuevo método para cambiar base URL
   fetchWithAuth: (endpoint: string, options?: RequestInit) => Promise<any>;
 }
 
@@ -22,7 +23,7 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [user, setUser] = useState<any | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(localStorage.getItem('retell_api_key'));
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const baseURL = 'https://api.retellai.com';
+  const [baseURL, setBaseURL] = useState<string>('https://api.retellai.com');
   const navigate = useNavigate();
 
   // Check if user is authenticated on load
@@ -134,6 +135,10 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('retell_api_key', key);
       setApiKey(key);
       setIsAuthenticated(true);
+    },
+    setBaseURL: (url: string) => {
+      setBaseURL(url);
+      toast.info(`Base URL updated to: ${url}`);
     },
     fetchWithAuth,
   };
