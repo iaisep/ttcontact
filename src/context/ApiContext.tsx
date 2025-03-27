@@ -21,7 +21,7 @@ const ApiContext = createContext<ApiContextType | undefined>(undefined);
 export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<any | null>(null);
-  const apiKey = 'key_49e140dd0f69fc46be7fce6a93b1';
+  const apiKey = 'key_618d2cf39b2593b13f65725245ea';
   //const [apiKey, setApiKey] = useState<string | null>(localStorage.getItem('retell_api_key'));
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [baseURL, setBaseURL] = useState<string>('https://api.retellai.com');
