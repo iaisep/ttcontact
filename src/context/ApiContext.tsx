@@ -31,7 +31,7 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const storedApiKey = localStorage.getItem('retell_api_key');
     if (storedApiKey) {
-      setApiKey(storedApiKey);
+      apiKey(storedApiKey);
       setIsAuthenticated(true);
       // Fetch user info
       fetchUserInfo(storedApiKey);
@@ -55,13 +55,13 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       } else {
         // If error, clear stored key
         localStorage.removeItem('retell_api_key');
-        setApiKey(null);
+        apiKey(null);
         setIsAuthenticated(false);
       }
     } catch (error) {
       console.error('Error fetching user info:', error);
       localStorage.removeItem('retell_api_key');
-      setApiKey(null);
+      apiKey(null);
       setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
@@ -74,7 +74,7 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // This is a mock login - in a real app, this would be a proper API call
       // For this example, we're just storing the API key provided in the password field
       localStorage.setItem('retell_api_key', password);
-      setApiKey(password);
+      apiKey(password);
       setIsAuthenticated(true);
       toast.success('Login successful');
       navigate('/dashboard');
@@ -88,7 +88,7 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const logout = () => {
     localStorage.removeItem('retell_api_key');
-    setApiKey(null);
+    apiKey(null);
     setUser(null);
     setIsAuthenticated(false);
     toast.info('Logged out successfully');
@@ -134,7 +134,7 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     logout,
     setApiKey: (key: string) => {
       localStorage.setItem('retell_api_key', key);
-      setApiKey(key);
+      apiKey(key);
       setIsAuthenticated(true);
     },
     setBaseURL: (url: string) => {
