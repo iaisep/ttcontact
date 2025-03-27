@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import { ApiProvider } from "@/context/ApiContext";
 
 const queryClient = new QueryClient();
 
@@ -17,13 +18,15 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ApiProvider>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Index />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ApiProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
