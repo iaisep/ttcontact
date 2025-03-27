@@ -120,9 +120,14 @@ const AgentsSection = () => {
   };
 
   const filteredAgents = agents.filter(agent => {
-    const matchesSearch = agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          agent.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFolder = folderFilter ? agent.folder === folderFilter : true;
+    // Safeguard against undefined properties
+    const agentName = agent.name || '';
+    const agentDescription = agent.description || '';
+    const agentFolder = agent.folder || '';
+    
+    const matchesSearch = agentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          agentDescription.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFolder = folderFilter ? agentFolder === folderFilter : true;
     return matchesSearch && matchesFolder;
   });
 
@@ -208,7 +213,7 @@ const AgentsSection = () => {
                 filteredAgents.map((agent) => (
                   <TableRow key={agent.id}>
                     <TableCell className="font-medium">{agent.name}</TableCell>
-                    <TableCell>{agent.description.substring(0, 50)}...</TableCell>
+                    <TableCell>{agent.description ? agent.description.substring(0, 50) + '...' : '-'}</TableCell>
                     <TableCell>{agent.folder || '-'}</TableCell>
                     <TableCell>{agent.voice_id}</TableCell>
                     <TableCell>{new Date(agent.created_at).toLocaleDateString()}</TableCell>
