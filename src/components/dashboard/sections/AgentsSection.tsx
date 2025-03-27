@@ -66,7 +66,7 @@ const AgentsSection = () => {
   const fetchAgents = async () => {
     setLoading(true);
     try {
-      const data = await fetchWithAuth('/agents');
+      const data = await fetchWithAuth('/lists-agents');
       setAgents(data);
     } catch (error) {
       toast.error('Failed to fetch agents');
@@ -212,7 +212,7 @@ const AgentsSection = () => {
               ) : (
                 filteredAgents.map((agent) => (
                   <TableRow key={agent.id}>
-                    <TableCell className="font-medium">{agent.name}</TableCell>
+                    <TableCell className="font-medium">{agent.agent_name}</TableCell>
                     <TableCell>{agent.description ? agent.description.substring(0, 50) + '...' : '-'}</TableCell>
                     <TableCell>{agent.folder || '-'}</TableCell>
                     <TableCell>{agent.voice_id}</TableCell>
