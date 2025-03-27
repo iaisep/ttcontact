@@ -44,7 +44,7 @@ interface Agent {
   description: string;
   voice_id: string;
   folder?: string;
-  created_at: string;
+  last_modification_timestamp: string;
   updated_at: string;
 }
 
@@ -216,7 +216,7 @@ const AgentsSection = () => {
                     <TableCell>{agent.description ? agent.description.substring(0, 50) + '...' : '-'}</TableCell>
                     <TableCell>{agent.folder || '-'}</TableCell>
                     <TableCell>{agent.voice_id}</TableCell>
-                    <TableCell>{new Date(agent.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(agent.last_modification_timestamp).toLocaleDateString()}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button variant="ghost" size="icon" onClick={() => handleEditClick(agent)}>
