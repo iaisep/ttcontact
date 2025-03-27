@@ -4,8 +4,8 @@ import { toast } from "sonner";
 
 // Add your Supabase URL and anon key here
 // These should be replaced with your actual Supabase project credentials
-const supabaseUrl = 'https://ortqovxtpgliulltankq.supabase.co';
-const supabaseKey = 'sbp_095f55339a1e75e64e9d139d3fc5aed5ca9e8eed';
+const supabaseUrl = 'https://hhejcxsjjayzylrbdlcr.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoZWpjeHNqamF5enlscmJkbGNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwMzY1MzYsImV4cCI6MjA1ODYxMjUzNn0.h4SJwsY0GvcBUOR6RDd3HCLTCnxxJB1hvq6rBQ8LJHQ';
 
 // Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseKey);
