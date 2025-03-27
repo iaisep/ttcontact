@@ -93,8 +93,8 @@ const AgentsSection = () => {
 
   const updateAgent = async (id: string, formData: any) => {
     try {
-      const updatedAgent = await fetchWithAuth(`/agents/${id}`, {
-        method: 'PUT',
+      const updatedAgent = await fetchWithAuth(`/update-agent/${id}`, {
+        method: 'PATCH',
         body: JSON.stringify(formData),
       });
       setAgents(agents.map(agent => agent.id === id ? updatedAgent : agent));
