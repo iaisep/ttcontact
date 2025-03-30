@@ -8,12 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Save, Upload } from "lucide-react";
 import { toast } from 'sonner';
 import { User } from './types';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface ProfileTabProps {
   currentUser: User | null;
 }
 
 const ProfileTab = ({ currentUser }: ProfileTabProps) => {
+  const { t } = useLanguage();
   const [editingUser, setEditingUser] = useState(false);
   const [userFormData, setUserFormData] = useState({
     name: currentUser?.name || '',
@@ -23,11 +25,11 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
   const updateUserProfile = async () => {
     try {
       // Logic would be implemented here for actual API calls
-      toast.success('Profile updated successfully');
+      toast.success(t('Profile updated successfully'));
       setEditingUser(false);
     } catch (error) {
       console.error('Failed to update profile:', error);
-      toast.error('Failed to update profile');
+      toast.error(t('Failed to update profile'));
     }
   };
 
@@ -44,9 +46,9 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Profile Information</CardTitle>
+          <CardTitle>{t('profile_information')}</CardTitle>
           <CardDescription>
-            Manage your personal account information
+            {t('manage_personal_info')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -60,39 +62,39 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
               </Avatar>
               <Button variant="outline" size="sm">
                 <Upload className="h-4 w-4 mr-2" />
-                Change Avatar
+                {t('Change Avatar')}
               </Button>
             </div>
             
             <div className="flex-1 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t('name')}</Label>
                 {editingUser ? (
                   <Input
                     id="name"
                     value={userFormData.name}
                     onChange={(e) => setUserFormData({ ...userFormData, name: e.target.value })}
-                    placeholder="Your full name"
+                    placeholder={t('Your full name')}
                   />
                 ) : (
                   <div className="flex justify-between items-center">
                     <p className="text-lg">{currentUser?.name}</p>
                     <Button variant="ghost" size="sm" onClick={() => setEditingUser(true)}>
-                      Edit
+                      {t('edit')}
                     </Button>
                   </div>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 {editingUser ? (
                   <Input
                     id="email"
                     type="email"
                     value={userFormData.email}
                     onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
-                    placeholder="Your email address"
+                    placeholder={t('Your email address')}
                   />
                 ) : (
                   <p className="text-lg">{currentUser?.email}</p>
@@ -100,12 +102,12 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
               </div>
               
               <div className="space-y-2">
-                <Label>Role</Label>
+                <Label>{t('role')}</Label>
                 <p className="text-lg capitalize">{currentUser?.role}</p>
               </div>
               
               <div className="space-y-2">
-                <Label>Member Since</Label>
+                <Label>{t('member_since')}</Label>
                 <p className="text-lg">
                   {currentUser?.created_at 
                     ? new Date(currentUser.created_at).toLocaleDateString() 
@@ -122,11 +124,11 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
                       email: currentUser?.email || '',
                     });
                   }}>
-                    Cancel
+                    {t('cancel')}
                   </Button>
                   <Button onClick={updateUserProfile}>
                     <Save className="h-4 w-4 mr-2" />
-                    Save Changes
+                    {t('save')}
                   </Button>
                 </div>
               )}
@@ -137,28 +139,28 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
       
       <Card>
         <CardHeader>
-          <CardTitle>Security</CardTitle>
+          <CardTitle>{t('security')}</CardTitle>
           <CardDescription>
-            Manage your account security settings
+            {t('manage_security')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Password</Label>
+            <Label>{t('password')}</Label>
             <div className="flex justify-between items-center">
               <p className="text-muted-foreground">••••••••••••</p>
               <Button variant="outline" size="sm">
-                Change Password
+                {t('change_password')}
               </Button>
             </div>
           </div>
           
           <div className="space-y-2">
-            <Label>Two-Factor Authentication</Label>
+            <Label>{t('two_factor')}</Label>
             <div className="flex justify-between items-center">
-              <p className="text-muted-foreground">Not enabled</p>
+              <p className="text-muted-foreground">{t('not_enabled')}</p>
               <Button variant="outline" size="sm">
-                Enable 2FA
+                {t('enable_2fa')}
               </Button>
             </div>
           </div>

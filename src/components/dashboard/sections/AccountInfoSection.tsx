@@ -8,9 +8,12 @@ import ProfileTab from './account/ProfileTab';
 import WorkspaceTab from './account/WorkspaceTab';
 import TeamMembersTab from './account/TeamMembersTab';
 import { User, Workspace } from './account/types';
+import { useLanguage } from '@/context/LanguageContext';
+import LanguageSelector from '../LanguageSelector';
 
 const AccountInfoSection = () => {
   const { fetchWithAuth } = useApiContext();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -67,7 +70,7 @@ const AccountInfoSection = () => {
       setCurrentUser(mockWorkspace.members[0]);
     } catch (error) {
       console.error('Failed to fetch account info:', error);
-      toast.error('Failed to load account information');
+      toast.error(t('Failed to load account information'));
     } finally {
       setLoading(false);
     }
@@ -84,14 +87,15 @@ const AccountInfoSection = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Account Information</h1>
+        <h1 className="text-2xl font-bold">{t('account_information')}</h1>
+        <LanguageSelector />
       </div>
 
       <Tabs defaultValue="profile" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="profile">My Profile</TabsTrigger>
-          <TabsTrigger value="workspace">Workspace</TabsTrigger>
-          <TabsTrigger value="team">Team Members</TabsTrigger>
+          <TabsTrigger value="profile">{t('my_profile')}</TabsTrigger>
+          <TabsTrigger value="workspace">{t('workspace')}</TabsTrigger>
+          <TabsTrigger value="team">{t('team_members')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="profile" className="space-y-4">
