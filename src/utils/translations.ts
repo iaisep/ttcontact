@@ -173,6 +173,9 @@ const translations: TranslationsType = {
     "remaining": "remaining",
     "available": "available",
     "campaigns": "Campaigns",
+    "voice_agent_hub": "Voice Agent Hub",
+    "user_name": "User Name",
+    "logout": "Logout",
   },
   es: {
     // Navegación y Común
@@ -339,6 +342,9 @@ const translations: TranslationsType = {
     "remaining": "restantes",
     "available": "disponibles",
     "campaigns": "Campañas",
+    "voice_agent_hub": "Centro de Agentes de Voz",
+    "user_name": "Nombre de Usuario",
+    "logout": "Cerrar Sesión",
   }
 };
 

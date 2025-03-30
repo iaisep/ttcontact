@@ -63,7 +63,7 @@ const Index = () => {
               </div>
             </div>
             <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-              Voice Agent Hub
+              {t("voice_agent_hub")}
             </h1>
             <p className="mt-3 text-lg text-gray-600">
               {t("hero_subtitle")}
