@@ -2,7 +2,7 @@
 import { PaymentMethod } from '../types';
 import { loadStripe } from '@stripe/stripe-js';
 
-// Stripe public key - en una aplicación real, esto debería venir de variables de entorno
+// Stripe public key - actualiza esto con tu clave pública real de Stripe
 const STRIPE_PUBLIC_KEY = 'pk_test_51NwgafILRXVQgZJ4IwjVfhxoaX2QOKQf3owTKwJu9DKk0WcHtLyOEBZHmjvh0MeKXmGGIpuBBCTns11ReBGiTgQW00FfARfGI7';
 
 // Inicializar Stripe

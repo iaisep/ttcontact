@@ -21,7 +21,7 @@ const plans = [
     ],
     cta: "Comenzar gratis",
     popular: false,
-    priceId: "price_basic" // Esto debe ser reemplazado con el ID real de Stripe
+    priceId: "price_basic" // Actualiza esto con tu ID real de Stripe (ej. price_1abc123...)
   },
   {
     name: "Pro",
@@ -37,7 +37,7 @@ const plans = [
     ],
     cta: "Comenzar prueba de 14 días",
     popular: true,
-    priceId: "price_pro" // Esto debe ser reemplazado con el ID real de Stripe
+    priceId: "price_pro" // Actualiza esto con tu ID real de Stripe (ej. price_2xyz456...)
   },
   {
     name: "Empresa",
@@ -54,7 +54,7 @@ const plans = [
     ],
     cta: "Contactar ventas",
     popular: false,
-    priceId: "price_enterprise" // Esto debe ser reemplazado con el ID real de Stripe
+    priceId: "price_enterprise" // Actualiza esto con tu ID real de Stripe (ej. price_3pqr789...)
   }
 ];
 
