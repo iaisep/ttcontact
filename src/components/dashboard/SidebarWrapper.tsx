@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -31,10 +30,12 @@ import {
   LogOut,
   ChevronRight,
   ChevronLeft,
+  Info,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useApiContext } from "@/context/ApiContext";
+import { Progress } from "@/components/ui/progress";
 
 interface SidebarWrapperProps {
   activeSection: string;
@@ -128,7 +129,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
       <div 
         className={`border-r bg-white transition-all duration-300 ease-in-out ${
           sidebarCollapsed ? 'w-[60px]' : 'w-[250px]'
-        }`}
+        } flex flex-col`}
       >
         {/* Header */}
         <div className="border-b p-4">
@@ -186,8 +187,8 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="border-t">
-          {!sidebarCollapsed && (
+        <div className="border-t mt-auto">
+          {!sidebarCollapsed ? (
             <div className="p-4">
               <div className="rounded-lg bg-gray-50 p-3 mb-3">
                 <h3 className="font-medium text-sm mb-2">Organization Usage</h3>
@@ -228,23 +229,24 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
                 </button>
               </div>
             </div>
-          )}
-          {sidebarCollapsed && (
-            <div className="py-4 flex flex-col items-center gap-2">
-              <div className="rounded-lg bg-gray-50 p-2 w-10 h-10 flex items-center justify-center mb-2">
-                <div className="rounded-full w-3 h-3 flex items-center justify-center border border-gray-500">
+          ) : (
+            <div className="py-4 flex flex-col items-center">
+              <button className="w-full flex justify-center py-2.5">
+                <div className="rounded-full w-5 h-5 flex items-center justify-center border border-gray-500">
                   <span className="text-[8px]">i</span>
                 </div>
-              </div>
+              </button>
               <button
                 onClick={handleLogout}
-                className="text-gray-500 hover:text-gray-700 p-2"
+                className="w-full flex justify-center py-2.5 text-gray-500 hover:text-gray-700"
               >
                 <LogOut size={20} />
               </button>
-              <Avatar className="h-8 w-8">
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
+              <button className="w-full flex justify-center py-2.5">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>U</AvatarFallback>
+                </Avatar>
+              </button>
             </div>
           )}
         </div>
