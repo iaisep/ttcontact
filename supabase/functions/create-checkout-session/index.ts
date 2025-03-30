@@ -18,7 +18,7 @@ serve(async (req) => {
   }
 
   try {
-    const { priceId, planName } = await req.json();
+    const { priceId, planName, productId } = await req.json();
     
     // Validar que se haya proporcionado un priceId
     if (!priceId) {
@@ -101,6 +101,7 @@ serve(async (req) => {
       metadata: {
         userId: user.id,
         planName: planName || 'Plan desconocido',
+        productId: productId || 'prod_S2XqigZAJV7SP5', // Incluir el ID del producto en los metadatos
       },
     });
 

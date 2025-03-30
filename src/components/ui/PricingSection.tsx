@@ -6,6 +6,7 @@ import { useApiContext } from "@/context/ApiContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { STRIPE_PRODUCT_ID } from "@/components/dashboard/sections/billing/utils/BillingUtils";
 
 const plans = [
   {
@@ -21,7 +22,8 @@ const plans = [
     ],
     cta: "Comenzar gratis",
     popular: false,
-    priceId: "price_basic" // Actualiza esto con tu ID real de Stripe (ej. price_1abc123...)
+    priceId: "price_1PTuZOILRXVQgZJ4ojW7JECh", // Precio asociado al producto prod_S2XqigZAJV7SP5
+    productId: STRIPE_PRODUCT_ID
   },
   {
     name: "Pro",
@@ -37,7 +39,8 @@ const plans = [
     ],
     cta: "Comenzar prueba de 14 días",
     popular: true,
-    priceId: "price_pro" // Actualiza esto con tu ID real de Stripe (ej. price_2xyz456...)
+    priceId: "price_1PTuZOILRXVQgZJ4B4KMrvcg", // Precio asociado al producto prod_S2XqigZAJV7SP5
+    productId: STRIPE_PRODUCT_ID
   },
   {
     name: "Empresa",
@@ -54,7 +57,8 @@ const plans = [
     ],
     cta: "Contactar ventas",
     popular: false,
-    priceId: "price_enterprise" // Actualiza esto con tu ID real de Stripe (ej. price_3pqr789...)
+    priceId: "price_1PTuZOILRXVQgZJ42hVwuKLR", // Precio asociado al producto prod_S2XqigZAJV7SP5
+    productId: STRIPE_PRODUCT_ID
   }
 ];
 

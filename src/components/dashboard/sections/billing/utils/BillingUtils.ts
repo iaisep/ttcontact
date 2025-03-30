@@ -8,6 +8,9 @@ const STRIPE_PUBLIC_KEY = 'pk_test_51NwgafILRXVQgZJ4IwjVfhxoaX2QOKQf3owTKwJu9DKk
 // Inicializar Stripe
 export const stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
 
+// Producto Stripe configurado
+export const STRIPE_PRODUCT_ID = 'prod_S2XqigZAJV7SP5';
+
 export const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('es-MX', {
     style: 'currency',
