@@ -30,7 +30,6 @@ const translations: TranslationsType = {
     "login": "Login",
     "register": "Register",
     "email": "Email",
-    "password": "Password",
     
     // Account Info
     "account_information": "Account Information",
@@ -127,7 +126,6 @@ const translations: TranslationsType = {
     "login": "Iniciar Sesión",
     "register": "Registrarse",
     "email": "Correo electrónico",
-    "password": "Contraseña",
     
     // Account Info
     "account_information": "Información de Cuenta",

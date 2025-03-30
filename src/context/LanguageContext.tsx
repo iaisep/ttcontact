@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import translations from '@/utils/translations';
 
 // Define our supported languages
 export type Language = 'es' | 'en';
