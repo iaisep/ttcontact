@@ -22,7 +22,7 @@ const plans = [
     ],
     cta: "Comenzar gratis",
     popular: false,
-    priceId: "price_1PTuZOILRXVQgZJ4ojW7JECh", // Precio asociado al producto prod_S2XqigZAJV7SP5
+    priceId: "price_1R8Sl9LeoauYmYi0EO0IBI7a", // Actualizado con el nuevo price ID proporcionado
     productId: STRIPE_PRODUCT_ID
   },
   {
@@ -39,7 +39,7 @@ const plans = [
     ],
     cta: "Comenzar prueba de 14 días",
     popular: true,
-    priceId: "price_1PTuZOILRXVQgZJ4B4KMrvcg", // Precio asociado al producto prod_S2XqigZAJV7SP5
+    priceId: "price_1R8Sl9LeoauYmYi0EO0IBI7a", // Actualizado con el nuevo price ID proporcionado
     productId: STRIPE_PRODUCT_ID
   },
   {
@@ -57,7 +57,7 @@ const plans = [
     ],
     cta: "Contactar ventas",
     popular: false,
-    priceId: "price_1PTuZOILRXVQgZJ42hVwuKLR", // Precio asociado al producto prod_S2XqigZAJV7SP5
+    priceId: "price_1R8Sl9LeoauYmYi0EO0IBI7a", // Actualizado con el nuevo price ID proporcionado
     productId: STRIPE_PRODUCT_ID
   }
 ];
