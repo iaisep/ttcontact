@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const LandingNav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -61,7 +62,7 @@ const LandingNav = () => {
                 />
               </svg>
             </div>
-            <span className="text-xl font-bold text-gray-900">Voice Agent Hub</span>
+            <span className="text-xl font-bold text-gray-900">{t("voice_agent_hub")}</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -83,8 +84,9 @@ const LandingNav = () => {
             </a>
           </nav>
 
-          {/* CTA Buttons */}
+          {/* Language Selector and CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            <LanguageSelector />
             <Link to="/login">
               <Button variant="outline">{t("login")}</Button>
             </Link>
@@ -94,7 +96,8 @@ const LandingNav = () => {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center space-x-2">
+            <LanguageSelector />
             <Button
               variant="ghost"
               size="icon"

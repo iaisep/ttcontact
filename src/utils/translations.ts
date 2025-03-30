@@ -92,6 +92,7 @@ const translations: TranslationsType = {
     "hero_title": "AI voice agents for customer service and sales",
     "hero_subtitle": "Reduce costs and improve customer experience with AI voice agents",
     "get_started": "Get Started",
+    "view_demo": "View Demo",
     "plans_title": "Plans that adapt to your business",
     "plans_subtitle": "Scale according to your needs with our flexible plans. All include free upgrades.",
     "basic_plan": "Basic",
@@ -176,6 +177,13 @@ const translations: TranslationsType = {
     "voice_agent_hub": "Voice Agent Hub",
     "user_name": "User Name",
     "logout": "Logout",
+    
+    // Hero Demo
+    "voice_agent_demo": "Voice agent in action",
+    "demo_message_1": "How can I help you today?",
+    "demo_message_2": "I want to know the customer service hours.",
+    "demo_message_3": "Our customer service hours are Monday to Friday from 9:00 AM to 6:00 PM. Do you need to schedule a consultation outside these hours?",
+    "trusted_companies": "Companies that trust our technology",
   },
   es: {
     // Navegación y Común
@@ -261,6 +269,7 @@ const translations: TranslationsType = {
     "hero_title": "Agentes de voz IA para servicio al cliente y ventas",
     "hero_subtitle": "Reduce costos y mejora la experiencia del cliente con agentes de voz IA",
     "get_started": "Comenzar",
+    "view_demo": "Ver demo",
     "plans_title": "Planes que se adaptan a tu negocio",
     "plans_subtitle": "Escala según tus necesidades con nuestros planes flexibles. Todos incluyen actualizaciones gratuitas.",
     "basic_plan": "Básico",
@@ -345,6 +354,13 @@ const translations: TranslationsType = {
     "voice_agent_hub": "Centro de Agentes de Voz",
     "user_name": "Nombre de Usuario",
     "logout": "Cerrar Sesión",
+    
+    // Hero Demo
+    "voice_agent_demo": "Agente de voz en acción",
+    "demo_message_1": "¿En qué puedo ayudarte hoy?",
+    "demo_message_2": "Quiero saber el horario de atención al cliente.",
+    "demo_message_3": "Nuestro horario de atención es de lunes a viernes de 9:00 a 18:00. ¿Necesitas programar alguna consulta fuera de este horario?",
+    "trusted_companies": "Empresas que confían en nuestra tecnología",
   }
 };
 

@@ -3,6 +3,9 @@ import AuthForm from "@/components/AuthForm";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
+import LandingNav from "@/components/ui/LandingNav";
+import HeroSection from "@/components/ui/HeroSection";
+import Footer from "@/components/ui/Footer";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -16,10 +19,8 @@ const Index = () => {
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style={{ animationDelay: "-5s" }}></div>
       </div>
 
-      {/* Language selector in top right corner */}
-      <div className="absolute top-4 right-4 z-10">
-        <LanguageSelector />
-      </div>
+      {/* Navigation */}
+      <LandingNav />
 
       {/* Main content */}
       <div className="relative flex flex-col items-center justify-center min-h-screen px-6 py-12">
@@ -90,6 +91,9 @@ const Index = () => {
           </motion.p>
         </footer>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

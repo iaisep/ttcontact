@@ -3,7 +3,7 @@ import { useLanguage, Language } from "@/context/LanguageContext";
 import { Globe } from "lucide-react";
 
 const LanguageSelector = () => {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   const handleLanguageChange = (value: Language) => {
     setLanguage(value);
@@ -16,9 +16,10 @@ const LanguageSelector = () => {
         value={language}
         onChange={(e) => handleLanguageChange(e.target.value as Language)}
         className="bg-transparent border-none text-sm focus:ring-0 focus:outline-none py-1 px-2"
+        aria-label={t("choose_language")}
       >
-        <option value="es">🇪🇸 Español</option>
-        <option value="en">🇺🇸 English</option>
+        <option value="es">🇪🇸 {t("spanish")}</option>
+        <option value="en">🇺🇸 {t("english")}</option>
       </select>
     </div>
   );
