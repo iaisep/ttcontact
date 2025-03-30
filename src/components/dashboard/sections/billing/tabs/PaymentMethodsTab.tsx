@@ -2,12 +2,13 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CreditCard as CreditCardIcon, Plus, Loader2 } from 'lucide-react';
+import { CreditCard as CreditCardIcon, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { PaymentMethod } from '../types';
 import { toast } from 'sonner';
 import AddCardDialog from '../dialogs/AddCardDialog';
 import AutoRechargeDialog from '../dialogs/AutoRechargeDialog';
+import { setDefaultPaymentMethod, deletePaymentMethod } from '../utils/BillingUtils';
 
 interface PaymentMethodsTabProps {
   paymentMethods: PaymentMethod[];
@@ -16,13 +17,15 @@ interface PaymentMethodsTabProps {
 
 const PaymentMethodsTab = ({ paymentMethods, setPaymentMethods }: PaymentMethodsTabProps) => {
   const [autoRechargeOpen, setAutoRechargeOpen] = useState(false);
+  const [processing, setProcessing] = useState<string | null>(null);
 
-  const setDefaultPaymentMethod = async (paymentMethodId: string) => {
+  const handleSetDefaultPaymentMethod = async (paymentMethodId: string) => {
+    setProcessing(paymentMethodId);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Llamar a la API para establecer el método de pago predeterminado
+      await setDefaultPaymentMethod(paymentMethodId);
       
-      // Update UI
+      // Actualizar el estado local
       setPaymentMethods(
         paymentMethods.map(method => ({
           ...method,
@@ -32,26 +35,41 @@ const PaymentMethodsTab = ({ paymentMethods, setPaymentMethods }: PaymentMethods
       
       toast.success('Método de pago predeterminado actualizado');
     } catch (error) {
-      console.error('Failed to set default payment method:', error);
+      console.error('Error al establecer el método de pago predeterminado:', error);
       toast.error('Error al actualizar el método de pago predeterminado');
+    } finally {
+      setProcessing(null);
     }
   };
 
-  const deletePaymentMethod = async (paymentMethodId: string) => {
+  const handleDeletePaymentMethod = async (paymentMethodId: string) => {
+    if (paymentMethods.find(m => m.id === paymentMethodId)?.isDefault) {
+      toast.error('No se puede eliminar el método de pago predeterminado');
+      return;
+    }
+
+    setProcessing(paymentMethodId);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Llamar a la API para eliminar el método de pago
+      await deletePaymentMethod(paymentMethodId);
       
-      // Remove from UI
+      // Eliminar del estado local
       setPaymentMethods(
         paymentMethods.filter(method => method.id !== paymentMethodId)
       );
       
       toast.success('Método de pago eliminado');
     } catch (error) {
-      console.error('Failed to delete payment method:', error);
+      console.error('Error al eliminar el método de pago:', error);
       toast.error('Error al eliminar el método de pago');
+    } finally {
+      setProcessing(null);
     }
+  };
+
+  const getCardBrandIcon = (brand: string) => {
+    // En una implementación más completa, podríamos tener iconos específicos para cada marca
+    return <CreditCardIcon className="h-6 w-6 text-primary" />;
   };
 
   return (
@@ -76,7 +94,7 @@ const PaymentMethodsTab = ({ paymentMethods, setPaymentMethods }: PaymentMethods
               {paymentMethods.map((method) => (
                 <div key={method.id} className="border rounded-md p-4 flex items-start space-x-4">
                   <div className="bg-primary/10 p-2 rounded">
-                    <CreditCardIcon className="h-6 w-6 text-primary" />
+                    {getCardBrandIcon(method.brand)}
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
@@ -96,11 +114,27 @@ const PaymentMethodsTab = ({ paymentMethods, setPaymentMethods }: PaymentMethods
                     </div>
                     <div className="flex space-x-2 mt-4">
                       {!method.isDefault && (
-                        <Button variant="outline" size="sm" onClick={() => setDefaultPaymentMethod(method.id)}>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleSetDefaultPaymentMethod(method.id)}
+                          disabled={processing === method.id}
+                        >
+                          {processing === method.id ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : null}
                           Establecer como predeterminada
                         </Button>
                       )}
-                      <Button variant="ghost" size="sm" onClick={() => deletePaymentMethod(method.id)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleDeletePaymentMethod(method.id)}
+                        disabled={processing === method.id || method.isDefault}
+                      >
+                        {processing === method.id ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : null}
                         Eliminar
                       </Button>
                     </div>

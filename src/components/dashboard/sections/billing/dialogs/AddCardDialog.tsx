@@ -1,16 +1,18 @@
+
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreditCard, Loader2 } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { toast } from 'sonner';
 import { PaymentMethod } from '../types';
+import { CardElement, useStripe, useElements, Elements } from '@stripe/react-stripe-js';
+import { stripePromise, createPaymentMethod, mapStripePaymentMethod } from '../utils/BillingUtils';
 
 interface AddCardDialogProps {
   paymentMethods: PaymentMethod[];
@@ -18,58 +20,116 @@ interface AddCardDialogProps {
 }
 
 const cardFormSchema = z.object({
-  cardNumber: z.string().min(16, "Número de tarjeta inválido").max(19),
   cardholderName: z.string().min(2, "Nombre requerido"),
-  expiryMonth: z.string().min(1, "Requerido"),
-  expiryYear: z.string().min(1, "Requerido"),
-  cvc: z.string().min(3, "CVC inválido").max(4),
 });
 
-const AddCardDialog = ({ paymentMethods, setPaymentMethods }: AddCardDialogProps) => {
+// Componente del formulario de tarjeta
+const CardForm = ({ paymentMethods, setPaymentMethods, closeDialog }: AddCardDialogProps & { closeDialog: () => void }) => {
   const [isAddingCard, setIsAddingCard] = useState(false);
+  const stripe = useStripe();
+  const elements = useElements();
   
   const cardForm = useForm<z.infer<typeof cardFormSchema>>({
     resolver: zodResolver(cardFormSchema),
     defaultValues: {
-      cardNumber: '',
       cardholderName: '',
-      expiryMonth: '',
-      expiryYear: '',
-      cvc: '',
     },
   });
 
   const handleAddCard = async (data: z.infer<typeof cardFormSchema>) => {
+    if (!stripe || !elements) {
+      toast.error('No se ha podido inicializar Stripe');
+      return;
+    }
+
     setIsAddingCard(true);
     try {
-      // In a real app, this would be an actual Stripe integration
-      // Simulate API call with a delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Crear el método de pago en Stripe
+      const paymentMethod = await createPaymentMethod(stripe, elements);
       
-      // Add mock card to list
-      const newCard: PaymentMethod = {
-        id: `pm_${Date.now()}`,
-        brand: data.cardNumber.startsWith('4') ? 'visa' : 'mastercard',
-        last4: data.cardNumber.slice(-4),
-        expMonth: parseInt(data.expiryMonth),
-        expYear: parseInt(data.expiryYear),
-        isDefault: paymentMethods.length === 0,
-      };
+      // En una implementación real, aquí enviaríamos el paymentMethod.id al servidor
+      // para asociarlo con el usuario actual
+      
+      // Simular una respuesta exitosa
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Añadir la nueva tarjeta a la lista local
+      const newCard = mapStripePaymentMethod({
+        ...paymentMethod,
+        isDefault: paymentMethods.length === 0
+      });
       
       setPaymentMethods([...paymentMethods, newCard]);
       toast.success('Tarjeta agregada exitosamente');
       cardForm.reset();
-      setIsAddingCard(false);
+      closeDialog();
     } catch (error) {
-      console.error('Failed to add payment method:', error);
-      toast.error('Error al agregar la tarjeta');
+      console.error('Error al agregar la tarjeta:', error);
+      toast.error(error instanceof Error ? error.message : 'Error al agregar la tarjeta');
     } finally {
       setIsAddingCard(false);
     }
   };
 
   return (
-    <Dialog>
+    <Form {...cardForm}>
+      <form onSubmit={cardForm.handleSubmit(handleAddCard)} className="space-y-4">
+        <FormField
+          control={cardForm.control}
+          name="cardholderName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre del titular</FormLabel>
+              <FormControl>
+                <Input placeholder="Nombre completo" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <div className="space-y-2">
+          <Label>Detalles de la tarjeta</Label>
+          <div className="border rounded-md p-3">
+            <CardElement
+              options={{
+                style: {
+                  base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                      color: '#aab7c4',
+                    },
+                  },
+                  invalid: {
+                    color: '#9e2146',
+                  },
+                },
+              }}
+            />
+          </div>
+          <FormDescription>
+            Información segura procesada por Stripe
+          </FormDescription>
+        </div>
+        
+        <DialogFooter>
+          <Button type="submit" disabled={isAddingCard || !stripe}>
+            {isAddingCard && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Agregar tarjeta
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
+  );
+};
+
+// Componente principal de diálogo
+const AddCardDialog = (props: AddCardDialogProps) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <CreditCard className="h-4 w-4 mr-2" />
@@ -83,139 +143,9 @@ const AddCardDialog = ({ paymentMethods, setPaymentMethods }: AddCardDialogProps
             Ingresa los detalles de tu tarjeta para agregarla como método de pago.
           </DialogDescription>
         </DialogHeader>
-        <Form {...cardForm}>
-          <form onSubmit={cardForm.handleSubmit(handleAddCard)} className="space-y-4">
-            <FormField
-              control={cardForm.control}
-              name="cardholderName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre del titular</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nombre completo" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={cardForm.control}
-              name="cardNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Número de tarjeta</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="1234 5678 9012 3456" 
-                      {...field} 
-                      onChange={(e) => {
-                        // Keep only digits
-                        const value = e.target.value.replace(/\D/g, '');
-                        field.onChange(value);
-                      }}
-                      maxLength={19}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex gap-4">
-              <div className="flex-1 space-y-2">
-                <Label>Fecha de expiración</Label>
-                <div className="flex gap-2">
-                  <FormField
-                    control={cardForm.control}
-                    name="expiryMonth"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="MM" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Array.from({ length: 12 }, (_, i) => {
-                              const month = i + 1;
-                              return (
-                                <SelectItem key={month} value={month.toString().padStart(2, '0')}>
-                                  {month.toString().padStart(2, '0')}
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={cardForm.control}
-                    name="expiryYear"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="YY" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Array.from({ length: 10 }, (_, i) => {
-                              const year = new Date().getFullYear() + i;
-                              const shortYear = year.toString().substr(-2);
-                              return (
-                                <SelectItem key={year} value={shortYear}>
-                                  {shortYear}
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              <FormField
-                control={cardForm.control}
-                name="cvc"
-                render={({ field }) => (
-                  <FormItem className="flex-none w-20">
-                    <FormLabel>CVC</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="123" 
-                        {...field} 
-                        onChange={(e) => {
-                          // Keep only digits
-                          const value = e.target.value.replace(/\D/g, '');
-                          field.onChange(value);
-                        }}
-                        maxLength={4}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <DialogFooter>
-              <Button type="submit" disabled={isAddingCard}>
-                {isAddingCard && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Agregar tarjeta
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        <Elements stripe={stripePromise}>
+          <CardForm {...props} closeDialog={() => setOpen(false)} />
+        </Elements>
       </DialogContent>
     </Dialog>
   );

@@ -4,11 +4,13 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Plus } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { toast } from 'sonner';
+import { useState } from 'react';
+import { setupAutoRecharge } from '../utils/BillingUtils';
 
 interface AutoRechargeDialogProps {
   open: boolean;
@@ -22,6 +24,8 @@ const autoRechargeFormSchema = z.object({
 });
 
 const AutoRechargeDialog = ({ open, onOpenChange }: AutoRechargeDialogProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const autoRechargeForm = useForm<z.infer<typeof autoRechargeFormSchema>>({
     resolver: zodResolver(autoRechargeFormSchema),
     defaultValues: {
@@ -32,15 +36,36 @@ const AutoRechargeDialog = ({ open, onOpenChange }: AutoRechargeDialogProps) => 
   });
 
   const saveAutoRechargeSettings = async (data: z.infer<typeof autoRechargeFormSchema>) => {
+    setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      if (data.enabled) {
+        // Convertir a números para el procesamiento
+        const threshold = parseFloat(data.threshold);
+        const amount = parseFloat(data.amount);
+        
+        // Validaciones adicionales
+        if (isNaN(threshold) || threshold <= 0) {
+          throw new Error('El umbral debe ser un número positivo');
+        }
+        
+        if (isNaN(amount) || amount <= 0) {
+          throw new Error('El monto debe ser un número positivo');
+        }
+        
+        // Configurar recarga automática
+        await setupAutoRecharge(threshold, amount);
+      }
+      
+      // En una implementación real, también habría un endpoint para desactivar
+      // la recarga automática si data.enabled es false
       
       toast.success('Configuración de recarga automática guardada');
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to save auto-recharge settings:', error);
-      toast.error('Error al guardar la configuración de recarga automática');
+      console.error('Error al guardar la configuración de recarga automática:', error);
+      toast.error(error instanceof Error ? error.message : 'Error al guardar la configuración');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -96,6 +121,7 @@ const AutoRechargeDialog = ({ open, onOpenChange }: AutoRechargeDialogProps) => 
                       step="0.01"
                       placeholder="10.00" 
                       {...field} 
+                      disabled={!autoRechargeForm.watch('enabled')}
                     />
                   </FormControl>
                   <FormDescription>
@@ -118,6 +144,7 @@ const AutoRechargeDialog = ({ open, onOpenChange }: AutoRechargeDialogProps) => 
                       step="0.01"
                       placeholder="50.00" 
                       {...field} 
+                      disabled={!autoRechargeForm.watch('enabled')}
                     />
                   </FormControl>
                   <FormDescription>
@@ -129,7 +156,8 @@ const AutoRechargeDialog = ({ open, onOpenChange }: AutoRechargeDialogProps) => 
             />
             
             <DialogFooter>
-              <Button type="submit">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Guardar configuración
               </Button>
             </DialogFooter>
