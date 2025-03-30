@@ -2,6 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
+import { useApiContext } from "@/context/ApiContext";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const plans = [
   {
@@ -16,7 +20,8 @@ const plans = [
       "Soporte por email"
     ],
     cta: "Comenzar gratis",
-    popular: false
+    popular: false,
+    priceId: "price_basic" // Esto debe ser reemplazado con el ID real de Stripe
   },
   {
     name: "Pro",
@@ -31,7 +36,8 @@ const plans = [
       "Soporte prioritario"
     ],
     cta: "Comenzar prueba de 14 días",
-    popular: true
+    popular: true,
+    priceId: "price_pro" // Esto debe ser reemplazado con el ID real de Stripe
   },
   {
     name: "Empresa",
@@ -47,11 +53,64 @@ const plans = [
       "Gestor de cuenta dedicado"
     ],
     cta: "Contactar ventas",
-    popular: false
+    popular: false,
+    priceId: "price_enterprise" // Esto debe ser reemplazado con el ID real de Stripe
   }
 ];
 
 const PricingSection = () => {
+  const { isAuthenticated } = useApiContext();
+  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+  const navigate = useNavigate();
+
+  const handlePlanSelect = async (plan: typeof plans[0]) => {
+    // Para el plan Empresa, simplemente redirigir a contacto
+    if (plan.name === "Empresa") {
+      navigate("#contact");
+      return;
+    }
+
+    // Si el usuario no está autenticado, redirigir a login
+    if (!isAuthenticated) {
+      // Guardar el plan seleccionado en localStorage para recuperarlo después del login
+      localStorage.setItem('selectedPlan', plan.priceId);
+      toast.info("Necesitas iniciar sesión para continuar");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setIsLoading(prev => ({ ...prev, [plan.priceId]: true }));
+      
+      // Llamada a nuestra función edge para crear la sesión de checkout
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: JSON.stringify({
+          priceId: plan.priceId,
+          planName: plan.name
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('No se pudo iniciar el proceso de pago');
+      }
+
+      const { url } = await response.json();
+      
+      // Redirigir a la página de checkout de Stripe
+      window.location.href = url;
+    } catch (error) {
+      console.error('Error al procesar el pago:', error);
+      toast.error('Hubo un error al procesar tu solicitud');
+    } finally {
+      setIsLoading(prev => ({ ...prev, [plan.priceId]: false }));
+    }
+  };
+
   return (
     <section id="pricing" className="py-20">
       <div className="container mx-auto px-4">
@@ -112,8 +171,18 @@ const PricingSection = () => {
                 <Button
                   variant={plan.popular ? "default" : "outline"}
                   className="w-full mb-6"
+                  onClick={() => handlePlanSelect(plan)}
+                  disabled={isLoading[plan.priceId]}
                 >
-                  {plan.cta}
+                  {isLoading[plan.priceId] ? (
+                    <span className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Procesando...
+                    </span>
+                  ) : plan.cta}
                 </Button>
                 <ul className="space-y-3">
                   {plan.features.map((feature, idx) => (
