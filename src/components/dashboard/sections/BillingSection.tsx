@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -6,8 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, CreditCard } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Elements } from '@stripe/react-stripe-js';
-import { stripePromise } from './billing/utils/BillingUtils';
 
 // Importaciones de tipos
 import { Invoice, UsageData, PaymentMethod, UsageHistoryItem } from './billing/types';
@@ -19,6 +16,9 @@ import UsageHistoryTab from './billing/tabs/UsageHistoryTab';
 import InvoicesTab from './billing/tabs/InvoicesTab';
 import PaymentMethodsTab from './billing/tabs/PaymentMethodsTab';
 import AddCardDialog from './billing/dialogs/AddCardDialog';
+import StripeWrapper from './billing/components/StripeWrapper';
+import { Elements } from '@stripe/react-stripe-js';
+import { stripePromise } from './billing/utils/BillingUtils';
 
 const BillingSection = () => {
   const { fetchWithAuth } = useApiContext();
@@ -117,63 +117,63 @@ const BillingSection = () => {
   }
 
   return (
-    <Elements stripe={stripePromise}>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Facturación</h1>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <CreditCard className="mr-2 h-4 w-4" />
-                Actualizar método de pago
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Agregar nueva tarjeta</DialogTitle>
-                <DialogDescription>
-                  Ingresa los detalles de tu tarjeta para agregarla como método de pago.
-                </DialogDescription>
-              </DialogHeader>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Facturación</h1>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>
+              <CreditCard className="mr-2 h-4 w-4" />
+              Actualizar método de pago
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Agregar nueva tarjeta</DialogTitle>
+              <DialogDescription>
+                Ingresa los detalles de tu tarjeta para agregarla como método de pago.
+              </DialogDescription>
+            </DialogHeader>
+            <StripeWrapper>
               <AddCardDialog 
                 paymentMethods={paymentMethods}
                 setPaymentMethods={setPaymentMethods}
               />
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <BillingSummaryCards usage={usage} />
-        
-        <Tabs defaultValue="usage" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="usage">Uso actual</TabsTrigger>
-            <TabsTrigger value="history">Historial de uso</TabsTrigger>
-            <TabsTrigger value="invoices">Facturas</TabsTrigger>
-            <TabsTrigger value="payment">Métodos de pago</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="usage">
-            <CurrentUsageTab usage={usage} />
-          </TabsContent>
-          
-          <TabsContent value="history">
-            <UsageHistoryTab usageHistory={usageHistory} usage={usage} />
-          </TabsContent>
-          
-          <TabsContent value="invoices">
-            <InvoicesTab invoices={invoices} />
-          </TabsContent>
-          
-          <TabsContent value="payment">
-            <PaymentMethodsTab 
-              paymentMethods={paymentMethods}
-              setPaymentMethods={setPaymentMethods}
-            />
-          </TabsContent>
-        </Tabs>
+            </StripeWrapper>
+          </DialogContent>
+        </Dialog>
       </div>
-    </Elements>
+
+      <BillingSummaryCards usage={usage} />
+      
+      <Tabs defaultValue="usage" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="usage">Uso actual</TabsTrigger>
+          <TabsTrigger value="history">Historial de uso</TabsTrigger>
+          <TabsTrigger value="invoices">Facturas</TabsTrigger>
+          <TabsTrigger value="payment">Métodos de pago</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="usage">
+          <CurrentUsageTab usage={usage} />
+        </TabsContent>
+        
+        <TabsContent value="history">
+          <UsageHistoryTab usageHistory={usageHistory} usage={usage} />
+        </TabsContent>
+        
+        <TabsContent value="invoices">
+          <InvoicesTab invoices={invoices} />
+        </TabsContent>
+        
+        <TabsContent value="payment">
+          <PaymentMethodsTab 
+            paymentMethods={paymentMethods}
+            setPaymentMethods={setPaymentMethods}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

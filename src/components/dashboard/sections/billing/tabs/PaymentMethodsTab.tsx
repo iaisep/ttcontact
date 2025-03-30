@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import AddCardDialog from '../dialogs/AddCardDialog';
 import AutoRechargeDialog from '../dialogs/AutoRechargeDialog';
 import { setDefaultPaymentMethod, deletePaymentMethod } from '../utils/BillingUtils';
+import StripeWrapper from '../components/StripeWrapper';
 
 interface PaymentMethodsTabProps {
   paymentMethods: PaymentMethod[];
@@ -145,7 +146,12 @@ const PaymentMethodsTab = ({ paymentMethods, setPaymentMethods }: PaymentMethods
           )}
           
           <div className="mt-4">
-            <AddCardDialog setPaymentMethods={setPaymentMethods} paymentMethods={paymentMethods} />
+            <StripeWrapper>
+              <AddCardDialog 
+                setPaymentMethods={setPaymentMethods} 
+                paymentMethods={paymentMethods} 
+              />
+            </StripeWrapper>
           </div>
           
           <Separator className="my-6" />
