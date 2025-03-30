@@ -22,7 +22,7 @@ interface ApiProviderProps {
 
 export const ApiProvider = ({ children }: ApiProviderProps) => {
   const [apiKey, setApiKey] = useState<string>('');
-  const [baseURL, setBaseURL] = useState<string>('https://api.retellai.com/v1');
+  const [baseURL, setBaseURL] = useState<string>('https://api.retellai.com/');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     localStorage.getItem('auth_token') !== null
   );
