@@ -55,9 +55,9 @@ const BatchCallSection = () => {
       console.error('Failed to fetch agents:', error);
       // Mock data for UI demonstration
       setAgents([
-        { id: 'agent_1', name: 'Sales Agent' },
-        { id: 'agent_2', name: 'Support Agent' },
-        { id: 'agent_3', name: 'Appointment Scheduler' },
+        { id: 'agent_1', name: 'Sales Agent', agent_id: 'agent_1', voice_id: 'voice_1', agent_type: 'sales', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { id: 'agent_2', name: 'Support Agent', agent_id: 'agent_2', voice_id: 'voice_2', agent_type: 'support', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { id: 'agent_3', name: 'Appointment Scheduler', agent_id: 'agent_3', voice_id: 'voice_3', agent_type: 'scheduler', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
       ]);
     }
   };

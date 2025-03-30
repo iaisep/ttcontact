@@ -1,6 +1,5 @@
 
 import { useMemo, useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
 import { 
   Table, 
   TableBody, 
@@ -37,7 +36,7 @@ const BatchCallHistory = ({ batches, agents }: BatchCallHistoryProps) => {
   }, [batches, currentPage, pageSize]);
 
   const getAgentName = (agentId: string) => {
-    const agent = agents.find(a => a.id === agentId);
+    const agent = agents.find(a => a.agent_id === agentId);
     return agent ? agent.name : 'Unknown Agent';
   };
 

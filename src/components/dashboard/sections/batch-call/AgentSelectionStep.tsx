@@ -34,7 +34,7 @@ const AgentSelectionStep = ({
         >
           <option value="">Select an agent</option>
           {agents.map((agent) => (
-            <option key={agent.id} value={agent.id}>
+            <option key={agent.agent_id} value={agent.agent_id}>
               {agent.name}
             </option>
           ))}
