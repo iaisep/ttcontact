@@ -60,6 +60,41 @@ const CallHistorySection = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  const mockTranscript = {
+    turns: [
+      {
+        speaker: 'caller',
+        text: 'Hi, I wanted to inquire about your services.',
+        timestamp: '00:00:05'
+      },
+      {
+        speaker: 'agent',
+        text: 'Hello! Thank you for calling. I\'d be happy to tell you about our services. What specific information are you looking for?',
+        timestamp: '00:00:12'
+      },
+      {
+        speaker: 'caller',
+        text: 'I\'m interested in your pricing plans.',
+        timestamp: '00:00:20'
+      },
+      {
+        speaker: 'agent',
+        text: 'Of course. We offer three pricing tiers: Basic, Professional, and Enterprise. The Basic plan starts at $29 per month, Professional is $89 per month, and Enterprise is custom-priced based on your specific needs.',
+        timestamp: '00:00:30'
+      },
+      {
+        speaker: 'caller',
+        text: 'What features are included in the Professional plan?',
+        timestamp: '00:01:05'
+      },
+      {
+        speaker: 'agent',
+        text: 'The Professional plan includes all features from Basic plus advanced analytics, unlimited users, priority support, and integration with CRM systems. Would you like me to go through these features in more detail?',
+        timestamp: '00:01:15'
+      }
+    ]
+  };
+
   const mockCalls: Call[] = [
     {
       id: '1',
