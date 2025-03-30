@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import {
@@ -15,6 +15,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarSeparator,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
   BookOpen,
@@ -30,19 +31,40 @@ import {
   UserCircle,
   HelpCircle,
   LogOut,
+  ChevronRight,
+  ChevronLeft,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DashboardContent from "@/components/dashboard/DashboardContent";
 import { useApiContext } from "@/context/ApiContext";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("agents");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
   const { logout } = useApiContext();
+
+  // Load sidebar state from localStorage if available
+  useEffect(() => {
+    const savedState = localStorage.getItem("sidebar-collapsed");
+    if (savedState !== null) {
+      setSidebarCollapsed(savedState === "true");
+    }
+  }, []);
+
+  // Save sidebar state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem("sidebar-collapsed", sidebarCollapsed.toString());
+  }, [sidebarCollapsed]);
 
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
   };
 
   const menuItems = [
@@ -108,30 +130,40 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background flex w-full">
       <Toaster position="top-right" />
-      <SidebarProvider defaultOpen={true}>
+      <SidebarProvider defaultOpen={!sidebarCollapsed}>
         <Sidebar variant="sidebar" className="border-r">
-          <SidebarHeader className="flex flex-col gap-2 px-4 pt-4">
+          <SidebarHeader className="flex flex-col gap-2 px-3 pt-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="/placeholder.svg" />
                   <AvatarFallback>RA</AvatarFallback>
                 </Avatar>
-                <h1 className="text-lg font-semibold">UISEP_IA</h1>
+                {!sidebarCollapsed && <h1 className="text-lg font-semibold">UISEP_IA</h1>}
               </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleSidebar} 
+                className="h-8 w-8"
+              >
+                {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+              </Button>
             </div>
-            <div className="flex items-center justify-between">
-              <select className="bg-background border border-input rounded px-2 py-1 text-xs w-full">
-                <option>My Workspace</option>
-                <option>Team Workspace</option>
-                <option>Enterprise Workspace</option>
-              </select>
-            </div>
+            {!sidebarCollapsed && (
+              <div className="flex items-center justify-between">
+                <select className="bg-background border border-input rounded px-2 py-1 text-xs w-full">
+                  <option>My Workspace</option>
+                  <option>Team Workspace</option>
+                  <option>Enterprise Workspace</option>
+                </select>
+              </div>
+            )}
           </SidebarHeader>
 
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Menu</SidebarGroupLabel>
+              {!sidebarCollapsed && <SidebarGroupLabel>Menu</SidebarGroupLabel>}
               <SidebarGroupContent>
                 <SidebarMenu>
                   {menuItems.map((item) => (
@@ -144,16 +176,17 @@ const Dashboard = () => {
                             setActiveSection(item.id);
                           }
                         }}
+                        tooltip={sidebarCollapsed ? item.title : undefined}
                       >
                         {item.external ? (
-                          <a href={item.url} target="_blank" rel="noopener noreferrer">
-                            <item.icon size={18} />
-                            <span>{item.title}</span>
+                          <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                            <item.icon size={18} className="min-w-[18px]" />
+                            {!sidebarCollapsed && <span className="ml-2">{item.title}</span>}
                           </a>
                         ) : (
-                          <button>
-                            <item.icon size={18} />
-                            <span>{item.title}</span>
+                          <button className="flex items-center w-full">
+                            <item.icon size={18} className="min-w-[18px]" />
+                            {!sidebarCollapsed && <span className="ml-2">{item.title}</span>}
                           </button>
                         )}
                       </SidebarMenuButton>
@@ -166,23 +199,27 @@ const Dashboard = () => {
 
           <SidebarFooter>
             <SidebarSeparator />
-            <div className="px-4 py-2">
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                <span>Pro Plan</span>
-                <span>10/20 Parallel Calls</span>
-              </div>
+            <div className="px-3 py-2">
+              {!sidebarCollapsed && (
+                <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                  <span>Pro Plan</span>
+                  <span>10/20 Parallel Calls</span>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
                   <AvatarImage src="/placeholder.svg" />
                   <AvatarFallback>U</AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col text-xs">
-                  <span className="font-semibold">User Name</span>
-                  <span className="text-muted-foreground">user@example.com</span>
-                </div>
+                {!sidebarCollapsed && (
+                  <div className="flex flex-col text-xs">
+                    <span className="font-semibold">User Name</span>
+                    <span className="text-muted-foreground">user@example.com</span>
+                  </div>
+                )}
                 <button 
                   onClick={handleLogout}
-                  className="ml-auto text-muted-foreground hover:text-foreground"
+                  className={`${sidebarCollapsed ? 'ml-0' : 'ml-auto'} text-muted-foreground hover:text-foreground`}
                   title="Log out"
                 >
                   <LogOut size={16} />
