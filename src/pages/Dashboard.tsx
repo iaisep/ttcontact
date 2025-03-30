@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Toaster } from "sonner";
 import DashboardContent from "@/components/dashboard/DashboardContent";
-import SidebarWrapper from "@/components/dashboard/SidebarWrapper";
+import SidebarWrapper from "@/components/dashboard/sidebar/SidebarWrapper";
 import { useSidebarState } from "@/hooks/useSidebarState";
 
 const Dashboard = () => {
