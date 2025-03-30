@@ -161,7 +161,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
         </div>
 
         {/* Main Menu */}
-        <div className="py-2">
+        <div className="py-2 flex-1 overflow-y-auto">
           <ul>
             {menuItems.map((item) => (
               <li key={item.id}>
@@ -186,7 +186,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="absolute bottom-0 w-full border-t">
+        <div className="border-t">
           {!sidebarCollapsed && (
             <div className="p-4">
               <div className="rounded-lg bg-gray-50 p-3 mb-3">
@@ -230,9 +230,17 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
             </div>
           )}
           {sidebarCollapsed && (
-            <div className="p-2 flex flex-col items-center gap-4">
-              <button className="p-2 text-gray-500 hover:text-gray-700">
-                <HelpCircle size={20} />
+            <div className="py-4 flex flex-col items-center gap-2">
+              <div className="rounded-lg bg-gray-50 p-2 w-10 h-10 flex items-center justify-center mb-2">
+                <div className="rounded-full w-3 h-3 flex items-center justify-center border border-gray-500">
+                  <span className="text-[8px]">i</span>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="text-gray-500 hover:text-gray-700 p-2"
+              >
+                <LogOut size={20} />
               </button>
               <Avatar className="h-8 w-8">
                 <AvatarFallback>U</AvatarFallback>
@@ -243,7 +251,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
       </div>
 
       {/* Main Content */}
-      <main className={`flex-1 transition-all duration-300`}>
+      <main className="flex-1 transition-all duration-300">
         {children}
       </main>
     </div>
