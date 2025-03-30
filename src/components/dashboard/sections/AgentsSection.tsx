@@ -93,7 +93,7 @@ const AgentsSection = () => {
 
   const updateAgent = async (id: string, formData: any) => {
     try {
-      const updatedAgent = await fetchWithAuth(`/update-agent/${agent_id}`, {
+      const updatedAgent = await fetchWithAuth(`/update-agent/${id}`, {
         method: 'PATCH',
         body: JSON.stringify(formData),
       });
@@ -212,7 +212,7 @@ const AgentsSection = () => {
               ) : (
                 filteredAgents.map((agent) => (
                   <TableRow key={agent.agent_id}>
-                    <TableCell className="font-medium">{agent.agent_name}</TableCell>
+                    <TableCell className="font-medium">{agent.name}</TableCell>
                     <TableCell>{agent.agent_type ? agent.agent_type.substring(0, 50) + '...' : '-'}</TableCell>
                     <TableCell>{agent.folder || '-'}</TableCell>
                     <TableCell>{agent.voice_id}</TableCell>
@@ -268,7 +268,7 @@ const AgentsSection = () => {
           </DialogHeader>
           <AgentForm 
             agent={currentAgent} 
-            onSubmit={isCreating ? createAgent : (data) => updateAgent(currentAgent!.id, data)} 
+            onSubmit={isCreating ? createAgent : (data) => updateAgent(currentAgent!.agent_id, data)} 
           />
         </DialogContent>
       </Dialog>
