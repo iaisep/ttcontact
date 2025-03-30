@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const LandingNav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   // Handle scroll effect
   useEffect(() => {
@@ -65,29 +67,29 @@ const LandingNav = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <a href="#features" className="text-gray-600 hover:text-primary transition-colors">
-              Features
+              {t("features")}
             </a>
             <a href="#pricing" className="text-gray-600 hover:text-primary transition-colors">
-              Pricing
+              {t("pricing")}
             </a>
             <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-              Documentation
+              {t("documentation")}
             </a>
             <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-              Solutions
+              {t("solutions")}
             </a>
             <a href="#" className="text-gray-600 hover:text-primary transition-colors">
-              Resources
+              {t("resources")}
             </a>
           </nav>
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/login">
-              <Button variant="outline">Login</Button>
+              <Button variant="outline">{t("login")}</Button>
             </Link>
             <Link to="#contact">
-              <Button>Contact Sales</Button>
+              <Button>{t("contact_sales")}</Button>
             </Link>
           </div>
 
@@ -114,42 +116,42 @@ const LandingNav = () => {
               className="block py-2 text-gray-600 hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Features
+              {t("features")}
             </a>
             <a
               href="#pricing"
               className="block py-2 text-gray-600 hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Pricing
+              {t("pricing")}
             </a>
             <a
               href="#"
               className="block py-2 text-gray-600 hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Documentation
+              {t("documentation")}
             </a>
             <a
               href="#"
               className="block py-2 text-gray-600 hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Solutions
+              {t("solutions")}
             </a>
             <a
               href="#"
               className="block py-2 text-gray-600 hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Resources
+              {t("resources")}
             </a>
             <div className="pt-4 flex flex-col space-y-3">
               <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button variant="outline" className="w-full">Login</Button>
+                <Button variant="outline" className="w-full">{t("login")}</Button>
               </Link>
               <Link to="#contact" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button className="w-full">Contact Sales</Button>
+                <Button className="w-full">{t("contact_sales")}</Button>
               </Link>
             </div>
           </div>

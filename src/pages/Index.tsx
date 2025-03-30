@@ -1,8 +1,12 @@
 
 import AuthForm from "@/components/AuthForm";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const Index = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-screen flex flex-col overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* Background elements */}
@@ -10,6 +14,11 @@ const Index = () => {
         <div className="absolute top-0 -left-4 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
         <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style={{ animationDelay: "-2s" }}></div>
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style={{ animationDelay: "-5s" }}></div>
+      </div>
+
+      {/* Language selector in top right corner */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSelector />
       </div>
 
       {/* Main content */}
@@ -57,7 +66,7 @@ const Index = () => {
               Voice Agent Hub
             </h1>
             <p className="mt-3 text-lg text-gray-600">
-              La plataforma que conecta tu negocio con agentes de IA por voz
+              {t("hero_subtitle")}
             </p>
           </motion.div>
         </header>
@@ -77,7 +86,7 @@ const Index = () => {
             transition={{ duration: 0.5, delay: 0.5 }}
             className="text-sm text-gray-500"
           >
-            © {new Date().getFullYear()} Voice Agent Hub. Todos los derechos reservados.
+            © {new Date().getFullYear()} Voice Agent Hub. {t("all_rights_reserved")}
           </motion.p>
         </footer>
       </div>

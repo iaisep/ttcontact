@@ -2,6 +2,8 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut } from "lucide-react";
 import SidebarUsageInfo from "./SidebarUsageInfo";
+import { useLanguage } from "@/context/LanguageContext";
+import LanguageSelector from "@/components/dashboard/LanguageSelector";
 
 interface SidebarFooterProps {
   sidebarCollapsed: boolean;
@@ -9,6 +11,8 @@ interface SidebarFooterProps {
 }
 
 const SidebarFooter = ({ sidebarCollapsed, onLogout }: SidebarFooterProps) => {
+  const { t } = useLanguage();
+  
   if (sidebarCollapsed) {
     return (
       <div className="py-4 flex flex-col items-center">
@@ -16,6 +20,7 @@ const SidebarFooter = ({ sidebarCollapsed, onLogout }: SidebarFooterProps) => {
         <button
           onClick={onLogout}
           className="w-full flex justify-center py-2.5 text-gray-500 hover:text-gray-700"
+          title={t("logout")}
         >
           <LogOut size={20} />
         </button>
@@ -31,17 +36,21 @@ const SidebarFooter = ({ sidebarCollapsed, onLogout }: SidebarFooterProps) => {
   return (
     <div className="p-4">
       <SidebarUsageInfo sidebarCollapsed={sidebarCollapsed} />
+      <div className="mb-3">
+        <LanguageSelector />
+      </div>
       <div className="flex items-center gap-2">
         <Avatar className="h-8 w-8">
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <div className="text-sm font-medium">User Name</div>
+          <div className="text-sm font-medium">{t("user_name")}</div>
           <div className="text-xs text-gray-500">user@example.com</div>
         </div>
         <button
           onClick={onLogout}
           className="text-gray-500 hover:text-gray-700"
+          title={t("logout")}
         >
           <LogOut size={18} />
         </button>

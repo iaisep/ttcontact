@@ -1,8 +1,14 @@
 
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { t, language, setLanguage } = useLanguage();
+  
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLanguage(e.target.value as "es" | "en");
+  };
   
   return (
     <footer className="bg-gray-900 text-gray-300">
@@ -43,7 +49,7 @@ const Footer = () => {
               <span className="text-xl font-bold text-white">Voice Agent Hub</span>
             </Link>
             <p className="text-gray-400 mb-4">
-              Transformando la atención al cliente con agentes de voz impulsados por inteligencia artificial.
+              {t("footer_description")}
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -69,42 +75,45 @@ const Footer = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-white font-semibold mb-4">Producto</h3>
+            <h3 className="text-white font-semibold mb-4">{t("product")}</h3>
             <ul className="space-y-2">
-              <li><a href="#features" className="hover:text-white transition-colors">Características</a></li>
-              <li><a href="#pricing" className="hover:text-white transition-colors">Precios</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Documentación</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Guías</a></li>
+              <li><a href="#features" className="hover:text-white transition-colors">{t("features")}</a></li>
+              <li><a href="#pricing" className="hover:text-white transition-colors">{t("pricing")}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t("documentation")}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t("guides")}</a></li>
               <li><a href="#" className="hover:text-white transition-colors">API</a></li>
             </ul>
           </div>
           <div>
-            <h3 className="text-white font-semibold mb-4">Empresa</h3>
+            <h3 className="text-white font-semibold mb-4">{t("company")}</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-white transition-colors">Sobre nosotros</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Empleo</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Prensa</a></li>
-              <li><a href="#contact" className="hover:text-white transition-colors">Contacto</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t("about_us")}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t("blog")}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t("jobs")}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t("press")}</a></li>
+              <li><a href="#contact" className="hover:text-white transition-colors">{t("contact")}</a></li>
             </ul>
           </div>
           <div>
-            <h3 className="text-white font-semibold mb-4">Legal</h3>
+            <h3 className="text-white font-semibold mb-4">{t("legal")}</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-white transition-colors">Términos de servicio</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Política de privacidad</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Cookies</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t("terms")}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t("privacy_policy")}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t("cookies")}</a></li>
               <li><a href="#" className="hover:text-white transition-colors">GDPR</a></li>
             </ul>
           </div>
         </div>
         <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p>© {currentYear} Voice Agent Hub. Todos los derechos reservados.</p>
+          <p>{t("copyright").replace('{year}', currentYear.toString())}</p>
           <div className="mt-4 md:mt-0">
-            <select className="bg-gray-800 text-gray-300 rounded px-2 py-1 text-sm border border-gray-700">
-              <option value="es">🇪🇸 Español</option>
-              <option value="en">🇺🇸 English</option>
-              <option value="fr">🇫🇷 Français</option>
+            <select 
+              className="bg-gray-800 text-gray-300 rounded px-2 py-1 text-sm border border-gray-700"
+              value={language}
+              onChange={handleLanguageChange}
+            >
+              <option value="es">🇪🇸 {t("spanish")}</option>
+              <option value="en">🇺🇸 {t("english")}</option>
             </select>
           </div>
         </div>
