@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { signUpWithEmail } from "@/lib/supabase";
 import { getValidationError } from "@/lib/validators";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface RegisterFormProps {
   switchToLogin: () => void;
 }
 
 const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
+  const { t } = useLanguage();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -59,19 +61,19 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
   return (
     <div className="animate-fade-in w-full max-w-md px-8 py-10">
       <div className="space-y-2 text-center mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Crear cuenta</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("create_account")}</h1>
         <p className="text-muted-foreground">
-          Regístrate para acceder a tu cuenta de agente de voz
+          {t("register_access")}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="name">Nombre</Label>
+          <Label htmlFor="name">{t("name")}</Label>
           <Input
             id="name"
             type="text"
-            placeholder="Tu nombre"
+            placeholder={t("your_name")}
             value={name}
             onChange={(e) => {
               setName(e.target.value);
@@ -89,11 +91,11 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("email")}</Label>
           <Input
             id="email"
             type="email"
-            placeholder="nombre@ejemplo.com"
+            placeholder={t("your_email")}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -111,7 +113,7 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="register-password">Contraseña</Label>
+          <Label htmlFor="register-password">{t("password")}</Label>
           <div className="relative">
             <Input
               id="register-password"
@@ -130,7 +132,7 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              aria-label={showPassword ? t("hide_password") : t("show_password")}
             >
               {showPassword ? (
                 <EyeOff size={18} className="opacity-70" />
@@ -145,7 +147,7 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
             </p>
           )}
           <p className="text-xs text-muted-foreground">
-            La contraseña debe tener al menos 6 caracteres
+            {t("password_min")}
           </p>
         </div>
 
@@ -176,24 +178,24 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              Procesando...
+              {t("processing")}
             </span>
           ) : (
             <span className="flex items-center justify-center">
-              <UserPlus size={18} className="mr-2" /> Registrarse
+              <UserPlus size={18} className="mr-2" /> {t("register")}
             </span>
           )}
         </Button>
 
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
-            ¿Ya tienes una cuenta?{" "}
+            {t("have_account")}{" "}
             <button
               type="button"
               onClick={switchToLogin}
               className="text-primary hover:underline font-medium"
             >
-              Inicia sesión
+              {t("log_in")}
             </button>
           </p>
         </div>

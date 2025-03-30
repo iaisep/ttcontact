@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,7 +8,7 @@ import WorkspaceTab from './account/WorkspaceTab';
 import TeamMembersTab from './account/TeamMembersTab';
 import { User, Workspace } from './account/types';
 import { useLanguage } from '@/context/LanguageContext';
-import LanguageSelector from '../LanguageSelector';
+import LanguageSelector from '@/components/dashboard/LanguageSelector';
 
 const AccountInfoSection = () => {
   const { fetchWithAuth } = useApiContext();

@@ -53,9 +53,30 @@ const translations: TranslationsType = {
     "spanish": "Español",
     "english": "English",
     
+    // Workspace Tab
+    "workspace_information": "Workspace Information",
+    "manage_workspace": "Manage your workspace settings",
+    "workspace_name": "Workspace Name",
+    "description": "Description",
+    "plan": "Plan",
+    "parallel_calls": "Parallel Calls",
+    "usage": "Usage",
+    "created": "Created",
+    "upload_logo": "Upload Logo",
+    "your_workspace_name": "Your workspace name",
+    "describe_workspace": "Describe your workspace",
+    "no_description": "No description provided",
+    "upgrade": "Upgrade",
+    "advanced_settings": "Advanced Settings",
+    "manage_advanced_settings": "Manage advanced workspace settings",
+    "workspace_id": "Workspace ID",
+    "workspace_id_copied": "Workspace ID copied to clipboard",
+    "danger_zone": "Danger Zone",
+    "delete_workspace_warning": "Permanently delete this workspace and all associated data.",
+    "delete_workspace": "Delete Workspace",
+    
     // Billing
     "current_plan": "Current Plan",
-    "upgrade": "Upgrade",
     "downgrade": "Downgrade",
     "invoice_history": "Invoice History",
     "payment_methods": "Payment Methods",
@@ -103,6 +124,28 @@ const translations: TranslationsType = {
     "custom_voice": "Complete voice customization",
     "dedicated_api": "Dedicated API",
     "account_manager": "Dedicated account manager",
+
+    // Login Form
+    "enter_credentials": "Enter your credentials to access your account",
+    "forgot_password": "Forgot your password?",
+    "recover_password": "Recover password",
+    "enter_email_recover": "Enter your email to recover your password",
+    "send_instructions": "Send instructions",
+    "back_to_login": "Back to login",
+    "no_account": "Don't have an account?",
+    "sign_up": "Sign up",
+    "processing": "Processing...",
+
+    // Register Form
+    "create_account": "Create account",
+    "register_access": "Register to access your voice agent account",
+    "your_name": "Your name",
+    "your_email": "your@example.com",
+    "password_min": "Password must be at least 6 characters",
+    "hide_password": "Hide password",
+    "show_password": "Show password",
+    "have_account": "Already have an account?",
+    "log_in": "Log in",
   },
   es: {
     // Navegación y Común
@@ -149,9 +192,30 @@ const translations: TranslationsType = {
     "spanish": "Español",
     "english": "English",
     
+    // Workspace Tab
+    "workspace_information": "Información del Espacio de Trabajo",
+    "manage_workspace": "Administra la configuración de tu espacio de trabajo",
+    "workspace_name": "Nombre del Espacio de Trabajo",
+    "description": "Descripción",
+    "plan": "Plan",
+    "parallel_calls": "Llamadas Paralelas",
+    "usage": "Uso",
+    "created": "Creado",
+    "upload_logo": "Subir Logo",
+    "your_workspace_name": "Nombre de tu espacio de trabajo",
+    "describe_workspace": "Describe tu espacio de trabajo",
+    "no_description": "Sin descripción",
+    "upgrade": "Mejorar",
+    "advanced_settings": "Configuración Avanzada",
+    "manage_advanced_settings": "Administra la configuración avanzada de tu espacio de trabajo",
+    "workspace_id": "ID del Espacio de Trabajo",
+    "workspace_id_copied": "ID del espacio de trabajo copiado al portapapeles",
+    "danger_zone": "Zona de Peligro",
+    "delete_workspace_warning": "Elimina permanentemente este espacio de trabajo y todos los datos asociados.",
+    "delete_workspace": "Eliminar Espacio de Trabajo",
+    
     // Billing
     "current_plan": "Plan Actual",
-    "upgrade": "Mejorar",
     "downgrade": "Degradar",
     "invoice_history": "Historial de Facturas",
     "payment_methods": "Métodos de Pago",
@@ -199,6 +263,28 @@ const translations: TranslationsType = {
     "custom_voice": "Personalización completa de voz",
     "dedicated_api": "API dedicada",
     "account_manager": "Gestor de cuenta dedicado",
+
+    // Login Form
+    "enter_credentials": "Ingresa tus credenciales para acceder a tu cuenta",
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "recover_password": "Recuperar contraseña",
+    "enter_email_recover": "Ingresa tu email para recuperar tu contraseña",
+    "send_instructions": "Enviar instrucciones",
+    "back_to_login": "Volver al inicio de sesión",
+    "no_account": "¿No tienes una cuenta?",
+    "sign_up": "Regístrate",
+    "processing": "Procesando...",
+
+    // Register Form
+    "create_account": "Crear cuenta",
+    "register_access": "Regístrate para acceder a tu cuenta de agente de voz",
+    "your_name": "Tu nombre",
+    "your_email": "tucorreo@ejemplo.com",
+    "password_min": "La contraseña debe tener al menos 6 caracteres",
+    "hide_password": "Ocultar contraseña",
+    "show_password": "Mostrar contraseña",
+    "have_account": "¿Ya tienes una cuenta?",
+    "log_in": "Inicia sesión",
   }
 };
 

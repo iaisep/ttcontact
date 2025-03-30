@@ -8,12 +8,14 @@ import { signInWithEmail, resetPassword } from "@/lib/supabase";
 import { getValidationError } from "@/lib/validators";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface LoginFormProps {
   switchToRegister: () => void;
 }
 
 const LoginForm = ({ switchToRegister }: LoginFormProps) => {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -53,13 +55,13 @@ const LoginForm = ({ switchToRegister }: LoginFormProps) => {
         // Handle login
         const { user, error } = await signInWithEmail(email, password);
         if (user && !error) {
-          toast.success("¡Inicio de sesión exitoso!");
+          toast.success(t("¡Inicio de sesión exitoso!"));
           navigate("/dashboard");
         }
       }
     } catch (error) {
       console.error("Auth error:", error);
-      toast.error("Error en la autenticación. Inténtalo de nuevo.");
+      toast.error(t("Error en la autenticación. Inténtalo de nuevo."));
     } finally {
       setLoading(false);
     }
@@ -69,23 +71,23 @@ const LoginForm = ({ switchToRegister }: LoginFormProps) => {
     <div className="animate-fade-in w-full max-w-md px-8 py-10">
       <div className="space-y-2 text-center mb-8">
         <h1 className="text-3xl font-bold tracking-tight">
-          {forgotPassword ? "Recuperar contraseña" : "Iniciar sesión"}
+          {forgotPassword ? t("recover_password") : t("login")}
         </h1>
         <p className="text-muted-foreground">
           {forgotPassword
-            ? "Ingresa tu email para recuperar tu contraseña"
-            : "Ingresa tus credenciales para acceder a tu cuenta"}
+            ? t("enter_email_recover")
+            : t("enter_credentials")}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("email")}</Label>
           <div className="relative">
             <Input
               id="email"
               type="email"
-              placeholder="nombre@ejemplo.com"
+              placeholder={t("your_email")}
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -106,13 +108,13 @@ const LoginForm = ({ switchToRegister }: LoginFormProps) => {
         {!forgotPassword && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password">{t("password")}</Label>
               <button
                 type="button"
                 onClick={() => setForgotPassword(true)}
                 className="text-sm text-primary hover:underline focus:outline-none"
               >
-                ¿Olvidaste tu contraseña?
+                {t("forgot_password")}
               </button>
             </div>
             <div className="relative">
@@ -133,7 +135,7 @@ const LoginForm = ({ switchToRegister }: LoginFormProps) => {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-label={showPassword ? t("hide_password") : t("show_password")}
               >
                 {showPassword ? (
                   <EyeOff size={18} className="opacity-70" />
@@ -177,13 +179,13 @@ const LoginForm = ({ switchToRegister }: LoginFormProps) => {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              Procesando...
+              {t("processing")}
             </span>
           ) : forgotPassword ? (
-            "Enviar instrucciones"
+            t("send_instructions")
           ) : (
             <span className="flex items-center justify-center">
-              <LogIn size={18} className="mr-2" /> Iniciar sesión
+              <LogIn size={18} className="mr-2" /> {t("login")}
             </span>
           )}
         </Button>
@@ -195,19 +197,19 @@ const LoginForm = ({ switchToRegister }: LoginFormProps) => {
               onClick={() => setForgotPassword(false)}
               className="text-sm text-primary hover:underline"
             >
-              Volver al inicio de sesión
+              {t("back_to_login")}
             </button>
           </div>
         ) : (
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              ¿No tienes una cuenta?{" "}
+              {t("no_account")}{" "}
               <button
                 type="button"
                 onClick={switchToRegister}
                 className="text-primary hover:underline font-medium"
               >
-                Regístrate
+                {t("sign_up")}
               </button>
             </p>
           </div>

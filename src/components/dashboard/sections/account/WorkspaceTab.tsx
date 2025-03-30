@@ -10,12 +10,14 @@ import { Building, CloudUpload, Save } from "lucide-react";
 import { toast } from 'sonner';
 import { Workspace } from './types';
 import { CopyIcon } from './CopyIcon';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface WorkspaceTabProps {
   workspace: Workspace | null;
 }
 
 const WorkspaceTab = ({ workspace }: WorkspaceTabProps) => {
+  const { t } = useLanguage();
   const [editingWorkspace, setEditingWorkspace] = useState(false);
   const [workspaceFormData, setWorkspaceFormData] = useState({
     name: workspace?.name || '',
@@ -25,11 +27,11 @@ const WorkspaceTab = ({ workspace }: WorkspaceTabProps) => {
   const updateWorkspace = async () => {
     try {
       // Logic would be implemented here for actual API calls
-      toast.success('Workspace updated successfully');
+      toast.success(t('Workspace updated successfully'));
       setEditingWorkspace(false);
     } catch (error) {
       console.error('Failed to update workspace:', error);
-      toast.error('Failed to update workspace');
+      toast.error(t('Failed to update workspace'));
     }
   };
 
@@ -37,9 +39,9 @@ const WorkspaceTab = ({ workspace }: WorkspaceTabProps) => {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Workspace Information</CardTitle>
+          <CardTitle>{t('workspace_information')}</CardTitle>
           <CardDescription>
-            Manage your workspace settings
+            {t('manage_workspace')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -58,60 +60,60 @@ const WorkspaceTab = ({ workspace }: WorkspaceTabProps) => {
               </div>
               <Button variant="outline" size="sm">
                 <CloudUpload className="h-4 w-4 mr-2" />
-                Upload Logo
+                {t('upload_logo')}
               </Button>
             </div>
             
             <div className="flex-1 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="workspace-name">Workspace Name</Label>
+                <Label htmlFor="workspace-name">{t('workspace_name')}</Label>
                 {editingWorkspace ? (
                   <Input
                     id="workspace-name"
                     value={workspaceFormData.name}
                     onChange={(e) => setWorkspaceFormData({ ...workspaceFormData, name: e.target.value })}
-                    placeholder="Your workspace name"
+                    placeholder={t('your_workspace_name')}
                   />
                 ) : (
                   <div className="flex justify-between items-center">
                     <p className="text-lg">{workspace?.name}</p>
                     <Button variant="ghost" size="sm" onClick={() => setEditingWorkspace(true)}>
-                      Edit
+                      {t('edit')}
                     </Button>
                   </div>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="workspace-description">Description</Label>
+                <Label htmlFor="workspace-description">{t('description')}</Label>
                 {editingWorkspace ? (
                   <Textarea
                     id="workspace-description"
                     value={workspaceFormData.description}
                     onChange={(e) => setWorkspaceFormData({ ...workspaceFormData, description: e.target.value })}
-                    placeholder="Describe your workspace"
+                    placeholder={t('describe_workspace')}
                     rows={3}
                   />
                 ) : (
-                  <p className="text-lg">{workspace?.description || 'No description provided'}</p>
+                  <p className="text-lg">{workspace?.description || t('no_description')}</p>
                 )}
               </div>
               
               <div className="space-y-2">
-                <Label>Plan</Label>
+                <Label>{t('plan')}</Label>
                 <div className="flex justify-between">
                   <p className="text-lg">{workspace?.plan}</p>
                   <Button variant="outline" size="sm">
-                    Upgrade
+                    {t('upgrade')}
                   </Button>
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label>Parallel Calls</Label>
+                <Label>{t('parallel_calls')}</Label>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Usage</span>
+                    <span>{t('usage')}</span>
                     <span>
                       {workspace?.parallel_calls_used} / {workspace?.parallel_calls_limit}
                     </span>
@@ -132,7 +134,7 @@ const WorkspaceTab = ({ workspace }: WorkspaceTabProps) => {
               </div>
               
               <div className="space-y-2">
-                <Label>Created</Label>
+                <Label>{t('created')}</Label>
                 <p className="text-lg">
                   {workspace?.created_at 
                     ? new Date(workspace.created_at).toLocaleDateString() 
@@ -149,11 +151,11 @@ const WorkspaceTab = ({ workspace }: WorkspaceTabProps) => {
                       description: workspace?.description || '',
                     });
                   }}>
-                    Cancel
+                    {t('cancel')}
                   </Button>
                   <Button onClick={updateWorkspace}>
                     <Save className="h-4 w-4 mr-2" />
-                    Save Changes
+                    {t('save')}
                   </Button>
                 </div>
               )}
@@ -164,20 +166,20 @@ const WorkspaceTab = ({ workspace }: WorkspaceTabProps) => {
       
       <Card>
         <CardHeader>
-          <CardTitle>Advanced Settings</CardTitle>
+          <CardTitle>{t('advanced_settings')}</CardTitle>
           <CardDescription>
-            Manage advanced workspace settings
+            {t('manage_advanced_settings')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Workspace ID</Label>
+            <Label>{t('workspace_id')}</Label>
             <div className="flex items-center gap-2">
               <code className="bg-muted px-2 py-1 rounded text-sm">{workspace?.id}</code>
               <Button variant="ghost" size="icon" onClick={() => {
                 if (workspace) {
                   navigator.clipboard.writeText(workspace.id);
-                  toast.success('Workspace ID copied to clipboard');
+                  toast.success(t('workspace_id_copied'));
                 }
               }}>
                 <CopyIcon className="h-4 w-4" />
@@ -188,11 +190,11 @@ const WorkspaceTab = ({ workspace }: WorkspaceTabProps) => {
           <Separator />
           
           <div>
-            <h3 className="text-lg font-medium text-destructive">Danger Zone</h3>
+            <h3 className="text-lg font-medium text-destructive">{t('danger_zone')}</h3>
             <p className="text-sm text-muted-foreground mt-1 mb-4">
-              Permanently delete this workspace and all associated data.
+              {t('delete_workspace_warning')}
             </p>
-            <Button variant="destructive">Delete Workspace</Button>
+            <Button variant="destructive">{t('delete_workspace')}</Button>
           </div>
         </CardContent>
       </Card>
