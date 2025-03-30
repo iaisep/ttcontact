@@ -10,7 +10,7 @@ const Dashboard = () => {
   const { sidebarCollapsed, setSidebarCollapsed } = useSidebarState();
 
   return (
-    <div className="min-h-screen bg-background flex w-full">
+    <div className="min-h-screen bg-background">
       <Toaster position="top-right" />
       <SidebarWrapper
         activeSection={activeSection}
@@ -18,9 +18,7 @@ const Dashboard = () => {
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
       >
-        <main className="flex-1 overflow-auto">
-          <DashboardContent activeSection={activeSection} />
-        </main>
+        <DashboardContent activeSection={activeSection} />
       </SidebarWrapper>
     </div>
   );

@@ -1,5 +1,4 @@
 
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Sidebar,
@@ -7,7 +6,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -16,7 +14,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import {
-  BookOpen,
+  Home,
   Users,
   BookText,
   Phone,
@@ -31,6 +29,8 @@ import {
   LogOut,
   ChevronRight,
   ChevronLeft,
+  Bell,
+  Rocket,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -65,164 +65,189 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
 
   const menuItems = [
     {
+      icon: Home,
+      title: "Inicio",
+      id: "home",
+    },
+    {
       icon: Users,
-      title: "Agents",
+      title: "Agentes",
       id: "agents",
     },
     {
       icon: BookText,
-      title: "Knowledge Base",
-      id: "knowledge-base",
+      title: "Campañas",
+      id: "campaigns",
     },
     {
       icon: Phone,
-      title: "Phone Numbers",
-      id: "phone-numbers",
-    },
-    {
-      icon: Upload,
-      title: "Batch Call",
-      id: "batch-call",
-    },
-    {
-      icon: History,
-      title: "Call History",
-      id: "call-history",
-    },
-    {
-      icon: BarChart3,
-      title: "Analytics",
-      id: "analytics",
-    },
-    {
-      icon: CreditCard,
-      title: "Billing",
-      id: "billing",
+      title: "Llamadas",
+      id: "calls",
     },
     {
       icon: Key,
-      title: "API Keys",
-      id: "api-keys",
+      title: "Integraciones",
+      id: "integrations",
     },
     {
       icon: Webhook,
-      title: "Webhooks",
-      id: "webhooks",
+      title: "Widgets",
+      id: "widgets",
     },
     {
       icon: UserCircle,
-      title: "Account Info",
-      id: "account-info",
+      title: "Contactos",
+      id: "contacts",
     },
     {
-      icon: HelpCircle,
-      title: "Help Center",
-      id: "help-center",
-      external: true,
-      url: "https://docs.retellai.com/",
+      icon: Upload,
+      title: "Tareas",
+      id: "tasks",
     },
+    {
+      icon: BarChart3,
+      title: "Organizaciones",
+      id: "organizations",
+    }
+  ];
+
+  const footerItems = [
+    {
+      icon: Bell,
+      title: "Notificaciones",
+      id: "notifications",
+    },
+    {
+      icon: Rocket,
+      title: "Academy",
+      id: "academy",
+      badge: "0%",
+    }
   ];
 
   return (
     <SidebarProvider defaultOpen={!sidebarCollapsed}>
-      <Sidebar variant="sidebar" className="border-r">
-        <SidebarHeader className="flex flex-col gap-2 px-3 pt-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback>RA</AvatarFallback>
-              </Avatar>
-              {!sidebarCollapsed && <h1 className="text-lg font-semibold">UISEP_IA</h1>}
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleSidebar} 
-              className="h-8 w-8"
-            >
-              {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-            </Button>
-          </div>
-          {!sidebarCollapsed && (
+      <div className="flex h-screen w-full">
+        <Sidebar variant="sidebar" className={`border-r transition-all duration-200 ${sidebarCollapsed ? "w-16" : "w-64"}`}>
+          <SidebarHeader className="flex flex-col gap-2 px-3 pt-4">
             <div className="flex items-center justify-between">
-              <select className="bg-background border border-input rounded px-2 py-1 text-xs w-full">
-                <option>My Workspace</option>
-                <option>Team Workspace</option>
-                <option>Enterprise Workspace</option>
-              </select>
+              <div className="flex items-center gap-2">
+                {sidebarCollapsed ? (
+                  <div className="flex justify-center w-full">
+                    <Home size={20} className="text-gray-500" />
+                  </div>
+                ) : (
+                  <>
+                    <Home size={20} className="text-gray-500" />
+                    <h1 className="text-lg font-medium text-gray-700">UISEP_IA</h1>
+                  </>
+                )}
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleSidebar} 
+                className={`h-8 w-8 absolute ${sidebarCollapsed ? "right-0 -mr-4" : "right-2"} top-1/2 transform -translate-y-1/2 bg-white border border-gray-200 rounded-full z-10 shadow-sm`}
+              >
+                {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+              </Button>
             </div>
-          )}
-        </SidebarHeader>
+          </SidebarHeader>
 
-        <SidebarContent>
-          <SidebarGroup>
-            {!sidebarCollapsed && <SidebarGroupLabel>Menu</SidebarGroupLabel>}
-            <SidebarGroupContent>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {menuItems.map((item) => (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton
+                        isActive={activeSection === item.id}
+                        onClick={() => setActiveSection(item.id)}
+                        tooltip={sidebarCollapsed ? item.title : undefined}
+                        className={`${activeSection === item.id ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'} ${sidebarCollapsed ? 'justify-center' : ''}`}
+                      >
+                        <item.icon size={20} className={`min-w-[20px] ${sidebarCollapsed ? 'mx-auto' : ''}`} />
+                        {!sidebarCollapsed && <span className="ml-3 font-medium">{item.title}</span>}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+
+          <SidebarFooter>
+            <SidebarSeparator className="my-2" />
+            <div className="px-2 py-2">
               <SidebarMenu>
-                {menuItems.map((item) => (
+                {footerItems.map((item) => (
                   <SidebarMenuItem key={item.id}>
                     <SidebarMenuButton
-                      asChild={item.external}
                       isActive={activeSection === item.id}
-                      onClick={() => {
-                        if (!item.external) {
-                          setActiveSection(item.id);
-                        }
-                      }}
+                      onClick={() => setActiveSection(item.id)}
                       tooltip={sidebarCollapsed ? item.title : undefined}
+                      className={`${activeSection === item.id ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'} ${sidebarCollapsed ? 'justify-center' : ''}`}
                     >
-                      {item.external ? (
-                        <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                          <item.icon size={18} className="min-w-[18px]" />
-                          {!sidebarCollapsed && <span className="ml-2">{item.title}</span>}
-                        </a>
-                      ) : (
-                        <button className="flex items-center w-full">
-                          <item.icon size={18} className="min-w-[18px]" />
-                          {!sidebarCollapsed && <span className="ml-2">{item.title}</span>}
-                        </button>
-                      )}
+                      <div className="flex items-center w-full">
+                        <item.icon size={20} className={`min-w-[20px] ${sidebarCollapsed ? 'mx-auto' : ''}`} />
+                        {!sidebarCollapsed && (
+                          <div className="flex justify-between items-center w-full">
+                            <span className="ml-3 font-medium">{item.title}</span>
+                            {item.badge && <span className="ml-auto text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-full">{item.badge}</span>}
+                          </div>
+                        )}
+                      </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-
-        <SidebarFooter>
-          <SidebarSeparator />
-          <div className="px-3 py-2">
-            {!sidebarCollapsed && (
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                <span>Pro Plan</span>
-                <span>10/20 Parallel Calls</span>
-              </div>
-            )}
-            <div className="flex items-center gap-2">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
+              
               {!sidebarCollapsed && (
-                <div className="flex flex-col text-xs">
-                  <span className="font-semibold">User Name</span>
-                  <span className="text-muted-foreground">user@example.com</span>
+                <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <div className="text-sm font-semibold text-gray-700">Uso de la organización</div>
+                  <div className="mt-2 flex justify-between text-xs text-gray-600">
+                    <span>Créditos:</span>
+                    <span>$0.00 restantes</span>
+                  </div>
+                  <div className="mt-1 flex justify-between text-xs text-gray-600">
+                    <span>Agentes:</span>
+                    <span>1 / 1 disponibles</span>
+                  </div>
+                  <div className="mt-1 w-full bg-gray-200 rounded-full h-1.5">
+                    <div className="bg-red-500 h-1.5 rounded-full w-full"></div>
+                  </div>
+                  <div className="mt-1 flex justify-between text-xs text-gray-600">
+                    <span className="flex items-center">
+                      <span className="inline-block mr-1 w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center text-xs">
+                        i
+                      </span>
+                      Campañas:
+                    </span>
+                    <span>0 / 1 disponibles</span>
+                  </div>
                 </div>
               )}
-              <button 
-                onClick={handleLogout}
-                className={`${sidebarCollapsed ? 'ml-0' : 'ml-auto'} text-muted-foreground hover:text-foreground`}
-                title="Log out"
-              >
-                <LogOut size={16} />
-              </button>
+              
+              <div className="mt-4">
+                <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : ''}`}>
+                  <Avatar className="h-8 w-8 border-2 border-white">
+                    <AvatarFallback className="bg-gray-200 text-gray-600">A</AvatarFallback>
+                  </Avatar>
+                  {!sidebarCollapsed && (
+                    <div className="ml-2">
+                      <div className="text-sm font-medium text-gray-700">Alberto Sanchez</div>
+                      <div className="text-xs text-gray-500 truncate">alberto.sanchez.pena@gmail.com</div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </SidebarFooter>
-      </Sidebar>
-      {children}
+          </SidebarFooter>
+        </Sidebar>
+        <main className={`flex-1 transition-all duration-200 overflow-auto`}>
+          {children}
+        </main>
+      </div>
     </SidebarProvider>
   );
 };
