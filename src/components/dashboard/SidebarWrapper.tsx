@@ -124,9 +124,14 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
   ];
 
   return (
-    <SidebarProvider defaultOpen={!sidebarCollapsed}>
-      <Sidebar variant="sidebar" className="border-r">
-        <SidebarHeader className="flex flex-col gap-2 px-3 pt-4">
+    <div className="flex min-h-screen w-full">
+      <div 
+        className={`border-r bg-white transition-all duration-300 ease-in-out ${
+          sidebarCollapsed ? 'w-[60px]' : 'w-[250px]'
+        }`}
+      >
+        {/* Header */}
+        <div className="border-b p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
@@ -139,13 +144,13 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
               variant="ghost" 
               size="icon" 
               onClick={toggleSidebar} 
-              className="h-8 w-8"
+              className="h-8 w-8 rounded-full bg-gray-100"
             >
               {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
             </Button>
           </div>
           {!sidebarCollapsed && (
-            <div className="flex items-center justify-between">
+            <div className="mt-2 flex items-center justify-between">
               <select className="bg-background border border-input rounded px-2 py-1 text-xs w-full">
                 <option>My Workspace</option>
                 <option>Team Workspace</option>
@@ -153,77 +158,95 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
               </select>
             </div>
           )}
-        </SidebarHeader>
+        </div>
 
-        <SidebarContent>
-          <SidebarGroup>
-            {!sidebarCollapsed && <SidebarGroupLabel>Menu</SidebarGroupLabel>}
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {menuItems.map((item) => (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      asChild={item.external}
-                      isActive={activeSection === item.id}
-                      onClick={() => {
-                        if (!item.external) {
-                          setActiveSection(item.id);
-                        }
-                      }}
-                      tooltip={sidebarCollapsed ? item.title : undefined}
-                    >
-                      {item.external ? (
-                        <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                          <item.icon size={18} className="min-w-[18px]" />
-                          {!sidebarCollapsed && <span className="ml-2">{item.title}</span>}
-                        </a>
-                      ) : (
-                        <button className="flex items-center w-full">
-                          <item.icon size={18} className="min-w-[18px]" />
-                          {!sidebarCollapsed && <span className="ml-2">{item.title}</span>}
-                        </button>
-                      )}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
+        {/* Main Menu */}
+        <div className="py-2">
+          <ul>
+            {menuItems.map((item) => (
+              <li key={item.id}>
+                <button
+                  className={`flex items-center w-full px-4 py-2.5 transition-colors ${
+                    activeSection === item.id 
+                      ? 'bg-blue-50 text-blue-600 font-medium' 
+                      : 'text-gray-500 hover:bg-gray-50'
+                  }`}
+                  onClick={() => {
+                    if (!item.external) {
+                      setActiveSection(item.id);
+                    }
+                  }}
+                >
+                  <item.icon size={20} className="min-w-[20px]" />
+                  {!sidebarCollapsed && <span className="ml-3">{item.title}</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        <SidebarFooter>
-          <SidebarSeparator />
-          <div className="px-3 py-2">
-            {!sidebarCollapsed && (
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                <span>Pro Plan</span>
-                <span>10/20 Parallel Calls</span>
+        {/* Footer */}
+        <div className="absolute bottom-0 w-full border-t">
+          {!sidebarCollapsed && (
+            <div className="p-4">
+              <div className="rounded-lg bg-gray-50 p-3 mb-3">
+                <h3 className="font-medium text-sm mb-2">Organization Usage</h3>
+                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <span>Credits:</span>
+                  <span>$0.00 remaining</span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <span>Agents:</span>
+                  <span>1/1 available</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                  <div className="bg-red-500 h-1.5 rounded-full w-full"></div>
+                </div>
+                <div className="flex items-center text-xs text-gray-500">
+                  <div className="w-4 h-4 mr-1 flex items-center justify-center">
+                    <div className="rounded-full w-3 h-3 flex items-center justify-center border border-gray-500">
+                      <span className="text-[8px]">i</span>
+                    </div>
+                  </div>
+                  <span>Campaigns:</span>
+                  <span className="ml-auto">0/1 available</span>
+                </div>
               </div>
-            )}
-            <div className="flex items-center gap-2">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src="/placeholder.svg" />
+              <div className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>U</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="text-sm font-medium">User Name</div>
+                  <div className="text-xs text-gray-500">user@example.com</div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <LogOut size={18} />
+                </button>
+              </div>
+            </div>
+          )}
+          {sidebarCollapsed && (
+            <div className="p-2 flex flex-col items-center gap-4">
+              <button className="p-2 text-gray-500 hover:text-gray-700">
+                <HelpCircle size={20} />
+              </button>
+              <Avatar className="h-8 w-8">
                 <AvatarFallback>U</AvatarFallback>
               </Avatar>
-              {!sidebarCollapsed && (
-                <div className="flex flex-col text-xs">
-                  <span className="font-semibold">User Name</span>
-                  <span className="text-muted-foreground">user@example.com</span>
-                </div>
-              )}
-              <button 
-                onClick={handleLogout}
-                className={`${sidebarCollapsed ? 'ml-0' : 'ml-auto'} text-muted-foreground hover:text-foreground`}
-                title="Log out"
-              >
-                <LogOut size={16} />
-              </button>
             </div>
-          </div>
-        </SidebarFooter>
-      </Sidebar>
-      {children}
-    </SidebarProvider>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className={`flex-1 transition-all duration-300`}>
+        {children}
+      </main>
+    </div>
   );
 };
 
