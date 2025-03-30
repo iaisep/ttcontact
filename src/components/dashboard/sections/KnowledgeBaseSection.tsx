@@ -35,6 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Plus, Pencil, Trash2, Search, BookText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
+import { PaginationControls } from '@/components/ui/pagination';
 
 interface KnowledgeEntry {
   id: string;
@@ -54,6 +55,10 @@ const KnowledgeBaseSection = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [currentEntry, setCurrentEntry] = useState<KnowledgeEntry | null>(null);
   const [agents, setAgents] = useState<any[]>([]);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     fetchEntries();
@@ -130,6 +135,17 @@ const KnowledgeBaseSection = () => {
     entry.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Get paginated data
+  const paginatedEntries = filteredEntries.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  // Reset to first page when search query or page size changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, pageSize]);
+
   const handleCreateClick = () => {
     setIsCreating(true);
     setCurrentEntry(null);
@@ -168,83 +184,96 @@ const KnowledgeBaseSection = () => {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="border rounded-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Content</TableHead>
-                <TableHead>Agent</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredEntries.length === 0 ? (
+        <>
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    <div className="flex flex-col items-center gap-2">
-                      <BookText className="h-8 w-8 text-muted-foreground" />
-                      <p>No knowledge base entries found</p>
-                      <Button variant="outline" size="sm" onClick={handleCreateClick}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Your First Entry
-                      </Button>
-                    </div>
-                  </TableCell>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Content</TableHead>
+                  <TableHead>Agent</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ) : (
-                filteredEntries.map((entry) => (
-                  <TableRow key={entry.id}>
-                    <TableCell className="font-medium">{entry.title}</TableCell>
-                    <TableCell>
-                      {entry.content.length > 100
-                        ? `${entry.content.substring(0, 100)}...`
-                        : entry.content}
-                    </TableCell>
-                    <TableCell>
-                      {entry.agent_id
-                        ? agents.find(a => a.id === entry.agent_id)?.name || entry.agent_id
-                        : 'All Agents'}
-                    </TableCell>
-                    <TableCell>{new Date(entry.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(entry)}>
-                          <Pencil className="h-4 w-4" />
+              </TableHeader>
+              <TableBody>
+                {paginatedEntries.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      <div className="flex flex-col items-center gap-2">
+                        <BookText className="h-8 w-8 text-muted-foreground" />
+                        <p>No knowledge base entries found</p>
+                        <Button variant="outline" size="sm" onClick={handleCreateClick}>
+                          <Plus className="mr-2 h-4 w-4" />
+                          Add Your First Entry
                         </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Entry</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete "{entry.title}"? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction 
-                                className="bg-destructive text-destructive-foreground"
-                                onClick={() => deleteEntry(entry.id)}
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ) : (
+                  paginatedEntries.map((entry) => (
+                    <TableRow key={entry.id}>
+                      <TableCell className="font-medium">{entry.title}</TableCell>
+                      <TableCell>
+                        {entry.content.length > 100
+                          ? `${entry.content.substring(0, 100)}...`
+                          : entry.content}
+                      </TableCell>
+                      <TableCell>
+                        {entry.agent_id
+                          ? agents.find(a => a.id === entry.agent_id)?.name || entry.agent_id
+                          : 'All Agents'}
+                      </TableCell>
+                      <TableCell>{new Date(entry.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => handleEditClick(entry)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Entry</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "{entry.title}"? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction 
+                                  className="bg-destructive text-destructive-foreground"
+                                  onClick={() => deleteEntry(entry.id)}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          
+          {filteredEntries.length > 0 && (
+            <PaginationControls
+              totalItems={filteredEntries.length}
+              pageSize={pageSize}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+              pageSizeOptions={[10, 25, 50]}
+            />
+          )}
+        </>
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

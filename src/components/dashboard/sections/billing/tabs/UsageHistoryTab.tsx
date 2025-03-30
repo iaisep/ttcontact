@@ -1,9 +1,11 @@
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { UsageData, UsageHistoryItem } from '../types';
 import { formatCurrency } from '../utils/BillingUtils';
+import { PaginationControls } from '@/components/ui/pagination';
 
 interface UsageHistoryTabProps {
   usageHistory: UsageHistoryItem[];
@@ -11,6 +13,36 @@ interface UsageHistoryTabProps {
 }
 
 const UsageHistoryTab = ({ usageHistory, usage }: UsageHistoryTabProps) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  
+  // Generate mock monthly data for the table display
+  const monthlyData = [
+    { month: 'Abril 2025', voice_minutes: usage?.voice_minutes || 0, api_calls: usage?.api_calls || 0, phone_numbers: usage?.phone_numbers || 0, total_cost: usage?.total_cost || 0 },
+    { month: 'Marzo 2025', voice_minutes: 3840, api_calls: 15420, phone_numbers: 5, total_cost: 289.50 },
+    { month: 'Febrero 2025', voice_minutes: 3275, api_calls: 12840, phone_numbers: 4, total_cost: 245.75 },
+    { month: 'Enero 2025', voice_minutes: 2890, api_calls: 11230, phone_numbers: 4, total_cost: 220.15 },
+    { month: 'Diciembre 2024', voice_minutes: 2540, api_calls: 9875, phone_numbers: 3, total_cost: 195.80 },
+    { month: 'Noviembre 2024', voice_minutes: 2320, api_calls: 8740, phone_numbers: 3, total_cost: 178.50 },
+    { month: 'Octubre 2024', voice_minutes: 2150, api_calls: 7920, phone_numbers: 3, total_cost: 164.25 },
+    { month: 'Septiembre 2024', voice_minutes: 1980, api_calls: 7150, phone_numbers: 2, total_cost: 149.75 },
+    { month: 'Agosto 2024', voice_minutes: 1820, api_calls: 6540, phone_numbers: 2, total_cost: 137.50 },
+    { month: 'Julio 2024', voice_minutes: 1640, api_calls: 5820, phone_numbers: 2, total_cost: 124.80 },
+    { month: 'Junio 2024', voice_minutes: 1490, api_calls: 5160, phone_numbers: 2, total_cost: 115.20 },
+    { month: 'Mayo 2024', voice_minutes: 1280, api_calls: 4520, phone_numbers: 1, total_cost: 98.60 },
+  ];
+  
+  // Get paginated data
+  const paginatedMonthlyData = monthlyData.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+  
+  // Reset to first page when page size changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [pageSize]);
+  
   return (
     <div className="space-y-4">
       <Card>
@@ -58,7 +90,7 @@ const UsageHistoryTab = ({ usageHistory, usage }: UsageHistoryTabProps) => {
             Comparar uso entre meses
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <Table>
             <TableHeader>
               <TableRow>
@@ -70,29 +102,26 @@ const UsageHistoryTab = ({ usageHistory, usage }: UsageHistoryTabProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">Abril 2025</TableCell>
-                <TableCell>{usage?.voice_minutes?.toLocaleString()}</TableCell>
-                <TableCell>{usage?.api_calls?.toLocaleString()}</TableCell>
-                <TableCell>{usage?.phone_numbers}</TableCell>
-                <TableCell className="text-right">{formatCurrency(usage?.total_cost ?? 0)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Marzo 2025</TableCell>
-                <TableCell>3,840</TableCell>
-                <TableCell>15,420</TableCell>
-                <TableCell>5</TableCell>
-                <TableCell className="text-right">{formatCurrency(289.50)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Febrero 2025</TableCell>
-                <TableCell>3,275</TableCell>
-                <TableCell>12,840</TableCell>
-                <TableCell>4</TableCell>
-                <TableCell className="text-right">{formatCurrency(245.75)}</TableCell>
-              </TableRow>
+              {paginatedMonthlyData.map((month, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">{month.month}</TableCell>
+                  <TableCell>{month.voice_minutes.toLocaleString()}</TableCell>
+                  <TableCell>{month.api_calls.toLocaleString()}</TableCell>
+                  <TableCell>{month.phone_numbers}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(month.total_cost)}</TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
+          
+          <PaginationControls
+            totalItems={monthlyData.length}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            pageSizeOptions={[5, 10, 12]}
+          />
         </CardContent>
       </Card>
     </div>

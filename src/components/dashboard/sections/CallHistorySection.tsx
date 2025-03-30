@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -29,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from '@/components/ui/label';
 import { Loader2, Search, History, Phone, Play, Mic, Download, Calendar, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+import { PaginationControls } from '@/components/ui/pagination';
 
 interface Call {
   id: string;
@@ -56,8 +56,10 @@ const CallHistorySection = () => {
   const [agents, setAgents] = useState<any[]>([]);
   const [dateFilter, setDateFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('all');
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  // Mock data for UI demonstration
   const mockCalls: Call[] = [
     {
       id: '1',
@@ -121,22 +123,6 @@ const CallHistorySection = () => {
     },
   ];
 
-  const mockTranscript = {
-    call_id: '1',
-    turns: [
-      { speaker: 'agent', text: 'Hello, this is AI assistant from Retell AI. How can I help you today?', timestamp: '00:00' },
-      { speaker: 'caller', text: 'Hi, I\'m calling about your services. What kind of voice AI solutions do you offer?', timestamp: '00:05' },
-      { speaker: 'agent', text: 'We offer a range of voice AI solutions including conversational agents that can handle customer service, sales calls, appointment scheduling, and more. Our agents are designed to sound natural and can be customized for your specific needs.', timestamp: '00:12' },
-      { speaker: 'caller', text: 'That sounds interesting. How much does it cost to set up?', timestamp: '00:28' },
-      { speaker: 'agent', text: 'Our pricing is based on usage. We charge per minute of call time with our AI agents. Plans start at $0.05 per minute with volume discounts available. Would you like me to send you our detailed pricing information?', timestamp: '00:32' },
-      { speaker: 'caller', text: 'Yes, please email it to me at john@example.com.', timestamp: '00:45' },
-      { speaker: 'agent', text: 'Great! I\'ll send that information to john@example.com right away. Is there anything else I can help you with today?', timestamp: '00:48' },
-      { speaker: 'caller', text: 'No, that\'s all. Thank you for your help.', timestamp: '00:56' },
-      { speaker: 'agent', text: 'You\'re welcome! Thank you for your interest in Retell AI. Have a great day!', timestamp: '01:00' },
-    ]
-  };
-
-  // Use mock data for UI demonstration
   useEffect(() => {
     fetchAgents();
     setCalls(mockCalls);
@@ -149,7 +135,6 @@ const CallHistorySection = () => {
       setAgents(data);
     } catch (error) {
       console.error('Failed to fetch agents:', error);
-      // Mock data for UI demonstration
       setAgents([
         { id: 'agent_1', name: 'Sales Agent' },
         { id: 'agent_2', name: 'Support Agent' },
@@ -161,10 +146,6 @@ const CallHistorySection = () => {
   const fetchTranscript = async (callId: string) => {
     setTranscriptLoading(true);
     try {
-      // In a real app, this would fetch from API
-      // const data = await fetchWithAuth(`/calls/${callId}/transcript`);
-      
-      // Simulate API call with mock data
       await new Promise(resolve => setTimeout(resolve, 1000));
       setTranscript(mockTranscript);
     } catch (error) {
@@ -245,6 +226,15 @@ const CallHistorySection = () => {
     return matchesSearch && matchesDirection && matchesDate;
   });
 
+  const paginatedCalls = filteredCalls.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeTab, dateFilter, pageSize]);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -317,81 +307,94 @@ const CallHistorySection = () => {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="border rounded-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Direction</TableHead>
-                <TableHead>Number</TableHead>
-                <TableHead>Agent</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCalls.length === 0 ? (
+        <>
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    <div className="flex flex-col items-center gap-2">
-                      <History className="h-8 w-8 text-muted-foreground" />
-                      <p>No call history found</p>
-                    </div>
-                  </TableCell>
+                  <TableHead>Direction</TableHead>
+                  <TableHead>Number</TableHead>
+                  <TableHead>Agent</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ) : (
-                filteredCalls.map((call) => (
-                  <TableRow key={call.id}>
-                    <TableCell>
-                      <div className="flex items-center">
-                        {getDirectionIcon(call.direction)}
-                        <span className="ml-2 capitalize">{call.direction}</span>
+              </TableHeader>
+              <TableBody>
+                {paginatedCalls.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      <div className="flex flex-col items-center gap-2">
+                        <History className="h-8 w-8 text-muted-foreground" />
+                        <p>No call history found</p>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{call.phone_number}</div>
-                        {call.caller_name && (
-                          <div className="text-xs text-muted-foreground">{call.caller_name}</div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {agents.find(a => a.id === call.agent_id)?.name || call.agent_id}
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div>{new Date(call.started_at).toLocaleDateString()}</div>
-                        <div className="text-xs text-muted-foreground flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {new Date(call.started_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {formatDuration(call.duration)}
-                    </TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(call.status)}`}>
-                        {call.status.charAt(0).toUpperCase() + call.status.slice(1)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => viewCallDetails(call)}
-                      >
-                        View Details
-                      </Button>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ) : (
+                  paginatedCalls.map((call) => (
+                    <TableRow key={call.id}>
+                      <TableCell>
+                        <div className="flex items-center">
+                          {getDirectionIcon(call.direction)}
+                          <span className="ml-2 capitalize">{call.direction}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{call.phone_number}</div>
+                          {call.caller_name && (
+                            <div className="text-xs text-muted-foreground">{call.caller_name}</div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {agents.find(a => a.id === call.agent_id)?.name || call.agent_id}
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <div>{new Date(call.started_at).toLocaleDateString()}</div>
+                          <div className="text-xs text-muted-foreground flex items-center">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {new Date(call.started_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {formatDuration(call.duration)}
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(call.status)}`}>
+                          {call.status.charAt(0).toUpperCase() + call.status.slice(1)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => viewCallDetails(call)}
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          
+          {filteredCalls.length > 0 && (
+            <PaginationControls
+              totalItems={filteredCalls.length}
+              pageSize={pageSize}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+              pageSizeOptions={[10, 25, 50]}
+            />
+          )}
+        </>
       )}
 
       {selectedCall && (

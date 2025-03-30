@@ -1,8 +1,11 @@
+
 import * as React from "react"
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
+import { ChevronLeft, ChevronRight, MoreHorizontal, ChevronsLeft, ChevronsRight } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { ButtonProps, buttonVariants } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
@@ -91,6 +94,36 @@ const PaginationNext = ({
 )
 PaginationNext.displayName = "PaginationNext"
 
+const PaginationFirst = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationLink>) => (
+  <PaginationLink
+    aria-label="Go to first page"
+    size="icon"
+    className={cn(className)}
+    {...props}
+  >
+    <ChevronsLeft className="h-4 w-4" />
+  </PaginationLink>
+)
+PaginationFirst.displayName = "PaginationFirst"
+
+const PaginationLast = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationLink>) => (
+  <PaginationLink
+    aria-label="Go to last page"
+    size="icon"
+    className={cn(className)}
+    {...props}
+  >
+    <ChevronsRight className="h-4 w-4" />
+  </PaginationLink>
+)
+PaginationLast.displayName = "PaginationLast"
+
 const PaginationEllipsis = ({
   className,
   ...props
@@ -106,6 +139,145 @@ const PaginationEllipsis = ({
 )
 PaginationEllipsis.displayName = "PaginationEllipsis"
 
+interface PaginationControlsProps {
+  totalItems: number
+  pageSize: number
+  currentPage: number
+  onPageChange: (page: number) => void
+  onPageSizeChange: (size: number) => void
+  className?: string
+  pageSizeOptions?: number[]
+}
+
+const PaginationControls = ({
+  totalItems,
+  pageSize,
+  currentPage,
+  onPageChange,
+  onPageSizeChange,
+  className,
+  pageSizeOptions = [10, 25, 50]
+}: PaginationControlsProps) => {
+  const totalPages = Math.ceil(totalItems / pageSize);
+  
+  // Generate page items
+  const generatePaginationItems = () => {
+    const items = [];
+    const showEllipsisStart = currentPage > 3;
+    const showEllipsisEnd = currentPage < totalPages - 2;
+    
+    // Always show first page
+    items.push(
+      <PaginationItem key="first">
+        <PaginationFirst onClick={() => onPageChange(1)} />
+      </PaginationItem>
+    );
+    
+    items.push(
+      <PaginationItem key="prev">
+        <PaginationPrevious 
+          onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+          aria-disabled={currentPage === 1}
+          className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+        />
+      </PaginationItem>
+    );
+    
+    // Show ellipsis at start if needed
+    if (showEllipsisStart) {
+      items.push(
+        <PaginationItem key="ellipsis-start">
+          <PaginationEllipsis />
+        </PaginationItem>
+      );
+    }
+    
+    // Calculate visible page range
+    let startPage = Math.max(1, currentPage - 1);
+    let endPage = Math.min(totalPages, currentPage + 1);
+    
+    // Adjust if at edges
+    if (currentPage <= 2) {
+      endPage = Math.min(totalPages, 3);
+    } else if (currentPage >= totalPages - 1) {
+      startPage = Math.max(1, totalPages - 2);
+    }
+    
+    // Generate numbered pages
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink 
+            isActive={currentPage === i}
+            onClick={() => onPageChange(i)}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    // Show ellipsis at end if needed
+    if (showEllipsisEnd) {
+      items.push(
+        <PaginationItem key="ellipsis-end">
+          <PaginationEllipsis />
+        </PaginationItem>
+      );
+    }
+    
+    items.push(
+      <PaginationItem key="next">
+        <PaginationNext 
+          onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+          aria-disabled={currentPage === totalPages}
+          className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+        />
+      </PaginationItem>
+    );
+    
+    // Always show last page
+    items.push(
+      <PaginationItem key="last">
+        <PaginationLast onClick={() => onPageChange(totalPages)} />
+      </PaginationItem>
+    );
+    
+    return items;
+  };
+  
+  return (
+    <div className={cn("flex flex-col sm:flex-row items-center justify-between mt-4 gap-4", className)}>
+      <div className="flex items-center gap-2">
+        <Label htmlFor="page-size" className="text-sm whitespace-nowrap">Items por página:</Label>
+        <Select 
+          value={String(pageSize)}
+          onValueChange={(value) => onPageSizeChange(Number(value))}
+        >
+          <SelectTrigger id="page-size" className="w-[80px]">
+            <SelectValue placeholder={pageSize} />
+          </SelectTrigger>
+          <SelectContent>
+            {pageSizeOptions.map(size => (
+              <SelectItem key={size} value={String(size)}>{size}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="flex items-center text-sm text-muted-foreground">
+        Mostrando {Math.min((currentPage - 1) * pageSize + 1, totalItems)} a {Math.min(currentPage * pageSize, totalItems)} de {totalItems} resultados
+      </div>
+      
+      <Pagination>
+        <PaginationContent>
+          {generatePaginationItems()}
+        </PaginationContent>
+      </Pagination>
+    </div>
+  );
+};
+
 export {
   Pagination,
   PaginationContent,
@@ -114,4 +286,7 @@ export {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationFirst,
+  PaginationLast,
+  PaginationControls,
 }
