@@ -37,6 +37,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Plus, Pencil, Trash2, Search, Filter, FileUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
+import { PaginationControls } from '@/components/ui/pagination';
 
 interface Agent {
   agent_id: string;
@@ -58,10 +59,19 @@ const AgentsSection = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentAgent, setCurrentAgent] = useState<Agent | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     fetchAgents();
   }, []);
+
+  // Reset to first page when search query, folder filter, or page size changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, folderFilter, pageSize]);
 
   const fetchAgents = async () => {
     setLoading(true);
@@ -131,6 +141,12 @@ const AgentsSection = () => {
     return matchesSearch && matchesFolder;
   });
 
+  // Get paginated data
+  const paginatedAgents = filteredAgents.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   const folders = [...new Set(agents.map(agent => agent.folder).filter(Boolean))];
 
   const handleCreateClick = () => {
@@ -190,70 +206,83 @@ const AgentsSection = () => {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="border rounded-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Folder</TableHead>
-                <TableHead>Voice ID</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAgents.length === 0 ? (
+        <>
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    No agents found. Create one to get started.
-                  </TableCell>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Folder</TableHead>
+                  <TableHead>Voice ID</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ) : (
-                filteredAgents.map((agent) => (
-                  <TableRow key={agent.agent_id}>
-                    <TableCell className="font-medium">{agent.name}</TableCell>
-                    <TableCell>{agent.agent_type ? agent.agent_type.substring(0, 50) + '...' : '-'}</TableCell>
-                    <TableCell>{agent.folder || '-'}</TableCell>
-                    <TableCell>{agent.voice_id}</TableCell>
-                    <TableCell>{new Date(agent.last_modification_timestamp).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => handleEditClick(agent)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Agent</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete the agent "{agent.name}"? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction 
-                                className="bg-destructive text-destructive-foreground"
-                                onClick={() => deleteAgent(agent.agent_id)}
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {paginatedAgents.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      No agents found. Create one to get started.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ) : (
+                  paginatedAgents.map((agent) => (
+                    <TableRow key={agent.agent_id}>
+                      <TableCell className="font-medium">{agent.name}</TableCell>
+                      <TableCell>{agent.agent_type ? agent.agent_type.substring(0, 50) + '...' : '-'}</TableCell>
+                      <TableCell>{agent.folder || '-'}</TableCell>
+                      <TableCell>{agent.voice_id}</TableCell>
+                      <TableCell>{new Date(agent.last_modification_timestamp).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => handleEditClick(agent)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Agent</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete the agent "{agent.name}"? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction 
+                                  className="bg-destructive text-destructive-foreground"
+                                  onClick={() => deleteAgent(agent.agent_id)}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          
+          {filteredAgents.length > 0 && (
+            <PaginationControls
+              totalItems={filteredAgents.length}
+              pageSize={pageSize}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+              pageSizeOptions={[10, 25, 50]}
+            />
+          )}
+        </>
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
