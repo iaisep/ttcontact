@@ -7,11 +7,33 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { DialogFooter } from '@/components/ui/dialog';
 import { Agent } from './types';
+import { useLanguage } from '@/context/LanguageContext';
+
+interface RetellVoice {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
+interface RetellFolder {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
+interface RetellLLM {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
 
 interface AgentFormProps {
   initialAgent: Agent | null;
   onSubmit: (data: Agent) => void;
   onCancel: () => void;
+  voices?: RetellVoice[];
+  folders?: RetellFolder[];
+  llms?: RetellLLM[];
 }
 
 type FormValues = {
@@ -21,7 +43,15 @@ type FormValues = {
   folder: string;
 };
 
-const AgentForm: React.FC<AgentFormProps> = ({ initialAgent, onSubmit, onCancel }) => {
+const AgentForm: React.FC<AgentFormProps> = ({ 
+  initialAgent, 
+  onSubmit, 
+  onCancel,
+  voices = [],
+  folders = [],
+  llms = []
+}) => {
+  const { t } = useLanguage();
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
       name: initialAgent?.name || '',
@@ -44,11 +74,11 @@ const AgentForm: React.FC<AgentFormProps> = ({ initialAgent, onSubmit, onCancel 
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div className="grid gap-4 py-4">
         <div className="grid gap-2">
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name">{t('name')}</Label>
           <Input
             id="name"
-            {...register('name', { required: 'Name is required' })}
-            placeholder="Agent name"
+            {...register('name', { required: t('name_required') })}
+            placeholder={t('agent_name_placeholder')}
           />
           {errors.name && (
             <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -56,11 +86,11 @@ const AgentForm: React.FC<AgentFormProps> = ({ initialAgent, onSubmit, onCancel 
         </div>
         
         <div className="grid gap-2">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description">{t('description')}</Label>
           <Textarea
             id="description"
-            {...register('description', { required: 'Description is required' })}
-            placeholder="Describe what this agent does"
+            {...register('description', { required: t('description_required') })}
+            placeholder={t('agent_description_placeholder')}
             rows={3}
           />
           {errors.description && (
@@ -69,18 +99,29 @@ const AgentForm: React.FC<AgentFormProps> = ({ initialAgent, onSubmit, onCancel 
         </div>
         
         <div className="grid gap-2">
-          <Label htmlFor="voice_id">Voice ID</Label>
+          <Label htmlFor="voice_id">{t('voice_id')}</Label>
           <select
             id="voice_id"
-            {...register('voice_id', { required: 'Voice ID is required' })}
+            {...register('voice_id', { required: t('voice_id_required') })}
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
           >
-            <option value="eleven_labs_emily">Eleven Labs - Emily</option>
-            <option value="eleven_labs_josh">Eleven Labs - Josh</option>
-            <option value="eleven_labs_rachel">Eleven Labs - Rachel</option>
-            <option value="eleven_labs_sam">Eleven Labs - Sam</option>
-            <option value="deepgram_nova">Deepgram - Nova</option>
-            <option value="deepgram_aura">Deepgram - Aura</option>
+            {voices && voices.length > 0 ? (
+              voices.map((voice) => (
+                <option key={voice.id} value={voice.id}>
+                  {voice.name}
+                </option>
+              ))
+            ) : (
+              // Fallback options if no voices are provided
+              <>
+                <option value="eleven_labs_emily">Eleven Labs - Emily</option>
+                <option value="eleven_labs_josh">Eleven Labs - Josh</option>
+                <option value="eleven_labs_rachel">Eleven Labs - Rachel</option>
+                <option value="eleven_labs_sam">Eleven Labs - Sam</option>
+                <option value="deepgram_nova">Deepgram - Nova</option>
+                <option value="deepgram_aura">Deepgram - Aura</option>
+              </>
+            )}
           </select>
           {errors.voice_id && (
             <p className="text-sm text-destructive">{errors.voice_id.message}</p>
@@ -88,19 +129,26 @@ const AgentForm: React.FC<AgentFormProps> = ({ initialAgent, onSubmit, onCancel 
         </div>
         
         <div className="grid gap-2">
-          <Label htmlFor="folder">Folder (Optional)</Label>
-          <Input
+          <Label htmlFor="folder">{t('folder')}</Label>
+          <select
             id="folder"
             {...register('folder')}
-            placeholder="Optional folder to organize agents"
-          />
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+          >
+            <option value="">{t('no_folder')}</option>
+            {folders && folders.length > 0 && folders.map((folder) => (
+              <option key={folder.id} value={folder.id}>
+                {folder.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel} className="mr-2">
-          Cancel
+          {t('cancel')}
         </Button>
-        <Button type="submit">{initialAgent ? 'Update Agent' : 'Create Agent'}</Button>
+        <Button type="submit">{initialAgent ? t('update_agent') : t('create_agent')}</Button>
       </DialogFooter>
     </form>
   );

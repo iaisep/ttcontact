@@ -2,17 +2,19 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search, Filter, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface AgentsToolbarProps {
   onAddAgent: () => void;
   onImportAgents: () => void;
+  onRefreshAgents: () => void;
 }
 
 const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
   onAddAgent,
   onImportAgents,
+  onRefreshAgents,
 }) => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,6 +34,9 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
           </Button>
           <Button variant="outline" onClick={onImportAgents}>
             {t('import')}
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onRefreshAgents} title={t('refresh')}>
+            <RefreshCw className="h-4 w-4" />
           </Button>
         </div>
       </div>
