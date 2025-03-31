@@ -70,17 +70,17 @@ const PricingSection = () => {
   ];
 
   const handlePlanSelect = async (plan: typeof plans[0]) => {
-    // Para el plan Empresa, simplemente redirigir a contacto
-    if (plan.name === "Empresa") {
+    // For the Enterprise plan, simply redirect to contact
+    if (plan.name === t("enterprise_plan")) {
       navigate("#contact");
       return;
     }
 
-    // Si el usuario no está autenticado, redirigir a login
+    // If the user is not authenticated, redirect to login
     if (!isAuthenticated) {
-      // Guardar el plan seleccionado en localStorage para recuperarlo después del login
+      // Save the selected plan in localStorage to retrieve it after login
       localStorage.setItem('selectedPlan', plan.priceId);
-      toast.info("Necesitas iniciar sesión para continuar");
+      toast.info(t("login_required"));
       navigate("/login");
       return;
     }
@@ -88,7 +88,7 @@ const PricingSection = () => {
     try {
       setIsLoading(prev => ({ ...prev, [plan.priceId]: true }));
       
-      // Llamada a nuestra función edge para crear la sesión de checkout
+      // Call our edge function to create the checkout session
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
@@ -102,23 +102,25 @@ const PricingSection = () => {
       });
 
       if (!response.ok) {
-        throw new Error('No se pudo iniciar el proceso de pago');
+        throw new Error(t("payment_process_error"));
       }
 
       const { url } = await response.json();
       
-      // Redirigir a la página de checkout de Stripe
+      // Redirect to Stripe checkout page
       window.location.href = url;
     } catch (error) {
-      console.error('Error al procesar el pago:', error);
-      toast.error('Hubo un error al procesar tu solicitud');
+      console.error('Error processing payment:', error);
+      toast.error(t("request_error"));
     } finally {
       setIsLoading(prev => ({ ...prev, [plan.priceId]: false }));
     }
   };
 
   return (
-    <section id="pricing" className="py-20">
+    <section id="pricing" className="py-24 relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/20 to-white dark:from-indigo-950/10 dark:to-gray-950 -z-10"></div>
+      
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <motion.span 
@@ -150,7 +152,7 @@ const PricingSection = () => {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={index}
@@ -158,10 +160,10 @@ const PricingSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`rounded-xl border ${
+              className={`rounded-2xl border ${
                 plan.popular 
-                  ? "border-indigo-500 shadow-lg relative" 
-                  : "border-gray-200 shadow-sm"
+                  ? "border-indigo-500 shadow-xl relative" 
+                  : "border-gray-200 shadow-md"
               } bg-white dark:bg-gray-800 overflow-hidden`}
             >
               {plan.popular && (
@@ -171,7 +173,7 @@ const PricingSection = () => {
                   </div>
                 </div>
               )}
-              <div className="p-6">
+              <div className="p-8">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{plan.name}</h3>
                 <div className="mb-4">
                   <span className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -185,7 +187,7 @@ const PricingSection = () => {
                 <p className="text-gray-600 dark:text-gray-400 mb-6">{plan.description}</p>
                 <Button
                   variant={plan.popular ? "default" : "outline"}
-                  className={`w-full mb-6 ${plan.popular ? "bg-indigo-600 hover:bg-indigo-700" : ""}`}
+                  className={`w-full mb-6 py-6 ${plan.popular ? "bg-indigo-600 hover:bg-indigo-700" : ""}`}
                   onClick={() => handlePlanSelect(plan)}
                   disabled={isLoading[plan.priceId]}
                 >
@@ -199,11 +201,11 @@ const PricingSection = () => {
                     </span>
                   ) : plan.cta}
                 </Button>
-                <ul className="space-y-3">
+                <ul className="space-y-4">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
-                      <Check className="w-5 h-5 text-indigo-600 mr-2 shrink-0" />
-                      <span className="text-gray-600 dark:text-gray-400 text-sm">{feature}</span>
+                      <Check className="w-5 h-5 text-indigo-600 mr-3 shrink-0 mt-0.5" />
+                      <span className="text-gray-600 dark:text-gray-400">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -212,11 +214,17 @@ const PricingSection = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mt-12"
+        >
           <p className="text-gray-600 dark:text-gray-400">
-            {t("custom_plan")} <a href="#contact" className="text-indigo-600 hover:underline">{t("contact_us")}</a>
+            {t("custom_plan")} <a href="#contact" className="text-indigo-600 hover:underline font-medium">{t("contact_us")}</a>
           </p>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
