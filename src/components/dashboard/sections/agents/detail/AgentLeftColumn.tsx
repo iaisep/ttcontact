@@ -2,6 +2,7 @@
 import React from 'react';
 import EditablePrompt from './EditablePrompt';
 import WelcomeMessageEditor from './WelcomeMessageEditor';
+import GeneralPromptEditor from './GeneralPromptEditor';
 import { RetellAgent, RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
 import { VoiceSelectionModal } from './voice-selection';
 import SelectorsRow from './components/SelectorsRow';
@@ -92,18 +93,12 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
       {/* Display LLM General Prompt if available */}
       {llm?.general_prompt && (
         <div className="mt-6 bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-sm font-medium mb-2">{t('llm_general_prompt')}</h3>
-          <div className="text-sm text-gray-700 max-h-[300px] overflow-y-auto whitespace-pre-wrap">
-            {llm.general_prompt}
-          </div>
+          <GeneralPromptEditor 
+            generalPrompt={llm.general_prompt}
+            onUpdate={(value) => updateAgentField('general_prompt', value)}
+          />
         </div>
       )}
-
-      {/* Prompt Editor */}
-      <EditablePrompt
-        prompt={agent.prompt || ''}
-        onUpdate={(value) => updateAgentField('prompt', value)}
-      />
 
       {/* Welcome Message */}
       <div className="mt-6">

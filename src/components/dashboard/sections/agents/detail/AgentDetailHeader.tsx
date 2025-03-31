@@ -1,12 +1,16 @@
 
 import React, { useState } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
-import { debounce } from 'lodash';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Volume2 } from 'lucide-react';
+import { ArrowLeft, Copy, Pencil } from 'lucide-react';
+import { toast } from 'sonner';
+import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 
 interface AgentDetailHeaderProps {
   agent: RetellAgent;
@@ -14,109 +18,112 @@ interface AgentDetailHeaderProps {
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
-const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({ 
-  agent, 
-  voice, 
-  updateAgentField 
+const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
+  agent,
+  voice,
+  updateAgentField
 }) => {
-  const { t } = useLanguage();
-  const [name, setName] = useState(agent.agent_name || agent.name || '');
-  const [description, setDescription] = useState(agent.description || '');
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const audioRef = React.useRef<HTMLAudioElement | null>(null);
-
-  // Create debounced update functions
-  const debouncedUpdateName = debounce((value) => updateAgentField('agent_name', value), 1000);
-  const debouncedUpdateDescription = debounce((value) => updateAgentField('description', value), 1000);
-
+  const navigate = useNavigate();
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [agentName, setAgentName] = useState(agent.agent_name || agent.name || '');
+  
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard');
+  };
+  
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setName(value);
-    debouncedUpdateName(value);
+    setAgentName(e.target.value);
   };
-
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setDescription(value);
-    debouncedUpdateDescription(value);
-  };
-
-  const handlePlayVoice = () => {
-    if (!voice?.preview_audio_url) return;
-    
-    if (!audioRef.current) {
-      audioRef.current = new Audio(voice.preview_audio_url);
-      audioRef.current.onended = () => setIsPlayingAudio(false);
-    }
-    
-    if (isPlayingAudio) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlayingAudio(false);
-    } else {
-      audioRef.current.play();
-      setIsPlayingAudio(true);
+  
+  const handleNameSubmit = () => {
+    if (agentName.trim() !== '') {
+      updateAgentField('agent_name', agentName);
+      setIsEditingName(false);
     }
   };
-
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleNameSubmit();
+    }
+  };
+  
   return (
-    <div className="bg-card py-6 px-4 shadow border-b">
-      <div className="container">
-        <div className="flex flex-col md:flex-row gap-6 items-start">
-          {/* Agent Avatar (Voice Avatar) */}
-          {voice?.avatar_url && (
-            <div className="flex-shrink-0">
-              <div className="relative">
-                <img 
-                  src={voice.avatar_url} 
-                  alt={voice.name || 'Agent'} 
-                  className="w-24 h-24 rounded-full object-cover"
+    <div className="border-b sticky top-0 z-10 bg-background">
+      <div className="container flex items-center h-16 px-4">
+        <Button variant="ghost" onClick={() => navigate('/agentes')} className="mr-4">
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        
+        <div className="flex-1">
+          <div className="flex items-center">
+            {isEditingName ? (
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  value={agentName}
+                  onChange={handleNameChange}
+                  onBlur={handleNameSubmit}
+                  onKeyDown={handleKeyDown}
+                  autoFocus
+                  className="text-lg font-semibold bg-transparent border-b border-primary outline-none mr-2"
                 />
-                {voice.preview_audio_url && (
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="absolute -bottom-2 -right-2 bg-white hover:bg-gray-100"
-                    onClick={handlePlayVoice}
-                  >
-                    <Volume2 className={`h-4 w-4 ${isPlayingAudio ? 'text-primary animate-pulse' : ''}`} />
-                  </Button>
-                )}
+                <Button variant="ghost" size="sm" onClick={handleNameSubmit}>
+                  Save
+                </Button>
               </div>
-            </div>
-          )}
-          
-          {/* Agent Information */}
-          <div className="flex-grow space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('agent_name')}</label>
-              <Input 
-                value={name} 
-                onChange={handleNameChange}
-                placeholder={t('agent_name_placeholder')}
-                className="w-full md:w-2/3"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('description')}</label>
-              <Textarea 
-                value={description} 
-                onChange={handleDescriptionChange}
-                placeholder={t('agent_description_placeholder')}
-                className="w-full md:w-2/3"
-                rows={2}
-              />
-            </div>
-            
-            {/* Voice Information */}
-            {voice && (
-              <div className="flex items-center text-sm text-gray-500">
-                <span className="font-medium mr-2">{t('voice')}:</span>
-                <span>{voice.name || voice.voice_name}</span>
-                {voice.accent && <span className="ml-2 text-gray-400">({voice.accent})</span>}
+            ) : (
+              <div className="flex items-center">
+                <h1 className="text-lg font-semibold">{agent.agent_name || agent.name}</h1>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-6 w-6 ml-2"
+                  onClick={() => setIsEditingName(true)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
               </div>
             )}
+          </div>
+          <div className="flex text-xs text-muted-foreground space-x-2 items-center">
+            <div className="flex items-center gap-1">
+              <span>Agent ID: {agent.agent_id?.substring(0, 8) || agent.id?.substring(0, 8)}</span>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6"
+                onClick={() => handleCopy(agent.agent_id || agent.id || '')}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+            <span>•</span>
+            <div className="flex items-center gap-1">
+              <span>Retell LLM ID: {agent.llm_id?.substring(0, 5) || 'll-49'}</span>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6"
+                onClick={() => handleCopy(agent.llm_id || 'll-49')}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+            <span>•</span>
+            <span>+50.087/min</span>
+            <span>•</span>
+            <span>1200-1450ms latency</span>
+            <span>•</span>
+            <span>Auto saved at 07:51</span>
+          </div>
+        </div>
+        
+        <div className="flex space-x-2 items-center">
+          <div className="flex space-x-2">
+            <Button variant="outline">Create</Button>
+            <Button variant="outline">Simulation</Button>
           </div>
         </div>
       </div>
