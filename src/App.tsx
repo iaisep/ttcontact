@@ -1,10 +1,9 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { ApiProvider } from './context/ApiContext';
 import { LanguageProvider } from './context/LanguageContext';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
+import Dashboard from './pages/Dashboard';
 import AgentsPage from './pages/AgentsPage';
 import AgentDetailPage from './pages/AgentDetailPage';
 import AgentEditPage from './pages/AgentEditPage';
@@ -27,15 +26,15 @@ const App: React.FC = () => {
       <LanguageProvider>
         <Router>
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<Dashboard />} />
+            <Route path="/register" element={<Dashboard />} />
             <Route path="/" element={<Navigate to="/dashboard" />} />
             
             <Route 
               path="/dashboard" 
               element={
                 <ProtectedRoute>
-                  <DashboardPage />
+                  <Dashboard />
                 </ProtectedRoute>
               } 
             />
