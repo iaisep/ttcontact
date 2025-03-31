@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
+import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -15,6 +15,7 @@ const AgentDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { fetchWithAuth } = useApiContext();
   
   // Use our new hook to fetch all agent details
   const { 
@@ -38,13 +39,9 @@ const AgentDetailPage: React.FC = () => {
       
       toast.loading(t('updating_field'));
       
-      // Update the API - Cambiado de PUT a PATCH
-      await fetch(`https://api.retellai.com/update-agent/${agent.agent_id || agent.id}`, {
+      // Use fetchWithAuth instead of direct fetch
+      await fetchWithAuth(`/update-agent/${agent.agent_id || agent.id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
-        },
         body: JSON.stringify(updatedAgent)
       });
       

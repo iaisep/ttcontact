@@ -40,7 +40,7 @@ export const useAgentDetails = (agentId: string | undefined) => {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
       try {
-        // Step 1: Fetch the agent details
+        // Step 1: Fetch the agent details using fetchWithAuth
         const agentData = await fetchWithAuth(`/get-agent/${agentId}`);
         setState(prev => ({ ...prev, agent: agentData }));
         
@@ -49,7 +49,7 @@ export const useAgentDetails = (agentId: string | undefined) => {
         const voiceId = agentData.voice_id;
         const knowledgeBaseIds = agentData.knowledge_base_ids || [];
         
-        // Step 2: Fetch LLM, voice, and knowledge bases in parallel
+        // Step 2: Fetch LLM, voice, and knowledge bases in parallel using fetchWithAuth
         const [llmData, voiceData, allKnowledgeBases] = await Promise.all([
           llmId ? fetchWithAuth(`/get-retell-llm/${llmId}`) : null,
           voiceId ? fetchWithAuth(`/get-voice/${voiceId}`) : null,
