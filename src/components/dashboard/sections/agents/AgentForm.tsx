@@ -5,27 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { DialogFooter } from '@/components/ui/dialog';
 import { Agent } from './types';
 import { useLanguage } from '@/context/LanguageContext';
-
-interface RetellVoice {
-  id: string;
-  name: string;
-  [key: string]: any;
-}
-
-interface RetellFolder {
-  id: string;
-  name: string;
-  [key: string]: any;
-}
-
-interface RetellLLM {
-  id: string;
-  name: string;
-  [key: string]: any;
-}
+import { RetellVoice, RetellFolder, RetellLLM } from './types/retell-types';
 
 interface AgentFormProps {
   initialAgent: Agent | null;
@@ -62,17 +44,17 @@ const AgentForm: React.FC<AgentFormProps> = ({
   });
 
   const handleFormSubmit = (formData: FormValues) => {
-    // Create a complete Agent object by adding the id if it exists
+    // Create a complete Agent object
     const agentData: Agent = {
-      id: initialAgent?.id || '',
+      ...(initialAgent || { id: '', name: '', description: '' }),
       ...formData
     };
     onSubmit(agentData);
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)}>
-      <div className="grid gap-4 py-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+      <div className="grid gap-4">
         <div className="grid gap-2">
           <Label htmlFor="name">{t('name')}</Label>
           <Input
@@ -144,12 +126,15 @@ const AgentForm: React.FC<AgentFormProps> = ({
           </select>
         </div>
       </div>
-      <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel} className="mr-2">
+      
+      <div className="flex justify-end space-x-4 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel}>
           {t('cancel')}
         </Button>
-        <Button type="submit">{initialAgent ? t('update_agent') : t('create_agent')}</Button>
-      </DialogFooter>
+        <Button type="submit">
+          {initialAgent ? t('update_agent') : t('create_agent')}
+        </Button>
+      </div>
     </form>
   );
 };

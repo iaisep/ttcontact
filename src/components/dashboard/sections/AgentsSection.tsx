@@ -1,243 +1,41 @@
 
 import React from 'react';
-import { useLanguage } from '@/context/LanguageContext';
-import { useApiContext } from '@/context/ApiContext';
 import AgentsTable from './agents/AgentsTable';
 import AgentsToolbar from './agents/AgentsToolbar';
 import AgentForm from './agents/AgentForm';
-import { Agent } from './agents/types';
-import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
-
-interface RetellAgent {
-  id: string;
-  name: string;
-  description: string;
-  agent_type: string;
-  voice_id: string;
-  folder: string;
-  agent_id: string;
-  agent_name: string;
-  response_engine?: { type: string };
-  last_modification_timestamp?: number;
-  [key: string]: any;
-}
-
-interface RetellVoice {
-  id: string;
-  name: string;
-  avatar_url?: string;
-  [key: string]: any;
-}
-
-interface RetellFolder {
-  id: string;
-  name: string;
-  [key: string]: any;
-}
-
-interface RetellLLM {
-  id: string;
-  name: string;
-  [key: string]: any;
-}
-
-interface RetellPhoneNumber {
-  id: string;
-  phone_number: string;
-  inbound_agent_id?: string;
-  outbound_agent_id?: string;
-  [key: string]: any;
-}
+import { useRetellData } from './agents/hooks/useRetellData';
+import { useAgentActions } from './agents/hooks/useAgentActions';
 
 const AgentsSection: React.FC = () => {
-  const { t } = useLanguage();
-  const { apiKey, baseURL, fetchWithAuth } = useApiContext();
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [voices, setVoices] = useState<RetellVoice[]>([]);
-  const [folders, setFolders] = useState<RetellFolder[]>([]);
-  const [llms, setLLMs] = useState<RetellLLM[]>([]);
-  const [phoneNumbers, setPhoneNumbers] = useState<RetellPhoneNumber[]>([]);
-  const [isAgentFormOpen, setIsAgentFormOpen] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // Use custom hooks to manage state and actions
+  const { 
+    agents, 
+    voices, 
+    folders, 
+    llms, 
+    isLoading, 
+    setAgents, 
+    setIsLoading,
+    fetchRetellData 
+  } = useRetellData();
 
-  const fetchRetellData = async () => {
-    setIsLoading(true);
-    try {
-      const endpoints = [
-        '/list-agents',
-        '/list-voices',
-        '/get-folders',
-        '/list-retell-llms',
-        '/list-phone-numbers',
-        //'/get-organization', //
-        '/check-org-complaince-status',
-      ];
-
-      const results = await Promise.all(
-        endpoints.map(endpoint => fetchWithAuth(endpoint))
-      );
-
-      // Process results according to the order of endpoints
-      const [agentsData, voicesData, foldersData, llmsData, phoneNumbersData] = results;
-
-      // Store voice data for later use
-      if (voicesData?.voices) {
-        setVoices(voicesData.voices);
-      }
-
-      if (foldersData?.folders) {
-        setFolders(foldersData.folders);
-      }
-
-      if (llmsData?.llms) {
-        setLLMs(llmsData.llms);
-      }
-
-      if (phoneNumbersData?.phone_numbers) {
-        setPhoneNumbers(phoneNumbersData.phone_numbers);
-      }
-
-      // Transform agent data with additional info from other endpoints
-      if (Array.isArray(agentsData)) {
-        const transformedAgents: Agent[] = agentsData.map((agent: RetellAgent) => {
-          // Find the voice information
-          const voiceInfo = voicesData?.voices?.find((v: RetellVoice) => 
-            v.id === agent.voice_id
-          );
-
-          // Find phone number assigned to this agent
-          const phoneNumber = phoneNumbersData?.phone_numbers?.find((p: RetellPhoneNumber) => 
-            p.inbound_agent_id === agent.agent_id || p.outbound_agent_id === agent.agent_id
-          );
-
-          return {
-            id: agent.agent_id || agent.id,
-            name: agent.agent_name || agent.name,
-            description: agent.description || '',
-            agent_type: agent.response_engine?.type || agent.agent_type || '',
-            voice_id: agent.voice_id,
-            folder: agent.folder || '',
-            // Add new properties
-            voice: voiceInfo ? {
-              name: voiceInfo.name,
-              avatar_url: voiceInfo.avatar_url
-            } : undefined,
-            phone: phoneNumber?.phone_number,
-            last_modification_timestamp: agent.last_modification_timestamp,
-          };
-        });
-
-        setAgents(transformedAgents);
-      }
-
-    } catch (error) {
-      console.error('Error fetching Retell data:', error);
-      toast.error(t('error_loading_agents'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRetellData();
-  }, [apiKey, baseURL]);
-
-  const handleAddAgent = () => {
-    setSelectedAgent(null);
-    setIsAgentFormOpen(true);
-  };
-
-  const handleEditAgent = (agent: Agent) => {
-    setSelectedAgent(agent);
-    setIsAgentFormOpen(true);
-  };
-
-  const handleDeleteAgent = async (agentId: string) => {
-    setIsLoading(true);
-    try {
-      // Llamada real a la API para eliminar un agente
-      await fetchWithAuth(`/delete-agent/${agentId}`, {
-        method: 'DELETE'
-      });
-      
-      // Actualizar el estado local después de la eliminación exitosa
-      setAgents(agents.filter(agent => agent.id !== agentId));
-      toast.success(t('agent_deleted'));
-    } catch (error) {
-      console.error('Error deleting agent:', error);
-      toast.error(t('error_deleting_agent'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubmitAgent = async (agent: Agent) => {
-    setIsLoading(true);
-    try {
-      if (agent.id) {
-        // Actualizar agente existente
-        const updatedAgent = await fetchWithAuth(`/update-agent/${agent.id}`, {
-          method: 'PUT',
-          body: JSON.stringify(agent)
-        });
-        
-        // Actualizar el estado local con el agente actualizado
-        setAgents(agents.map(a => (a.id === agent.id ? { ...a, ...updatedAgent } : a)));
-        toast.success(t('agent_updated'));
-      } else {
-        // Crear nuevo agente
-        const newAgent = await fetchWithAuth('/create-agent', {
-          method: 'POST',
-          body: JSON.stringify(agent)
-        });
-        
-        // Agregar el nuevo agente al estado local
-        setAgents([...agents, newAgent]);
-        toast.success(t('agent_added'));
-      }
-    } catch (error) {
-      console.error('Error submitting agent:', error);
-      toast.error(agent.id ? t('error_updating_agent') : t('error_adding_agent'));
-    } finally {
-      setIsLoading(false);
-      setIsAgentFormOpen(false);
-    }
-  };
-
-  const handleCancelAgentForm = () => {
-    setIsAgentFormOpen(false);
-  };
-
-  const handleImportAgents = async () => {
-    // Implementación real de importación de agentes
-    try {
-      setIsLoading(true);
-      // Aquí iría la lógica real de importación
-      // Por ahora solo mostramos una notificación de éxito
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulación de tiempo de procesamiento
-      toast.success(t('agents_imported'));
-      // Recargar los agentes después de la importación
-      fetchRetellData();
-    } catch (error) {
-      console.error('Error importing agents:', error);
-      toast.error(t('error_importing_agents'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRefreshAgents = () => {
-    fetchRetellData();
-  };
+  const {
+    isAgentFormOpen,
+    selectedAgent,
+    handleAddAgent,
+    handleEditAgent,
+    handleDeleteAgent,
+    handleSubmitAgent,
+    handleCancelAgentForm,
+    handleImportAgents
+  } = useAgentActions(agents, setAgents, setIsLoading, fetchRetellData);
 
   return (
     <div className="p-6 space-y-6">
       <AgentsToolbar 
         onAddAgent={handleAddAgent} 
         onImportAgents={handleImportAgents}
-        onRefreshAgents={handleRefreshAgents}
+        onRefreshAgents={fetchRetellData}
       />
       <AgentsTable 
         agents={agents} 
