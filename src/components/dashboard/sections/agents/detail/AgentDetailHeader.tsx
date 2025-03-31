@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Copy, Flag, Edit } from 'lucide-react';
+import { ArrowLeft, Copy, Flag } from 'lucide-react';
 import { toast } from 'sonner';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import {
@@ -39,21 +39,6 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
     navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard');
   };
-  
-  // Language options with flag icons
-  const languageOptions = [
-    { value: 'es', label: 'Spanish', icon: <Flag color="#AA151B" fill="#AA151B" className="h-4 w-4" /> },
-    { value: 'en', label: 'English', icon: <Flag color="#B22234" fill="#B22234" className="h-4 w-4" /> },
-    { value: 'fr', label: 'French', icon: <Flag color="#0055A4" fill="#0055A4" className="h-4 w-4" /> },
-    { value: 'de', label: 'German', icon: <Flag color="#000000" fill="#000000" className="h-4 w-4" /> },
-    { value: 'pt-BR', label: 'Portuguese (Brazil)', icon: <Flag color="#009C3B" fill="#009C3B" className="h-4 w-4" /> },
-    { value: 'pt-PT', label: 'Portuguese (Portugal)', icon: <Flag color="#FF0000" fill="#FF0000" className="h-4 w-4" /> },
-    { value: 'it', label: 'Italian', icon: <Flag color="#009246" fill="#009246" className="h-4 w-4" /> },
-    { value: 'ru', label: 'Russian', icon: <Flag color="#FFFFFF" fill="#FFFFFF" className="h-4 w-4" strokeWidth={1} stroke="#0039A6" /> },
-  ];
-
-  // Find the current language display data
-  const currentLanguage = languageOptions.find(lang => lang.value === defaultLanguage) || languageOptions[0];
   
   // Get the agent ID or slug for navigation
   const agentId = agent.agent_id || agent.id;
@@ -99,51 +84,7 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
         </div>
         
         <div className="flex space-x-2 items-center">
-          <TooltipProvider>
-            <DropdownMenu>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <div className="flex items-center space-x-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-md p-2 cursor-pointer mr-2">
-                      {currentLanguage.icon}
-                      <span className="text-sm ml-2">{currentLanguage.label}</span>
-                      <svg 
-                        width="12" 
-                        height="12" 
-                        viewBox="0 0 12 12" 
-                        fill="none" 
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="ml-1"
-                      >
-                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Select language</p>
-                </TooltipContent>
-              </Tooltip>
-              <DropdownMenuContent align="end" className="w-[200px] max-h-[350px] overflow-y-auto">
-                {languageOptions.map((lang) => (
-                  <DropdownMenuItem 
-                    key={lang.value}
-                    onClick={() => onLanguageChange(lang.value)}
-                    className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 py-2"
-                  >
-                    {lang.icon}
-                    <span className="text-sm">{lang.label}</span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </TooltipProvider>
-          
           <div className="flex space-x-2">
-            <Button variant="outline" onClick={() => navigate(`/agentes/${agentId}/edit`)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
             <Button variant="outline">Create</Button>
             <Button variant="outline">Simulation</Button>
           </div>
