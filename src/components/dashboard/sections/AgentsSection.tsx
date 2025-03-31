@@ -100,37 +100,35 @@ const AgentsSection: React.FC = () => {
       }
 
       // Transform agent data with additional info from other endpoints
-      if (Array.isArray(agentsData)) {
-        const transformedAgents: Agent[] = agentsData.map((agent: RetellAgent) => {
-          // Find the voice information
-          const voiceInfo = voicesData?.voices?.find((v: RetellVoice) => 
-            v.id === agent.voice_id
-          );
+if (Array.isArray(agentsData?.agents)) {
+  const transformedAgents: Agent[] = agentsData.agents.map((agent: RetellAgent) => {
+    const voiceInfo = voicesData?.voices?.find((v: RetellVoice) => 
+      v.id === agent.voice_id
+    );
 
-          // Find phone number assigned to this agent
-          const phoneNumber = phoneNumbersData?.phone_numbers?.find((p: RetellPhoneNumber) => 
-            p.inbound_agent_id === agent.agent_id || p.outbound_agent_id === agent.agent_id
-          );
+    const phoneNumber = phoneNumbersData?.phone_numbers?.find((p: RetellPhoneNumber) => 
+      p.inbound_agent_id === agent.agent_id || p.outbound_agent_id === agent.agent_id
+    );
 
-          return {
-            id: agent.agent_id || agent.id,
-            name: agent.agent_name || agent.name,
-            description: agent.description || '',
-            agent_type: agent.response_engine?.type || agent.agent_type || '',
-            voice_id: agent.voice_id,
-            folder: agent.folder || '',
-            // Add new properties
-            voice: voiceInfo ? {
-              name: voiceInfo.name,
-              avatar_url: voiceInfo.avatar_url
-            } : undefined,
-            phone: phoneNumber?.phone_number,
-            last_modification_timestamp: agent.last_modification_timestamp,
-          };
-        });
+    return {
+      id: agent.agent_id || agent.id,
+      name: agent.agent_name || agent.name,
+      description: agent.description || '',
+      agent_type: agent.response_engine?.type || agent.agent_type || '',
+      voice_id: agent.voice_id,
+      folder: agent.folder || '',
+      voice: voiceInfo ? {
+        name: voiceInfo.name,
+        avatar_url: voiceInfo.avatar_url
+      } : undefined,
+      phone: phoneNumber?.phone_number,
+      last_modification_timestamp: agent.last_modification_timestamp,
+    };
+  });
 
-        setAgents(transformedAgents);
-      }
+  setAgents(transformedAgents);
+}
+
 
     } catch (error) {
       console.error('Error fetching Retell data:', error);
