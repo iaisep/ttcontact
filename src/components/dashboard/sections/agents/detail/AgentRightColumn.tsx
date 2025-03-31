@@ -13,8 +13,7 @@ const AgentRightColumn: React.FC<AgentRightColumnProps> = ({
   updateAgentField
 }) => {
   return (
-    <div className="bg-card rounded-lg p-4 border shadow-sm">
-      {/* Test Agent Section */}
+    <div className="bg-card border rounded-lg shadow-sm">
       <TestPanel agent={agent} />
     </div>
   );
