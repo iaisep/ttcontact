@@ -9,6 +9,17 @@ interface UseLlmSettingsProps {
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
+// Helper function to map UI model names to API model values
+const getApiModelValue = (uiModelName: string): { s2s_model: string; model: null } => {
+  // This maps the UI-friendly names to the API values
+  // For all models we're currently setting s2s_model to "gpt-4o-realtime" and model to null
+  // according to the requirement
+  return {
+    s2s_model: "gpt-4o-realtime",
+    model: null
+  };
+};
+
 export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentField }: UseLlmSettingsProps) => {
   const { fetchWithAuth } = useApiContext();
   const [selectedLlmModel, setSelectedLlmModel] = useState(initialModel);
@@ -25,20 +36,17 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
   ];
 
   const handleLlmChange = async (llm: string) => {
-    setSelectedLlmModel(llm);
-    
     try {
       if (llmId) {
         toast.loading('Updating LLM model...');
         
+        // Get the API model value based on UI selection
+        const modelPayload = getApiModelValue(llm);
+        
         // Update the LLM using the update-retell-llm endpoint with PATCH method
-        // Using the correct request body format
         await fetchWithAuth(`/update-retell-llm/${llmId}`, {
           method: 'PATCH',
-          body: JSON.stringify({
-            s2s_model: "gpt-4o-realtime",
-            model: null
-          })
+          body: JSON.stringify(modelPayload)
         });
         
         // Fetch the updated LLM data to ensure changes are reflected

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Globe, User, Settings } from 'lucide-react';
@@ -13,7 +12,6 @@ import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { toast } from 'sonner';
 
 interface SelectorsRowProps {
   selectedLlmModel: string;
@@ -96,7 +94,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
             <span>{selectedLlmModel}</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
+        <DropdownMenuContent align="start" className="bg-white">
           {llmOptions.map((option) => (
             <DropdownMenuItem key={option} onClick={() => handleLlmChange(option)}>
               {option}
@@ -112,7 +110,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
             <Settings className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80">
+        <PopoverContent className="w-80 bg-white">
           <div className="space-y-4">
             <h3 className="font-medium">LLM Temperature</h3>
             <p className="text-xs text-muted-foreground">Lower value yields better function call results.</p>
@@ -288,7 +286,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
             <span>{selectedLanguage}</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
+        <DropdownMenuContent align="start" className="bg-white">
           {languageOptions.map((option) => (
             <DropdownMenuItem key={option.value} onClick={() => handleLanguageChange(option.label)}>
               <span className="mr-2">{option.icon}</span>

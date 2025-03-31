@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Globe } from 'lucide-react';
 import {
@@ -13,13 +14,15 @@ interface AgentSettingsToolbarProps {
   selectedLlmModel: string;
   onLanguageChange: (value: string) => void;
   onLlmModelChange: (value: string) => void;
+  llmOptions: string[];
 }
 
 const AgentSettingsToolbar: React.FC<AgentSettingsToolbarProps> = ({
   defaultLanguage,
   selectedLlmModel,
   onLanguageChange,
-  onLlmModelChange
+  onLlmModelChange,
+  llmOptions
 }) => {
   // Language options with flag icons
   const languageOptions = [
@@ -40,15 +43,22 @@ const AgentSettingsToolbar: React.FC<AgentSettingsToolbarProps> = ({
     <div className="flex items-center space-x-2 mb-4">
       <div className="flex items-center space-x-2 bg-muted rounded-md p-2">
         <Globe className="h-4 w-4" />
-        <select 
-          value={selectedLlmModel}
-          onChange={(e) => onLlmModelChange(e.target.value)}
-          className="bg-transparent border-none focus:outline-none text-sm"
-        >
-          <option value="GPT 4o mini">GPT 4o mini</option>
-          <option value="GPT 4o">GPT 4o</option>
-          <option value="Claude 3 Opus">Claude 3 Opus</option>
-        </select>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="bg-transparent border-none focus:outline-none text-sm">
+            {selectedLlmModel}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="bg-white">
+            {llmOptions.map((option) => (
+              <DropdownMenuItem 
+                key={option}
+                onClick={() => onLlmModelChange(option)}
+                className="cursor-pointer"
+              >
+                {option}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="flex items-center space-x-2 bg-muted rounded-md p-2">
