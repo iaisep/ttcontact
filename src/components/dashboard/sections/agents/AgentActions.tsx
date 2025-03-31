@@ -44,7 +44,7 @@ const AgentActions: React.FC<AgentActionsProps> = ({ agent, onEdit, onDelete }) 
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction 
               className="bg-destructive text-destructive-foreground"
-              onClick={() => onDelete(agent.agent_id)}
+              onClick={() => onDelete(agent.id)}
             >
               Delete
             </AlertDialogAction>

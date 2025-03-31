@@ -14,8 +14,15 @@ interface AgentFormProps {
   onCancel: () => void;
 }
 
+type FormValues = {
+  name: string;
+  description: string;
+  voice_id: string;
+  folder: string;
+};
+
 const AgentForm: React.FC<AgentFormProps> = ({ initialAgent, onSubmit, onCancel }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
       name: initialAgent?.name || '',
       description: initialAgent?.description || '',
@@ -24,8 +31,17 @@ const AgentForm: React.FC<AgentFormProps> = ({ initialAgent, onSubmit, onCancel 
     }
   });
 
+  const handleFormSubmit = (formData: FormValues) => {
+    // Create a complete Agent object by adding the id if it exists
+    const agentData: Agent = {
+      id: initialAgent?.id || '',
+      ...formData
+    };
+    onSubmit(agentData);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div className="grid gap-4 py-4">
         <div className="grid gap-2">
           <Label htmlFor="name">Name</Label>
