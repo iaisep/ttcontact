@@ -62,81 +62,92 @@ const AgentsSection: React.FC = () => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchRetellData = async () => {
-    setIsLoading(true);
-    try {
-      const endpoints = [
-        '/list-agents',
-        '/list-voices',
-        '/get-folders',
-        '/list-retell-llms',
-        '/list-phone-numbers',
-        //'/get-organization', //
-        '/check-org-complaince-status',
-      ];
+ const fetchRetellData = async () => {
+  setIsLoading(true);
+  try {
+    const endpoints = [
+      '/list-agents',
+      '/list-voices',
+      '/get-folders',
+      '/list-retell-llms',
+      '/list-phone-numbers',
+      '/check-org-complaince-status',
+    ];
 
-      const results = await Promise.all(
-        endpoints.map(endpoint => fetchWithAuth(endpoint))
-      );
+    // Ejecutar todos los fetch y asegurarse de que se parseen a JSON
+    const rawResponses = await Promise.all(
+      endpoints.map(endpoint => fetchWithAuth(endpoint))
+    );
 
-      // Process results according to the order of endpoints
-      const [agentsData, voicesData, foldersData, llmsData, phoneNumbersData] = results;
+    const [
+      agentsData,
+      voicesData,
+      foldersData,
+      llmsData,
+      phoneNumbersData
+    ] = await Promise.all(rawResponses.map(async (res: any) =>
+      typeof res.json === 'function' ? await res.json() : res
+    ));
 
-      // Store voice data for later use
-      if (voicesData?.voices) {
-        setVoices(voicesData.voices);
-      }
-
-      if (foldersData?.folders) {
-        setFolders(foldersData.folders);
-      }
-
-      if (llmsData?.llms) {
-        setLLMs(llmsData.llms);
-      }
-
-      if (phoneNumbersData?.phone_numbers) {
-        setPhoneNumbers(phoneNumbersData.phone_numbers);
-      }
-
-      // Transform agent data with additional info from other endpoints
-      if (Array.isArray(agentsData?.agents)) {
-        const transformedAgents: Agent[] = agentsData.agents.map((agent: RetellAgent) => {
-          const voiceInfo = voicesData?.voices?.find((v: RetellVoice) => 
-            v.id === agent.voice_id
-          );
-      
-          const phoneNumber = phoneNumbersData?.phone_numbers?.find((p: RetellPhoneNumber) => 
-            p.inbound_agent_id === agent.agent_id || p.outbound_agent_id === agent.agent_id
-          );
-      
-          return {
-            id: agent.agent_id || agent.id,
-            name: agent.agent_name || agent.name,
-            description: agent.description || '',
-            agent_type: agent.response_engine?.type || agent.agent_type || '',
-            voice_id: agent.voice_id,
-            folder: agent.folder || '',
-            voice: voiceInfo ? {
-              name: voiceInfo.name,
-              avatar_url: voiceInfo.avatar_url
-            } : undefined,
-            phone: phoneNumber?.phone_number,
-            last_modification_timestamp: agent.last_modification_timestamp,
-          };
-        });
-      
-        setAgents(transformedAgents);
-      }
-
-
-    } catch (error) {
-      console.error('Error fetching Retell data:', error);
-      toast.error(t('error_loading_agents'));
-    } finally {
-      setIsLoading(false);
+    // Almacenar otros datos globales
+    if (Array.isArray(voicesData?.voices)) {
+      setVoices(voicesData.voices);
     }
-  };
+
+    if (Array.isArray(foldersData?.folders)) {
+      setFolders(foldersData.folders);
+    }
+
+    if (Array.isArray(llmsData?.llms)) {
+      setLLMs(llmsData.llms);
+    }
+
+    if (Array.isArray(phoneNumbersData?.phone_numbers)) {
+      setPhoneNumbers(phoneNumbersData.phone_numbers);
+    }
+
+    // Verificar y mapear agentes
+    if (Array.isArray(agentsData?.agents)) {
+      const transformedAgents: Agent[] = agentsData.agents.map((agent: RetellAgent) => {
+        const voiceInfo = voicesData?.voices?.find((v: RetellVoice) =>
+          v.id === agent.voice_id
+        );
+
+        const phoneNumber = phoneNumbersData?.phone_numbers?.find((p: RetellPhoneNumber) =>
+          p.inbound_agent_id === agent.agent_id || p.outbound_agent_id === agent.agent_id
+        );
+
+        return {
+          id: agent.agent_id || agent.id,
+          name: agent.agent_name || agent.name,
+          description: agent.description || '',
+          agent_type: agent.response_engine?.type || agent.agent_type || '',
+          voice_id: agent.voice_id,
+          folder: agent.folder || '',
+          voice: voiceInfo
+            ? {
+                name: voiceInfo.name,
+                avatar_url: voiceInfo.avatar_url
+              }
+            : undefined,
+          phone: phoneNumber?.phone_number,
+          last_modification_timestamp: agent.last_modification_timestamp,
+        };
+      });
+
+      setAgents(transformedAgents);
+    } else {
+      toast.error('Formato inesperado de respuesta en list-agents');
+    }
+
+  } catch (error) {
+    console.error('Error fetching Retell data:', error);
+    toast.error(t('error_loading_agents'));
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchRetellData();
