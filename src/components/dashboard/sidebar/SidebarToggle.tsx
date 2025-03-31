@@ -8,7 +8,7 @@ const SidebarToggle = ({
   sidebarCollapsed,
   toggleSidebar
 }: SidebarToggleProps) => {
-  return <Button variant="ghost" size="icon" onClick={toggleSidebar} className="h-8 w-8 rounded-full bg-gray-800 hover:bg-gray-700">
+  return <Button variant="ghost" size="icon" onClick={toggleSidebar} className="">
       {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
     </Button>;
 };
