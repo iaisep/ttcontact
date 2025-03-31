@@ -48,7 +48,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
         </AccordionTrigger>
         <AccordionContent className="border border-t-0 rounded-b-md p-4">
           <SpeechSettings 
-            speechSettings={agent.speech_settings || {}} 
+            settings={agent.speech_settings || {}} 
             onUpdate={(value) => updateAgentField('speech_settings', value)} 
           />
         </AccordionContent>

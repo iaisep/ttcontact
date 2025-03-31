@@ -8,6 +8,7 @@ import SelectorsRow from './components/SelectorsRow';
 import { useVoiceSettings } from './hooks/useVoiceSettings';
 import { useLlmSettings } from './hooks/useLlmSettings';
 import { useLanguageSelector } from './hooks/useLanguageSelector';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface AgentLeftColumnProps {
   agent: RetellAgent;
@@ -20,6 +21,9 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   llm,
   updateAgentField
 }) => {
+  // Use language context
+  const { t } = useLanguage();
+  
   // Use custom hooks to manage state and logic
   const voiceSettings = useVoiceSettings({ 
     initialVoice: agent.voice || 'Adrian', 
