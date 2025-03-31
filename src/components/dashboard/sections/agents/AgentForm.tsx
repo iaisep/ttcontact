@@ -9,17 +9,18 @@ import { DialogFooter } from '@/components/ui/dialog';
 import { Agent } from './types';
 
 interface AgentFormProps {
-  agent: Agent | null;
-  onSubmit: (data: any) => void;
+  initialAgent: Agent | null;
+  onSubmit: (data: Agent) => void;
+  onCancel: () => void;
 }
 
-const AgentForm: React.FC<AgentFormProps> = ({ agent, onSubmit }) => {
+const AgentForm: React.FC<AgentFormProps> = ({ initialAgent, onSubmit, onCancel }) => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
-      name: agent?.name || '',
-      description: agent?.agent_type || '',
-      voice_id: agent?.voice_id || 'eleven_labs_emily',
-      folder: agent?.folder || '',
+      name: initialAgent?.name || '',
+      description: initialAgent?.description || '',
+      voice_id: initialAgent?.voice_id || 'eleven_labs_emily',
+      folder: initialAgent?.folder || '',
     }
   });
 
@@ -80,7 +81,10 @@ const AgentForm: React.FC<AgentFormProps> = ({ agent, onSubmit }) => {
         </div>
       </div>
       <DialogFooter>
-        <Button type="submit">{agent ? 'Update Agent' : 'Create Agent'}</Button>
+        <Button type="button" variant="outline" onClick={onCancel} className="mr-2">
+          Cancel
+        </Button>
+        <Button type="submit">{initialAgent ? 'Update Agent' : 'Create Agent'}</Button>
       </DialogFooter>
     </form>
   );

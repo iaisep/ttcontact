@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import AgentsTable from './agents/AgentsTable';
@@ -5,7 +6,7 @@ import AgentsToolbar from './agents/AgentsToolbar';
 import AgentForm from './agents/AgentForm';
 import { Agent } from './agents/types';
 import { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const AgentsSection: React.FC = () => {
   const { t } = useLanguage();

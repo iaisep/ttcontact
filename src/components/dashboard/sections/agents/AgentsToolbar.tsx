@@ -1,34 +1,39 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Filter } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface AgentsToolbarProps {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  folderFilter: string;
-  setFolderFilter: (folder: string) => void;
-  folders: string[];
-  onCreateClick: () => void;
+  onAddAgent: () => void;
+  onImportAgents: () => void;
 }
 
 const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
-  searchQuery,
-  setSearchQuery,
-  folderFilter,
-  setFolderFilter,
-  folders,
-  onCreateClick,
+  onAddAgent,
+  onImportAgents,
 }) => {
+  const { t } = useLanguage();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [folderFilter, setFolderFilter] = useState('');
+  
+  // Mock folders for demonstration
+  const folders = ['Personal', 'Business', 'Support'];
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Agents</h1>
-        <Button onClick={onCreateClick}>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Agent
-        </Button>
+        <h1 className="text-2xl font-bold">{t('agents')}</h1>
+        <div className="flex gap-2">
+          <Button onClick={onAddAgent}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('create_agent')}
+          </Button>
+          <Button variant="outline" onClick={onImportAgents}>
+            {t('import')}
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-4 items-center">
@@ -36,7 +41,7 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search agents..."
+            placeholder={t('search_agents')}
             className="pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -49,7 +54,7 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
             value={folderFilter}
             onChange={(e) => setFolderFilter(e.target.value)}
           >
-            <option value="">All Folders</option>
+            <option value="">{t('all_folders')}</option>
             {folders.map((folder) => (
               <option key={folder} value={folder}>
                 {folder}
