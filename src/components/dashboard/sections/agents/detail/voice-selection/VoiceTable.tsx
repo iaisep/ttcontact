@@ -6,11 +6,13 @@ import { Voice } from './types';
 interface VoiceTableProps {
   voices: Voice[];
   onSelectVoice: (voice: Voice) => void;
+  selectedVoiceId?: string;
 }
 
 const VoiceTable: React.FC<VoiceTableProps> = ({
   voices,
-  onSelectVoice
+  onSelectVoice,
+  selectedVoiceId
 }) => {
   return (
     <div className="overflow-auto h-[400px] border rounded-md">
@@ -29,6 +31,7 @@ const VoiceTable: React.FC<VoiceTableProps> = ({
               key={voice.id} 
               voice={voice} 
               onSelectVoice={onSelectVoice} 
+              isSelected={selectedVoiceId === voice.voice_id}
             />
           ))}
         </tbody>

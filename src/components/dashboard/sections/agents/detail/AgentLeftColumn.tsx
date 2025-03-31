@@ -85,6 +85,8 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         onClose={() => voiceSettings.setIsVoiceModalOpen(false)}
         onSelectVoice={voiceSettings.handleVoiceChange}
         selectedVoice={agent.voice_id}
+        agent={agent}
+        updateAgentField={updateAgentField}
       />
 
       {/* Display LLM General Prompt if available */}
@@ -105,7 +107,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
 
       {/* Welcome Message */}
       <div className="mt-6">
-        <h3 className="text-sm font-medium mb-2">Welcome Message</h3>
+        <h3 className="text-sm font-medium mb-2">{t('welcome_message')}</h3>
         <WelcomeMessageEditor
           welcomeMessage={agent.welcome_message || 'User initiates: AI remains silent until users speak first.'}
           onUpdate={(value) => updateAgentField('welcome_message', value)}

@@ -1,22 +1,24 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Play } from 'lucide-react';
+import { Play, CheckCircle } from 'lucide-react';
 import { Voice } from './types';
 
 interface VoiceTableRowProps {
   voice: Voice;
   onSelectVoice: (voice: Voice) => void;
+  isSelected?: boolean;
 }
 
 const VoiceTableRow: React.FC<VoiceTableRowProps> = ({
   voice,
-  onSelectVoice
+  onSelectVoice,
+  isSelected = false
 }) => {
   return (
     <tr 
       onClick={() => onSelectVoice(voice)}
-      className="hover:bg-gray-50 cursor-pointer border-b"
+      className={`hover:bg-gray-50 cursor-pointer border-b ${isSelected ? 'bg-blue-50' : ''}`}
     >
       <td className="p-2 text-center">
         <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -32,7 +34,10 @@ const VoiceTableRow: React.FC<VoiceTableRowProps> = ({
               <span className="text-xs">{voice.name.substring(0, 2)}</span>
             )}
           </div>
-          <span>{voice.name}</span>
+          <div className="flex items-center">
+            <span>{voice.name}</span>
+            {isSelected && <CheckCircle className="ml-2 h-4 w-4 text-green-500" />}
+          </div>
         </div>
       </td>
       <td className="p-2">
