@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
+import { motion } from "framer-motion";
 
 interface MobileMenuProps {
   isMobileMenuOpen: boolean;
@@ -14,11 +15,17 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
   if (!isMobileMenuOpen) return null;
 
   return (
-    <div className="md:hidden bg-white dark:bg-gray-950 border-t dark:border-gray-800">
-      <div className="container mx-auto px-4 py-4 space-y-4">
+    <motion.div 
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.3 }}
+      className="md:hidden bg-white dark:bg-gray-950 border-t dark:border-gray-800 shadow-lg"
+    >
+      <div className="container mx-auto px-4 py-6 space-y-6">
         <div className="py-2">
-          <div className="font-medium text-gray-800 dark:text-gray-200 mb-2">{t("products")}</div>
-          <ul className="pl-4 space-y-2">
+          <div className="font-medium text-gray-800 dark:text-gray-200 mb-3">{t("products")}</div>
+          <ul className="pl-4 space-y-3">
             <li>
               <Link
                 to="/voice-sdk"
@@ -56,8 +63,8 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
           {t("documentation")}
         </Link>
         <div className="py-2">
-          <div className="font-medium text-gray-800 dark:text-gray-200 mb-2">{t("resources")}</div>
-          <ul className="pl-4 space-y-2">
+          <div className="font-medium text-gray-800 dark:text-gray-200 mb-3">{t("resources")}</div>
+          <ul className="pl-4 space-y-3">
             <li>
               <Link
                 to="/blog"
@@ -99,11 +106,11 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
             <Button variant="outline" className="w-full">{t("login")}</Button>
           </Link>
           <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-            <Button className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">{t("get_started")}</Button>
+            <Button className="w-full bg-primary text-white hover:bg-primary/90">{t("get_started")}</Button>
           </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

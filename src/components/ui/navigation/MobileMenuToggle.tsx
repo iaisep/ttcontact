@@ -17,6 +17,7 @@ const MobileMenuToggle = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuT
         size="icon"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         aria-label="Toggle menu"
+        className="text-gray-700 dark:text-gray-200"
       >
         {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
       </Button>

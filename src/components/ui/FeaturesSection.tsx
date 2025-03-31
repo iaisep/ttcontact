@@ -93,7 +93,7 @@ const FeaturesSection = () => {
         </div>
 
         <div className="mt-24">
-          <div className="bg-gradient-to-r from-blue-600 to-violet-500 rounded-2xl p-8 md:p-12 overflow-hidden relative">
+          <div className="bg-gradient-to-r from-primary to-blue-600 rounded-2xl p-8 md:p-12 overflow-hidden relative">
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
             
@@ -101,12 +101,12 @@ const FeaturesSection = () => {
               <div className="max-w-lg">
                 <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">{t("sdk_integration_title")}</h3>
                 <p className="text-white/80 text-lg mb-6">{t("sdk_integration_description")}</p>
-                <Link to="/docs" className="inline-flex items-center px-6 py-3 rounded-lg bg-white text-black font-medium hover:bg-gray-100 transition-colors">
+                <Link to="/docs" className="inline-flex items-center px-6 py-3 rounded-lg bg-white text-primary font-medium hover:bg-gray-100 transition-colors">
                   {t("view_documentation")}
                 </Link>
               </div>
               
-              <div className="bg-gradient-to-br from-black/20 to-black/40 backdrop-blur-sm rounded-xl p-4 border border-white/10 max-w-sm w-full">
+              <div className="bg-black/30 backdrop-blur-sm rounded-xl p-4 border border-white/10 max-w-sm w-full">
                 <div className="text-sm font-mono text-white/70 mb-3">// {t("code_example")}</div>
                 <pre className="text-white font-mono text-sm overflow-x-auto p-2">
                   <code>

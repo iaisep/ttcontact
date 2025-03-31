@@ -11,10 +11,14 @@ const NavActions = () => {
     <div className="hidden md:flex items-center space-x-4">
       <LanguageSelector />
       <Link to="/login">
-        <Button variant="outline">{t("login")}</Button>
+        <Button variant="ghost" className="text-gray-700 dark:text-gray-200">
+          {t("login")}
+        </Button>
       </Link>
       <Link to="/login">
-        <Button className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">{t("get_started")}</Button>
+        <Button className="bg-primary text-white hover:bg-primary/90">
+          {t("get_started")}
+        </Button>
       </Link>
     </div>
   );

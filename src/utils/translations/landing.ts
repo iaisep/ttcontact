@@ -2,17 +2,17 @@
 const landingTranslations = {
   "en": {
     // Hero section
-    "hero_title": "The Voice AI Platform for Applications",
-    "hero_subtitle": "Create conversational AI agents that speak in natural voices",
+    "hero_title": "Voice AI for your applications",
+    "hero_subtitle": "Create AI agents with natural voices for your product or service",
     "get_started": "Get Started",
     "view_demo": "Watch Demo",
-    "trusted_companies": "Trusted by leading companies worldwide",
+    "trusted_companies": "Trusted by innovative companies worldwide",
     "learn_more": "Learn more",
     
     // Features section
     "features": "Features",
-    "features_section_title": "Create powerful voice agents",
-    "features_section_subtitle": "Our platform makes it easy to create AI-powered voice agents that can understand and respond to users naturally",
+    "features_section_title": "AI voice agents for any use case",
+    "features_section_subtitle": "Our platform provides all you need to build natural, contextual voice agents that transform customer interactions",
     "advanced_voice_recognition": "Advanced Voice Recognition",
     "voice_recognition_description": "Our AI understands speech in multiple languages with high accuracy, even with accents and background noise",
     "natural_language_processing": "Natural Language Processing",
@@ -63,17 +63,17 @@ const landingTranslations = {
   },
   "es": {
     // Hero section
-    "hero_title": "La Plataforma de IA de Voz para Aplicaciones",
-    "hero_subtitle": "Crea agentes de IA conversacionales que hablan con voces naturales",
+    "hero_title": "IA de Voz para tus aplicaciones",
+    "hero_subtitle": "Crea agentes de IA con voces naturales para tu producto o servicio",
     "get_started": "Comenzar",
     "view_demo": "Ver Demo",
-    "trusted_companies": "De confianza para empresas líderes en todo el mundo",
+    "trusted_companies": "Confiado por empresas innovadoras en todo el mundo",
     "learn_more": "Saber más",
     
     // Features section
     "features": "Características",
-    "features_section_title": "Crea potentes agentes de voz",
-    "features_section_subtitle": "Nuestra plataforma facilita la creación de agentes de voz impulsados por IA que pueden entender y responder a los usuarios de forma natural",
+    "features_section_title": "Agentes de voz IA para cualquier caso de uso",
+    "features_section_subtitle": "Nuestra plataforma proporciona todo lo que necesitas para construir agentes de voz naturales y contextuales que transforman las interacciones con clientes",
     "advanced_voice_recognition": "Reconocimiento de Voz Avanzado",
     "voice_recognition_description": "Nuestra IA entiende el habla en múltiples idiomas con alta precisión, incluso con acentos y ruido de fondo",
     "natural_language_processing": "Procesamiento de Lenguaje Natural",
