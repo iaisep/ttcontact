@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowLeft, Settings, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
@@ -16,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface AgentEditorHeaderProps {
   agent: RetellAgent;
@@ -51,11 +52,21 @@ const AgentEditorHeader: React.FC<AgentEditorHeaderProps> = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 font-semibold">
-                  <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-700 rounded-full flex items-center justify-center overflow-hidden text-white">
-                    {agent.agent_name?.substring(0, 1) || agent.name?.substring(0, 1) || 'A'}
-                  </div>
+                  <Avatar className="h-8 w-8 bg-gradient-to-br from-amber-500 to-amber-700">
+                    <AvatarFallback className="text-white">
+                      {agent.agent_name?.substring(0, 1) || agent.name?.substring(0, 1) || 'A'}
+                    </AvatarFallback>
+                  </Avatar>
                   <span>{agent.agent_name || agent.name || 'Unnamed Agent'}</span>
-                  <ChevronDown className="h-4 w-4 ml-1" />
+                  <svg 
+                    width="12" 
+                    height="12" 
+                    viewBox="0 0 12 12" 
+                    fill="none" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[250px]">
