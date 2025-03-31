@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import EditablePrompt from './EditablePrompt';
 import WelcomeMessageEditor from './WelcomeMessageEditor';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
