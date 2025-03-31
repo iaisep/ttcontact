@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 import LandingNav from "@/components/ui/LandingNav";
-import HeroSection from "@/components/ui/HeroSection";
 import Footer from "@/components/ui/Footer";
 
 const Index = () => {

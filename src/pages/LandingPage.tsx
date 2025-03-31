@@ -5,17 +5,20 @@ import FeaturesSection from "@/components/ui/FeaturesSection";
 import PricingSection from "@/components/ui/PricingSection";
 import ContactSection from "@/components/ui/ContactSection";
 import Footer from "@/components/ui/Footer";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen">
-      <LandingNav />
-      <HeroSection />
-      <FeaturesSection />
-      <PricingSection />
-      <ContactSection />
-      <Footer />
-    </div>
+    <TooltipProvider>
+      <div className="min-h-screen">
+        <LandingNav />
+        <HeroSection />
+        <FeaturesSection />
+        <PricingSection />
+        <ContactSection />
+        <Footer />
+      </div>
+    </TooltipProvider>
   );
 };
 
