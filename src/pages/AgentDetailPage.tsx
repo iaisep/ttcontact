@@ -38,9 +38,9 @@ const AgentDetailPage: React.FC = () => {
       
       toast.loading(t('updating_field'));
       
-      // Update the API
+      // Update the API - Cambiado de PUT a PATCH
       await fetch(`https://api.retellai.com/update-agent/${agent.agent_id || agent.id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
