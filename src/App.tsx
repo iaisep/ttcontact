@@ -11,6 +11,10 @@ import NotFound from "./pages/NotFound";
 import { ApiProvider } from "@/context/ApiContext";
 import LanguageProvider from "@/context/LanguageContext";
 
+// Importamos las páginas relacionadas con agentes
+import AgentsPage from "./pages/AgentsPage";
+import AgentEditPage from "./pages/AgentEditPage";
+
 // Importamos las nuevas páginas (componentes temporales que redirigirán)
 import VoiceSDKPage from "./pages/VoiceSDKPage";
 import AIAgentsPage from "./pages/AIAgentsPage";
@@ -41,6 +45,10 @@ const App = () => (
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              
+              {/* Rutas de agentes */}
+              <Route path="/agentes" element={<AgentsPage />} />
+              <Route path="/agentes/:slug" element={<AgentEditPage />} />
               
               {/* Nuevas rutas */}
               <Route path="/voice-sdk" element={<VoiceSDKPage />} />

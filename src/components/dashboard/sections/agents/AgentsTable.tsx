@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Agent } from './types';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useNavigate } from 'react-router-dom';
 
 interface AgentsTableProps {
   agents: Agent[];
@@ -20,6 +21,17 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
   isLoading = false 
 }) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+
+  const handleEditClick = (agent: Agent) => {
+    // Create a slug from the agent name or use the id if name is not available
+    const slug = agent.name 
+      ? agent.name.toLowerCase().replace(/\s+/g, '-') 
+      : agent.id;
+    
+    // Navigate to the edit page with the slug
+    navigate(`/agentes/${slug}`);
+  };
 
   return (
     <Table>
@@ -66,7 +78,7 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => onEditAgent(agent)}
+                  onClick={() => handleEditClick(agent)}
                   disabled={isLoading}
                 >
                   {t('edit')}
