@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Copy, Settings } from 'lucide-react';
+import { ArrowLeft, Copy, Flag, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import {
@@ -24,8 +24,6 @@ interface AgentDetailHeaderProps {
   selectedLlmModel: string;
   onLanguageChange: (value: string) => void;
   onLlmModelChange: (value: string) => void;
-  onOpenAgentSelector?: () => void;
-  onOpenVoiceSettings?: () => void;
 }
 
 const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
@@ -33,9 +31,7 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
   defaultLanguage,
   selectedLlmModel,
   onLanguageChange,
-  onLlmModelChange,
-  onOpenAgentSelector,
-  onOpenVoiceSettings
+  onLlmModelChange
 }) => {
   const navigate = useNavigate();
   
@@ -46,14 +42,14 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
   
   // Language options with flag icons
   const languageOptions = [
-    { value: 'es', label: 'Spanish', icon: '🇪🇸' },
-    { value: 'en', label: 'English', icon: '🇺🇸' },
-    { value: 'fr', label: 'French', icon: '🇫🇷' },
-    { value: 'de', label: 'German', icon: '🇩🇪' },
-    { value: 'pt-BR', label: 'Portuguese (Brazil)', icon: '🇧🇷' },
-    { value: 'pt-PT', label: 'Portuguese (Portugal)', icon: '🇵🇹' },
-    { value: 'it', label: 'Italian', icon: '🇮🇹' },
-    { value: 'ru', label: 'Russian', icon: '🇷🇺' },
+    { value: 'es', label: 'Spanish', icon: <Flag color="#AA151B" fill="#AA151B" className="h-4 w-4" /> },
+    { value: 'en', label: 'English', icon: <Flag color="#B22234" fill="#B22234" className="h-4 w-4" /> },
+    { value: 'fr', label: 'French', icon: <Flag color="#0055A4" fill="#0055A4" className="h-4 w-4" /> },
+    { value: 'de', label: 'German', icon: <Flag color="#000000" fill="#000000" className="h-4 w-4" /> },
+    { value: 'pt-BR', label: 'Portuguese (Brazil)', icon: <Flag color="#009C3B" fill="#009C3B" className="h-4 w-4" /> },
+    { value: 'pt-PT', label: 'Portuguese (Portugal)', icon: <Flag color="#FF0000" fill="#FF0000" className="h-4 w-4" /> },
+    { value: 'it', label: 'Italian', icon: <Flag color="#009246" fill="#009246" className="h-4 w-4" /> },
+    { value: 'ru', label: 'Russian', icon: <Flag color="#FFFFFF" fill="#FFFFFF" className="h-4 w-4" strokeWidth={1} stroke="#0039A6" /> },
   ];
 
   // Find the current language display data
@@ -70,50 +66,7 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
         </Button>
         
         <div className="flex-1">
-          <div className="flex items-center">
-            <div className="flex items-center">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 font-semibold">
-                    <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-700 rounded-full flex items-center justify-center overflow-hidden text-white">
-                      {agent.agent_name?.substring(0, 1) || agent.name?.substring(0, 1) || 'A'}
-                    </div>
-                    <span>{agent.agent_name || agent.name}</span>
-                    <svg 
-                      width="12" 
-                      height="12" 
-                      viewBox="0 0 12 12" 
-                      fill="none" 
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="ml-1"
-                    >
-                      <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-[250px]">
-                  <DropdownMenuItem onClick={onOpenAgentSelector}>
-                    Select different agent
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              
-              {onOpenVoiceSettings && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={onOpenVoiceSettings} className="ml-1">
-                        <Settings className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Voice settings</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-          </div>
+          <h1 className="text-lg font-semibold">{agent.agent_name || agent.name}</h1>
           <div className="flex text-xs text-muted-foreground space-x-2 items-center">
             <div className="flex items-center gap-1">
               <span>Agent ID: {agent.agent_id?.substring(0, 8) || agent.id?.substring(0, 8)}</span>
@@ -146,36 +99,51 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
         </div>
         
         <div className="flex space-x-2 items-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="flex items-center space-x-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-md p-2 cursor-pointer mr-2">
-                <span className="text-sm ml-2">{currentLanguage.icon} {currentLanguage.label}</span>
-                <svg 
-                  width="12" 
-                  height="12" 
-                  viewBox="0 0 12 12" 
-                  fill="none" 
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="ml-1"
-                >
-                  <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[200px] max-h-[350px] overflow-y-auto">
-              {languageOptions.map((lang) => (
-                <DropdownMenuItem 
-                  key={lang.value}
-                  onClick={() => onLanguageChange(lang.value)}
-                  className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 py-2"
-                >
-                  <span className="text-sm">{lang.icon} {lang.label}</span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <TooltipProvider>
+            <DropdownMenu>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <div className="flex items-center space-x-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-md p-2 cursor-pointer mr-2">
+                      {currentLanguage.icon}
+                      <span className="text-sm ml-2">{currentLanguage.label}</span>
+                      <svg 
+                        width="12" 
+                        height="12" 
+                        viewBox="0 0 12 12" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="ml-1"
+                      >
+                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Select language</p>
+                </TooltipContent>
+              </Tooltip>
+              <DropdownMenuContent align="end" className="w-[200px] max-h-[350px] overflow-y-auto">
+                {languageOptions.map((lang) => (
+                  <DropdownMenuItem 
+                    key={lang.value}
+                    onClick={() => onLanguageChange(lang.value)}
+                    className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 py-2"
+                  >
+                    {lang.icon}
+                    <span className="text-sm">{lang.label}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TooltipProvider>
           
           <div className="flex space-x-2">
+            <Button variant="outline" onClick={() => navigate(`/agentes/${agentId}/edit`)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
             <Button variant="outline">Create</Button>
             <Button variant="outline">Simulation</Button>
           </div>
