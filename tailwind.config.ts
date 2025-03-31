@@ -116,6 +116,8 @@ export default {
         'subtle': '0 2px 10px rgba(0, 0, 0, 0.05)',
         'subtle-lg': '0 10px 25px -5px rgba(0, 0, 0, 0.05)',
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.08)',
+        'dark': '0 2px 10px rgba(0, 0, 0, 0.2)',
+        'dark-lg': '0 10px 25px -5px rgba(0, 0, 0, 0.2)',
       },
       backdropBlur: {
         'xs': '2px',

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const LandingNav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -24,7 +25,7 @@ const LandingNav = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/90 backdrop-blur-md shadow-sm"
+          ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-sm"
           : "bg-transparent"
       }`}
     >
@@ -62,30 +63,31 @@ const LandingNav = () => {
                 />
               </svg>
             </div>
-            <span className="text-xl font-bold text-gray-900">{t("voice_agent_hub")}</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">{t("voice_agent_hub")}</span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-gray-600 hover:text-primary transition-colors">
+            <a href="#features" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
               {t("features")}
             </a>
-            <a href="#pricing" className="text-gray-600 hover:text-primary transition-colors">
+            <a href="#pricing" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
               {t("pricing")}
             </a>
-            <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
               {t("documentation")}
             </a>
-            <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
               {t("solutions")}
             </a>
-            <a href="#" className="text-gray-600 hover:text-primary transition-colors">
+            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
               {t("resources")}
             </a>
           </nav>
 
           {/* Language Selector and CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
             <LanguageSelector />
             <Link to="/login">
               <Button variant="outline">{t("login")}</Button>
@@ -97,6 +99,7 @@ const LandingNav = () => {
 
           {/* Mobile Menu Toggle */}
           <div className="md:hidden flex items-center space-x-2">
+            <ThemeToggle />
             <LanguageSelector />
             <Button
               variant="ghost"
@@ -112,39 +115,39 @@ const LandingNav = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t">
+        <div className="md:hidden bg-white dark:bg-gray-900 border-t dark:border-gray-800">
           <div className="container mx-auto px-4 py-4 space-y-4">
             <a
               href="#features"
-              className="block py-2 text-gray-600 hover:text-primary"
+              className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t("features")}
             </a>
             <a
               href="#pricing"
-              className="block py-2 text-gray-600 hover:text-primary"
+              className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t("pricing")}
             </a>
             <a
               href="#"
-              className="block py-2 text-gray-600 hover:text-primary"
+              className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t("documentation")}
             </a>
             <a
               href="#"
-              className="block py-2 text-gray-600 hover:text-primary"
+              className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t("solutions")}
             </a>
             <a
               href="#"
-              className="block py-2 text-gray-600 hover:text-primary"
+              className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t("resources")}

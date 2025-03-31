@@ -1,60 +1,31 @@
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut } from "lucide-react";
-import SidebarUsageInfo from "./SidebarUsageInfo";
+import { Button } from "@/components/ui/button";
+import { LogOut, Github, LifeBuoy } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useLanguage } from "@/context/LanguageContext";
-import LanguageSelector from "@/components/dashboard/LanguageSelector";
 
-interface SidebarFooterProps {
-  sidebarCollapsed: boolean;
-  onLogout: () => void;
-}
-
-const SidebarFooter = ({ sidebarCollapsed, onLogout }: SidebarFooterProps) => {
+const SidebarFooter = () => {
   const { t } = useLanguage();
   
-  if (sidebarCollapsed) {
-    return (
-      <div className="py-4 flex flex-col items-center">
-        <SidebarUsageInfo sidebarCollapsed={sidebarCollapsed} />
-        <button
-          onClick={onLogout}
-          className="w-full flex justify-center py-2.5 text-gray-500 hover:text-gray-700"
-          title={t("logout")}
-        >
-          <LogOut size={20} />
-        </button>
-        <button className="w-full flex justify-center py-2.5">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-4">
-      <SidebarUsageInfo sidebarCollapsed={sidebarCollapsed} />
-      <div className="mb-3">
-        <LanguageSelector />
+    <div className="p-4 pt-0">
+      <div className="flex items-center justify-between mb-4">
+        <ThemeToggle variant="switch" />
       </div>
-      <div className="flex items-center gap-2">
-        <Avatar className="h-8 w-8">
-          <AvatarFallback>U</AvatarFallback>
-        </Avatar>
-        <div className="flex-1">
-          <div className="text-sm font-medium">{t("user_name")}</div>
-          <div className="text-xs text-gray-500">user@example.com</div>
-        </div>
-        <button
-          onClick={onLogout}
-          className="text-gray-500 hover:text-gray-700"
-          title={t("logout")}
-        >
-          <LogOut size={18} />
-        </button>
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm" className="w-full">
+          <Github className="mr-2 h-4 w-4" />
+          {t("github")}
+        </Button>
+        <Button variant="outline" size="sm" className="w-full">
+          <LifeBuoy className="mr-2 h-4 w-4" />
+          {t("help")}
+        </Button>
       </div>
+      <Button variant="destructive" size="sm" className="w-full mt-2">
+        <LogOut className="mr-2 h-4 w-4" />
+        {t("logout")}
+      </Button>
     </div>
   );
 };
