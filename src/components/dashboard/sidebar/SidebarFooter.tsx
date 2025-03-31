@@ -16,7 +16,7 @@ const SidebarFooter = ({ sidebarCollapsed, onLogout }: SidebarFooterProps) => {
     <div className="p-4 pt-0">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <ThemeToggle variant="switch" />
+          <ThemeToggle variant={sidebarCollapsed ? "icon" : "switch"} />
           {!sidebarCollapsed && (
             <span className="text-sm">{t("theme")}</span>
           )}
