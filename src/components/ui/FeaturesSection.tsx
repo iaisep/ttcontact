@@ -11,33 +11,33 @@ const FeaturesSection = () => {
   const features = [
     {
       icon: <Mic className="w-6 h-6 text-indigo-600" />,
-      title: t("advanced_voice_recognition"),
-      description: t("voice_recognition_description")
+      title: "Ultra-realistic voices",
+      description: "Our voices sound indistinguishable from humans, complete with natural pauses, filler words, and emotions."
     },
     {
       icon: <Brain className="w-6 h-6 text-indigo-600" />,
-      title: t("natural_language_processing"),
-      description: t("nlp_description")
+      title: "Conversation memory",
+      description: "Our voice agents remember previous conversations and context, creating more natural and personalized interactions."
     },
     {
       icon: <MessageSquare className="w-6 h-6 text-indigo-600" />,
-      title: t("personalized_responses"),
-      description: t("personalized_responses_description")
+      title: "Conversational AI",
+      description: "Powered by the latest AI models, our agents can handle complex discussions and follow natural conversation flows."
     },
     {
       icon: <Code className="w-6 h-6 text-indigo-600" />,
-      title: t("simple_api_integration"),
-      description: t("api_integration_description")
+      title: "Simple API & SDK",
+      description: "Get started quickly with our well-documented API and SDKs for JavaScript, Python, and more."
     },
     {
       icon: <Headphones className="w-6 h-6 text-indigo-600" />,
-      title: t("human_agent_transfer"),
-      description: t("human_agent_transfer_description")
+      title: "Real-time interactions",
+      description: "Our voice agents respond in real-time with minimal latency, making conversations feel natural."
     },
     {
       icon: <Zap className="w-6 h-6 text-indigo-600" />,
-      title: t("continuous_learning"),
-      description: t("continuous_learning_description")
+      title: "Custom voice cloning",
+      description: "Create unique AI voices that match your brand identity or clone specific voice profiles."
     }
   ];
 
@@ -54,7 +54,7 @@ const FeaturesSection = () => {
             transition={{ duration: 0.5 }}
             className="inline-block px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full mb-4"
           >
-            {t("features")}
+            Features
           </motion.span>
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
@@ -63,7 +63,7 @@ const FeaturesSection = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4"
           >
-            {t("features_section_title")}
+            Everything you need to build voice AI
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -72,7 +72,7 @@ const FeaturesSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
           >
-            {t("features_section_subtitle")}
+            Our comprehensive platform provides all the tools and features for creating natural voice interactions
           </motion.p>
         </div>
 
@@ -108,25 +108,25 @@ const FeaturesSection = () => {
             
             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
               <div className="max-w-lg">
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">{t("sdk_integration_title")}</h3>
-                <p className="text-white/80 text-lg mb-6">{t("sdk_integration_description")}</p>
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Integrate voice AI in minutes, not months</h3>
+                <p className="text-white/80 text-lg mb-6">Our simple SDK and well-documented API make it easy to add voice AI to your application</p>
                 <Link to="/docs">
                   <Button className="bg-white text-indigo-600 hover:bg-gray-100 font-medium">
-                    {t("view_documentation")}
+                    View Documentation
                     <ArrowRight size={16} className="ml-2" />
                   </Button>
                 </Link>
               </div>
               
               <div className="bg-black/30 backdrop-blur-sm rounded-xl p-4 border border-white/10 max-w-sm w-full">
-                <div className="text-sm font-mono text-white/70 mb-3">// {t("code_example")}</div>
+                <div className="text-sm font-mono text-white/70 mb-3">// Example code</div>
                 <pre className="text-white font-mono text-sm overflow-x-auto p-2">
                   <code>
-{`import { VoiceAgent } from '@voice/hub';
+{`import { VoiceAgent } from 'retell';
 
 const agent = new VoiceAgent({
   apiKey: 'YOUR_API_KEY',
-  voice: 'natural-female-1',
+  voice: 'emma',
   language: 'en-US'
 });
 
@@ -148,10 +148,10 @@ agent.onCall((call) => {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full mb-4">
-              {t("industries_section_title")}
+              Use Cases
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              {t("industries_section_subtitle")}
+              Perfect for multiple industries and applications
             </h2>
             <ul className="space-y-4 mt-6">
               <li className="flex items-start">
@@ -161,8 +161,8 @@ agent.onCall((call) => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{t("customer_service")}</h3>
-                  <p className="text-gray-600 dark:text-gray-300">{t("customer_service_description")}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Customer Support</h3>
+                  <p className="text-gray-600 dark:text-gray-300">Provide 24/7 support with AI agents that sound just like your best support representatives.</p>
                 </div>
               </li>
               <li className="flex items-start">
@@ -172,8 +172,8 @@ agent.onCall((call) => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{t("healthcare")}</h3>
-                  <p className="text-gray-600 dark:text-gray-300">{t("healthcare_description")}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Sales & Lead Generation</h3>
+                  <p className="text-gray-600 dark:text-gray-300">Qualify leads with personalized initial conversations that sound human and natural.</p>
                 </div>
               </li>
               <li className="flex items-start">
@@ -183,8 +183,8 @@ agent.onCall((call) => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{t("sales")}</h3>
-                  <p className="text-gray-600 dark:text-gray-300">{t("sales_description")}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Healthcare & Wellness</h3>
+                  <p className="text-gray-600 dark:text-gray-300">Create empathetic interactions for appointment scheduling, followups, and care coordination.</p>
                 </div>
               </li>
               <li className="flex items-start">
@@ -194,8 +194,8 @@ agent.onCall((call) => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{t("call_centers")}</h3>
-                  <p className="text-gray-600 dark:text-gray-300">{t("call_centers_description")}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Customer Experience</h3>
+                  <p className="text-gray-600 dark:text-gray-300">Enhance customer interactions with personalized experiences that remember preferences.</p>
                 </div>
               </li>
             </ul>

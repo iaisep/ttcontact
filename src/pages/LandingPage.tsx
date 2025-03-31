@@ -5,6 +5,7 @@ import LandingNav from "@/components/ui/LandingNav";
 import HeroSection from "@/components/ui/HeroSection";
 import FeaturesSection from "@/components/ui/FeaturesSection";
 import PricingSection from "@/components/ui/PricingSection";
+import ContactSection from "@/components/ui/ContactSection";
 import Footer from "@/components/ui/Footer";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
@@ -52,6 +53,7 @@ const LandingPage = () => {
           </motion.div>
           <FeaturesSection />
           <PricingSection />
+          <ContactSection />
         </main>
         <Footer />
       </div>

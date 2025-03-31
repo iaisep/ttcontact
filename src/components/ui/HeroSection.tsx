@@ -23,22 +23,22 @@ const HeroSection = () => {
           className="text-center max-w-4xl mx-auto"
         >
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6 leading-tight">
-            {t("retell_hero_title")}
+            Build Voice AI that sounds exactly like a human
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            {t("retell_hero_subtitle")}
+            Retell helps you build voice AI with our simple SDK and API that sounds indistinguishable from a human.
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-10">
             <Link to="/login">
               <Button size="lg" className="text-base px-6 py-6 bg-indigo-600 hover:bg-indigo-700 text-white w-full sm:w-auto">
-                {t("get_started")}
+                Get Started
                 <ArrowRight size={16} className="ml-2" />
               </Button>
             </Link>
             <Button size="lg" variant="outline" className="text-base px-6 py-6 w-full sm:w-auto border-gray-300 dark:border-gray-700">
               <Play size={16} className="mr-2" />
-              {t("view_demo")}
+              Watch Demo
             </Button>
           </div>
           
@@ -52,13 +52,13 @@ const HeroSection = () => {
               <svg className="w-4 h-4 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
               </svg>
-              {t("no_credit_card")}
+              No credit card required
             </span>
             <span className="inline-flex items-center">
               <svg className="w-4 h-4 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
               </svg>
-              {t("free_minutes")}
+              100 free minutes
             </span>
           </motion.div>
         </motion.div>

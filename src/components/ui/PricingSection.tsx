@@ -17,61 +17,61 @@ const PricingSection = () => {
 
   const plans = [
     {
-      name: t("basic_plan"),
-      price: "49",
-      description: t("basic_description"),
+      name: "Starter",
+      price: "0",
+      description: "For developers and hobbyists to try our Voice AI platform",
       features: [
-        t("up_to_minutes").replace("{0}", "500"),
-        t("voice_agents").replace("{0}", "2"),
-        t("basic_integrations"),
-        t("weekly_reports"),
-        t("email_support")
+        "100 free minutes",
+        "2 voice options",
+        "Basic AI capabilities",
+        "REST API access",
+        "Community support"
       ],
-      cta: t("start_free"),
+      cta: "Start for free",
       popular: false,
-      priceId: "price_1R8Sl9LeoauYmYi0EO0IBI7a",
+      priceId: "price_free",
       productId: STRIPE_PRODUCT_ID
     },
     {
-      name: t("pro_plan"),
-      price: "149",
-      description: t("pro_description"),
+      name: "Growth",
+      price: "99",
+      description: "For growing teams with increased voice AI needs",
       features: [
-        t("up_to_minutes").replace("{0}", "2.000"),
-        t("voice_agents").replace("{0}", "5"),
-        t("all_integrations"),
-        t("advanced_reports"),
-        t("human_transfer"),
-        t("priority_support")
+        "1,000 minutes/month",
+        "All voice options",
+        "Advanced conversation memory",
+        "Voice customization",
+        "Webhook integrations",
+        "Email support"
       ],
-      cta: t("start_trial"),
+      cta: "Start 7-day trial",
       popular: true,
       priceId: "price_1R8Sl9LeoauYmYi0EO0IBI7a",
       productId: STRIPE_PRODUCT_ID
     },
     {
-      name: t("enterprise_plan"),
-      price: t("custom_price"),
-      description: t("enterprise_description"),
+      name: "Enterprise",
+      price: "Custom",
+      description: "For organizations with high-volume requirements",
       features: [
-        t("unlimited_minutes"),
-        t("unlimited_agents"),
-        t("custom_integrations"),
-        t("custom_voice"),
-        t("dedicated_api"),
-        t("support_24_7"),
-        t("account_manager")
+        "Custom volume pricing",
+        "Custom voice creation",
+        "Advanced analytics",
+        "Dedicated infrastructure",
+        "SLA guarantees",
+        "Dedicated account manager",
+        "24/7 premium support"
       ],
-      cta: t("contact_sales_cta"),
+      cta: "Contact sales",
       popular: false,
-      priceId: "price_1R8Sl9LeoauYmYi0EO0IBI7a",
+      priceId: "price_enterprise",
       productId: STRIPE_PRODUCT_ID
     }
   ];
 
   const handlePlanSelect = async (plan: typeof plans[0]) => {
     // For the Enterprise plan, simply redirect to contact
-    if (plan.name === t("enterprise_plan")) {
+    if (plan.name === "Enterprise") {
       navigate("#contact");
       return;
     }
@@ -130,7 +130,7 @@ const PricingSection = () => {
             transition={{ duration: 0.5 }}
             className="inline-block px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full mb-4"
           >
-            {t("pricing")}
+            Pricing
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -139,7 +139,7 @@ const PricingSection = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4"
           >
-            {t("plans_title")}
+            Simple, transparent pricing
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -148,7 +148,7 @@ const PricingSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
           >
-            {t("plans_subtitle")}
+            Choose the plan that fits your needs, from individual developers to enterprise organizations
           </motion.p>
         </div>
 
@@ -169,7 +169,7 @@ const PricingSection = () => {
               {plan.popular && (
                 <div className="absolute top-0 right-0">
                   <div className="bg-indigo-600 text-white text-xs font-medium px-3 py-1 rounded-bl-lg">
-                    {t("popular")}
+                    Popular
                   </div>
                 </div>
               )}
@@ -177,11 +177,11 @@ const PricingSection = () => {
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{plan.name}</h3>
                 <div className="mb-4">
                   <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                    {plan.price === t("custom_price") ? "" : "$"}
+                    {plan.price !== "Custom" && "$"}
                     {plan.price}
                   </span>
-                  {plan.price !== t("custom_price") && (
-                    <span className="text-gray-600 dark:text-gray-400 ml-1">{t("per_month")}</span>
+                  {plan.price !== "Custom" && plan.price !== "0" && (
+                    <span className="text-gray-600 dark:text-gray-400 ml-1">/month</span>
                   )}
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">{plan.description}</p>
@@ -197,7 +197,7 @@ const PricingSection = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      {t("loading")}
+                      Loading
                     </span>
                   ) : plan.cta}
                 </Button>
@@ -222,7 +222,7 @@ const PricingSection = () => {
           className="text-center mt-12"
         >
           <p className="text-gray-600 dark:text-gray-400">
-            {t("custom_plan")} <a href="#contact" className="text-indigo-600 hover:underline font-medium">{t("contact_us")}</a>
+            Need a custom plan for your specific requirements? <a href="#contact" className="text-indigo-600 hover:underline font-medium">Contact us</a>
           </p>
         </motion.div>
       </div>

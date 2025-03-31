@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +28,7 @@ const ContactSection = () => {
     
     // Simulate API call
     setTimeout(() => {
-      toast.success(t("message_sent_success"));
+      toast.success("Your message has been sent successfully. We'll get back to you soon!");
       setFormData({
         name: "",
         email: "",
@@ -50,7 +51,7 @@ const ContactSection = () => {
               transition={{ duration: 0.6 }}
               className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
             >
-              {t("contact_ready_title")}
+              Ready to transform your voice experiences?
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -59,7 +60,7 @@ const ContactSection = () => {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-xl text-gray-600"
             >
-              {t("contact_ready_subtitle")}
+              Get in touch with our team to learn how Retell can help your business
             </motion.p>
           </div>
 
@@ -72,10 +73,10 @@ const ContactSection = () => {
           >
             <div className="grid grid-cols-1 md:grid-cols-2">
               <div className="p-8 md:p-10">
-                <h3 className="text-2xl font-semibold mb-6">{t("contact_us_heading")}</h3>
+                <h3 className="text-2xl font-semibold mb-6">Contact Us</h3>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <Label htmlFor="name">{t("full_name")}</Label>
+                    <Label htmlFor="name">Full Name</Label>
                     <Input
                       id="name"
                       name="name"
@@ -86,7 +87,7 @@ const ContactSection = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email">{t("email")}</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       name="email"
@@ -98,7 +99,7 @@ const ContactSection = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="company">{t("company")}</Label>
+                    <Label htmlFor="company">Company</Label>
                     <Input
                       id="company"
                       name="company"
@@ -109,7 +110,7 @@ const ContactSection = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="message">{t("message")}</Label>
+                    <Label htmlFor="message">Message</Label>
                     <textarea
                       id="message"
                       name="message"
@@ -123,41 +124,34 @@ const ContactSection = () => {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700"
                   >
-                    {isSubmitting ? t("sending") : t("send_message")}
+                    {isSubmitting ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
               </div>
-              <div className="bg-gradient-to-br from-primary/80 to-primary p-8 md:p-10 text-white flex flex-col justify-between">
+              <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 p-8 md:p-10 text-white flex flex-col justify-between">
                 <div>
-                  <h3 className="text-2xl font-semibold mb-6">{t("contact_information")}</h3>
+                  <h3 className="text-2xl font-semibold mb-6">Contact Information</h3>
                   <div className="space-y-4">
                     <p className="flex items-start">
                       <svg className="w-5 h-5 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span>info@voiceagenthub.com</span>
-                    </p>
-                    <p className="flex items-start">
-                      <svg className="w-5 h-5 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                      <span>+34 900 123 456</span>
+                      <span>hello@retellai.com</span>
                     </p>
                     <p className="flex items-start">
                       <svg className="w-5 h-5 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
-                      <span>{t("company_address")}</span>
+                      <span>San Francisco, CA</span>
                     </p>
                   </div>
                 </div>
                 <div className="mt-12">
-                  <h4 className="text-lg font-medium mb-4">{t("office_hours")}</h4>
-                  <p>{t("weekday_hours")}</p>
-                  <p>{t("weekend_hours")}</p>
+                  <h4 className="text-lg font-medium mb-4">Office Hours</h4>
+                  <p>Monday - Friday: 9:00 AM - 6:00 PM PT</p>
                 </div>
               </div>
             </div>
