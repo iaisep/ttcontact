@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
-import { Mic, Phone, TestTube } from 'lucide-react';
+import { Mic, Phone, TestTube, Code } from 'lucide-react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 
@@ -48,6 +48,20 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
     }
   };
   
+  const handleCodeTest = async () => {
+    setIsLoading(true);
+    try {
+      toast.info(t('testing_code'));
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success(t('code_test_complete'));
+    } catch (error) {
+      console.error('Error testing code:', error);
+      toast.error(t('error_testing_code'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   const handleFullTest = async () => {
     if (isRecording) {
       // Stop recording
@@ -75,29 +89,39 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
 
   return (
     <div className="flex flex-col items-center justify-center">
+      {/* Test Action Buttons */}
+      <div className="w-full flex gap-2 mb-10">
+        <Button variant="outline" onClick={handleAudioTest} className="flex-1" disabled={isLoading}>
+          <Phone className="mr-2 h-4 w-4" /> 
+          {t('test_audio')}
+        </Button>
+        
+        <Button variant="outline" onClick={handleLlmTest} className="flex-1" disabled={isLoading}>
+          <TestTube className="mr-2 h-4 w-4" /> 
+          {t('test_llm')}
+        </Button>
+        
+        <Button variant="outline" onClick={handleCodeTest} disabled={isLoading}>
+          <Code className="h-4 w-4" />
+        </Button>
+      </div>
+      
+      {/* Microphone Icon */}
       <div className="mb-4 rounded-full bg-gray-100 p-6 flex items-center justify-center">
         <Mic className="h-8 w-8 text-gray-400" />
       </div>
-      <p className="text-gray-500 mb-4">Test your agent</p>
       
-      <div className="flex space-x-4 mb-4 w-full">
-        <Button variant="outline" onClick={handleAudioTest} className="flex-1" disabled={isLoading}>
-          <Phone className="mr-2 h-4 w-4" /> 
-          Test Audio
-        </Button>
-        <Button variant="outline" onClick={handleLlmTest} className="flex-1" disabled={isLoading}>
-          <TestTube className="mr-2 h-4 w-4" /> 
-          Test LLM
-        </Button>
-      </div>
+      {/* Test Label */}
+      <p className="text-gray-500 mb-4">{t('test_your_agent')}</p>
       
+      {/* Test Button */}
       <Button 
         onClick={handleFullTest}
         variant="default"
-        className={`w-full ${isRecording ? 'bg-red-500 hover:bg-red-600' : ''}`}
+        className={`${isRecording ? 'bg-red-500 hover:bg-red-600' : ''}`}
         disabled={isLoading && !isRecording}
       >
-        Test
+        {t('test')}
       </Button>
     </div>
   );
