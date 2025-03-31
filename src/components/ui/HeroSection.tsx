@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Play } from "lucide-react";
+import { ChevronDown, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -9,103 +9,78 @@ const HeroSection = () => {
   const { t } = useLanguage();
   
   return (
-    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 -right-4 w-72 h-72 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style={{ animationDelay: "-5s" }}></div>
-      </div>
-
+    <section className="relative pt-28 pb-16 md:pt-36 md:pb-24 overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-white dark:from-gray-900/30 dark:to-gray-950 -z-10"></div>
+      
       <div className="container mx-auto px-4 relative">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center lg:text-left"
-          >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900 mb-6">
-              {t("hero_title")}
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0">
-              {t("hero_subtitle")}
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
-              <Button size="lg" className="text-base px-6 py-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-4xl mx-auto"
+        >
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
+            {t("hero_title")}
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+            {t("hero_subtitle")}
+          </p>
+          
+          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-12">
+            <Link to="/login">
+              <Button size="lg" className="text-base px-6 py-6 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100">
                 {t("get_started")}
               </Button>
-              <Button size="lg" variant="outline" className="text-base px-6 py-6">
-                <Play size={18} className="mr-2" />
-                {t("view_demo")}
-              </Button>
-            </div>
-          </motion.div>
-
+            </Link>
+            <Button size="lg" variant="outline" className="text-base px-6 py-6">
+              <Play size={18} className="mr-2" />
+              {t("view_demo")}
+            </Button>
+          </div>
+          
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="hidden lg:block"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="flex justify-center"
           >
-            <div className="relative">
-              <div className="relative z-10 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-                <div className="bg-gray-50 p-4 border-b border-gray-100 flex items-center">
-                  <div className="flex space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  </div>
-                  <div className="text-sm text-gray-500 mx-auto">{t("voice_agent_demo")}</div>
-                </div>
-                <div className="p-6 space-y-4">
-                  <div className="flex items-start">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
-                      <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
-                    <div className="ml-4 bg-gray-100 rounded-2xl rounded-tl-none p-4 text-gray-700">
-                      {t("demo_message_1")}
-                    </div>
-                  </div>
-                  <div className="flex items-start justify-end">
-                    <div className="mr-4 bg-primary/10 text-gray-800 rounded-2xl rounded-tr-none p-4">
-                      {t("demo_message_2")}
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                      <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
-                      <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
-                    <div className="ml-4 bg-gray-100 rounded-2xl rounded-tl-none p-4 text-gray-700">
-                      {t("demo_message_3")}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Decorative elements */}
-              <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-yellow-100 rounded-full z-0"></div>
-              <div className="absolute -top-6 -right-6 w-32 h-32 bg-blue-100 rounded-full z-0"></div>
-            </div>
+            <a href="#features" className="flex flex-col items-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+              <span className="text-sm mb-2">{t("learn_more")}</span>
+              <ChevronDown size={18} className="animate-bounce" />
+            </a>
           </motion.div>
-        </div>
-
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="mt-16 md:mt-24 relative max-w-5xl mx-auto"
+        >
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800">
+            <div className="aspect-video w-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+              <img 
+                src="https://source.unsplash.com/7esRPTT8d8s/1920x1080" 
+                alt="Voice Agent Hub Demo" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+          {/* Decorative elements */}
+          <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-primary/10 rounded-full z-0 blur-xl"></div>
+          <div className="absolute -top-6 -right-6 w-32 h-32 bg-blue-100 dark:bg-blue-900/20 rounded-full z-0 blur-xl"></div>
+        </motion.div>
+        
         {/* Logos de clientes */}
-        <div className="mt-20">
-          <p className="text-center text-gray-500 mb-8">{t("trusted_companies")}</p>
-          <div className="flex flex-wrap justify-center gap-8 opacity-60">
-            <div className="w-24 h-12 bg-gray-200 rounded flex items-center justify-center">Logo 1</div>
-            <div className="w-24 h-12 bg-gray-200 rounded flex items-center justify-center">Logo 2</div>
-            <div className="w-24 h-12 bg-gray-200 rounded flex items-center justify-center">Logo 3</div>
-            <div className="w-24 h-12 bg-gray-200 rounded flex items-center justify-center">Logo 4</div>
-            <div className="w-24 h-12 bg-gray-200 rounded flex items-center justify-center">Logo 5</div>
+        <div className="mt-24 md:mt-32">
+          <p className="text-center text-gray-500 dark:text-gray-400 mb-8">{t("trusted_companies")}</p>
+          <div className="flex flex-wrap justify-center gap-8 opacity-70">
+            <div className="w-24 h-12 bg-gray-200 dark:bg-gray-800 rounded flex items-center justify-center">Logo 1</div>
+            <div className="w-24 h-12 bg-gray-200 dark:bg-gray-800 rounded flex items-center justify-center">Logo 2</div>
+            <div className="w-24 h-12 bg-gray-200 dark:bg-gray-800 rounded flex items-center justify-center">Logo 3</div>
+            <div className="w-24 h-12 bg-gray-200 dark:bg-gray-800 rounded flex items-center justify-center">Logo 4</div>
+            <div className="w-24 h-12 bg-gray-200 dark:bg-gray-800 rounded flex items-center justify-center">Logo 5</div>
           </div>
         </div>
       </div>

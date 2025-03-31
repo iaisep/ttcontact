@@ -38,7 +38,7 @@ const LandingNav = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-sm"
+          ? "bg-white/90 dark:bg-gray-950/90 backdrop-blur-md shadow-sm"
           : "bg-transparent"
       }`}
     >
@@ -80,92 +80,116 @@ const LandingNav = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList className="gap-2">
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-gray-700 dark:text-gray-200">
-                  {t("features")}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4">
-                    <li className="row-span-3">
-                      <a
-                        href="#features"
-                        className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/50 to-primary p-6 no-underline outline-none focus:shadow-md"
-                      >
-                        <div className="mt-4 mb-2 text-lg font-medium text-white">{t("features")}</div>
-                        <p className="text-sm leading-tight text-white/90">{t("discover_features")}</p>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#features" className="block p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <div className="text-sm font-medium">{t("voice_recognition")}</div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t("voice_recognition_desc")}</p>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#features" className="block p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <div className="text-sm font-medium">{t("natural_language")}</div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t("natural_language_desc")}</p>
-                      </a>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <a href="#pricing" className="text-gray-700 dark:text-gray-200 px-3 py-2 hover:text-primary dark:hover:text-primary transition-colors">
-                  {t("pricing")}
-                </a>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <a href="#" className="text-gray-700 dark:text-gray-200 px-3 py-2 hover:text-primary dark:hover:text-primary transition-colors">
-                  {t("documentation")}
-                </a>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-gray-700 dark:text-gray-200">
-                  {t("solutions")}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4">
-                    <li>
-                      <a href="#" className="block p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <div className="text-sm font-medium">{t("enterprise")}</div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t("enterprise_desc")}</p>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="block p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <div className="text-sm font-medium">{t("small_business")}</div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t("small_business_desc")}</p>
-                      </a>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-gray-700 dark:text-gray-200">
-                  {t("resources")}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4">
-                    <li>
-                      <a href="#" className="block p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <div className="text-sm font-medium">{t("blog")}</div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t("blog_desc")}</p>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" className="block p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                        <div className="text-sm font-medium">{t("guides")}</div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t("guides_desc")}</p>
-                      </a>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+          <div className="hidden md:flex items-center space-x-2">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="bg-transparent text-gray-700 dark:text-gray-200">
+                    {t("products")}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-6 w-[400px]">
+                      <li className="row-span-3">
+                        <NavigationMenuLink asChild>
+                          <a
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/50 to-primary p-6 no-underline outline-none focus:shadow-md"
+                            href="#features"
+                          >
+                            <div className="mt-4 mb-2 text-lg font-medium text-white">
+                              {t("features")}
+                            </div>
+                            <p className="text-sm leading-tight text-white/90">
+                              {t("discover_features")}
+                            </p>
+                          </a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <Link
+                          to="/voice-sdk"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        >
+                          <div className="text-sm font-medium leading-none">{t("voice_sdk")}</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            {t("voice_sdk_desc")}
+                          </p>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/ai-agents"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        >
+                          <div className="text-sm font-medium leading-none">{t("ai_agents")}</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            {t("ai_agents_desc")}
+                          </p>
+                        </Link>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link
+                    to="/docs"
+                    className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary transition-colors"
+                  >
+                    {t("documentation")}
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="bg-transparent text-gray-700 dark:text-gray-200">
+                    {t("resources")}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-6 w-[400px]">
+                      <li>
+                        <Link
+                          to="/blog"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        >
+                          <div className="text-sm font-medium leading-none">{t("blog")}</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            {t("blog_desc")}
+                          </p>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/guides"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        >
+                          <div className="text-sm font-medium leading-none">{t("guides")}</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            {t("guides_desc")}
+                          </p>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/examples"
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        >
+                          <div className="text-sm font-medium leading-none">{t("examples")}</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            {t("examples_desc")}
+                          </p>
+                        </Link>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link
+                    to="#pricing"
+                    className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary transition-colors"
+                  >
+                    {t("pricing")}
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
 
           {/* Language Selector and CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
@@ -173,8 +197,8 @@ const LandingNav = () => {
             <Link to="/login">
               <Button variant="outline">{t("login")}</Button>
             </Link>
-            <Link to="#contact">
-              <Button className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">{t("contact_sales")}</Button>
+            <Link to="/login">
+              <Button className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">{t("get_started")}</Button>
             </Link>
           </div>
 
@@ -195,49 +219,92 @@ const LandingNav = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 border-t dark:border-gray-800">
+        <div className="md:hidden bg-white dark:bg-gray-950 border-t dark:border-gray-800">
           <div className="container mx-auto px-4 py-4 space-y-4">
-            <a
-              href="#features"
-              className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {t("features")}
-            </a>
-            <a
-              href="#pricing"
-              className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {t("pricing")}
-            </a>
-            <a
-              href="#"
-              className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
+            <div className="py-2">
+              <div className="font-medium text-gray-800 dark:text-gray-200 mb-2">{t("products")}</div>
+              <ul className="pl-4 space-y-2">
+                <li>
+                  <Link
+                    to="/voice-sdk"
+                    className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t("voice_sdk")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/ai-agents"
+                    className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t("ai_agents")}
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    href="#features"
+                    className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t("features")}
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <Link
+              to="/docs"
+              className="block py-2 text-gray-800 dark:text-gray-200 hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t("documentation")}
-            </a>
+            </Link>
+            <div className="py-2">
+              <div className="font-medium text-gray-800 dark:text-gray-200 mb-2">{t("resources")}</div>
+              <ul className="pl-4 space-y-2">
+                <li>
+                  <Link
+                    to="/blog"
+                    className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t("blog")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/guides"
+                    className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t("guides")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/examples"
+                    className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t("examples")}
+                  </Link>
+                </li>
+              </ul>
+            </div>
             <a
-              href="#"
-              className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
+              href="#pricing"
+              className="block py-2 text-gray-800 dark:text-gray-200 hover:text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              {t("solutions")}
-            </a>
-            <a
-              href="#"
-              className="block py-2 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {t("resources")}
+              {t("pricing")}
             </a>
             <div className="pt-4 flex flex-col space-y-3">
               <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="outline" className="w-full">{t("login")}</Button>
               </Link>
-              <Link to="#contact" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">{t("contact_sales")}</Button>
+              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button className="w-full bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">{t("get_started")}</Button>
               </Link>
             </div>
           </div>

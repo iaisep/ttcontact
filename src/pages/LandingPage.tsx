@@ -10,7 +10,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 const LandingPage = () => {
   return (
     <TooltipProvider>
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         <LandingNav />
         <HeroSection />
         <FeaturesSection />
