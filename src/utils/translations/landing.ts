@@ -1,4 +1,3 @@
-
 const landingTranslations = {
   "en": {
     // Hero section
@@ -99,7 +98,17 @@ const landingTranslations = {
 
     // Under construction pages
     "page_under_construction": "This page is under construction",
-    "page_coming_soon": "We're working on this page. You'll be redirected to home shortly."
+    "page_coming_soon": "We're working on this page. You'll be redirected to home shortly.",
+    "how_it_works_title": "How It Works",
+    "how_it_works_subtitle": "Create powerful, context-aware voice AI agents in four simple steps",
+    "how_it_works_step1_title": "Build",
+    "how_it_works_step1_description": "Utilize the voice AI API and our intuitive agent builder to create custom voice AI agents effortlessly.",
+    "how_it_works_step2_title": "Test",
+    "how_it_works_step2_description": "Perform comprehensive agent testing with built-in test LLM features to ensure seamless handling of edge cases.",
+    "how_it_works_step3_title": "Deploy",
+    "how_it_works_step3_description": "Easily deploy your agents to phone calls, web calls, SMS, and more.",
+    "how_it_works_step4_title": "Monitor",
+    "how_it_works_step4_description": "Track success rates, latency, and user sentiment through call history dashboard. Quickly identify failed calls.",
   },
   "es": {
     // Hero section
@@ -200,7 +209,17 @@ const landingTranslations = {
 
     // Under construction pages
     "page_under_construction": "Esta página está en construcción",
-    "page_coming_soon": "Estamos trabajando en esta página. Serás redirigido al inicio en breve."
+    "page_coming_soon": "Estamos trabajando en esta página. Serás redirigido al inicio en breve.",
+    "how_it_works_title": "Cómo Funciona",
+    "how_it_works_subtitle": "Crea agentes de voz IA potentes y conscientes del contexto en cuatro pasos simples",
+    "how_it_works_step1_title": "Construir",
+    "how_it_works_step1_description": "Utiliza la API de IA de voz y nuestro constructor de agentes intuitivo para crear agentes de voz IA personalizados sin esfuerzo.",
+    "how_it_works_step2_title": "Probar",
+    "how_it_works_step2_description": "Realiza pruebas exhaustivas de agentes con funciones de prueba LLM integradas para garantizar un manejo perfecto de casos extremos.",
+    "how_it_works_step3_title": "Implementar",
+    "how_it_works_step3_description": "Implementa fácilmente tus agentes en llamadas telefónicas, llamadas web, SMS y más.",
+    "how_it_works_step4_title": "Monitorear",
+    "how_it_works_step4_description": "Rastrea tasas de éxito, latencia y sentimiento del usuario a través del panel de historial de llamadas. Identifica rápidamente las llamadas fallidas.",
   }
 };
 

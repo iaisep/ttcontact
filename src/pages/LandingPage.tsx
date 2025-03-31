@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import LandingNav from "@/components/ui/LandingNav";
 import HeroSection from "@/components/ui/HeroSection";
+import HowItWorksSection from "@/components/ui/HowItWorksSection";
 import FeaturesSection from "@/components/ui/FeaturesSection";
 import PricingSection from "@/components/ui/PricingSection";
 import ContactSection from "@/components/ui/ContactSection";
@@ -32,6 +33,7 @@ const LandingPage = () => {
         <LandingNav />
         <main>
           <HeroSection />
+          <HowItWorksSection />
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
