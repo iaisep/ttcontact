@@ -16,6 +16,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { toast } from 'sonner';
 
 interface AgentLeftColumnProps {
   agent: RetellAgent;
@@ -37,6 +39,12 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   const [voiceTemperature, setVoiceTemperature] = useState(1.0);
   const [voiceVolume, setVoiceVolume] = useState(1.0);
   const [isVoiceSettingsOpen, setIsVoiceSettingsOpen] = useState(false);
+  
+  // LLM settings state
+  const [isLlmSettingsOpen, setIsLlmSettingsOpen] = useState(false);
+  const [llmTemperature, setLlmTemperature] = useState(0.0);
+  const [structuredOutput, setStructuredOutput] = useState(false);
+  const [highPriority, setHighPriority] = useState(false);
 
   const languageOptions = [
     { value: 'es', label: 'Spanish', icon: '🇪🇸' },
@@ -88,6 +96,14 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
     updateAgentField('voice_volume', voiceVolume);
     setIsVoiceSettingsOpen(false);
   };
+  
+  const handleSaveLlmSettings = () => {
+    updateAgentField('llm_temperature', llmTemperature);
+    updateAgentField('structured_output', structuredOutput);
+    updateAgentField('high_priority', highPriority);
+    toast.success('LLM settings saved');
+    setIsLlmSettingsOpen(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -108,6 +124,79 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+        
+        {/* LLM Settings Button */}
+        <Popover open={isLlmSettingsOpen} onOpenChange={setIsLlmSettingsOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="icon" className="rounded-full bg-gray-50">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80">
+            <div className="space-y-4">
+              <h3 className="font-medium">LLM Temperature</h3>
+              <p className="text-xs text-muted-foreground">Lower value yields better function call results.</p>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm"></span>
+                  <span className="text-sm">{llmTemperature.toFixed(2)}</span>
+                </div>
+                <Slider
+                  value={[llmTemperature]}
+                  min={0}
+                  max={1.0}
+                  step={0.01}
+                  onValueChange={([value]) => setLlmTemperature(value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="structured-output">Structured Output</Label>
+                    <p className="text-xs text-muted-foreground">Always generate responses that adhere to your supplied JSON Schema. This will make functions longer to save or update.</p>
+                  </div>
+                  <Switch
+                    id="structured-output"
+                    checked={structuredOutput}
+                    onCheckedChange={setStructuredOutput}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="high-priority">High Priority</Label>
+                    <p className="text-xs text-muted-foreground">Use more dedicated resource pool to ensure lower and more consistent latency. This feature incurs a higher cost.</p>
+                  </div>
+                  <Switch
+                    id="high-priority"
+                    checked={highPriority}
+                    onCheckedChange={setHighPriority}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setIsLlmSettingsOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={handleSaveLlmSettings}
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
 
         {/* Voice Selector */}
         <Button 
@@ -121,7 +210,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
           <span>{selectedVoice}</span>
         </Button>
 
-        {/* Settings Button */}
+        {/* Voice Settings Button */}
         <Popover open={isVoiceSettingsOpen} onOpenChange={setIsVoiceSettingsOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="icon" className="rounded-full bg-gray-50">
