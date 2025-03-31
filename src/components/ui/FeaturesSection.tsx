@@ -1,60 +1,63 @@
 
 import { motion } from "framer-motion";
 import { Mic, Brain, MessageSquare, Code, Headphones, Zap } from "lucide-react";
-
-const features = [
-  {
-    icon: <Mic className="w-6 h-6 text-primary" />,
-    title: "Reconocimiento de voz avanzado",
-    description: "Entiende acentos, dialectos y expresiones coloquiales con una precisión superior al 95%."
-  },
-  {
-    icon: <Brain className="w-6 h-6 text-primary" />,
-    title: "Procesamiento de lenguaje natural",
-    description: "Comprende el contexto y las intenciones del cliente para ofrecer respuestas más precisas."
-  },
-  {
-    icon: <MessageSquare className="w-6 h-6 text-primary" />,
-    title: "Respuestas personalizadas",
-    description: "Genera respuestas naturales adaptadas a la voz e identidad de tu marca."
-  },
-  {
-    icon: <Code className="w-6 h-6 text-primary" />,
-    title: "Integración API sencilla",
-    description: "Conéctate con tus sistemas existentes a través de APIs REST y webhooks fáciles de implementar."
-  },
-  {
-    icon: <Headphones className="w-6 h-6 text-primary" />,
-    title: "Transferencia a agentes humanos",
-    description: "Deriva automáticamente las consultas complejas a tu equipo de soporte cuando sea necesario."
-  },
-  {
-    icon: <Zap className="w-6 h-6 text-primary" />,
-    title: "Aprendizaje continuo",
-    description: "Mejora constantemente con cada interacción para ofrecer un servicio cada vez más efectivo."
-  }
-];
-
-const industries = [
-  {
-    title: "Atención al cliente",
-    description: "Automatiza consultas frecuentes, recopila información y ofrece soporte 24/7."
-  },
-  {
-    title: "Sector Salud",
-    description: "Programa citas, realiza seguimientos y responde dudas sobre procedimientos médicos."
-  },
-  {
-    title: "Ventas",
-    description: "Califica leads, agenda demostraciones y gestiona el seguimiento de clientes potenciales."
-  },
-  {
-    title: "Call Centers",
-    description: "Reduce el tiempo de espera y mejora la experiencia de tus clientes con atención inmediata."
-  }
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 const FeaturesSection = () => {
+  const { t } = useLanguage();
+  
+  const features = [
+    {
+      icon: <Mic className="w-6 h-6 text-primary" />,
+      title: t("advanced_voice_recognition"),
+      description: t("voice_recognition_description")
+    },
+    {
+      icon: <Brain className="w-6 h-6 text-primary" />,
+      title: t("natural_language_processing"),
+      description: t("nlp_description")
+    },
+    {
+      icon: <MessageSquare className="w-6 h-6 text-primary" />,
+      title: t("personalized_responses"),
+      description: t("personalized_responses_description")
+    },
+    {
+      icon: <Code className="w-6 h-6 text-primary" />,
+      title: t("simple_api_integration"),
+      description: t("api_integration_description")
+    },
+    {
+      icon: <Headphones className="w-6 h-6 text-primary" />,
+      title: t("human_agent_transfer"),
+      description: t("human_agent_transfer_description")
+    },
+    {
+      icon: <Zap className="w-6 h-6 text-primary" />,
+      title: t("continuous_learning"),
+      description: t("continuous_learning_description")
+    }
+  ];
+
+  const industries = [
+    {
+      title: t("customer_service"),
+      description: t("customer_service_description")
+    },
+    {
+      title: t("healthcare"),
+      description: t("healthcare_description")
+    },
+    {
+      title: t("sales"),
+      description: t("sales_description")
+    },
+    {
+      title: t("call_centers"),
+      description: t("call_centers_description")
+    }
+  ];
+
   return (
     <section id="features" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -66,7 +69,7 @@ const FeaturesSection = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
           >
-            Tecnología avanzada que transforma la comunicación
+            {t("features_section_title")}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -75,7 +78,7 @@ const FeaturesSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-xl text-gray-600 max-w-2xl mx-auto"
           >
-            Nuestros agentes de voz combinan las tecnologías más avanzadas para ofrecer una experiencia conversacional extraordinaria.
+            {t("features_section_subtitle")}
           </motion.p>
         </div>
 
@@ -107,7 +110,7 @@ const FeaturesSection = () => {
               transition={{ duration: 0.6 }}
               className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
             >
-              Soluciones para cada industria
+              {t("industries_section_title")}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -116,7 +119,7 @@ const FeaturesSection = () => {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-xl text-gray-600 max-w-2xl mx-auto"
             >
-              Adaptamos nuestros agentes de voz a las necesidades específicas de tu sector.
+              {t("industries_section_subtitle")}
             </motion.p>
           </div>
 
