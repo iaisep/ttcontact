@@ -121,12 +121,21 @@ const PricingSection = () => {
     <section id="pricing" className="py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
+          <motion.span 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="inline-block px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full mb-4"
+          >
+            {t("pricing")}
+          </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+            className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4"
           >
             {t("plans_title")}
           </motion.h2>
@@ -135,7 +144,7 @@ const PricingSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-xl text-gray-600 max-w-2xl mx-auto"
+            className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
           >
             {t("plans_subtitle")}
           </motion.p>
@@ -151,32 +160,32 @@ const PricingSection = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className={`rounded-xl border ${
                 plan.popular 
-                  ? "border-primary shadow-lg relative" 
+                  ? "border-indigo-500 shadow-lg relative" 
                   : "border-gray-200 shadow-sm"
-              } bg-white overflow-hidden`}
+              } bg-white dark:bg-gray-800 overflow-hidden`}
             >
               {plan.popular && (
                 <div className="absolute top-0 right-0">
-                  <div className="bg-primary text-white text-xs font-medium px-3 py-1 rounded-bl-lg">
+                  <div className="bg-indigo-600 text-white text-xs font-medium px-3 py-1 rounded-bl-lg">
                     {t("popular")}
                   </div>
                 </div>
               )}
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{plan.name}</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{plan.name}</h3>
                 <div className="mb-4">
-                  <span className="text-3xl font-bold text-gray-900">
+                  <span className="text-3xl font-bold text-gray-900 dark:text-white">
                     {plan.price === t("custom_price") ? "" : "$"}
                     {plan.price}
                   </span>
                   {plan.price !== t("custom_price") && (
-                    <span className="text-gray-600 ml-1">{t("per_month")}</span>
+                    <span className="text-gray-600 dark:text-gray-400 ml-1">{t("per_month")}</span>
                   )}
                 </div>
-                <p className="text-gray-600 mb-6">{plan.description}</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">{plan.description}</p>
                 <Button
                   variant={plan.popular ? "default" : "outline"}
-                  className="w-full mb-6"
+                  className={`w-full mb-6 ${plan.popular ? "bg-indigo-600 hover:bg-indigo-700" : ""}`}
                   onClick={() => handlePlanSelect(plan)}
                   disabled={isLoading[plan.priceId]}
                 >
@@ -193,8 +202,8 @@ const PricingSection = () => {
                 <ul className="space-y-3">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
-                      <Check className="w-5 h-5 text-primary mr-2 shrink-0" />
-                      <span className="text-gray-600 text-sm">{feature}</span>
+                      <Check className="w-5 h-5 text-indigo-600 mr-2 shrink-0" />
+                      <span className="text-gray-600 dark:text-gray-400 text-sm">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -204,8 +213,8 @@ const PricingSection = () => {
         </div>
 
         <div className="text-center mt-12">
-          <p className="text-gray-600">
-            {t("custom_plan")} <a href="#contact" className="text-primary hover:underline">{t("contact_us")}</a>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("custom_plan")} <a href="#contact" className="text-indigo-600 hover:underline">{t("contact_us")}</a>
           </p>
         </div>
       </div>

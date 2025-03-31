@@ -26,7 +26,7 @@ const DesktopNavigation = () => {
                 <li className="row-span-3">
                   <NavigationMenuLink asChild>
                     <a
-                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/50 to-primary p-6 no-underline outline-none focus:shadow-md"
+                      className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-indigo-500/50 to-indigo-600 p-6 no-underline outline-none focus:shadow-md"
                       href="#features"
                     >
                       <div className="mt-4 mb-2 text-lg font-medium text-white">
@@ -66,7 +66,7 @@ const DesktopNavigation = () => {
           <NavigationMenuItem>
             <Link
               to="/docs"
-              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary transition-colors"
+              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
             >
               {t("documentation")}
             </Link>
@@ -114,12 +114,12 @@ const DesktopNavigation = () => {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link
-              to="#pricing"
-              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary transition-colors"
+            <a
+              href="#pricing"
+              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
             >
               {t("pricing")}
-            </Link>
+            </a>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>

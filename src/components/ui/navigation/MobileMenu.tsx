@@ -29,7 +29,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
             <li>
               <Link
                 to="/voice-sdk"
-                className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                className="text-gray-600 dark:text-gray-400 hover:text-indigo-600"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {t("voice_sdk")}
@@ -38,7 +38,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
             <li>
               <Link
                 to="/ai-agents"
-                className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                className="text-gray-600 dark:text-gray-400 hover:text-indigo-600"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {t("ai_agents")}
@@ -47,7 +47,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
             <li>
               <a
                 href="#features"
-                className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                className="text-gray-600 dark:text-gray-400 hover:text-indigo-600"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {t("features")}
@@ -57,7 +57,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
         </div>
         <Link
           to="/docs"
-          className="block py-2 text-gray-800 dark:text-gray-200 hover:text-primary"
+          className="block py-2 text-gray-800 dark:text-gray-200 hover:text-indigo-600"
           onClick={() => setIsMobileMenuOpen(false)}
         >
           {t("documentation")}
@@ -68,7 +68,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
             <li>
               <Link
                 to="/blog"
-                className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                className="text-gray-600 dark:text-gray-400 hover:text-indigo-600"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {t("blog")}
@@ -77,7 +77,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
             <li>
               <Link
                 to="/guides"
-                className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                className="text-gray-600 dark:text-gray-400 hover:text-indigo-600"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {t("guides")}
@@ -86,7 +86,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
             <li>
               <Link
                 to="/examples"
-                className="text-gray-600 dark:text-gray-400 hover:text-primary"
+                className="text-gray-600 dark:text-gray-400 hover:text-indigo-600"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {t("examples")}
@@ -96,7 +96,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
         </div>
         <a
           href="#pricing"
-          className="block py-2 text-gray-800 dark:text-gray-200 hover:text-primary"
+          className="block py-2 text-gray-800 dark:text-gray-200 hover:text-indigo-600"
           onClick={() => setIsMobileMenuOpen(false)}
         >
           {t("pricing")}
@@ -106,7 +106,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
             <Button variant="outline" className="w-full">{t("login")}</Button>
           </Link>
           <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-            <Button className="w-full bg-primary text-white hover:bg-primary/90">{t("get_started")}</Button>
+            <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">{t("get_started")}</Button>
           </Link>
         </div>
       </div>
