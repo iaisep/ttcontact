@@ -64,8 +64,8 @@ const AgentsSection: React.FC = () => {
         '/get-folders',
         '/list-retell-llms',
         '/list-phone-numbers',
-        // '/get-organization', // Comentado temporalmente, podría agregarse si se necesita
-        // '/check-org-complaince-status', // Comentado temporalmente, podría agregarse si se necesita
+        '/get-organization', 
+        '/check-org-complaince-status',
       ];
 
       const results = await Promise.all(
@@ -78,10 +78,10 @@ const AgentsSection: React.FC = () => {
       // Transformar los datos de agentes al formato requerido
       if (agentsData?.agents) {
         const transformedAgents: Agent[] = agentsData.agents.map((agent: RetellAgent) => ({
-          id: agent.id,
-          name: agent.name,
+          id: agent.agent_id,
+          name: agent.agent_name,
           description: agent.description || '',
-          agent_type: agent.agent_type,
+          agent_type: agent.language,
           voice_id: agent.voice_id,
           folder: agent.folder,
         }));
