@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Copy, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
-import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
+import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import {
   Tooltip,
   TooltipContent,
@@ -13,11 +14,13 @@ import {
 
 interface AgentDetailHeaderProps {
   agent: RetellAgent;
+  voice?: RetellVoice | null;
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
 const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
   agent,
+  voice,
   updateAgentField
 }) => {
   const navigate = useNavigate();
