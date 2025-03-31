@@ -64,7 +64,7 @@ const AgentsSection: React.FC = () => {
         '/get-folders',
         '/list-retell-llms',
         '/list-phone-numbers',
-        '/get-organization', 
+        //'/get-organization', //
         '/check-org-complaince-status',
       ];
 
