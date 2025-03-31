@@ -1,0 +1,100 @@
+
+// Features related translations
+const featuresTranslations = {
+  en: {
+    // Features Section
+    "features_section_title": "Advanced technology that transforms communication",
+    "features_section_subtitle": "Our voice agents combine the most advanced technologies to deliver an extraordinary conversational experience.",
+    "industries_section_title": "Solutions for every industry",
+    "industries_section_subtitle": "We adapt our voice agents to the specific needs of your sector.",
+    
+    "advanced_voice_recognition": "Advanced voice recognition",
+    "voice_recognition_description": "Understands accents, dialects, and colloquial expressions with over 95% accuracy.",
+    "natural_language_processing": "Natural language processing",
+    "nlp_description": "Understands context and customer intentions to provide more accurate responses.",
+    "personalized_responses": "Personalized responses",
+    "personalized_responses_description": "Generates natural responses adapted to your brand's voice and identity.",
+    "simple_api_integration": "Simple API integration",
+    "api_integration_description": "Connect with your existing systems through easy-to-implement REST APIs and webhooks.",
+    "human_agent_transfer": "Transfer to human agents",
+    "human_agent_transfer_description": "Automatically transfers complex queries to your support team when necessary.",
+    "continuous_learning": "Continuous learning",
+    "continuous_learning_description": "Constantly improves with each interaction to provide increasingly effective service.",
+    
+    "customer_service": "Customer Service",
+    "customer_service_description": "Automate frequent queries, collect information, and provide 24/7 support.",
+    "healthcare": "Healthcare",
+    "healthcare_description": "Schedule appointments, conduct follow-ups, and answer questions about medical procedures.",
+    "sales": "Sales",
+    "sales_description": "Qualify leads, schedule demonstrations, and manage potential customer follow-up.",
+    "call_centers": "Call Centers",
+    "call_centers_description": "Reduce wait times and improve your customers' experience with immediate attention.",
+    
+    // Features in plans
+    "up_to_minutes": "Up to {0} minutes/month",
+    "voice_agents": "{0} simultaneous voice agents",
+    "basic_integrations": "Basic integrations",
+    "all_integrations": "All integrations",
+    "custom_integrations": "Custom integrations",
+    "weekly_reports": "Weekly reports",
+    "advanced_reports": "Advanced reports",
+    "email_support": "Email support",
+    "priority_support": "Priority support",
+    "support_24_7": "24/7 support",
+    "human_transfer": "Transfer to human agents",
+    "unlimited_minutes": "Unlimited minutes",
+    "unlimited_agents": "Unlimited agents",
+    "custom_voice": "Complete voice customization",
+    "dedicated_api": "Dedicated API",
+    "account_manager": "Dedicated account manager",
+  },
+  es: {
+    // Features Section
+    "features_section_title": "Tecnología avanzada que transforma la comunicación",
+    "features_section_subtitle": "Nuestros agentes de voz combinan las tecnologías más avanzadas para ofrecer una experiencia conversacional extraordinaria.",
+    "industries_section_title": "Soluciones para cada industria",
+    "industries_section_subtitle": "Adaptamos nuestros agentes de voz a las necesidades específicas de tu sector.",
+    
+    "advanced_voice_recognition": "Reconocimiento de voz avanzado",
+    "voice_recognition_description": "Entiende acentos, dialectos y expresiones coloquiales con una precisión superior al 95%.",
+    "natural_language_processing": "Procesamiento de lenguaje natural",
+    "nlp_description": "Comprende el contexto y las intenciones del cliente para ofrecer respuestas más precisas.",
+    "personalized_responses": "Respuestas personalizadas",
+    "personalized_responses_description": "Genera respuestas naturales adaptadas a la voz e identidad de tu marca.",
+    "simple_api_integration": "Integración API sencilla",
+    "api_integration_description": "Conéctate con tus sistemas existentes a través de APIs REST y webhooks fáciles de implementar.",
+    "human_agent_transfer": "Transferencia a agentes humanos",
+    "human_agent_transfer_description": "Deriva automáticamente las consultas complejas a tu equipo de soporte cuando sea necesario.",
+    "continuous_learning": "Aprendizaje continuo",
+    "continuous_learning_description": "Mejora constantemente con cada interacción para ofrecer un servicio cada vez más efectivo.",
+    
+    "customer_service": "Atención al cliente",
+    "customer_service_description": "Automatiza consultas frecuentes, recopila información y ofrece soporte 24/7.",
+    "healthcare": "Sector Salud",
+    "healthcare_description": "Programa citas, realiza seguimientos y responde dudas sobre procedimientos médicos.",
+    "sales": "Ventas",
+    "sales_description": "Califica leads, agenda demostraciones y gestiona el seguimiento de clientes potenciales.",
+    "call_centers": "Call Centers",
+    "call_centers_description": "Reduce el tiempo de espera y mejora la experiencia de tus clientes con atención inmediata.",
+    
+    // Features in plans
+    "up_to_minutes": "Hasta {0} minutos/mes",
+    "voice_agents": "{0} agentes de voz simultáneos",
+    "basic_integrations": "Integraciones básicas",
+    "all_integrations": "Todas las integraciones",
+    "custom_integrations": "Integraciones personalizadas",
+    "weekly_reports": "Reportes semanales",
+    "advanced_reports": "Reportes avanzados",
+    "email_support": "Soporte por email",
+    "priority_support": "Soporte prioritario",
+    "support_24_7": "Soporte 24/7",
+    "human_transfer": "Transferencia a agentes humanos",
+    "unlimited_minutes": "Minutos ilimitados",
+    "unlimited_agents": "Agentes ilimitados",
+    "custom_voice": "Personalización completa de voz",
+    "dedicated_api": "API dedicada",
+    "account_manager": "Gestor de cuenta dedicado",
+  }
+};
+
+export default featuresTranslations;

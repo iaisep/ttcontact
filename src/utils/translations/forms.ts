@@ -1,0 +1,58 @@
+
+// Form related translations
+const formsTranslations = {
+  en: {
+    // Login/Register
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "your_email": "Your email",
+    "your_name": "Your name",
+    "password": "Password",
+    "confirm_password": "Confirm password",
+    "password_min": "Password must be at least 8 characters with 1 lowercase, 1 uppercase, and 1 number",
+    "hide_password": "Hide password",
+    "show_password": "Show password",
+    "create_account": "Create an Account",
+    "register_access": "Register to access all features",
+    "processing": "Processing...",
+    "have_account": "Already have an account?",
+    "log_in": "Log in",
+    "recover_password": "Recover Password",
+    "enter_email_recover": "Enter your email to recover your password",
+    "enter_credentials": "Enter your credentials to continue",
+    "forgot_password": "Forgot password?",
+    "send_instructions": "Send Instructions",
+    "back_to_login": "Back to login",
+    "no_account": "Don't have an account?",
+    "sign_up": "Sign up",
+  },
+  es: {
+    // Login/Register
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "email": "Correo electrónico",
+    "your_email": "Tu correo electrónico",
+    "your_name": "Tu nombre",
+    "password": "Contraseña",
+    "confirm_password": "Confirmar contraseña",
+    "password_min": "La contraseña debe tener al menos 8 caracteres con 1 minúscula, 1 mayúscula y 1 número",
+    "hide_password": "Ocultar contraseña",
+    "show_password": "Mostrar contraseña",
+    "create_account": "Crear una Cuenta",
+    "register_access": "Regístrate para acceder a todas las funciones",
+    "processing": "Procesando...",
+    "have_account": "¿Ya tienes una cuenta?",
+    "log_in": "Iniciar sesión",
+    "recover_password": "Recuperar Contraseña",
+    "enter_email_recover": "Ingresa tu correo para recuperar tu contraseña",
+    "enter_credentials": "Ingresa tus credenciales para continuar",
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "send_instructions": "Enviar Instrucciones",
+    "back_to_login": "Volver al inicio de sesión",
+    "no_account": "¿No tienes una cuenta?",
+    "sign_up": "Registrarse",
+  }
+};
+
+export default formsTranslations;
