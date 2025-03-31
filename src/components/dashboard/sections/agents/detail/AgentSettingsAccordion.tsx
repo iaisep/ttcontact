@@ -22,7 +22,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   updateAgentField
 }) => {
   return (
-    <Accordion type="multiple" defaultValue={["functions", "knowledge"]}>
+    <Accordion type="multiple" defaultValue={[]}>
       <AccordionItem value="functions" className="border rounded-md px-2 mb-2">
         <AccordionTrigger className="py-2">
           <div className="flex items-center">
