@@ -16,12 +16,17 @@ interface RetellAgent {
   agent_type: string;
   voice_id: string;
   folder: string;
+  agent_id: string;
+  agent_name: string;
+  response_engine?: { type: string };
+  last_modification_timestamp?: number;
   [key: string]: any;
 }
 
 interface RetellVoice {
   id: string;
   name: string;
+  avatar_url?: string;
   [key: string]: any;
 }
 
@@ -40,6 +45,8 @@ interface RetellLLM {
 interface RetellPhoneNumber {
   id: string;
   phone_number: string;
+  inbound_agent_id?: string;
+  outbound_agent_id?: string;
   [key: string]: any;
 }
 
@@ -72,23 +79,10 @@ const AgentsSection: React.FC = () => {
         endpoints.map(endpoint => fetchWithAuth(endpoint))
       );
 
-      // Procesar los resultados según el orden de los endpoints
+      // Process results according to the order of endpoints
       const [agentsData, voicesData, foldersData, llmsData, phoneNumbersData] = results;
 
-      // Transformar los datos de agentes al formato requerido
-      if (Array.isArray(agentsData)) {
-        const transformedAgents: Agent[] = agentsData.map((agent: any) => ({
-          id: agent.agent_id,
-          name: agent.agent_name,
-          description: '', // no se incluye en el JSON, así que por ahora lo dejamos vacío
-          agent_type: agent.response_engine?.type ?? '',
-          voice_id: agent.voice_id,
-          folder: '', // no está en la respuesta, también vacío
-        }));
-        setAgents(transformedAgents);
-}
-
-      // Almacenar otros datos para uso potencial futuro
+      // Store voice data for later use
       if (voicesData?.voices) {
         setVoices(voicesData.voices);
       }
@@ -103,6 +97,39 @@ const AgentsSection: React.FC = () => {
 
       if (phoneNumbersData?.phone_numbers) {
         setPhoneNumbers(phoneNumbersData.phone_numbers);
+      }
+
+      // Transform agent data with additional info from other endpoints
+      if (Array.isArray(agentsData)) {
+        const transformedAgents: Agent[] = agentsData.map((agent: RetellAgent) => {
+          // Find the voice information
+          const voiceInfo = voicesData?.voices?.find((v: RetellVoice) => 
+            v.id === agent.voice_id
+          );
+
+          // Find phone number assigned to this agent
+          const phoneNumber = phoneNumbersData?.phone_numbers?.find((p: RetellPhoneNumber) => 
+            p.inbound_agent_id === agent.agent_id || p.outbound_agent_id === agent.agent_id
+          );
+
+          return {
+            id: agent.agent_id || agent.id,
+            name: agent.agent_name || agent.name,
+            description: agent.description || '',
+            agent_type: agent.response_engine?.type || agent.agent_type || '',
+            voice_id: agent.voice_id,
+            folder: agent.folder || '',
+            // Add new properties
+            voice: voiceInfo ? {
+              name: voiceInfo.name,
+              avatar_url: voiceInfo.avatar_url
+            } : undefined,
+            phone: phoneNumber?.phone_number,
+            last_modification_timestamp: agent.last_modification_timestamp,
+          };
+        });
+
+        setAgents(transformedAgents);
       }
 
     } catch (error) {
