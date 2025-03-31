@@ -1,153 +1,101 @@
-
-import { useState, useEffect } from 'react';
-import { useApiContext } from '@/context/ApiContext';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import AgentsToolbar from './agents/AgentsToolbar';
+import React from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import AgentsTable from './agents/AgentsTable';
+import AgentsToolbar from './agents/AgentsToolbar';
 import AgentForm from './agents/AgentForm';
 import { Agent } from './agents/types';
+import { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 
-const AgentsSection = () => {
-  const { fetchWithAuth } = useApiContext();
+const AgentsSection: React.FC = () => {
+  const { t } = useLanguage();
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [folderFilter, setFolderFilter] = useState('');
-  const [isCreating, setIsCreating] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentAgent, setCurrentAgent] = useState<Agent | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [isAgentFormOpen, setIsAgentFormOpen] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetchAgents();
+    // Simulate loading agents from an API
+    const loadAgents = async () => {
+      setIsLoading(true);
+      // Replace this with your actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const mockAgents: Agent[] = [
+        { id: '1', name: 'Agent 1', description: 'Description 1' },
+        { id: '2', name: 'Agent 2', description: 'Description 2' },
+      ];
+      setAgents(mockAgents);
+      setIsLoading(false);
+    };
+
+    loadAgents();
   }, []);
 
-  const fetchAgents = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchWithAuth('/list-agents');
-      setAgents(data);
-    } catch (error) {
-      toast.error('Failed to fetch agents');
-      console.error(error);
-    } finally {
-      setLoading(false);
+  const handleAddAgent = () => {
+    setSelectedAgent(null);
+    setIsAgentFormOpen(true);
+  };
+
+  const handleEditAgent = (agent: Agent) => {
+    setSelectedAgent(agent);
+    setIsAgentFormOpen(true);
+  };
+
+  const handleDeleteAgent = async (agentId: string) => {
+    setIsLoading(true);
+    // Simulate deleting an agent from an API
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setAgents(agents.filter(agent => agent.id !== agentId));
+    setIsLoading(false);
+    toast.success(t('agent_deleted'));
+  };
+
+  const handleSubmitAgent = async (agent: Agent) => {
+    setIsLoading(true);
+    // Simulate saving an agent to an API
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    if (agent.id) {
+      // Update existing agent
+      setAgents(agents.map(a => (a.id === agent.id ? agent : a)));
+      toast.success(t('agent_updated'));
+    } else {
+      // Add new agent
+      agent.id = Math.random().toString(); // Simulate ID generation
+      setAgents([...agents, agent]);
+      toast.success(t('agent_added'));
     }
+    setIsLoading(false);
+    setIsAgentFormOpen(false);
   };
 
-  const createAgent = async (formData: any) => {
-    try {
-      const newAgent = await fetchWithAuth('/agents', {
-        method: 'POST',
-        body: JSON.stringify(formData),
-      });
-      setAgents([...agents, newAgent]);
-      toast.success('Agent created successfully');
-      setDialogOpen(false);
-    } catch (error) {
-      toast.error('Failed to create agent');
-      console.error(error);
-    }
+  const handleCancelAgentForm = () => {
+    setIsAgentFormOpen(false);
   };
 
-  const updateAgent = async (id: string, formData: any) => {
-    try {
-      const updatedAgent = await fetchWithAuth(`/update-agent/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(formData),
-      });
-      setAgents(agents.map(agent => agent.agent_id === id ? updatedAgent : agent));
-      toast.success('Agent updated successfully');
-      setDialogOpen(false);
-    } catch (error) {
-      toast.error('Failed to update agent');
-      console.error(error);
-    }
-  };
-
-  const deleteAgent = async (id: string) => {
-    try {
-      await fetchWithAuth(`/agents/${id}`, {
-        method: 'DELETE',
-      });
-      setAgents(agents.filter(agent => agent.agent_id !== id));
-      toast.success('Agent deleted successfully');
-    } catch (error) {
-      toast.error('Failed to delete agent');
-      console.error(error);
-    }
-  };
-
-  const filteredAgents = agents.filter(agent => {
-    // Safeguard against undefined properties
-    const agentName = agent.name || '';
-    const agentDescription = agent.agent_type || '';
-    const agentFolder = agent.folder || '';
-    
-    const matchesSearch = agentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          agentDescription.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFolder = folderFilter ? agentFolder === folderFilter : true;
-    return matchesSearch && matchesFolder;
-  });
-
-  const folders = [...new Set(agents.map(agent => agent.folder).filter(Boolean))];
-
-  const handleCreateClick = () => {
-    setIsCreating(true);
-    setIsEditing(false);
-    setCurrentAgent(null);
-    setDialogOpen(true);
-  };
-
-  const handleEditClick = (agent: Agent) => {
-    setIsEditing(true);
-    setIsCreating(false);
-    setCurrentAgent(agent);
-    setDialogOpen(true);
+  const handleImportAgents = () => {
+    // Handle import agents logic
+    toast.success(t('agents_imported'));
   };
 
   return (
-    <div className="space-y-6">
-      <AgentsToolbar
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        folderFilter={folderFilter}
-        setFolderFilter={setFolderFilter}
-        folders={folders}
-        onCreateClick={handleCreateClick}
+    <div className="p-6 space-y-6">
+      <AgentsToolbar 
+        onAddAgent={handleAddAgent} 
+        onImportAgents={handleImportAgents} 
       />
-
-      {loading ? (
-        <div className="flex justify-center p-8">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : (
-        <AgentsTable
-          agents={filteredAgents}
-          onEditAgent={handleEditClick}
-          onDeleteAgent={deleteAgent}
-          isLoading={loading}
+      <AgentsTable 
+        agents={agents} 
+        onEditAgent={handleEditAgent} 
+        onDeleteAgent={handleDeleteAgent}
+        isLoading={isLoading}
+      />
+      {isAgentFormOpen && (
+        <AgentForm 
+          initialAgent={selectedAgent} 
+          onSubmit={handleSubmitAgent}
+          onCancel={handleCancelAgentForm}
         />
       )}
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[525px]">
-          <DialogHeader>
-            <DialogTitle>{isCreating ? 'Create Agent' : 'Edit Agent'}</DialogTitle>
-            <DialogDescription>
-              {isCreating 
-                ? 'Create a new AI voice agent to handle your calls.' 
-                : 'Update your AI voice agent details.'}
-            </DialogDescription>
-          </DialogHeader>
-          <AgentForm 
-            agent={currentAgent} 
-            onSubmit={isCreating ? createAgent : (data) => updateAgent(currentAgent!.agent_id, data)} 
-          />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

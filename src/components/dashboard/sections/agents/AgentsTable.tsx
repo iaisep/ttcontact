@@ -3,15 +3,21 @@ import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Agent } from './types'; // Ensure this import is correct
+import { Agent } from './types';
 
 interface AgentsTableProps {
   agents: Agent[];
   onEditAgent: (agent: Agent) => void;
   onDeleteAgent: (agentId: string) => void;
+  isLoading?: boolean;
 }
 
-const AgentsTable: React.FC<AgentsTableProps> = ({ agents, onEditAgent, onDeleteAgent }) => {
+const AgentsTable: React.FC<AgentsTableProps> = ({ 
+  agents, 
+  onEditAgent, 
+  onDeleteAgent, 
+  isLoading = false 
+}) => {
   const { t } = useLanguage();
 
   return (
@@ -34,6 +40,7 @@ const AgentsTable: React.FC<AgentsTableProps> = ({ agents, onEditAgent, onDelete
                   variant="outline" 
                   size="sm" 
                   onClick={() => onEditAgent(agent)}
+                  disabled={isLoading}
                 >
                   {t('edit')}
                 </Button>
@@ -41,6 +48,7 @@ const AgentsTable: React.FC<AgentsTableProps> = ({ agents, onEditAgent, onDelete
                   variant="destructive" 
                   size="sm" 
                   onClick={() => onDeleteAgent(agent.id)}
+                  disabled={isLoading}
                 >
                   {t('delete')}
                 </Button>
