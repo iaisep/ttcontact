@@ -1,15 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion';
 import { RetellAgent, RetellVoice, RetellFolder } from '@/components/dashboard/sections/agents/types/retell-types';
-import { Flag, ChevronDown } from 'lucide-react';
 import { debounce } from 'lodash';
+import { Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface AgentEditorFormProps {
   agent: RetellAgent;
@@ -26,252 +28,156 @@ const AgentEditorForm: React.FC<AgentEditorFormProps> = ({
   onUpdateField,
   onOpenVoiceSelector
 }) => {
-  const { t } = useLanguage();
-
-  // Create state for editable fields
-  const [name, setName] = useState(agent.agent_name || agent.name || '');
-  const [description, setDescription] = useState(agent.description || '');
-  const [voiceId, setVoiceId] = useState(agent.voice_id || '');
-  const [folder, setFolder] = useState(agent.folder || '');
-  const [language, setLanguage] = useState(agent.language || 'en-US');
-  
-  // Use optional chaining and type guards for response_engine properties
+  // Extract initial values from agent with safe fallbacks
   const initialPrompt = agent.response_engine && 
     typeof agent.response_engine === 'object' ? 
     (agent.response_engine as any).prompt || 
     (agent.response_engine as any).general_prompt || 
     '' : '';
   
-  const [generalPrompt, setGeneralPrompt] = useState(initialPrompt);
-  const [beginMessage, setBeginMessage] = useState(agent.begin_message || '');
-
+  const initialWelcomeMessage = agent.begin_message || agent.welcome_message || '';
+  
+  // Create state for editable fields
+  const [prompt, setPrompt] = useState(initialPrompt);
+  const [welcomeMessage, setWelcomeMessage] = useState(initialWelcomeMessage);
+  
   // Create debounced update functions
-  const debouncedUpdateName = debounce((value) => onUpdateField('agent_name', value), 1000);
-  const debouncedUpdateDescription = debounce((value) => onUpdateField('description', value), 1000);
-  const debouncedUpdateGeneralPrompt = debounce((value) => {
+  const debouncedUpdatePrompt = debounce((value) => {
     if (agent.response_engine?.type === 'retell-llm') {
       onUpdateField('response_engine.general_prompt', value);
     } else {
       onUpdateField('response_engine.prompt', value);
     }
   }, 1000);
-  const debouncedUpdateBeginMessage = debounce((value) => onUpdateField('begin_message', value), 1000);
-
-  // Language options with flag icons
-  const languageOptions = [
-    { value: 'es-ES', label: 'Spanish', icon: <Flag className="h-4 w-4 text-red-600" /> },
-    { value: 'en-US', label: 'English (US)', icon: <Flag className="h-4 w-4 text-blue-600" /> },
-    { value: 'en-GB', label: 'English (UK)', icon: <Flag className="h-4 w-4 text-blue-900" /> },
-    { value: 'fr-FR', label: 'French', icon: <Flag className="h-4 w-4 text-blue-800" /> },
-    { value: 'de-DE', label: 'German', icon: <Flag className="h-4 w-4 text-black" /> },
-    { value: 'it-IT', label: 'Italian', icon: <Flag className="h-4 w-4 text-green-600" /> },
-    { value: 'pt-BR', label: 'Portuguese (Brazil)', icon: <Flag className="h-4 w-4 text-green-700" /> },
-    { value: 'es-419', label: 'Spanish (Latin America)', icon: <Flag className="h-4 w-4 text-yellow-600" /> },
-  ];
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  
+  const debouncedUpdateWelcomeMessage = debounce((value) => {
+    onUpdateField('begin_message', value);
+  }, 1000);
+  
+  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    setName(value);
-    debouncedUpdateName(value);
-  };
-
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setDescription(value);
-    debouncedUpdateDescription(value);
-  };
-
-  const handleFolderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setFolder(value);
-    onUpdateField('folder', value);
-  };
-
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setLanguage(value);
-    onUpdateField('language', value);
-  };
-
-  const handleGeneralPromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setGeneralPrompt(value);
-    debouncedUpdateGeneralPrompt(value);
-  };
-
-  const handleBeginMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setBeginMessage(value);
-    debouncedUpdateBeginMessage(value);
+    setPrompt(value);
+    debouncedUpdatePrompt(value);
   };
   
-  // Find current selected voice
-  const currentVoice = voices.find(v => v.id === voiceId);
-
+  const handleWelcomeMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setWelcomeMessage(value);
+    debouncedUpdateWelcomeMessage(value);
+  };
+  
   return (
-    <div className="space-y-6">
-      <Card className="p-6">
-        <div className="space-y-4">
+    <div className="container px-4 pb-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-2 space-y-6">
           <div>
-            <Label htmlFor="name">Nombre del Agente</Label>
-            <Input 
-              id="name"
-              value={name}
-              onChange={handleNameChange}
-              className="mt-1"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="description">Descripción</Label>
+            <h2 className="text-lg font-medium mb-2">Agent Prompt</h2>
             <Textarea
-              id="description"
-              value={description}
-              onChange={handleDescriptionChange}
-              rows={3}
-              className="mt-1"
+              value={prompt}
+              onChange={handlePromptChange}
+              rows={15}
+              className="font-mono text-sm resize-vertical"
+              placeholder="Enter agent instructions here..."
             />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="voice">Voz</Label>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full mt-1 flex items-center justify-between h-10 px-3 py-2 text-left"
-                onClick={onOpenVoiceSelector}
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                    {currentVoice?.avatar_url ? (
-                      <img src={currentVoice.avatar_url} alt={currentVoice.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-xs font-semibold">
-                        {currentVoice?.name?.substring(0, 2).toUpperCase() || 'VO'}
-                      </span>
-                    )}
-                  </div>
-                  <span>
-                    {currentVoice?.name || 'Seleccionar voz'}
-                  </span>
-                </div>
-                <ChevronDown className="h-4 w-4 opacity-50" />
-              </Button>
+          <div>
+            <h2 className="text-lg font-medium mb-2">Welcome Message</h2>
+            <Textarea
+              value={welcomeMessage}
+              onChange={handleWelcomeMessageChange}
+              rows={4}
+              className="resize-vertical"
+              placeholder="Enter a welcome message for the agent..."
+            />
+          </div>
+          
+          <div className="flex flex-col items-center justify-center mt-12 p-8 border border-dashed rounded-lg bg-muted/30">
+            <div className="bg-muted rounded-full p-4 mb-4">
+              <Mic className="h-6 w-6 text-muted-foreground" />
             </div>
-            
-            <div>
-              <Label htmlFor="language">Idioma</Label>
-              <select
-                id="language"
-                value={language}
-                onChange={handleLanguageChange}
-                className="w-full mt-1 border border-input rounded-md h-10 px-3 py-2"
-              >
-                {languageOptions.map(lang => (
-                  <option key={lang.value} value={lang.value}>
-                    {lang.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <Label htmlFor="folder">Carpeta</Label>
-              <select
-                id="folder"
-                value={folder}
-                onChange={handleFolderChange}
-                className="w-full mt-1 border border-input rounded-md h-10 px-3 py-2"
-              >
-                <option value="">Sin carpeta</option>
-                {folders.map(folder => (
-                  <option key={folder.id} value={folder.id}>
-                    {folder.name || folder.folderName}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Button className="mb-2">Test Agent</Button>
+            <p className="text-sm text-muted-foreground">
+              Click to test your agent voice and responses
+            </p>
           </div>
         </div>
-      </Card>
-      
-      <Card className="p-6">
-        <Tabs defaultValue="instructions">
-          <TabsList className="mb-4">
-            <TabsTrigger value="instructions">Instrucciones</TabsTrigger>
-            <TabsTrigger value="beginMessage">Mensaje inicial</TabsTrigger>
-            <TabsTrigger value="configuration">Configuración</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="instructions">
-            <div>
-              <Label htmlFor="generalPrompt">Instrucciones generales</Label>
-              <Textarea
-                id="generalPrompt"
-                value={generalPrompt}
-                onChange={handleGeneralPromptChange}
-                rows={15}
-                className="font-mono text-sm mt-1"
-              />
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="beginMessage">
-            <div>
-              <Label htmlFor="beginMessage">Mensaje inicial</Label>
-              <Textarea
-                id="beginMessage"
-                value={beginMessage}
-                onChange={handleBeginMessageChange}
-                rows={8}
-                className="font-mono text-sm mt-1"
-              />
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="configuration">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-medium mb-2">Configuración de llamada</h3>
-                <div className="space-y-4">
+        
+        <div className="space-y-2">
+          <Accordion type="multiple" className="w-full">
+            <AccordionItem value="functions">
+              <AccordionTrigger>Functions</AccordionTrigger>
+              <AccordionContent>
+                <div className="py-2">
+                  <p className="text-sm text-muted-foreground">
+                    Manage the functions your agent can use to interact with external systems.
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-2 w-full">
+                    Add Function
+                  </Button>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="knowledge-base">
+              <AccordionTrigger>Knowledge Base</AccordionTrigger>
+              <AccordionContent>
+                <div className="py-2">
+                  <p className="text-sm text-muted-foreground">
+                    Add or update the knowledge base for your agent.
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-2 w-full">
+                    Manage Knowledge
+                  </Button>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="speech-settings">
+              <AccordionTrigger>Speech Settings</AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 py-2">
                   <div>
-                    <Label htmlFor="maxCallDuration">Duración máxima de llamada (ms)</Label>
-                    <Input 
-                      id="maxCallDuration"
+                    <label className="text-sm font-medium">Stability</label>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="1" 
+                      step="0.1" 
+                      value={agent.speech_settings?.stability || 0.5}
+                      onChange={(e) => onUpdateField('speech_settings.stability', parseFloat(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Similarity</label>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="1" 
+                      step="0.1" 
+                      value={agent.speech_settings?.similarity || 0.5}
+                      onChange={(e) => onUpdateField('speech_settings.similarity', parseFloat(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="call-settings">
+              <AccordionTrigger>Call Settings</AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 py-2">
+                  <div>
+                    <label className="text-sm font-medium">Max Call Duration (ms)</label>
+                    <input 
                       type="number"
                       value={agent.max_call_duration_ms || 3600000}
                       onChange={(e) => onUpdateField('max_call_duration_ms', parseInt(e.target.value))}
-                      className="mt-1"
+                      className="w-full border rounded-md px-3 py-1.5 mt-1"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="voicemailTimeout">Tiempo de espera para buzón (ms)</Label>
-                    <Input 
-                      id="voicemailTimeout"
-                      type="number"
-                      value={agent.voicemail_detection_timeout_ms || 30000}
-                      onChange={(e) => onUpdateField('voicemail_detection_timeout_ms', parseInt(e.target.value))}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2">Configuración avanzada</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="optOutStorage"
-                      checked={agent.opt_out_sensitive_data_storage || false}
-                      onChange={(e) => onUpdateField('opt_out_sensitive_data_storage', e.target.checked)}
-                      className="mr-2"
-                    />
-                    <Label htmlFor="optOutStorage">Excluir almacenamiento de datos sensibles</Label>
-                  </div>
-                  
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -280,14 +186,69 @@ const AgentEditorForm: React.FC<AgentEditorFormProps> = ({
                       onChange={(e) => onUpdateField('enable_voicemail_detection', e.target.checked)}
                       className="mr-2"
                     />
-                    <Label htmlFor="enableVoicemail">Habilitar detección de buzón</Label>
+                    <label htmlFor="enableVoicemail" className="text-sm">Enable voicemail detection</label>
                   </div>
                 </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </Card>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="post-call">
+              <AccordionTrigger>Post-Call Analysis</AccordionTrigger>
+              <AccordionContent>
+                <div className="py-2">
+                  <p className="text-sm text-muted-foreground">
+                    Configure post-call analysis settings.
+                  </p>
+                  <div className="flex items-center mt-2">
+                    <input
+                      type="checkbox"
+                      id="enablePostCallAnalysis"
+                      checked={agent.enable_post_call_analysis || false}
+                      onChange={(e) => onUpdateField('enable_post_call_analysis', e.target.checked)}
+                      className="mr-2"
+                    />
+                    <label htmlFor="enablePostCallAnalysis" className="text-sm">Enable analysis</label>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="security">
+              <AccordionTrigger>Security & Fallback</AccordionTrigger>
+              <AccordionContent>
+                <div className="py-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="optOutStorage"
+                      checked={agent.opt_out_sensitive_data_storage || false}
+                      onChange={(e) => onUpdateField('opt_out_sensitive_data_storage', e.target.checked)}
+                      className="mr-2"
+                    />
+                    <label htmlFor="optOutStorage" className="text-sm">Opt out of sensitive data storage</label>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="webhook">
+              <AccordionTrigger>Webhook Settings</AccordionTrigger>
+              <AccordionContent>
+                <div className="py-2">
+                  <label className="text-sm font-medium">Webhook URL</label>
+                  <input 
+                    type="text"
+                    value={agent.webhook_url || ''}
+                    onChange={(e) => onUpdateField('webhook_url', e.target.value)}
+                    className="w-full border rounded-md px-3 py-1.5 mt-1"
+                    placeholder="https://example.com/webhook"
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </div>
     </div>
   );
 };

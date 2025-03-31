@@ -23,7 +23,6 @@ const AgentEditorPage: React.FC = () => {
   const [voices, setVoices] = useState([]);
   const [folders, setFolders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showAgentSelector, setShowAgentSelector] = useState(false);
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
@@ -81,13 +80,25 @@ const AgentEditorPage: React.FC = () => {
     if (!agent) return;
     
     setSaveStatus('saving');
-    setIsSaving(true);
     
     try {
       // Create the payload with just the updated field
-      const payload = {
-        [fieldName]: value
-      };
+      let payload = {};
+      
+      // Handle nested fields (e.g., speech_settings.stability)
+      if (fieldName.includes('.')) {
+        const [parent, child] = fieldName.split('.');
+        payload = {
+          [parent]: {
+            ...(agent[parent] || {}),
+            [child]: value
+          }
+        };
+      } else {
+        payload = { [fieldName]: value };
+      }
+      
+      console.log('Updating agent with payload:', payload);
       
       // Update the agent using PATCH
       await fetchWithAuth(`/update-agent/${agent.agent_id || agent.id}`, {
@@ -99,7 +110,23 @@ const AgentEditorPage: React.FC = () => {
       });
       
       // Update local state
-      setAgent(prev => prev ? ({ ...prev, [fieldName]: value }) : null);
+      setAgent(prev => {
+        if (!prev) return null;
+        
+        if (fieldName.includes('.')) {
+          const [parent, child] = fieldName.split('.');
+          return {
+            ...prev,
+            [parent]: {
+              ...(prev[parent] || {}),
+              [child]: value
+            }
+          };
+        }
+        
+        return { ...prev, [fieldName]: value };
+      });
+      
       setSaveStatus('saved');
       
       // Reset saved status after 2 seconds
@@ -110,8 +137,6 @@ const AgentEditorPage: React.FC = () => {
       console.error(`Error updating ${fieldName}:`, error);
       toast.error(t('error_updating_field'));
       setSaveStatus('idle');
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -156,17 +181,16 @@ const AgentEditorPage: React.FC = () => {
         saveStatus={saveStatus}
         onOpenAgentSelector={() => setShowAgentSelector(true)}
         onOpenVoiceSettings={() => setShowVoiceSettings(true)}
+        onUpdateField={updateAgent}
       />
       
-      <div className="container py-6 px-4">
-        <AgentEditorForm 
-          agent={agent}
-          voices={voices}
-          folders={folders}
-          onUpdateField={updateAgent}
-          onOpenVoiceSelector={() => setShowVoiceSelector(true)}
-        />
-      </div>
+      <AgentEditorForm 
+        agent={agent}
+        voices={voices}
+        folders={folders}
+        onUpdateField={updateAgent}
+        onOpenVoiceSelector={() => setShowVoiceSelector(true)}
+      />
       
       {showAgentSelector && (
         <AgentSelector 
