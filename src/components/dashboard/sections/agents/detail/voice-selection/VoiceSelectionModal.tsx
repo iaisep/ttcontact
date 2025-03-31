@@ -1,16 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { X } from 'lucide-react';
 import { useVoiceFiltering } from './useVoiceFiltering';
-import VoiceProviderTabs from './VoiceProviderTabs';
-import VoiceFilterBar from './VoiceFilterBar';
-import VoiceTable from './VoiceTable';
 import { Voice } from './types';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import { useLanguage } from '@/context/LanguageContext';
+import AgentHeaderInfo from './components/AgentHeaderInfo';
+import VoiceSelectionContent from './components/VoiceSelectionContent';
 
 interface VoiceSelectionModalProps {
   open: boolean;
@@ -60,16 +57,14 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
     onClose();
   };
   
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const handleNameChange = (value: string) => {
     setAgentName(value);
     if (updateAgentField) {
       updateAgentField('agent_name', value);
     }
   };
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
+  const handleDescriptionChange = (value: string) => {
     setAgentDescription(value);
     if (updateAgentField) {
       updateAgentField('description', value);
@@ -89,65 +84,30 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
         
         {/* Agent header section (only show if agent is provided) */}
         {agent && updateAgentField && (
-          <div className="px-6 pb-4 border-b">
-            <div className="flex gap-4 items-start">
-              {agent.avatar_url && (
-                <div className="flex-shrink-0">
-                  <img 
-                    src={agent.avatar_url} 
-                    alt={agent.agent_name || agent.name} 
-                    className="w-20 h-20 rounded-full object-cover"
-                  />
-                </div>
-              )}
-              
-              <div className="flex-grow space-y-3">
-                <div>
-                  <label className="block text-sm font-medium mb-1">{t('agent_name')}</label>
-                  <Input 
-                    value={agentName} 
-                    onChange={handleNameChange}
-                    placeholder={t('agent_name_placeholder')}
-                    className="w-full"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">{t('description')}</label>
-                  <Textarea 
-                    value={agentDescription} 
-                    onChange={handleDescriptionChange}
-                    placeholder={t('agent_description_placeholder')}
-                    className="w-full"
-                    rows={2}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <AgentHeaderInfo
+            agent={agent}
+            agentName={agentName}
+            agentDescription={agentDescription}
+            onNameChange={handleNameChange}
+            onDescriptionChange={handleDescriptionChange}
+          />
         )}
         
-        <VoiceProviderTabs 
+        <VoiceSelectionContent
           activeProvider={activeProvider}
           setActiveProvider={setActiveProvider}
-        >
-          <VoiceFilterBar
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            genderFilter={genderFilter}
-            setGenderFilter={setGenderFilter}
-            accentFilter={accentFilter}
-            setAccentFilter={setAccentFilter}
-            typeFilter={typeFilter}
-            setTypeFilter={setTypeFilter}
-          />
-          
-          <VoiceTable 
-            voices={filteredVoices}
-            onSelectVoice={handleSelectVoice}
-            selectedVoiceId={selectedVoice}
-          />
-        </VoiceProviderTabs>
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          genderFilter={genderFilter}
+          setGenderFilter={setGenderFilter}
+          accentFilter={accentFilter}
+          setAccentFilter={setAccentFilter}
+          typeFilter={typeFilter}
+          setTypeFilter={setTypeFilter}
+          filteredVoices={filteredVoices}
+          onSelectVoice={handleSelectVoice}
+          selectedVoice={selectedVoice}
+        />
       </DialogContent>
     </Dialog>
   );
