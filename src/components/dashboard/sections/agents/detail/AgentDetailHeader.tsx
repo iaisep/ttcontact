@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Copy } from 'lucide-react';
+import { ArrowLeft, Copy, Flag } from 'lucide-react';
 import { toast } from 'sonner';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import {
@@ -40,24 +39,16 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
     toast.success('Copied to clipboard');
   };
   
-  // Language options with flags - expanded to match the image
+  // Language options with flag icons
   const languageOptions = [
-    { value: 'es', label: 'Spanish', flag: '🇪🇸' },
-    { value: 'de', label: 'German', flag: '🇩🇪' },
-    { value: 'hi', label: 'Hindi', flag: '🇮🇳' },
-    { value: 'ja', label: 'Japanese', flag: '🇯🇵' },
-    { value: 'pt-PT', label: 'Portuguese', region: 'Portugal', flag: '🇵🇹' },
-    { value: 'pt-BR', label: 'Portuguese', region: 'Brazil', flag: '🇧🇷' },
-    { value: 'ru', label: 'Russian', flag: '🇷🇺' },
-    { value: 'it', label: 'Italian', flag: '🇮🇹' },
-    { value: 'ko', label: 'Korean', flag: '🇰🇷' },
-    { value: 'nl', label: 'Dutch', flag: '🇳🇱' },
-    { value: 'pl', label: 'Polish', flag: '🇵🇱' },
-    { value: 'tr', label: 'Turkish', flag: '🇹🇷' },
-    { value: 'vi', label: 'Vietnamese', flag: '🇻🇳' },
-    { value: 'ro', label: 'Romanian', flag: '🇷🇴' },
-    { value: 'en', label: 'English', flag: '🇺🇸' },
-    { value: 'fr', label: 'French', flag: '🇫🇷' },
+    { value: 'es', label: 'Spanish', icon: <Flag color="#AA151B" fill="#AA151B" className="h-4 w-4" /> },
+    { value: 'en', label: 'English', icon: <Flag color="#B22234" fill="#B22234" className="h-4 w-4" /> },
+    { value: 'fr', label: 'French', icon: <Flag color="#0055A4" fill="#0055A4" className="h-4 w-4" /> },
+    { value: 'de', label: 'German', icon: <Flag color="#000000" fill="#000000" className="h-4 w-4" /> },
+    { value: 'pt-BR', label: 'Portuguese (Brazil)', icon: <Flag color="#009C3B" fill="#009C3B" className="h-4 w-4" /> },
+    { value: 'pt-PT', label: 'Portuguese (Portugal)', icon: <Flag color="#FF0000" fill="#FF0000" className="h-4 w-4" /> },
+    { value: 'it', label: 'Italian', icon: <Flag color="#009246" fill="#009246" className="h-4 w-4" /> },
+    { value: 'ru', label: 'Russian', icon: <Flag color="#FFFFFF" fill="#FFFFFF" className="h-4 w-4" strokeWidth={1} stroke="#0039A6" /> },
   ];
 
   // Find the current language display data
@@ -110,8 +101,8 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
                 <TooltipTrigger asChild>
                   <DropdownMenuTrigger asChild>
                     <div className="flex items-center space-x-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-md p-2 cursor-pointer mr-2">
-                      <span className="mr-1">{currentLanguage.flag}</span>
-                      <span className="text-sm">{currentLanguage.label}</span>
+                      {currentLanguage.icon}
+                      <span className="text-sm ml-2">{currentLanguage.label}</span>
                       <svg 
                         width="12" 
                         height="12" 
@@ -136,7 +127,7 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
                     onClick={() => onLanguageChange(lang.value)}
                     className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 py-2"
                   >
-                    <span className="text-base">{lang.flag}</span>
+                    {lang.icon}
                     <div className="flex flex-col">
                       <span className="text-sm">{lang.label}</span>
                       {lang.region && (

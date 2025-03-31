@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Globe } from 'lucide-react';
 import {
@@ -7,12 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from "@/components/ui/tooltip";
+import { Flag } from 'lucide-react';
 
 interface AgentSettingsToolbarProps {
   defaultLanguage: string;
@@ -27,24 +21,16 @@ const AgentSettingsToolbar: React.FC<AgentSettingsToolbarProps> = ({
   onLanguageChange,
   onLlmModelChange
 }) => {
-  // Language options with flags - extended to match the image
+  // Language options with flag icons
   const languageOptions = [
-    { value: 'es', label: 'Spanish', flag: '🇪🇸' },
-    { value: 'de', label: 'German', flag: '🇩🇪' },
-    { value: 'hi', label: 'Hindi', flag: '🇮🇳' },
-    { value: 'ja', label: 'Japanese', flag: '🇯🇵' },
-    { value: 'pt-PT', label: 'Portuguese', region: 'Portugal', flag: '🇵🇹' },
-    { value: 'pt-BR', label: 'Portuguese', region: 'Brazil', flag: '🇧🇷' },
-    { value: 'ru', label: 'Russian', flag: '🇷🇺' },
-    { value: 'it', label: 'Italian', flag: '🇮🇹' },
-    { value: 'ko', label: 'Korean', flag: '🇰🇷' },
-    { value: 'nl', label: 'Dutch', flag: '🇳🇱' },
-    { value: 'pl', label: 'Polish', flag: '🇵🇱' },
-    { value: 'tr', label: 'Turkish', flag: '🇹🇷' },
-    { value: 'vi', label: 'Vietnamese', flag: '🇻🇳' },
-    { value: 'ro', label: 'Romanian', flag: '🇷🇴' },
-    { value: 'en', label: 'English', flag: '🇺🇸' },
-    { value: 'fr', label: 'French', flag: '🇫🇷' },
+    { value: 'es', label: 'Spanish', icon: <Flag color="#AA151B" fill="#AA151B" className="h-4 w-4" /> },
+    { value: 'en', label: 'English', icon: <Flag color="#B22234" fill="#B22234" className="h-4 w-4" /> },
+    { value: 'fr', label: 'French', icon: <Flag color="#0055A4" fill="#0055A4" className="h-4 w-4" /> },
+    { value: 'de', label: 'German', icon: <Flag color="#000000" fill="#000000" className="h-4 w-4" /> },
+    { value: 'pt-BR', label: 'Portuguese (Brazil)', icon: <Flag color="#009C3B" fill="#009C3B" className="h-4 w-4" /> },
+    { value: 'pt-PT', label: 'Portuguese (Portugal)', icon: <Flag color="#FF0000" fill="#FF0000" className="h-4 w-4" /> },
+    { value: 'it', label: 'Italian', icon: <Flag color="#009246" fill="#009246" className="h-4 w-4" /> },
+    { value: 'ru', label: 'Russian', icon: <Flag color="#FFFFFF" fill="#FFFFFF" className="h-4 w-4" strokeWidth={1} stroke="#0039A6" /> },
   ];
 
   // Find the current language display data
@@ -72,50 +58,36 @@ const AgentSettingsToolbar: React.FC<AgentSettingsToolbarProps> = ({
         <span className="text-sm">Angie vendedora</span>
       </div>
 
-      <TooltipProvider>
-        <DropdownMenu>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <div className="flex items-center space-x-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-md p-2 cursor-pointer">
-                  <span className="mr-1">{currentLanguage.flag}</span>
-                  <span className="text-sm">{currentLanguage.label}</span>
-                  <svg 
-                    width="12" 
-                    height="12" 
-                    viewBox="0 0 12 12" 
-                    fill="none" 
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="ml-1"
-                  >
-                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Select language</p>
-            </TooltipContent>
-          </Tooltip>
-          <DropdownMenuContent align="start" className="w-[200px] max-h-[350px] overflow-y-auto">
-            {languageOptions.map((lang) => (
-              <DropdownMenuItem 
-                key={lang.value}
-                onClick={() => onLanguageChange(lang.value)}
-                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 py-2"
-              >
-                <span className="text-base">{lang.flag}</span>
-                <div className="flex flex-col">
-                  <span className="text-sm">{lang.label}</span>
-                  {lang.region && (
-                    <span className="text-xs text-gray-500">({lang.region})</span>
-                  )}
-                </div>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </TooltipProvider>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="flex items-center space-x-2 bg-gray-50 hover:bg-gray-100 rounded-md p-2 cursor-pointer">
+            {currentLanguage.icon}
+            <span className="text-sm ml-2">{currentLanguage.label}</span>
+            <svg 
+              width="12" 
+              height="12" 
+              viewBox="0 0 12 12" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+              className="ml-1"
+            >
+              <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-[220px] bg-white">
+          {languageOptions.map((lang) => (
+            <DropdownMenuItem 
+              key={lang.value}
+              onClick={() => onLanguageChange(lang.value)}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              {lang.icon}
+              <span>{lang.label}</span>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
