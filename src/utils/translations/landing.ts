@@ -1,3 +1,4 @@
+
 const landingTranslations = {
   "en": {
     // Hero section
@@ -109,6 +110,27 @@ const landingTranslations = {
     "how_it_works_step3_description": "Easily deploy your agents to phone calls, web calls, SMS, and more.",
     "how_it_works_step4_title": "Monitor",
     "how_it_works_step4_description": "Track success rates, latency, and user sentiment through call history dashboard. Quickly identify failed calls.",
+    
+    // Testimonials section
+    "testimonials_title": "Loved by customers worldwide",
+    "testimonials_subtitle": "See what our customers have to say about their experience with our voice AI solutions",
+    
+    // Case Studies section
+    "case_studies_title": "Success stories from real customers",
+    "case_studies_subtitle": "Learn how leading companies are transforming their operations with our voice AI technology",
+    "view_all_case_studies": "View all case studies",
+    "read_case_study": "Read case study",
+    
+    // Industries section
+    "industries_title": "Voice AI solutions for every industry",
+    "industries_subtitle": "Discover how our voice AI technology can be customized for your specific industry needs",
+    "view_all_industries": "View all industry solutions",
+    "industry_call_centers": "Call Centers",
+    "industry_healthcare": "Healthcare",
+    "industry_financial": "Financial Services",
+    "industry_retail": "Retail & E-commerce",
+    "industry_sales": "Sales & Marketing",
+    "industry_education": "Education"
   },
   "es": {
     // Hero section
@@ -220,6 +242,27 @@ const landingTranslations = {
     "how_it_works_step3_description": "Implementa fácilmente tus agentes en llamadas telefónicas, llamadas web, SMS y más.",
     "how_it_works_step4_title": "Monitorear",
     "how_it_works_step4_description": "Rastrea tasas de éxito, latencia y sentimiento del usuario a través del panel de historial de llamadas. Identifica rápidamente las llamadas fallidas.",
+    
+    // Testimonials section
+    "testimonials_title": "Amado por clientes en todo el mundo",
+    "testimonials_subtitle": "Mira lo que nuestros clientes dicen sobre su experiencia con nuestras soluciones de IA de voz",
+    
+    // Case Studies section
+    "case_studies_title": "Historias de éxito de clientes reales",
+    "case_studies_subtitle": "Aprende cómo empresas líderes están transformando sus operaciones con nuestra tecnología de IA de voz",
+    "view_all_case_studies": "Ver todos los casos de estudio",
+    "read_case_study": "Leer caso de estudio",
+    
+    // Industries section
+    "industries_title": "Soluciones de IA de voz para cada industria",
+    "industries_subtitle": "Descubre cómo nuestra tecnología de IA de voz puede ser personalizada para las necesidades específicas de tu industria",
+    "view_all_industries": "Ver todas las soluciones por industria",
+    "industry_call_centers": "Centros de Llamadas",
+    "industry_healthcare": "Salud",
+    "industry_financial": "Servicios Financieros",
+    "industry_retail": "Retail y E-commerce",
+    "industry_sales": "Ventas y Marketing",
+    "industry_education": "Educación"
   }
 };
 

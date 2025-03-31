@@ -5,6 +5,9 @@ import LandingNav from "@/components/ui/LandingNav";
 import HeroSection from "@/components/ui/HeroSection";
 import HowItWorksSection from "@/components/ui/HowItWorksSection";
 import FeaturesSection from "@/components/ui/FeaturesSection";
+import TestimonialsSection from "@/components/ui/TestimonialsSection";
+import CaseStudiesSection from "@/components/ui/CaseStudiesSection";
+import IndustriesSection from "@/components/ui/IndustriesSection";
 import PricingSection from "@/components/ui/PricingSection";
 import ContactSection from "@/components/ui/ContactSection";
 import Footer from "@/components/ui/Footer";
@@ -33,7 +36,6 @@ const LandingPage = () => {
         <LandingNav />
         <main>
           <HeroSection />
-          <HowItWorksSection />
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -53,7 +55,11 @@ const LandingPage = () => {
               </div>
             </div>
           </motion.div>
+          <HowItWorksSection />
           <FeaturesSection />
+          <TestimonialsSection />
+          <CaseStudiesSection />
+          <IndustriesSection />
           <PricingSection />
           <ContactSection />
         </main>
