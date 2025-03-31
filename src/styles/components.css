@@ -1,0 +1,11 @@
+
+@layer components {
+  /* Glassmorphism utility classes */
+  .glass {
+    @apply bg-white/80 dark:bg-black/40 backdrop-blur-sm border border-white/20 dark:border-white/10;
+  }
+  
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-sm border border-white/10;
+  }
+}

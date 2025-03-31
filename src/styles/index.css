@@ -1,0 +1,12 @@
+
+/* Base styles and Tailwind imports */
+@import './base.css';
+
+/* Theme variables and dark mode */
+@import './theme.css';
+
+/* Component utilities */
+@import './components.css';
+
+/* Animations */
+@import './animations.css';
