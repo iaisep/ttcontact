@@ -1,16 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Copy, Flag } from 'lucide-react';
+import { ArrowLeft, Copy, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -20,28 +14,38 @@ import {
 
 interface AgentDetailHeaderProps {
   agent: RetellAgent;
-  defaultLanguage: string;
-  selectedLlmModel: string;
-  onLanguageChange: (value: string) => void;
-  onLlmModelChange: (value: string) => void;
+  updateAgentField: (fieldName: string, value: any) => void;
 }
 
 const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
   agent,
-  defaultLanguage,
-  selectedLlmModel,
-  onLanguageChange,
-  onLlmModelChange
+  updateAgentField
 }) => {
   const navigate = useNavigate();
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [agentName, setAgentName] = useState(agent.agent_name || agent.name || '');
   
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard');
   };
   
-  // Get the agent ID or slug for navigation
-  const agentId = agent.agent_id || agent.id;
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAgentName(e.target.value);
+  };
+  
+  const handleNameSubmit = () => {
+    if (agentName.trim() !== '') {
+      updateAgentField('agent_name', agentName);
+      setIsEditingName(false);
+    }
+  };
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleNameSubmit();
+    }
+  };
   
   return (
     <div className="border-b sticky top-0 z-10 bg-background">
@@ -51,7 +55,36 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
         </Button>
         
         <div className="flex-1">
-          <h1 className="text-lg font-semibold">{agent.agent_name || agent.name}</h1>
+          <div className="flex items-center">
+            {isEditingName ? (
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  value={agentName}
+                  onChange={handleNameChange}
+                  onBlur={handleNameSubmit}
+                  onKeyDown={handleKeyDown}
+                  autoFocus
+                  className="text-lg font-semibold bg-transparent border-b border-primary outline-none mr-2"
+                />
+                <Button variant="ghost" size="sm" onClick={handleNameSubmit}>
+                  Save
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center">
+                <h1 className="text-lg font-semibold">{agent.agent_name || agent.name}</h1>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-6 w-6 ml-2"
+                  onClick={() => setIsEditingName(true)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
           <div className="flex text-xs text-muted-foreground space-x-2 items-center">
             <div className="flex items-center gap-1">
               <span>Agent ID: {agent.agent_id?.substring(0, 8) || agent.id?.substring(0, 8)}</span>
@@ -79,7 +112,9 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
             <span>•</span>
             <span>+50.087/min</span>
             <span>•</span>
-            <span>1350-1600ms latency</span>
+            <span>1200-1450ms latency</span>
+            <span>•</span>
+            <span>Auto saved at 07:51</span>
           </div>
         </div>
         

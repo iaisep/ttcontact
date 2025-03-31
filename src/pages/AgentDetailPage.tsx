@@ -5,7 +5,6 @@ import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import AgentDetailHeader from '@/components/dashboard/sections/agents/detail/AgentDetailHeader';
 import AgentLeftColumn from '@/components/dashboard/sections/agents/detail/AgentLeftColumn';
@@ -23,8 +22,6 @@ const AgentDetailPage: React.FC = () => {
   const [llms, setLLMs] = useState<RetellLLM[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [defaultLanguage, setDefaultLanguage] = useState('es');
-  const [selectedLlmModel, setSelectedLlmModel] = useState('GPT 4o mini');
 
   useEffect(() => {
     const fetchAgentData = async () => {
@@ -130,35 +127,26 @@ const AgentDetailPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       <AgentDetailHeader 
         agent={agent}
-        defaultLanguage={defaultLanguage}
-        selectedLlmModel={selectedLlmModel}
-        onLanguageChange={(value) => {
-          setDefaultLanguage(value);
-          updateAgentField('language', value);
-        }}
-        onLlmModelChange={(value) => setSelectedLlmModel(value)}
+        updateAgentField={updateAgentField}
       />
 
       <div className="container py-6 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Left Column - Prompt Editor */}
-          <AgentLeftColumn 
-            agent={agent}
-            defaultLanguage={defaultLanguage}
-            selectedLlmModel={selectedLlmModel}
-            onLanguageChange={(value) => {
-              setDefaultLanguage(value);
-              updateAgentField('language', value);
-            }}
-            onLlmModelChange={(value) => setSelectedLlmModel(value)}
-            updateAgentField={updateAgentField}
-          />
+          <div className="md:col-span-7">
+            <AgentLeftColumn 
+              agent={agent}
+              updateAgentField={updateAgentField}
+            />
+          </div>
 
           {/* Right Column - Settings & Testing */}
-          <AgentRightColumn 
-            agent={agent}
-            updateAgentField={updateAgentField}
-          />
+          <div className="md:col-span-5">
+            <AgentRightColumn 
+              agent={agent}
+              updateAgentField={updateAgentField}
+            />
+          </div>
         </div>
       </div>
     </div>
