@@ -31,11 +31,15 @@ const AgentEditorForm: React.FC<AgentEditorFormProps> = ({
   const [voiceId, setVoiceId] = useState(agent.voice_id || '');
   const [folder, setFolder] = useState(agent.folder || '');
   const [language, setLanguage] = useState(agent.language || 'en-US');
-  const [generalPrompt, setGeneralPrompt] = useState(
-    agent.response_engine?.prompt || 
-    agent.response_engine?.general_prompt || 
-    ''
-  );
+  
+  // Use optional chaining and type guards for response_engine properties
+  const initialPrompt = agent.response_engine && 
+    typeof agent.response_engine === 'object' ? 
+    (agent.response_engine as any).prompt || 
+    (agent.response_engine as any).general_prompt || 
+    '' : '';
+  
+  const [generalPrompt, setGeneralPrompt] = useState(initialPrompt);
   const [beginMessage, setBeginMessage] = useState(agent.begin_message || '');
 
   // Create debounced update functions
