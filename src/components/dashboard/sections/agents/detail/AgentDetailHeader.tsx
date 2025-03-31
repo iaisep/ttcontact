@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -128,12 +129,7 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
                     className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 py-2"
                   >
                     {lang.icon}
-                    <div className="flex flex-col">
-                      <span className="text-sm">{lang.label}</span>
-                      {lang.region && (
-                        <span className="text-xs text-gray-500">({lang.region})</span>
-                      )}
-                    </div>
+                    <span className="text-sm">{lang.label}</span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
