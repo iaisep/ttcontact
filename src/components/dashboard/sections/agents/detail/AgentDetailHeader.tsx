@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Copy, Flag, Edit } from 'lucide-react';
+import { ArrowLeft, Copy, Flag, Settings, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import {
@@ -24,6 +24,8 @@ interface AgentDetailHeaderProps {
   selectedLlmModel: string;
   onLanguageChange: (value: string) => void;
   onLlmModelChange: (value: string) => void;
+  onOpenAgentSelector?: () => void;
+  onOpenVoiceSettings?: () => void;
 }
 
 const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
@@ -31,7 +33,9 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
   defaultLanguage,
   selectedLlmModel,
   onLanguageChange,
-  onLlmModelChange
+  onLlmModelChange,
+  onOpenAgentSelector,
+  onOpenVoiceSettings
 }) => {
   const navigate = useNavigate();
   
@@ -66,7 +70,41 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
         </Button>
         
         <div className="flex-1">
-          <h1 className="text-lg font-semibold">{agent.agent_name || agent.name}</h1>
+          <div className="flex items-center">
+            <div className="flex items-center">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2 font-semibold">
+                    <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-700 rounded-full flex items-center justify-center overflow-hidden text-white">
+                      {agent.agent_name?.substring(0, 1) || agent.name?.substring(0, 1) || 'A'}
+                    </div>
+                    <span>{agent.agent_name || agent.name}</span>
+                    <ChevronDown className="h-4 w-4 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-[250px]">
+                  <DropdownMenuItem onClick={onOpenAgentSelector}>
+                    Select different agent
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              {onOpenVoiceSettings && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" onClick={onOpenVoiceSettings} className="ml-1">
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Voice settings</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+          </div>
           <div className="flex text-xs text-muted-foreground space-x-2 items-center">
             <div className="flex items-center gap-1">
               <span>Agent ID: {agent.agent_id?.substring(0, 8) || agent.id?.substring(0, 8)}</span>
@@ -140,10 +178,6 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
           </TooltipProvider>
           
           <div className="flex space-x-2">
-            <Button variant="outline" onClick={() => navigate(`/agentes/${agentId}/edit`)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
             <Button variant="outline">Create</Button>
             <Button variant="outline">Simulation</Button>
           </div>
