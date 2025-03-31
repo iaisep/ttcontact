@@ -20,12 +20,26 @@ interface AgentSettingsAccordionProps {
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
+// Default speech settings to use when not provided
+const defaultSpeechSettings = {
+  stability: 0.5,
+  similarity: 0.8,
+  style: 0.5,
+  speed: 1.0
+};
+
 const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   agent,
   knowledgeBases = [],
   updateAgentField
 }) => {
   const { t } = useLanguage();
+  
+  // Ensure speech settings are complete with defaults
+  const speechSettings = {
+    ...defaultSpeechSettings,
+    ...(agent.speech_settings || {})
+  };
   
   return (
     <Accordion type="single" defaultValue="knowledge-base" className="w-full">
@@ -48,7 +62,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
         </AccordionTrigger>
         <AccordionContent className="border border-t-0 rounded-b-md p-4">
           <SpeechSettings 
-            settings={agent.speech_settings || {}} 
+            settings={speechSettings} 
             onUpdate={(value) => updateAgentField('speech_settings', value)} 
           />
         </AccordionContent>
