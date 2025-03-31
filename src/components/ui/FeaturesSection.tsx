@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { Mic, Brain, MessageSquare, Code, Headphones, Zap } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { Link } from "react-router-dom";
 
 const FeaturesSection = () => {
   const { t } = useLanguage();
