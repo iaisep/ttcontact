@@ -102,7 +102,10 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-
+        {/* Settings Button */}
+        <Button variant="outline" size="icon" className="rounded-full bg-gray-50">
+          <Settings className="h-4 w-4" />
+        </Button>
         {/* Language Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -123,10 +126,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Settings Button */}
-        <Button variant="outline" size="icon" className="rounded-full bg-gray-50">
-          <Settings className="h-4 w-4" />
-        </Button>
+       
       </div>
 
       {/* Prompt Editor */}
