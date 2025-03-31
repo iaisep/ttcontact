@@ -2,7 +2,7 @@
 import React from 'react';
 import EditablePrompt from './EditablePrompt';
 import WelcomeMessageEditor from './WelcomeMessageEditor';
-import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
+import { RetellAgent, RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
 import { VoiceSelectionModal } from './voice-selection';
 import SelectorsRow from './components/SelectorsRow';
 import { useVoiceSettings } from './hooks/useVoiceSettings';
@@ -11,11 +11,13 @@ import { useLanguageSelector } from './hooks/useLanguageSelector';
 
 interface AgentLeftColumnProps {
   agent: RetellAgent;
+  llm?: RetellLLM | null;
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
 const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   agent,
+  llm,
   updateAgentField
 }) => {
   // Use custom hooks to manage state and logic
@@ -80,6 +82,16 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         onSelectVoice={voiceSettings.handleVoiceChange}
         selectedVoice={agent.voice_id}
       />
+
+      {/* Display LLM General Prompt if available */}
+      {llm?.general_prompt && (
+        <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-sm font-medium mb-2">{t('llm_general_prompt')}</h3>
+          <div className="text-sm text-gray-700 max-h-[300px] overflow-y-auto whitespace-pre-wrap">
+            {llm.general_prompt}
+          </div>
+        </div>
+      )}
 
       {/* Prompt Editor */}
       <EditablePrompt

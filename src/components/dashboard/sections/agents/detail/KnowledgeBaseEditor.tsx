@@ -1,72 +1,88 @@
 
-import React, { useState, useEffect } from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import { useLanguage } from '@/context/LanguageContext';
-import { debounce } from 'lodash';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import { Plus, Trash } from 'lucide-react';
 
-interface KnowledgeBaseEditorProps {
-  knowledgeBase: string;
-  onUpdate: (value: string) => void;
+interface KnowledgeBase {
+  id: string;
+  name: string;
+  description?: string;
+  created_at?: string;
 }
 
-const KnowledgeBaseEditor: React.FC<KnowledgeBaseEditorProps> = ({ knowledgeBase, onUpdate }) => {
+interface KnowledgeBaseEditorProps {
+  agent: RetellAgent;
+  knowledgeBases: KnowledgeBase[];
+  onUpdate: (value: string[]) => void;
+}
+
+const KnowledgeBaseEditor: React.FC<KnowledgeBaseEditorProps> = ({
+  agent,
+  knowledgeBases,
+  onUpdate
+}) => {
   const { t } = useLanguage();
-  const [value, setValue] = useState(knowledgeBase);
-  
-  useEffect(() => {
-    setValue(knowledgeBase);
-  }, [knowledgeBase]);
+  const [selectedKbs, setSelectedKbs] = React.useState<string[]>(
+    agent.knowledge_base_ids || []
+  );
 
-  // Create debounced update function
-  const debouncedUpdate = debounce((value) => onUpdate(value), 1000);
-  
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    setValue(newValue);
-    debouncedUpdate(newValue);
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      setValue(content);
-      onUpdate(content);
-    };
-    reader.readAsText(file);
+  const handleKbChange = (kbId: string, checked: boolean) => {
+    let newSelectedKbs;
+    if (checked) {
+      newSelectedKbs = [...selectedKbs, kbId];
+    } else {
+      newSelectedKbs = selectedKbs.filter(id => id !== kbId);
+    }
+    setSelectedKbs(newSelectedKbs);
+    onUpdate(newSelectedKbs);
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4 mb-4">
-        <input
-          type="file"
-          id="knowledge-file"
-          className="hidden"
-          accept=".txt,.md,.csv"
-          onChange={handleFileUpload}
-        />
-        <Button 
-          variant="outline" 
-          onClick={() => document.getElementById('knowledge-file')?.click()}
-        >
-          {t('upload_knowledge_file')}
+      <div className="flex justify-between items-center">
+        <h3 className="text-sm font-medium">{t('knowledge_bases')}</h3>
+        <Button variant="outline" size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          {t('add_knowledge_base')}
         </Button>
       </div>
 
-      <Textarea
-        value={value}
-        onChange={handleChange}
-        className="min-h-[400px] font-mono text-sm"
-        placeholder={t('knowledge_base_placeholder')}
-      />
-      <p className="mt-2 text-sm text-muted-foreground">
-        {t('knowledge_base_description')}
-      </p>
+      {knowledgeBases.length === 0 ? (
+        <div className="py-4 text-center text-gray-500">
+          {t('no_knowledge_bases')}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {knowledgeBases.map((kb) => (
+            <div key={kb.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+              <div className="flex items-center space-x-3">
+                <Checkbox 
+                  id={`kb-${kb.id}`}
+                  checked={selectedKbs.includes(kb.id)}
+                  onCheckedChange={(checked) => handleKbChange(kb.id, !!checked)}
+                />
+                <label 
+                  htmlFor={`kb-${kb.id}`}
+                  className="text-sm font-medium cursor-pointer"
+                >
+                  {kb.name || kb.id}
+                </label>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => handleKbChange(kb.id, false)}
+                disabled={!selectedKbs.includes(kb.id)}
+              >
+                <Trash className="h-4 w-4 text-gray-500" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

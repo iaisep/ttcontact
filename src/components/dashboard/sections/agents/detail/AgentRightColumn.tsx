@@ -1,21 +1,23 @@
 
 import React from 'react';
-import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
+import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import TestPanel from './TestPanel';
 
 interface AgentRightColumnProps {
   agent: RetellAgent;
+  voice?: RetellVoice | null;
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
 const AgentRightColumn: React.FC<AgentRightColumnProps> = ({
   agent,
+  voice,
   updateAgentField
 }) => {
   return (
     <div className="bg-[hsl(var(--muted)/.3)] rounded-lg p-4 border shadow-sm">
       {/* Test Agent Section */}
-      <TestPanel agent={agent} />
+      <TestPanel agent={agent} voice={voice} />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Edit, Trash } from 'lucide-react';
 import { Agent } from './types';
 import { useLanguage } from '@/context/LanguageContext';
+import { toast } from 'sonner';
 
 interface AgentsTableProps {
   agents: Agent[];
@@ -30,7 +31,13 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
     e.preventDefault();
     e.stopPropagation();
     // Navigate to the detailed agent page
-    navigate(`/agentes/${getAgentSlug(agent)}`);
+    try {
+      const slug = getAgentSlug(agent);
+      navigate(`/agentes/${slug}`);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      toast.error(t('error_navigating_to_agent'));
+    }
   };
 
   const handleDeleteClick = (agentId: string, e: React.MouseEvent) => {
@@ -40,7 +47,13 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
   };
 
   const handleRowClick = (agent: Agent) => {
-    navigate(`/agentes/${getAgentSlug(agent)}`);
+    try {
+      const slug = getAgentSlug(agent);
+      navigate(`/agentes/${slug}`);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      toast.error(t('error_navigating_to_agent'));
+    }
   };
 
   if (isLoading) {
@@ -92,6 +105,15 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
+                    {agent.voice?.avatar_url && (
+                      <div className="flex-shrink-0 h-10 w-10 mr-3">
+                        <img 
+                          className="h-10 w-10 rounded-full" 
+                          src={agent.voice.avatar_url} 
+                          alt={agent.name} 
+                        />
+                      </div>
+                    )}
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {agent.name}

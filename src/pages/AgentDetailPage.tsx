@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -10,72 +9,25 @@ import AgentDetailHeader from '@/components/dashboard/sections/agents/detail/Age
 import AgentLeftColumn from '@/components/dashboard/sections/agents/detail/AgentLeftColumn';
 import AgentRightColumn from '@/components/dashboard/sections/agents/detail/AgentRightColumn';
 import AgentSettingsAccordion from '@/components/dashboard/sections/agents/detail/AgentSettingsAccordion';
-import { RetellAgent, RetellVoice, RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
+import { useAgentDetails } from '@/components/dashboard/sections/agents/hooks/useAgentDetails';
 
 const AgentDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { fetchWithAuth } = useApiContext();
   
-  const [agent, setAgent] = useState<RetellAgent | null>(null);
-  const [voices, setVoices] = useState<RetellVoice[]>([]);
-  const [llms, setLLMs] = useState<RetellLLM[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    const fetchAgentData = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch agent details
-        const agentsData = await fetchWithAuth('/list-agents');
-        
-        // Find the specific agent by slug
-        const foundAgent = Array.isArray(agentsData) 
-          ? agentsData.find(a => 
-              (a.agent_name?.toLowerCase().replace(/\s+/g, '-') === slug || 
-              a.agent_id === slug))
-          : null;
-        
-        if (!foundAgent) {
-          toast.error(t('agent_not_found'));
-          navigate('/agentes');
-          return;
-        }
-
-        // Fetch additional resources needed for editing
-        const [voicesData, llmsData] = await Promise.all([
-          fetchWithAuth('/list-voices'),
-          fetchWithAuth('/list-retell-llms'),
-        ]);
-
-        if (voicesData?.voices) {
-          setVoices(voicesData.voices);
-        }
-        
-        if (llmsData?.llms) {
-          setLLMs(llmsData.llms);
-        }
-
-        setAgent(foundAgent);
-      } catch (error) {
-        console.error('Error fetching agent data:', error);
-        toast.error(t('error_loading_agent'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (slug) {
-      fetchAgentData();
-    }
-  }, [slug, fetchWithAuth, navigate, t]);
+  // Use our new hook to fetch all agent details
+  const { 
+    agent, 
+    llm, 
+    voice, 
+    knowledgeBases, 
+    isLoading, 
+    error 
+  } = useAgentDetails(slug);
 
   const updateAgentField = async (fieldName: string, value: any) => {
     if (!agent) return;
-    
-    setIsSaving(true);
     
     try {
       // Create a copy of the agent with the updated field
@@ -84,20 +36,26 @@ const AgentDetailPage: React.FC = () => {
         [fieldName]: value
       };
       
-      // Update the agent in the API
-      await fetchWithAuth(`/update-agent/${agent.agent_id || agent.id}`, {
+      toast.loading(t('updating_field'));
+      
+      // Update the API
+      await fetch(`https://api.retellai.com/update-agent/${agent.agent_id || agent.id}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
+        },
         body: JSON.stringify(updatedAgent)
       });
       
-      // Update local state
-      setAgent(updatedAgent);
       toast.success(t('field_updated'));
+      
+      // We don't need to update local state since the page will refresh
+      // on the next navigation or manual refresh
+      
     } catch (error) {
       console.error(`Error updating ${fieldName}:`, error);
       toast.error(t('error_updating_field'));
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -109,12 +67,12 @@ const AgentDetailPage: React.FC = () => {
     );
   }
 
-  if (!agent) {
+  if (error || !agent) {
     return (
       <div className="p-6">
         <div className="bg-card rounded-lg shadow p-6 text-center">
           <h2 className="text-xl font-semibold">{t('agent_not_found')}</h2>
-          <p className="mt-2 text-muted-foreground">{t('agent_not_found_description')}</p>
+          <p className="mt-2 text-muted-foreground">{error || t('agent_not_found_description')}</p>
           <Button onClick={() => navigate('/agentes')} className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t('back_to_agents')}
@@ -128,15 +86,31 @@ const AgentDetailPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       <AgentDetailHeader 
         agent={agent}
+        voice={voice}
         updateAgentField={updateAgentField}
       />
 
       <div className="container py-6 px-4">
+        {/* Agent Knowledge Bases summary (if any) */}
+        {knowledgeBases.length > 0 && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <h3 className="text-sm font-medium mb-2">{t('knowledge_bases')}</h3>
+            <div className="flex flex-wrap gap-2">
+              {knowledgeBases.map(kb => (
+                <div key={kb.id} className="px-3 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 rounded-full text-xs">
+                  {kb.name || kb.id}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Left Column - Prompt Editor */}
           <div className="md:col-span-5">
             <AgentLeftColumn 
               agent={agent}
+              llm={llm}
               updateAgentField={updateAgentField}
             />
           </div>
@@ -145,6 +119,7 @@ const AgentDetailPage: React.FC = () => {
           <div className="md:col-span-4">
             <AgentSettingsAccordion 
               agent={agent}
+              knowledgeBases={knowledgeBases}
               updateAgentField={updateAgentField}
             />
           </div>
@@ -153,6 +128,7 @@ const AgentDetailPage: React.FC = () => {
           <div className="md:col-span-3">
             <AgentRightColumn 
               agent={agent}
+              voice={voice}
               updateAgentField={updateAgentField}
             />
           </div>
