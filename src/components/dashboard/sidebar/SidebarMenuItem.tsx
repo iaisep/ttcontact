@@ -33,15 +33,15 @@ const SidebarMenuItem = ({
   return (
     <li>
       <button
-        className={`flex items-center w-full px-4 py-2.5 transition-colors ${
+        className={`flex items-center w-full px-4 py-2.5 transition-colors text-left ${
           activeSection === id 
             ? 'bg-blue-50 text-blue-600 font-medium' 
             : 'text-gray-500 hover:bg-gray-50'
         }`}
         onClick={handleClick}
       >
-        <Icon size={20} className="min-w-[20px]" />
-        {!sidebarCollapsed && <span className="ml-3">{title}</span>}
+        <Icon size={20} className="min-w-[20px] mr-3" />
+        {!sidebarCollapsed && <span className="text-sm">{title}</span>}
       </button>
     </li>
   );
