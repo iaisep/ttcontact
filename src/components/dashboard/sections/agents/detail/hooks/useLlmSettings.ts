@@ -42,14 +42,11 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
         });
         
         // Fetch the updated LLM data to ensure changes are reflected
-        const updatedLlmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
+        await fetchWithAuth(`/get-retell-llm/${llmId}`);
         
-        // Update local state
-        updateAgentField('llm_model', llm);
+        // Just update the local state without updating the agent
+        setSelectedLlmModel(llm);
         toast.success('LLM model updated successfully');
-      } else {
-        // If no LLM ID is available, just update the local state
-        updateAgentField('llm_model', llm);
       }
     } catch (error) {
       console.error('Error updating LLM model:', error);
@@ -73,9 +70,9 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
         });
         
         // Fetch the updated LLM data to ensure changes are reflected
-        const updatedLlmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
+        await fetchWithAuth(`/get-retell-llm/${llmId}`);
         
-        // Update local state
+        // Update agent fields only for temperature, structured output and high priority
         updateAgentField('llm_temperature', llmTemperature);
         updateAgentField('structured_output', structuredOutput);
         updateAgentField('high_priority', highPriority);
