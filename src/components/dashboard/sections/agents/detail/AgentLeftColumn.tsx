@@ -15,12 +15,14 @@ interface AgentLeftColumnProps {
   agent: RetellAgent;
   llm?: RetellLLM | null;
   updateAgentField: (fieldName: string, value: any) => void;
+  refreshData?: () => void;
 }
 
 const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   agent,
   llm,
-  updateAgentField
+  updateAgentField,
+  refreshData
 }) => {
   // Use language context
   const { t } = useLanguage();

@@ -32,12 +32,17 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
         toast.loading('Updating LLM model...');
         
         // Update the LLM using the update-retell-llm endpoint with PATCH method
+        // Using the correct request body format
         await fetchWithAuth(`/update-retell-llm/${llmId}`, {
           method: 'PATCH',
           body: JSON.stringify({
-            model: llm
+            s2s_model: "gpt-4o-realtime",
+            model: null
           })
         });
+        
+        // Fetch the updated LLM data to ensure changes are reflected
+        const updatedLlmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
         
         // Update local state
         updateAgentField('llm_model', llm);
@@ -66,6 +71,9 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
             high_priority: highPriority
           })
         });
+        
+        // Fetch the updated LLM data to ensure changes are reflected
+        const updatedLlmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
         
         // Update local state
         updateAgentField('llm_temperature', llmTemperature);

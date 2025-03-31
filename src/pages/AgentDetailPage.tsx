@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
@@ -24,7 +25,8 @@ const AgentDetailPage: React.FC = () => {
     voice, 
     knowledgeBases, 
     isLoading, 
-    error 
+    error,
+    refreshData
   } = useAgentDetails(slug);
 
   const updateAgentField = async (fieldName: string, value: any) => {
@@ -47,8 +49,8 @@ const AgentDetailPage: React.FC = () => {
       
       toast.success(t('field_updated'));
       
-      // We don't need to update local state since the page will refresh
-      // on the next navigation or manual refresh
+      // Refresh the data after successful update
+      if (refreshData) refreshData();
       
     } catch (error) {
       console.error(`Error updating ${fieldName}:`, error);
@@ -109,6 +111,7 @@ const AgentDetailPage: React.FC = () => {
               agent={agent}
               llm={llm}
               updateAgentField={updateAgentField}
+              refreshData={refreshData}
             />
           </div>
 
