@@ -31,9 +31,9 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
       </TableHeader>
       <TableBody>
         {agents.map((agent) => (
-          <TableRow key={agent.id}>
-            <TableCell>{agent.name}</TableCell>
-            <TableCell>{agent.description}</TableCell>
+          <TableRow key={agent.agent_id}>
+            <TableCell>{agent.agent_name}</TableCell>
+            <TableCell>{agent.response_engine.type}</TableCell>
             <TableCell>
               <div className="flex gap-2">
                 <Button 
