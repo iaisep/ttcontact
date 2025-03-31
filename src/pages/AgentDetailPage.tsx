@@ -9,6 +9,7 @@ import { ArrowLeft } from 'lucide-react';
 import AgentDetailHeader from '@/components/dashboard/sections/agents/detail/AgentDetailHeader';
 import AgentLeftColumn from '@/components/dashboard/sections/agents/detail/AgentLeftColumn';
 import AgentRightColumn from '@/components/dashboard/sections/agents/detail/AgentRightColumn';
+import AgentSettingsAccordion from '@/components/dashboard/sections/agents/detail/AgentSettingsAccordion';
 import { RetellAgent, RetellVoice, RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
 
 const AgentDetailPage: React.FC = () => {
@@ -133,15 +134,23 @@ const AgentDetailPage: React.FC = () => {
       <div className="container py-6 px-4">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Left Column - Prompt Editor */}
-          <div className="md:col-span-7">
+          <div className="md:col-span-5">
             <AgentLeftColumn 
               agent={agent}
               updateAgentField={updateAgentField}
             />
           </div>
 
-          {/* Right Column - Settings & Testing */}
-          <div className="md:col-span-5">
+          {/* Middle Column - Accordion Settings */}
+          <div className="md:col-span-4">
+            <AgentSettingsAccordion 
+              agent={agent}
+              updateAgentField={updateAgentField}
+            />
+          </div>
+
+          {/* Right Column - Test Panel */}
+          <div className="md:col-span-3">
             <AgentRightColumn 
               agent={agent}
               updateAgentField={updateAgentField}
