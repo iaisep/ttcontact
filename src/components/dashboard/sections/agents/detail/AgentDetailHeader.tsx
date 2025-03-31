@@ -5,6 +5,18 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 
 interface AgentDetailHeaderProps {
   agent: RetellAgent;
@@ -27,6 +39,29 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
     navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard');
   };
+  
+  // Language options with flags - expanded to match the image
+  const languageOptions = [
+    { value: 'es', label: 'Spanish', flag: '🇪🇸' },
+    { value: 'de', label: 'German', flag: '🇩🇪' },
+    { value: 'hi', label: 'Hindi', flag: '🇮🇳' },
+    { value: 'ja', label: 'Japanese', flag: '🇯🇵' },
+    { value: 'pt-PT', label: 'Portuguese', region: 'Portugal', flag: '🇵🇹' },
+    { value: 'pt-BR', label: 'Portuguese', region: 'Brazil', flag: '🇧🇷' },
+    { value: 'ru', label: 'Russian', flag: '🇷🇺' },
+    { value: 'it', label: 'Italian', flag: '🇮🇹' },
+    { value: 'ko', label: 'Korean', flag: '🇰🇷' },
+    { value: 'nl', label: 'Dutch', flag: '🇳🇱' },
+    { value: 'pl', label: 'Polish', flag: '🇵🇱' },
+    { value: 'tr', label: 'Turkish', flag: '🇹🇷' },
+    { value: 'vi', label: 'Vietnamese', flag: '🇻🇳' },
+    { value: 'ro', label: 'Romanian', flag: '🇷🇴' },
+    { value: 'en', label: 'English', flag: '🇺🇸' },
+    { value: 'fr', label: 'French', flag: '🇫🇷' },
+  ];
+
+  // Find the current language display data
+  const currentLanguage = languageOptions.find(lang => lang.value === defaultLanguage) || languageOptions[0];
   
   return (
     <div className="border-b sticky top-0 z-10 bg-background">
@@ -68,9 +103,56 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
           </div>
         </div>
         
-        <div className="flex space-x-2">
-          <Button variant="outline">Create</Button>
-          <Button variant="outline">Simulation</Button>
+        <div className="flex space-x-2 items-center">
+          <TooltipProvider>
+            <DropdownMenu>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <div className="flex items-center space-x-2 bg-white hover:bg-gray-100 border border-gray-200 rounded-md p-2 cursor-pointer mr-2">
+                      <span className="mr-1">{currentLanguage.flag}</span>
+                      <span className="text-sm">{currentLanguage.label}</span>
+                      <svg 
+                        width="12" 
+                        height="12" 
+                        viewBox="0 0 12 12" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="ml-1"
+                      >
+                        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Select language</p>
+                </TooltipContent>
+              </Tooltip>
+              <DropdownMenuContent align="end" className="w-[200px] max-h-[350px] overflow-y-auto">
+                {languageOptions.map((lang) => (
+                  <DropdownMenuItem 
+                    key={lang.value}
+                    onClick={() => onLanguageChange(lang.value)}
+                    className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 py-2"
+                  >
+                    <span className="text-base">{lang.flag}</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm">{lang.label}</span>
+                      {lang.region && (
+                        <span className="text-xs text-gray-500">({lang.region})</span>
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TooltipProvider>
+          
+          <div className="flex space-x-2">
+            <Button variant="outline">Create</Button>
+            <Button variant="outline">Simulation</Button>
+          </div>
         </div>
       </div>
     </div>
