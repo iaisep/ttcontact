@@ -1,13 +1,16 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useApiContext } from '@/context/ApiContext';
 
 interface UseLlmSettingsProps {
   initialModel?: string;
+  llmId?: string;
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
-export const useLlmSettings = ({ initialModel = 'GPT 4o', updateAgentField }: UseLlmSettingsProps) => {
+export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentField }: UseLlmSettingsProps) => {
+  const { fetchWithAuth } = useApiContext();
   const [selectedLlmModel, setSelectedLlmModel] = useState(initialModel);
   const [isLlmSettingsOpen, setIsLlmSettingsOpen] = useState(false);
   const [llmTemperature, setLlmTemperature] = useState(0.0);
@@ -21,17 +24,68 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', updateAgentField }: Us
     'Claude 3 Sonnet',
   ];
 
-  const handleLlmChange = (llm: string) => {
+  const handleLlmChange = async (llm: string) => {
     setSelectedLlmModel(llm);
-    updateAgentField('llm_model', llm);
+    
+    try {
+      if (llmId) {
+        toast.loading('Updating LLM model...');
+        
+        // Update the LLM using the update-retell-llm endpoint with PATCH method
+        await fetchWithAuth(`/update-retell-llm/${llmId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            model: llm
+          })
+        });
+        
+        // Update local state
+        updateAgentField('llm_model', llm);
+        toast.success('LLM model updated successfully');
+      } else {
+        // If no LLM ID is available, just update the local state
+        updateAgentField('llm_model', llm);
+      }
+    } catch (error) {
+      console.error('Error updating LLM model:', error);
+      toast.error('Failed to update LLM model');
+    }
   };
 
-  const handleSaveLlmSettings = () => {
-    updateAgentField('llm_temperature', llmTemperature);
-    updateAgentField('structured_output', structuredOutput);
-    updateAgentField('high_priority', highPriority);
-    toast.success('LLM settings saved');
-    setIsLlmSettingsOpen(false);
+  const handleSaveLlmSettings = async () => {
+    try {
+      if (llmId) {
+        toast.loading('Saving LLM settings...');
+        
+        // Update the LLM settings using the update-retell-llm endpoint with PATCH method
+        await fetchWithAuth(`/update-retell-llm/${llmId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            temperature: llmTemperature,
+            structured_output: structuredOutput,
+            high_priority: highPriority
+          })
+        });
+        
+        // Update local state
+        updateAgentField('llm_temperature', llmTemperature);
+        updateAgentField('structured_output', structuredOutput);
+        updateAgentField('high_priority', highPriority);
+        
+        toast.success('LLM settings saved successfully');
+      } else {
+        // If no LLM ID is available, just update the local state
+        updateAgentField('llm_temperature', llmTemperature);
+        updateAgentField('structured_output', structuredOutput);
+        updateAgentField('high_priority', highPriority);
+        toast.success('LLM settings saved');
+      }
+      
+      setIsLlmSettingsOpen(false);
+    } catch (error) {
+      console.error('Error saving LLM settings:', error);
+      toast.error('Failed to save LLM settings');
+    }
   };
 
   return {

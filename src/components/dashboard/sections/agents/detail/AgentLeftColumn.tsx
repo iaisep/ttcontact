@@ -32,7 +32,8 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   });
   
   const llmSettings = useLlmSettings({ 
-    initialModel: agent.llm_model || 'GPT 4o', 
+    initialModel: agent.llm_model || 'GPT 4o',
+    llmId: agent.response_engine?.llm_id || llm?.id,
     updateAgentField 
   });
   

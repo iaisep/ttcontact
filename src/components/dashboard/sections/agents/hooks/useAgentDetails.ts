@@ -42,12 +42,20 @@ export const useAgentDetails = (agentId: string | undefined) => {
       try {
         // Step 1: Fetch the agent details using fetchWithAuth
         const agentData = await fetchWithAuth(`/get-agent/${agentId}`);
-        setState(prev => ({ ...prev, agent: agentData }));
+        
+        // Ensure we have a consistent agent object format
+        const formattedAgent = {
+          ...agentData,
+          agent_id: agentData.agent_id || agentData.id,
+          agent_name: agentData.agent_name || agentData.name
+        };
+        
+        setState(prev => ({ ...prev, agent: formattedAgent }));
         
         // Extract IDs needed for subsequent requests
-        const llmId = agentData.response_engine?.llm_id;
-        const voiceId = agentData.voice_id;
-        const knowledgeBaseIds = agentData.knowledge_base_ids || [];
+        const llmId = formattedAgent.response_engine?.llm_id;
+        const voiceId = formattedAgent.voice_id;
+        const knowledgeBaseIds = formattedAgent.knowledge_base_ids || [];
         
         // Step 2: Fetch LLM, voice, and knowledge bases in parallel using fetchWithAuth
         const [llmData, voiceData, allKnowledgeBases] = await Promise.all([
