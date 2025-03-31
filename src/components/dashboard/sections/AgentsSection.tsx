@@ -76,17 +76,17 @@ const AgentsSection: React.FC = () => {
       const [agentsData, voicesData, foldersData, llmsData, phoneNumbersData] = results;
 
       // Transformar los datos de agentes al formato requerido
-      if (agentsData?.agents) {
-        const transformedAgents: Agent[] = agentsData.agents.map((agent: RetellAgent) => ({
+      if (Array.isArray(agentsData)) {
+        const transformedAgents: Agent[] = agentsData.map((agent: any) => ({
           id: agent.agent_id,
           name: agent.agent_name,
-          description: agent.description || '',
-          agent_type: agent.language,
+          description: '', // no se incluye en el JSON, así que por ahora lo dejamos vacío
+          agent_type: agent.response_engine?.type ?? '',
           voice_id: agent.voice_id,
-          folder: agent.folder,
+          folder: '', // no está en la respuesta, también vacío
         }));
         setAgents(transformedAgents);
-      }
+}
 
       // Almacenar otros datos para uso potencial futuro
       if (voicesData?.voices) {
