@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Copy, Flag } from 'lucide-react';
+import { ArrowLeft, Copy, Flag, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import {
@@ -54,6 +54,9 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
 
   // Find the current language display data
   const currentLanguage = languageOptions.find(lang => lang.value === defaultLanguage) || languageOptions[0];
+  
+  // Get the agent ID or slug for navigation
+  const agentId = agent.agent_id || agent.id;
   
   return (
     <div className="border-b sticky top-0 z-10 bg-background">
@@ -137,6 +140,10 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
           </TooltipProvider>
           
           <div className="flex space-x-2">
+            <Button variant="outline" onClick={() => navigate(`/agentes/${agentId}/edit`)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
             <Button variant="outline">Create</Button>
             <Button variant="outline">Simulation</Button>
           </div>

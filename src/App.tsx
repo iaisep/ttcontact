@@ -15,6 +15,7 @@ import LanguageProvider from "@/context/LanguageContext";
 import AgentsPage from "./pages/AgentsPage";
 import AgentEditPage from "./pages/AgentEditPage";
 import AgentDetailPage from "./pages/AgentDetailPage";
+import AgentEditorPage from "./pages/AgentEditorPage";
 
 // Importamos las nuevas páginas (componentes temporales que redirigirán)
 import VoiceSDKPage from "./pages/VoiceSDKPage";
@@ -49,7 +50,8 @@ const App = () => (
               
               {/* Rutas de agentes */}
               <Route path="/agentes" element={<AgentsPage />} />
-              <Route path="/agentes/:slug/edit" element={<AgentEditPage />} />
+              <Route path="/agentes/:slug/edit" element={<AgentEditorPage />} />
+              <Route path="/agentes/:slug/legacy-edit" element={<AgentEditPage />} />
               <Route path="/agentes/:slug" element={<AgentDetailPage />} />
               
               {/* Nuevas rutas */}
