@@ -16,13 +16,13 @@ const AgentsTable: React.FC<AgentsTableProps> = ({ agents, onEditAgent, onDelete
     {
       key: 'name',
       header: 'Name',
-      cell: (agent: Agent) => <span className="font-medium">{agent.name}</span>,
+      cell: (agent: Agent) => <span className="font-medium">{agent.agent_name}</span>,
     },
     {
       key: 'description',
       header: 'Description',
       cell: (agent: Agent) => (
-        <span>{agent.agent_type ? agent.agent_type.substring(0, 50) + '...' : '-'}</span>
+        <span>{agent.agent_type ? agent.response_engine.type}</span>
       ),
     },
     {
