@@ -22,7 +22,7 @@ const AgentsTable: React.FC<AgentsTableProps> = ({ agents, onEditAgent, onDelete
       key: 'description',
       header: 'Description',
       cell: (agent: Agent) => (
-        <span>{agent.agent_type ? agent.response_engine.type}</span>
+        <span>{agent.agent_name}</span>
       ),
     },
     {
