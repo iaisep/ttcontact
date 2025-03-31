@@ -1,81 +1,81 @@
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { ApiProvider } from './context/ApiContext';
+import { LanguageProvider } from './context/LanguageContext';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+import AgentsPage from './pages/AgentsPage';
+import AgentDetailPage from './pages/AgentDetailPage';
+import AgentEditPage from './pages/AgentEditPage';
+import { useApiContext } from './context/ApiContext';
+import AgentSettingsPage from './pages/AgentSettingsPage';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "next-themes";
-import Index from "./pages/Index";
-import LandingPage from "./pages/LandingPage";
-import Dashboard from "./pages/Dashboard";
-import NotFound from "./pages/NotFound";
-import { ApiProvider } from "@/context/ApiContext";
-import LanguageProvider from "@/context/LanguageContext";
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useApiContext();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
 
-// Importamos las páginas relacionadas con agentes
-import AgentsPage from "./pages/AgentsPage";
-import AgentEditPage from "./pages/AgentEditPage";
-import AgentDetailPage from "./pages/AgentDetailPage";
+  return <>{children}</>;
+};
 
-// Importamos las nuevas páginas (componentes temporales que redirigirán)
-import VoiceSDKPage from "./pages/VoiceSDKPage";
-import AIAgentsPage from "./pages/AIAgentsPage";
-import DocumentationPage from "./pages/DocumentationPage";
-import BlogPage from "./pages/BlogPage";
-import GuidesPage from "./pages/GuidesPage";
-import ExamplesPage from "./pages/ExamplesPage";
-import AboutPage from "./pages/AboutPage";
-import CareersPage from "./pages/CareersPage";
-import PressPage from "./pages/PressPage";
-import TermsPage from "./pages/TermsPage";
-import PrivacyPage from "./pages/PrivacyPage";
-import CookiesPage from "./pages/CookiesPage";
-import GDPRPage from "./pages/GDPRPage";
-import APIPage from "./pages/APIPage";
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+const App: React.FC = () => {
+  return (
+    <ApiProvider>
       <LanguageProvider>
-        <ApiProvider>
-          <BrowserRouter>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              
-              {/* Rutas de agentes */}
-              <Route path="/agentes" element={<AgentsPage />} />
-              <Route path="/agentes/:slug/edit" element={<AgentEditPage />} />
-              <Route path="/agentes/:slug" element={<AgentDetailPage />} />
-              
-              {/* Nuevas rutas */}
-              <Route path="/voice-sdk" element={<VoiceSDKPage />} />
-              <Route path="/ai-agents" element={<AIAgentsPage />} />
-              <Route path="/docs" element={<DocumentationPage />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="/guides" element={<GuidesPage />} />
-              <Route path="/examples" element={<ExamplesPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/careers" element={<CareersPage />} />
-              <Route path="/press" element={<PressPage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/privacy" element={<PrivacyPage />} />
-              <Route path="/cookies" element={<CookiesPage />} />
-              <Route path="/gdpr" element={<GDPRPage />} />
-              <Route path="/api" element={<APIPage />} />
-              
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </ApiProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+            
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/agentes" 
+              element={
+                <ProtectedRoute>
+                  <AgentsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/agentes/:slug" 
+              element={
+                <ProtectedRoute>
+                  <AgentDetailPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/agentes/:slug/edit" 
+              element={
+                <ProtectedRoute>
+                  <AgentEditPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/agents/:agent_id/edit" 
+              element={
+                <ProtectedRoute>
+                  <AgentSettingsPage />
+                </ProtectedRoute>
+              } 
+            />
+          </Routes>
+        </Router>
       </LanguageProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+    </ApiProvider>
+  );
+};
 
 export default App;
