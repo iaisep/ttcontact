@@ -1,9 +1,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/context/LanguageContext';
 import { RetellFunction } from '@/components/dashboard/sections/agents/types/retell-types';
 import { Plus, Trash, Edit, Save } from 'lucide-react';
@@ -73,39 +72,23 @@ const AgentFunctionsPanel: React.FC<AgentFunctionsPanelProps> = ({ functions, on
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">{t('functions')}</h3>
-        <Button size="sm" onClick={handleAddFunction}>
-          <Plus size={16} className="mr-1" /> {t('add_function')}
-        </Button>
-      </div>
-
-      {functionList.length === 0 && !isAddingNew && (
-        <div className="text-center py-8 text-muted-foreground">
-          {t('no_functions')}
-        </div>
-      )}
-
+    <div className="space-y-2">
       {functionList.map(func => (
-        <Card key={func.id} className="p-4">
+        <div key={func.id} className="flex items-center justify-between border rounded-md p-2">
           {editingFunction && editingFunction.id === func.id ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('function_name')}</label>
-                <Input 
-                  value={editingFunction.name} 
-                  onChange={(e) => setEditingFunction({...editingFunction, name: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t('function_description')}</label>
-                <Textarea 
-                  value={editingFunction.description} 
-                  onChange={(e) => setEditingFunction({...editingFunction, description: e.target.value})}
-                  rows={2}
-                />
-              </div>
+            <div className="w-full space-y-2">
+              <Input 
+                value={editingFunction.name} 
+                onChange={(e) => setEditingFunction({...editingFunction, name: e.target.value})}
+                className="text-sm"
+                placeholder={t('function_name')}
+              />
+              <Textarea 
+                value={editingFunction.description} 
+                onChange={(e) => setEditingFunction({...editingFunction, description: e.target.value})}
+                className="text-sm min-h-[60px]"
+                placeholder={t('function_description')}
+              />
               <div className="flex justify-end gap-2">
                 <Button 
                   variant="outline" 
@@ -118,75 +101,62 @@ const AgentFunctionsPanel: React.FC<AgentFunctionsPanelProps> = ({ functions, on
                   size="sm" 
                   onClick={handleUpdateFunction}
                 >
-                  <Save size={16} className="mr-1" /> {t('save')}
+                  <Save size={14} className="mr-1" /> {t('save')}
                 </Button>
               </div>
             </div>
           ) : (
-            <div>
-              <div className="flex justify-between">
-                <h4 className="font-medium">{func.name}</h4>
-                <div className="flex gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleEditFunction(func)}
-                  >
-                    <Edit size={16} />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleDeleteFunction(func.id)}
-                  >
-                    <Trash size={16} />
-                  </Button>
-                </div>
+            <>
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 mr-2">
+                  <path d="M17 6.1H3"></path><path d="M21 12.5H3"></path><path d="M15.9 18.9H3"></path><path d="m14 12.5 6.3-6.4"></path><path d="M14 12.5v6.4"></path>
+                </svg>
+                <span className="text-sm">{func.name}</span>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">{func.description}</p>
-            </div>
+              <div className="flex gap-1">
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleEditFunction(func)}>
+                  <Edit size={14} />
+                </Button>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive hover:text-destructive" onClick={() => handleDeleteFunction(func.id)}>
+                  <Trash size={14} />
+                </Button>
+              </div>
+            </>
           )}
-        </Card>
+        </div>
       ))}
 
       {isAddingNew && (
-        <Card className="p-4">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('function_name')}</label>
-              <Input 
-                value={newFunction.name} 
-                onChange={(e) => setNewFunction({...newFunction, name: e.target.value})}
-                placeholder={t('function_name_placeholder')}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('function_description')}</label>
-              <Textarea 
-                value={newFunction.description} 
-                onChange={(e) => setNewFunction({...newFunction, description: e.target.value})}
-                placeholder={t('function_description_placeholder')}
-                rows={2}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setIsAddingNew(false)}
-              >
-                {t('cancel')}
-              </Button>
-              <Button 
-                size="sm" 
-                onClick={handleSaveNewFunction}
-                disabled={!newFunction.name}
-              >
-                <Save size={16} className="mr-1" /> {t('add')}
-              </Button>
-            </div>
+        <div className="border rounded-md p-2 space-y-2">
+          <Input 
+            value={newFunction.name} 
+            onChange={(e) => setNewFunction({...newFunction, name: e.target.value})}
+            className="text-sm"
+            placeholder={t('function_name_placeholder')}
+          />
+          <Textarea 
+            value={newFunction.description} 
+            onChange={(e) => setNewFunction({...newFunction, description: e.target.value})}
+            className="text-sm min-h-[60px]"
+            placeholder={t('function_description_placeholder')}
+          />
+          <div className="flex justify-end gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setIsAddingNew(false)}
+            >
+              {t('cancel')}
+            </Button>
+            <Button 
+              size="sm" 
+              onClick={handleSaveNewFunction}
+              disabled={!newFunction.name}
+            >
+              <Save size={14} className="mr-1" /> {t('add')}
+            </Button>
           </div>
-        </Card>
+        </div>
       )}
     </div>
   );

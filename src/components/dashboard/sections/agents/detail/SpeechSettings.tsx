@@ -1,6 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface SpeechSettingsProps {
@@ -15,99 +16,79 @@ interface SpeechSettingsProps {
 
 const SpeechSettings: React.FC<SpeechSettingsProps> = ({ settings, onUpdate }) => {
   const { t } = useLanguage();
-  const [stability, setStability] = useState(settings.stability);
-  const [similarity, setSimilarity] = useState(settings.similarity);
-  const [style, setStyle] = useState(settings.style);
-  const [speed, setSpeed] = useState(settings.speed);
-
-  useEffect(() => {
-    setStability(settings.stability);
-    setSimilarity(settings.similarity);
-    setStyle(settings.style);
-    setSpeed(settings.speed);
-  }, [settings]);
-
-  const updateSettings = (field: string, value: number) => {
-    const newSettings = { ...settings, [field]: value };
+  
+  const handleChange = (key: string, value: number[]) => {
+    const newSettings = {
+      ...settings,
+      [key]: value[0]
+    };
     onUpdate(newSettings);
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 py-2">
       <div className="space-y-2">
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">{t('stability')}</label>
-          <span className="text-sm text-muted-foreground">{Math.round(stability * 100)}%</span>
+        <div className="flex justify-between items-center">
+          <Label htmlFor="stability" className="text-sm">{t('stability')}</Label>
+          <span className="text-xs text-muted-foreground">{Math.round(settings.stability * 100)}%</span>
         </div>
         <Slider
-          value={[stability * 100]}
+          id="stability"
           min={0}
-          max={100}
-          step={1}
-          onValueChange={(values) => {
-            const value = values[0] / 100;
-            setStability(value);
-            updateSettings('stability', value);
-          }}
+          max={1}
+          step={0.01}
+          value={[settings.stability]}
+          onValueChange={(value) => handleChange('stability', value)}
+          className="w-full"
         />
-        <p className="text-xs text-muted-foreground mt-1">{t('stability_description')}</p>
       </div>
-
+      
       <div className="space-y-2">
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">{t('similarity')}</label>
-          <span className="text-sm text-muted-foreground">{Math.round(similarity * 100)}%</span>
+        <div className="flex justify-between items-center">
+          <Label htmlFor="similarity" className="text-sm">{t('similarity')}</Label>
+          <span className="text-xs text-muted-foreground">{Math.round(settings.similarity * 100)}%</span>
         </div>
         <Slider
-          value={[similarity * 100]}
+          id="similarity"
           min={0}
-          max={100}
-          step={1}
-          onValueChange={(values) => {
-            const value = values[0] / 100;
-            setSimilarity(value);
-            updateSettings('similarity', value);
-          }}
+          max={1}
+          step={0.01}
+          value={[settings.similarity]}
+          onValueChange={(value) => handleChange('similarity', value)}
+          className="w-full"
         />
-        <p className="text-xs text-muted-foreground mt-1">{t('similarity_description')}</p>
       </div>
-
+      
       <div className="space-y-2">
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">{t('style')}</label>
-          <span className="text-sm text-muted-foreground">{Math.round(style * 100)}%</span>
+        <div className="flex justify-between items-center">
+          <Label htmlFor="style" className="text-sm">{t('style')}</Label>
+          <span className="text-xs text-muted-foreground">{Math.round(settings.style * 100)}%</span>
         </div>
         <Slider
-          value={[style * 100]}
+          id="style"
           min={0}
-          max={100}
-          step={1}
-          onValueChange={(values) => {
-            const value = values[0] / 100;
-            setStyle(value);
-            updateSettings('style', value);
-          }}
+          max={1}
+          step={0.01}
+          value={[settings.style]}
+          onValueChange={(value) => handleChange('style', value)}
+          className="w-full"
         />
-        <p className="text-xs text-muted-foreground mt-1">{t('style_description')}</p>
       </div>
-
+      
       <div className="space-y-2">
-        <div className="flex justify-between">
-          <label className="text-sm font-medium">{t('speech_speed')}</label>
-          <span className="text-sm text-muted-foreground">{speed.toFixed(1)}x</span>
+        <div className="flex justify-between items-center">
+          <Label htmlFor="speed" className="text-sm">{t('speed')}</Label>
+          <span className="text-xs text-muted-foreground">{settings.speed.toFixed(1)}x</span>
         </div>
         <Slider
-          value={[speed * 10]}
-          min={5}
-          max={20}
-          step={1}
-          onValueChange={(values) => {
-            const value = values[0] / 10;
-            setSpeed(value);
-            updateSettings('speed', value);
-          }}
+          id="speed"
+          min={0.5}
+          max={2}
+          step={0.1}
+          value={[settings.speed]}
+          onValueChange={(value) => handleChange('speed', value)}
+          className="w-full"
         />
-        <p className="text-xs text-muted-foreground mt-1">{t('speed_description')}</p>
       </div>
     </div>
   );

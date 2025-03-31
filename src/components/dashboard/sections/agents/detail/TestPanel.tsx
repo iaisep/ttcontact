@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useLanguage } from '@/context/LanguageContext';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import { Mic, Play, TestTube } from 'lucide-react';
@@ -20,7 +19,6 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
   const [testInput, setTestInput] = useState('');
   const [responseText, setResponseText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [testMode, setTestMode] = useState('text');
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
@@ -96,73 +94,34 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="text" onValueChange={(value) => setTestMode(value)}>
-        <TabsList>
-          <TabsTrigger value="text">{t('text_test')}</TabsTrigger>
-          <TabsTrigger value="voice">{t('voice_test')}</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="text" className="space-y-4 pt-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">{t('test_input')}</label>
-            <Textarea
-              value={testInput}
-              onChange={(e) => setTestInput(e.target.value)}
-              placeholder={t('test_input_placeholder')}
-              rows={3}
-            />
-          </div>
-          
-          <div className="flex justify-end">
-            <Button 
-              onClick={handleTestWithText} 
-              disabled={isLoading || !testInput.trim()}
-            >
-              {isLoading ? (
-                <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
-              ) : (
-                <TestTube size={16} className="mr-2" />
-              )}
-              {t('test_agent')}
-            </Button>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="voice" className="space-y-4 pt-4">
-          <div className="flex justify-center py-8">
-            <Button 
-              size="lg" 
-              onClick={handleVoiceTest}
-              className={`rounded-full p-6 ${isRecording ? 'bg-red-500 hover:bg-red-600' : ''}`}
-            >
-              <Mic size={24} />
-            </Button>
-          </div>
-          
-          <p className="text-center text-sm text-muted-foreground">
-            {isRecording 
-              ? t('recording_in_progress')
-              : t('press_to_start_recording')}
-          </p>
-        </TabsContent>
-      </Tabs>
-      
+    <div className="flex flex-col items-center">
+      <div className="rounded-full bg-muted-foreground/10 w-24 h-24 flex items-center justify-center mb-4">
+        <Mic className="h-8 w-8 text-muted-foreground/50" />
+      </div>
+      <div className="text-center mb-4">
+        <p className="text-sm text-muted-foreground">Test your agent</p>
+      </div>
+      <Button 
+        onClick={handleVoiceTest}
+        variant="default"
+        className={`${isRecording ? 'bg-red-500 hover:bg-red-600' : ''}`}
+      >
+        Test
+      </Button>
+
       {responseText && (
-        <div className="mt-8 space-y-4">
-          <div className="border rounded-lg p-4 bg-muted/30">
-            <h4 className="font-medium mb-2">{t('agent_response')}</h4>
-            <p>{responseText}</p>
-            
-            {audioUrl && (
-              <div className="mt-4">
-                <Button variant="outline" size="sm" onClick={playAudio}>
-                  <Play size={16} className="mr-2" />
-                  {t('play_audio')}
-                </Button>
-              </div>
-            )}
-          </div>
+        <div className="mt-6 w-full border rounded-md p-4">
+          <h4 className="text-sm font-medium mb-2">{t('agent_response')}</h4>
+          <p className="text-sm">{responseText}</p>
+          
+          {audioUrl && (
+            <div className="mt-4">
+              <Button variant="outline" size="sm" onClick={playAudio}>
+                <Play size={16} className="mr-2" />
+                {t('play_audio')}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
