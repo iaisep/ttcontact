@@ -16,6 +16,10 @@ export function ThemeToggle({ variant = "icon" }: { variant?: "icon" | "switch" 
     setMounted(true);
   }, []);
 
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
   if (!mounted) {
     return null;
   }
@@ -26,7 +30,7 @@ export function ThemeToggle({ variant = "icon" }: { variant?: "icon" | "switch" 
         <Switch
           id="theme-toggle"
           checked={theme === "dark"}
-          onCheckedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onCheckedChange={toggleTheme}
         />
       </div>
     );
@@ -39,7 +43,7 @@ export function ThemeToggle({ variant = "icon" }: { variant?: "icon" | "switch" 
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            onClick={toggleTheme}
             aria-label={language === 'es' ? "Cambiar tema" : "Toggle theme"}
           >
             <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

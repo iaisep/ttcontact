@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { LogOut, Github, LifeBuoy } from "lucide-react";
+import { LogOut, LifeBuoy } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -24,20 +24,18 @@ const SidebarFooter = ({ sidebarCollapsed, onLogout }: SidebarFooterProps) => {
       </div>
       {!sidebarCollapsed ? (
         <>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="w-full">
-              <Github className="mr-2 h-4 w-4" />
-              {t("github")}
-            </Button>
-            <Button variant="outline" size="sm" className="w-full">
-              <LifeBuoy className="mr-2 h-4 w-4" />
-              {t("help")}
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full mb-2"
+          >
+            <LifeBuoy className="mr-2 h-4 w-4" />
+            {t("help")}
+          </Button>
           <Button 
             variant="destructive" 
             size="sm" 
-            className="w-full mt-2"
+            className="w-full"
             onClick={onLogout}
           >
             <LogOut className="mr-2 h-4 w-4" />
@@ -46,9 +44,6 @@ const SidebarFooter = ({ sidebarCollapsed, onLogout }: SidebarFooterProps) => {
         </>
       ) : (
         <div className="flex flex-col gap-2">
-          <Button variant="outline" size="icon">
-            <Github className="h-4 w-4" />
-          </Button>
           <Button variant="outline" size="icon">
             <LifeBuoy className="h-4 w-4" />
           </Button>
