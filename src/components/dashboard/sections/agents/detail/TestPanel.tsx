@@ -82,19 +82,19 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="w-full flex gap-2 mb-4">
-        <Button variant="outline" onClick={handleAudioTest} className="flex-1 flex items-center justify-center" disabled={isLoading}>
+    <div className="flex flex-col items-center justify-center space-y-4">
+      <div className="w-full grid grid-cols-3 gap-2">
+        <Button variant="outline" onClick={handleAudioTest} className="w-full flex items-center justify-center" disabled={isLoading}>
           <Phone className="mr-2 h-4 w-4" /> 
           {t('test_audio')}
         </Button>
         
-        <Button variant="outline" onClick={handleLlmTest} className="flex-1 flex items-center justify-center" disabled={isLoading}>
+        <Button variant="outline" onClick={handleLlmTest} className="w-full flex items-center justify-center" disabled={isLoading}>
           <TestTube className="mr-2 h-4 w-4" /> 
           {t('test_llm')}
         </Button>
         
-        <Button variant="outline" onClick={handleCodeTest} className="flex-1 flex items-center justify-center" disabled={isLoading}>
+        <Button variant="outline" onClick={handleCodeTest} className="w-full flex items-center justify-center" disabled={isLoading}>
           <Code className="h-4 w-4 mr-2" />
           {t('test_code')}
         </Button>
