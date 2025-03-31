@@ -7,21 +7,24 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RetellAgent, RetellVoice, RetellFolder } from '@/components/dashboard/sections/agents/types/retell-types';
-import { Flag } from 'lucide-react';
+import { Flag, ChevronDown } from 'lucide-react';
 import { debounce } from 'lodash';
+import { Button } from '@/components/ui/button';
 
 interface AgentEditorFormProps {
   agent: RetellAgent;
   voices: RetellVoice[];
   folders: RetellFolder[];
   onUpdateField: (fieldName: string, value: any) => void;
+  onOpenVoiceSelector: () => void;
 }
 
 const AgentEditorForm: React.FC<AgentEditorFormProps> = ({
   agent,
   voices,
   folders,
-  onUpdateField
+  onUpdateField,
+  onOpenVoiceSelector
 }) => {
   const { t } = useLanguage();
 
@@ -78,12 +81,6 @@ const AgentEditorForm: React.FC<AgentEditorFormProps> = ({
     debouncedUpdateDescription(value);
   };
 
-  const handleVoiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setVoiceId(value);
-    onUpdateField('voice_id', value);
-  };
-
   const handleFolderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setFolder(value);
@@ -107,6 +104,9 @@ const AgentEditorForm: React.FC<AgentEditorFormProps> = ({
     setBeginMessage(value);
     debouncedUpdateBeginMessage(value);
   };
+  
+  // Find current selected voice
+  const currentVoice = voices.find(v => v.id === voiceId);
 
   return (
     <div className="space-y-6">
@@ -136,18 +136,28 @@ const AgentEditorForm: React.FC<AgentEditorFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="voice">Voz</Label>
-              <select
-                id="voice"
-                value={voiceId}
-                onChange={handleVoiceChange}
-                className="w-full mt-1 border border-input rounded-md h-10 px-3 py-2"
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full mt-1 flex items-center justify-between h-10 px-3 py-2 text-left"
+                onClick={onOpenVoiceSelector}
               >
-                {voices.map(voice => (
-                  <option key={voice.id} value={voice.id}>
-                    {voice.name || voice.voice_name}
-                  </option>
-                ))}
-              </select>
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                    {currentVoice?.avatar_url ? (
+                      <img src={currentVoice.avatar_url} alt={currentVoice.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-xs font-semibold">
+                        {currentVoice?.name?.substring(0, 2).toUpperCase() || 'VO'}
+                      </span>
+                    )}
+                  </div>
+                  <span>
+                    {currentVoice?.name || 'Seleccionar voz'}
+                  </span>
+                </div>
+                <ChevronDown className="h-4 w-4 opacity-50" />
+              </Button>
             </div>
             
             <div>

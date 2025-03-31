@@ -9,6 +9,7 @@ import AgentEditorHeader from '@/components/dashboard/sections/agents/editor/Age
 import AgentEditorForm from '@/components/dashboard/sections/agents/editor/AgentEditorForm';
 import AgentSelector from '@/components/dashboard/sections/agents/editor/AgentSelector';
 import VoiceSettings from '@/components/dashboard/sections/agents/editor/VoiceSettings';
+import VoiceSelector from '@/components/dashboard/sections/agents/editor/VoiceSelector';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 
 const AgentEditorPage: React.FC = () => {
@@ -26,6 +27,7 @@ const AgentEditorPage: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showAgentSelector, setShowAgentSelector] = useState(false);
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
+  const [showVoiceSelector, setShowVoiceSelector] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -120,6 +122,11 @@ const AgentEditorPage: React.FC = () => {
     }
   };
 
+  const handleVoiceSelect = (voiceId: string) => {
+    updateAgent('voice_id', voiceId);
+    setShowVoiceSelector(false);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -157,6 +164,7 @@ const AgentEditorPage: React.FC = () => {
           voices={voices}
           folders={folders}
           onUpdateField={updateAgent}
+          onOpenVoiceSelector={() => setShowVoiceSelector(true)}
         />
       </div>
       
@@ -174,6 +182,15 @@ const AgentEditorPage: React.FC = () => {
           agent={agent}
           onUpdate={updateAgent}
           onClose={() => setShowVoiceSettings(false)}
+        />
+      )}
+
+      {showVoiceSelector && (
+        <VoiceSelector
+          voices={voices}
+          currentVoiceId={agent.voice_id || ''}
+          onSelectVoice={handleVoiceSelect}
+          onClose={() => setShowVoiceSelector(false)}
         />
       )}
     </div>
