@@ -99,11 +99,11 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         </div>
       )}
 
-      {/* Prompt Editor */}
+      {/* Prompt Editor 
       <EditablePrompt
         prompt={agent.prompt || ''}
         onUpdate={(value) => updateAgentField('prompt', value)}
-      />
+      />*/}
 
       {/* Welcome Message */}
       <div className="mt-6">
