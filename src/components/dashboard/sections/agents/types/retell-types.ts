@@ -9,7 +9,26 @@ export interface RetellAgent {
   agent_id: string;
   agent_name: string;
   response_engine?: { type: string };
+  prompt?: string;
+  welcome_message?: string;
+  language?: string;
+  knowledge_base?: string;
+  speech_settings?: {
+    stability: number;
+    similarity: number;
+    style: number;
+    speed: number;
+  };
+  functions?: RetellFunction[];
   last_modification_timestamp?: number;
+  [key: string]: any;
+}
+
+export interface RetellFunction {
+  id: string;
+  name: string;
+  description: string;
+  parameters?: any;
   [key: string]: any;
 }
 

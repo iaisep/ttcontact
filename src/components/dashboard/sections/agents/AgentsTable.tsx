@@ -1,102 +1,138 @@
 
 import React from 'react';
-import { useLanguage } from '@/context/LanguageContext';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Agent } from './types';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
+import { Edit, Trash } from 'lucide-react';
+import { Agent } from './types';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface AgentsTableProps {
   agents: Agent[];
   onEditAgent: (agent: Agent) => void;
   onDeleteAgent: (agentId: string) => void;
-  isLoading?: boolean;
+  isLoading: boolean;
 }
 
-const AgentsTable: React.FC<AgentsTableProps> = ({ 
-  agents, 
-  onEditAgent, 
-  onDeleteAgent, 
-  isLoading = false 
+const AgentsTable: React.FC<AgentsTableProps> = ({
+  agents,
+  onEditAgent,
+  onDeleteAgent,
+  isLoading,
 }) => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const handleEditClick = (agent: Agent) => {
-    // Create a slug from the agent name or use the id if name is not available
-    const slug = agent.name 
-      ? agent.name.toLowerCase().replace(/\s+/g, '-') 
-      : agent.id;
-    
-    // Navigate to the edit page with the slug
-    navigate(`/agentes/${slug}`);
+  const getAgentSlug = (agent: Agent) => {
+    return agent.id || (agent.name?.toLowerCase().replace(/\s+/g, '-') || 'unknown');
   };
 
+  const handleEditClick = (agent: Agent, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Navigate to the detailed agent page
+    navigate(`/agentes/${getAgentSlug(agent)}`);
+  };
+
+  const handleDeleteClick = (agentId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDeleteAgent(agentId);
+  };
+
+  const handleRowClick = (agent: Agent) => {
+    navigate(`/agentes/${getAgentSlug(agent)}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div className="p-8 flex justify-center items-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (agents.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div className="p-8 text-center">
+          <h3 className="text-lg font-medium">{t('no_agents_found')}</h3>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">
+            {t('no_agents_description')}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>{t('name')}</TableHead>
-          <TableHead>{t('agent_type')}</TableHead>
-          <TableHead>{t('voice')}</TableHead>
-          <TableHead>{t('phone')}</TableHead>
-          <TableHead>{t('edited')}</TableHead>
-          <TableHead>{t('actions')}</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {agents.map((agent) => (
-          <TableRow key={agent.id}>
-            <TableCell>{agent.name}</TableCell>
-            <TableCell>{agent.agent_type}</TableCell>
-            <TableCell>
-              {agent.voice ? (
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    {agent.voice.avatar_url ? (
-                      <AvatarImage src={agent.voice.avatar_url} alt={agent.voice.name} />
-                    ) : null}
-                    <AvatarFallback>
-                      {agent.voice.name?.substring(0, 2).toUpperCase() || '--'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span>{agent.voice.name}</span>
-                </div>
-              ) : (
-                "--"
-              )}
-            </TableCell>
-            <TableCell>{agent.phone || "--"}</TableCell>
-            <TableCell>
-              {agent.last_modification_timestamp 
-                ? new Date(agent.last_modification_timestamp).toLocaleString() 
-                : "--"}
-            </TableCell>
-            <TableCell>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleEditClick(agent)}
-                  disabled={isLoading}
-                >
-                  {t('edit')}
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  size="sm" 
-                  onClick={() => onDeleteAgent(agent.id)}
-                  disabled={isLoading}
-                >
-                  {t('delete')}
-                </Button>
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t('name')}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t('agent_type')}
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t('actions')}
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            {agents.map((agent) => (
+              <tr 
+                key={agent.id} 
+                className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                onClick={() => handleRowClick(agent)}
+              >
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        {agent.name}
+                      </div>
+                      {agent.description && (
+                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                          {agent.description}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">
+                    {agent.agent_type || t('standard')}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => handleEditClick(agent, e)}
+                    >
+                      <Edit size={16} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => handleDeleteClick(agent.id, e)}
+                    >
+                      <Trash size={16} />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 
