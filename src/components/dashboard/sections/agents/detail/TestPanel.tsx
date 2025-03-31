@@ -88,9 +88,9 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
   };
 
   return (
-    <div className="border rounded-lg px-2 mb-2 py-4">
+    <div className="flex flex-col items-center justify-center">
       {/* Test Action Buttons */}
-      <div className="w-full flex gap-2 mb-10 px-4">
+      <div className="w-full flex gap-2 mb-10">
         <Button variant="outline" onClick={handleAudioTest} className="flex-1" disabled={isLoading}>
           <Phone className="mr-2 h-4 w-4" /> 
           {t('test_audio')}
@@ -112,19 +112,17 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
       </div>
       
       {/* Test Label */}
-      <p className="text-gray-500 mb-4 text-center">{t('test_your_agent')}</p>
+      <p className="text-gray-500 mb-4">{t('test_your_agent')}</p>
       
       {/* Test Button */}
-      <div className="flex justify-center">
-        <Button 
-          onClick={handleFullTest}
-          variant="default"
-          className={`${isRecording ? 'bg-red-500 hover:bg-red-600' : ''}`}
-          disabled={isLoading && !isRecording}
-        >
-          {t('test')}
-        </Button>
-      </div>
+      <Button 
+        onClick={handleFullTest}
+        variant="default"
+        className={`${isRecording ? 'bg-red-500 hover:bg-red-600' : ''}`}
+        disabled={isLoading && !isRecording}
+      >
+        {t('test')}
+      </Button>
     </div>
   );
 };
