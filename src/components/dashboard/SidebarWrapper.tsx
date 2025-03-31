@@ -1,4 +1,6 @@
 
+import { useNavigate } from "react-router-dom";
+import { useApiContext } from "@/context/ApiContext";
 import Sidebar from "./sidebar/Sidebar";
 
 interface SidebarWrapperProps {
@@ -16,6 +18,14 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
   setSidebarCollapsed,
   children,
 }) => {
+  const navigate = useNavigate();
+  const { logout } = useApiContext();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
   return (
     <div className="flex min-h-screen w-full">
       <Sidebar 
@@ -23,6 +33,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
         setActiveSection={setActiveSection}
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
+        onLogout={handleLogout}
       />
 
       {/* Main Content */}

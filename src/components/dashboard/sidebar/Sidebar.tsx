@@ -1,37 +1,44 @@
-import { useNavigate } from "react-router-dom";
-import { useApiContext } from "@/context/ApiContext";
+
 import SidebarHeader from "./SidebarHeader";
 import SidebarMenu from "./SidebarMenu";
 import SidebarFooter from "./SidebarFooter";
+import { useApiContext } from "@/context/ApiContext";
+
 interface SidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
+  onLogout: () => void;
 }
+
 const Sidebar = ({
   activeSection,
   setActiveSection,
   sidebarCollapsed,
-  setSidebarCollapsed
+  setSidebarCollapsed,
+  onLogout
 }: SidebarProps) => {
-  const navigate = useNavigate();
-  const {
-    logout
-  } = useApiContext();
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
-  return <div className="">
+
+  return (
+    <div className="">
       <SidebarHeader sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
       
-      <SidebarMenu activeSection={activeSection} setActiveSection={setActiveSection} sidebarCollapsed={sidebarCollapsed} />
+      <SidebarMenu 
+        activeSection={activeSection} 
+        setActiveSection={setActiveSection} 
+        sidebarCollapsed={sidebarCollapsed} 
+      />
       
-      <SidebarFooter sidebarCollapsed={sidebarCollapsed} onLogout={handleLogout} />
-    </div>;
+      <SidebarFooter 
+        sidebarCollapsed={sidebarCollapsed} 
+        onLogout={onLogout} 
+      />
+    </div>
+  );
 };
+
 export default Sidebar;
