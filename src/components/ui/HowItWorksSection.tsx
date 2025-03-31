@@ -9,27 +9,27 @@ const HowItWorksSection = () => {
   const steps = [
     {
       number: '01',
-      title: 'Build',
-      description: 'Utilize the voice AI API and our intuitive agent builder to create custom voice AI agents effortlessly.',
-      image: '/lovable-uploads/b48c5652-81ae-437e-9fc7-8d7fca9e4945.png'
+      title: t('how_it_works_step1_title'),
+      description: t('how_it_works_step1_description'),
+      image: '/lovable-uploads/photo-1487058792275-0ad4aaf24ca7.jpeg' // Code/development image
     },
     {
       number: '02',
-      title: 'Test',
-      description: 'Perform comprehensive agent testing with built-in test LLM features to ensure seamless handling of edge cases.',
-      image: '/lovable-uploads/b48c5652-81ae-437e-9fc7-8d7fca9e4945.png'
+      title: t('how_it_works_step2_title'),
+      description: t('how_it_works_step2_description'),
+      image: '/lovable-uploads/photo-1531297484001-80022131f5a1.jpeg' // Testing with computer image
     },
     {
       number: '03',
-      title: 'Deploy',
-      description: 'Easily deploy your agents to phone calls, web calls, SMS, and more.',
-      image: '/lovable-uploads/b48c5652-81ae-437e-9fc7-8d7fca9e4945.png'
+      title: t('how_it_works_step3_title'),
+      description: t('how_it_works_step3_description'),
+      image: '/lovable-uploads/photo-1581091226825-a6a2a5aee158.jpeg' // Person deploying application
     },
     {
       number: '04',
-      title: 'Monitor',
-      description: 'Track success rates, latency, and user sentiment through call history dashboard. Quickly identify failed calls.',
-      image: '/lovable-uploads/b48c5652-81ae-437e-9fc7-8d7fca9e4945.png'
+      title: t('how_it_works_step4_title'),
+      description: t('how_it_works_step4_description'),
+      image: '/lovable-uploads/photo-1605810230434-7631ac76ec81.jpeg' // Monitoring dashboard screens
     }
   ];
 
@@ -44,7 +44,7 @@ const HowItWorksSection = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4"
           >
-            How It Works
+            {t('how_it_works_title')}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -53,7 +53,7 @@ const HowItWorksSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
           >
-            Create powerful, context-aware voice AI agents in four simple steps
+            {t('how_it_works_subtitle')}
           </motion.p>
         </div>
 
