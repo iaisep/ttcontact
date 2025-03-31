@@ -96,9 +96,9 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
 }) => {
   const [activeProvider, setActiveProvider] = useState('ElevenLabs');
   const [searchTerm, setSearchTerm] = useState('');
-  const [genderFilter, setGenderFilter] = useState<string>('');
-  const [accentFilter, setAccentFilter] = useState<string>('');
-  const [typeFilter, setTypeFilter] = useState<string>('');
+  const [genderFilter, setGenderFilter] = useState<string>('all_genders');
+  const [accentFilter, setAccentFilter] = useState<string>('all_accents');
+  const [typeFilter, setTypeFilter] = useState<string>('all_types');
 
   const filteredVoices = mockVoices.filter(voice => {
     // Filter by provider
@@ -167,7 +167,7 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
                   <SelectValue placeholder="Gender" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Genders</SelectItem>
+                  <SelectItem value="all_genders">All Genders</SelectItem>
                   <SelectItem value="male">Male</SelectItem>
                   <SelectItem value="female">Female</SelectItem>
                   <SelectItem value="neutral">Neutral</SelectItem>
@@ -179,7 +179,7 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
                   <SelectValue placeholder="Accent" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Accents</SelectItem>
+                  <SelectItem value="all_accents">All Accents</SelectItem>
                   <SelectItem value="american">American</SelectItem>
                   <SelectItem value="british">British</SelectItem>
                   <SelectItem value="indian">Indian</SelectItem>
@@ -191,7 +191,7 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
                   <SelectValue placeholder="Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all_types">All Types</SelectItem>
                   <SelectItem value="retail">Retail</SelectItem>
                   <SelectItem value="provider">Provider</SelectItem>
                   <SelectItem value="custom">Custom</SelectItem>
