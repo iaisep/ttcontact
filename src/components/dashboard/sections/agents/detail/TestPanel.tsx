@@ -83,15 +83,6 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
 
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
-      <div className="w-full flex items-center space-x-2 mb-2">
-        {/* LLM Model Selector - Display only */}
-        <div className="flex-1">
-          <Button variant="outline" className="w-full flex items-center justify-center bg-gray-50 text-gray-700">
-            <span>GPT 4o</span>
-          </Button>
-        </div>
-      </div>
-      
       <div className="w-full grid grid-cols-3 gap-2">
         <Button variant="outline" onClick={handleAudioTest} className="w-full flex items-center justify-center" disabled={isLoading}>
           <Phone className="mr-2 h-4 w-4" /> 
