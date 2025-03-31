@@ -64,6 +64,11 @@ export const useAgentDetails = (agentId: string | undefined) => {
           fetchWithAuth('/list-knowledge-bases')
         ]);
         
+        // If the LLM data doesn't contain the ID, add it from the agent
+        if (llmData && llmId && !llmData.id) {
+          llmData.id = llmId;
+        }
+        
         // Filter knowledge bases to only include those associated with the agent
         const agentKnowledgeBases = Array.isArray(allKnowledgeBases) 
           ? allKnowledgeBases.filter((kb: KnowledgeBase) => 

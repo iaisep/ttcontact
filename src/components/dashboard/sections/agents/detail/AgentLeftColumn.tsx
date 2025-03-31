@@ -25,6 +25,9 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   // Use language context
   const { t } = useLanguage();
   
+  // Get the LLM ID safely
+  const llmId = agent.response_engine?.llm_id || llm?.id;
+  
   // Use custom hooks to manage state and logic
   const voiceSettings = useVoiceSettings({ 
     initialVoice: agent.voice || 'Adrian', 
@@ -33,7 +36,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   
   const llmSettings = useLlmSettings({ 
     initialModel: agent.llm_model || 'GPT 4o',
-    llmId: agent.response_engine?.llm_id || llm?.id,
+    llmId,
     updateAgentField 
   });
   
