@@ -1,38 +1,121 @@
-import React from 'react';
-import { LlmOption } from './useLlmSettings';
 
-interface Props {
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Loader2, Check } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LlmOption } from '../hooks/useLlmSettings';
+
+// Provider-specific icons
+const ProviderIcon = ({ provider }: { provider: string }) => {
+  switch (provider) {
+    case 'openai':
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.051 6.051 0 0 0 6.0289-5.4142c.1984-.2344.3936-.4766.5762-.7301a5.9824 5.9824 0 0 0 1.323-3.5268 6.0557 6.0557 0 0 0-1.9531-4.5067c.4157-.5946.763-1.2484 1.0007-1.9364Zm-16.9979 8.5181a3.8801 3.8801 0 0 1 2.4452-1.2325c1.4382-.1333 2.8763.4113 3.7742 1.473a8.4938 8.4938 0 0 1 .8274 1.1503 8.3683 8.3683 0 0 1 .8235-1.1479 4.4 4.4 0 0 1 6.2031-.325 3.87 3.87 0 0 1 1.152 2.5655 3.6746 3.6746 0 0 1-.8157 2.5322 10.5373 10.5373 0 0 1-2.1806 2.07l-5.1664 3.8581-5.1675-3.8672c-.6832-.5027-1.3212-1.0682-1.9052-1.6894a4.4756 4.4756 0 0 1-.8959-1.1019 3.6954 3.6954 0 0 1-.3942-1.3416 3.83 3.83 0 0 1 .2999-1.9073ZM11.6599 3a3.9657 3.9657 0 0 1 3.2744 1.7369 11.361 11.361 0 0 1 1.4415 2.5173l2.8706 6.12-1.0512.3391-2.593-1.775a.7074.7074 0 0 0-.4801-.1206.7228.7228 0 0 0-.4544.2029.7089.7089 0 0 0 .0685.9993l2.2526 1.7369-.8167.2632-2.8689-1.7241a.4655.4655 0 0 0-.4879-.0114.4552.4552 0 0 0-.2297.2775.45.45 0 0 0 .0662.4276l2.5991 1.8088-.7621.2434-2.8053-1.6738a.2376.2376 0 0 0-.2932 0 .2391.2391 0 0 0-.0069.347l2.274 1.7643-2.85.9814-2.0964-6.1155a11.5486 11.5486 0 0 1-.655-2.7899 3.9657 3.9657 0 0 1 3.2995-4.4568 4.0953 4.0953 0 0 1 .7149 0Zm6.945 4.0398a3.8558 3.8558 0 0 1-2.4358 1.2418 3.0787 3.0787 0 0 0-.239.0396l-2.6426 5.6294a.3512.3512 0 0 0 .0282.3407.3706.3706 0 0 0 .336.1714.3758.3758 0 0 0 .3096-.1615l1.5451-2.0468.7604-.2434-.6778 2.0901a.375.375 0 0 0 .0607.3407.3802.3802 0 0 0 .6658-.0805l1.0708-2.638.8151-.2615-.9032 2.4358a.4021.4021 0 0 0 .3322.5305.415.415 0 0 0 .452-.2809l1.1104-2.5775 1.0512-.3373-1.9797 3.9276a3.985 3.985 0 0 1-1.7748 1.8476 4.3511 4.3511 0 0 1-5.2834-1.2455 3.7568 3.7568 0 0 1-.2874-3.7927l.3117-.6762.2514-.499A11.646 11.646 0 0 1 7.71 7.8562 4.3511 4.3511 0 0 1 12.3041 5.48a3.7982 3.7982 0 0 1 3.1547 2.8254 3.8264 3.8264 0 0 1-.1554 2.2798l-.6985-3.5454ZM6.7139 7.9498a3.8845 3.8845 0 0 1-2.2918-1.5217 3.8404 3.8404 0 0 1-.7063-3.353A3.7897 3.7897 0 0 1 9.5772 1.5814a3.923 3.923 0 0 1-.1196 3.0696 11.3519 11.3519 0 0 1-1.4456 2.5049 11.4198 11.4198 0 0 1-1.298.7939Zm-2.4485 2.6645A3.8844 3.8844 0 0 1 1.969 8.5991a4.3518 4.3518 0 0 1 1.2458-5.2835 3.7568 3.7568 0 0 1 3.7927-.2874 11.9602 11.9602 0 0 1-.6093 2.5485 3.7982 3.7982 0 0 1-2.8253 3.1547 3.8263 3.8263 0 0 1-2.2799-.1554Zm13.9254 1.8467a11.9602 11.9602 0 0 1 2.5485-.6093 3.7982 3.7982 0 0 1 3.1547 2.8253 3.8264 3.8264 0 0 1-.1554 2.2799 3.8853 3.8853 0 0 1-1.5261 2.2919 4.3518 4.3518 0 0 1-5.2835-1.2459 3.7568 3.7568 0 0 1-.2874-3.7927 3.8844 3.8844 0 0 1 1.5492-1.7492Z" fill="#000000" />
+        </svg>
+      );
+    case 'anthropic':
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19.1281 2C19.3148 2 19.5 2.13267 19.5 2.37333V21.6267C19.5 21.8673 19.3148 22 19.1281 22H4.87185C4.68519 22 4.5 21.8673 4.5 21.6267V2.37333C4.5 2.13267 4.68519 2 4.87185 2H19.1281ZM17.4815 14.4893C17.4815 15.296 16.9352 15.824 16.2111 15.824H14.5278C14.8278 16.3333 15.0148 16.8893 15.0148 17.5093C15.0148 17.7133 14.9963 17.9333 14.9593 18.136L15.0185 18.1573C15.3185 18.3107 15.3 18.5627 14.9593 18.664L12.7889 19.1733C12.4666 19.264 12.2593 19.0587 12.3 18.7293C12.3555 18.3213 12.2593 17.9547 12.0333 17.6347C11.85 17.3787 11.6037 17.2 11.3037 17.0627V19.2453C11.3037 19.6267 11.0667 19.7573 10.7259 19.5893L7.65926 17.9547C7.3 17.7867 7.3 17.456 7.63704 17.2773L10.7074 15.6427C11.0481 15.464 11.3037 15.5947 11.3037 15.976V16.952C11.4296 16.9413 11.537 16.9413 11.6444 16.9413C12.2962 16.9413 12.7889 16.456 12.7889 15.8453C12.7889 15.2347 12.2962 14.7493 11.6444 14.7493C11.0296 14.7493 10.5556 15.1947 10.4667 15.7733H8.42592V8.66667H15.6111V14.1947C16.6667 14.2853 17.4815 14.8213 17.4815 14.4893ZM12 4.53333C10.4074 4.53333 9.12963 5.808 9.12963 7.4C9.12963 8.992 10.4074 10.2667 12 10.2667C13.5926 10.2667 14.8704 8.992 14.8704 7.4C14.8704 5.808 13.5926 4.53333 12 4.53333Z" fill="#6000AB"/>
+        </svg>
+      );
+    case 'google':
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.5114 11.5113C22.5114 10.7263 22.4402 9.97008 22.3096 9.24258H12.2368V13.2526H18.0402C17.7908 14.5951 17.0339 15.7576 15.9014 16.5313V19.0813H19.4063C21.4438 17.2013 22.5114 14.5951 22.5114 11.5113Z" fill="#4285F4"/>
+          <path d="M12.2367 22.5001C15.1617 22.5001 17.6192 21.5438 19.4067 19.0813L15.9017 16.5313C14.9567 17.1651 13.7142 17.5476 12.2367 17.5476C9.36918 17.5476 6.94168 15.6438 6.10793 13.0426H2.49805V15.6676C4.27555 19.7226 8.00918 22.5001 12.2367 22.5001Z" fill="#34A853"/>
+          <path d="M6.10801 13.0425C5.89426 12.4087 5.77301 11.7275 5.77301 11.025C5.77301 10.3225 5.89426 9.64127 6.10801 9.00752V6.38252H2.49813C1.80938 7.78502 1.4043 9.36002 1.4043 11.025C1.4043 12.69 1.80938 14.265 2.49813 15.6675L6.10801 13.0425Z" fill="#FBBC05"/>
+          <path d="M12.2367 4.50249C13.8067 4.50249 15.2092 5.04749 16.33 6.11249L19.4179 3.02499C17.6167 1.33874 15.1592 0.300049 12.2367 0.300049C8.00918 0.300049 4.27555 3.07755 2.49805 7.13255L6.10793 9.75755C6.94168 7.15624 9.36918 4.50249 12.2367 4.50249Z" fill="#EA4335"/>
+        </svg>
+      );
+    case 'mistral':
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 24C18.6274 24 24 18.6274 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 18.6274 5.37258 24 12 24Z" fill="#7A00F5"/>
+          <path d="M8.57046 7.23741L12.0661 16.3761L15.5617 7.23741L16.7662 10.2494L18.3324 6.22267L20.1818 7.13954L17.7513 13.0056C17.7312 13.054 17.7022 13.0969 17.6656 13.1314C17.6289 13.166 17.5856 13.1914 17.5386 13.2062C17.4915 13.221 17.4416 13.2248 17.3923 13.2174C17.343 13.21 17.2957 13.1916 17.254 13.1633L15.5402 12.0302L14.1728 15.5471L12.0661 19.4669L9.95936 15.5471L8.59194 12.0302L6.8782 13.1633C6.83649 13.1916 6.78924 13.21 6.73992 13.2174C6.6906 13.2248 6.64077 13.221 6.59371 13.2062C6.54665 13.1914 6.50329 13.166 6.46664 13.1314C6.42999 13.0969 6.40102 13.054 6.38086 13.0056L3.95044 7.13954L5.79978 6.22267L7.36593 10.2494L8.57046 7.23741Z" fill="white"/>
+        </svg>
+      );
+    default:
+      return <div className="w-4 h-4 bg-gray-200 rounded-full"></div>;
+  }
+};
+
+interface LlmSelectorProps {
+  selectedLlmOption: LlmOption;
   llmOptions: LlmOption[];
-  selectedLlmOption: LlmOption | null;
-  handleModelChange: (model: LlmOption) => void;
-  isLoadingLlmOptions: boolean;
+  handleModelChange: (option: LlmOption) => void;
+  isLoadingLlmOptions?: boolean;
 }
 
-const LlmSelector: React.FC<Props> = ({
-  llmOptions,
+const LlmSelector: React.FC<LlmSelectorProps> = ({
   selectedLlmOption,
+  llmOptions,
   handleModelChange,
-  isLoadingLlmOptions
+  isLoadingLlmOptions = false,
 }) => {
+  // Add fallback for undefined selectedLlmOption to prevent "provider" errors
+  const fallbackOption: LlmOption = {
+    displayName: 'Loading...',
+    model: 'unknown',
+    provider: 'openai'
+  };
+  
+  // Use fallback if selectedLlmOption is undefined
+  const safeSelectedOption = selectedLlmOption || fallbackOption;
+  
   return (
-    <div className="flex flex-col gap-2">
-      <select
-        id="llm-model"
-        className="border px-2 py-1 rounded text-sm"
-        value={selectedLlmOption?.model || ''}
-        onChange={(e) => {
-          const selected = llmOptions.find(opt => opt.model === e.target.value);
-          if (selected) handleModelChange(selected);
-        }}
-        disabled={isLoadingLlmOptions}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="flex items-center gap-2 bg-gray-50 text-gray-700">
+          {isLoadingLlmOptions ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <ProviderIcon provider={safeSelectedOption.provider} />
+          )}
+          <span>{safeSelectedOption.displayName}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent 
+        align="start" 
+        className="bg-white w-64 shadow-lg border border-gray-200 z-50 rounded-md"
+        sideOffset={5}
+        avoidCollisions={true}
       >
-        {llmOptions.map(option => (
-          <option key={option.model} value={option.model}>
-            {option.displayName}
-          </option>
-        ))}
-      </select>
-    </div>
+        {isLoadingLlmOptions ? (
+          <div className="flex items-center justify-center py-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="ml-2">Loading models...</span>
+          </div>
+        ) : (
+          llmOptions.map((option) => (
+            <DropdownMenuItem 
+              key={option.model + (option.isRealtime ? '-realtime' : '')}
+              onClick={() => handleModelChange(option)}
+              className="flex items-center justify-between py-2 px-3 hover:bg-gray-100 cursor-pointer"
+            >
+              <div className="flex items-center">
+                <ProviderIcon provider={option.provider} />
+                <div className="ml-2">
+                  <div className="font-medium">{option.displayName}</div>
+                  {option.pricing && (
+                    <div className="text-xs text-gray-500">{option.pricing}</div>
+                  )}
+                </div>
+              </div>
+              {safeSelectedOption.displayName === option.displayName && (
+                <Check className="h-4 w-4 text-green-500" />
+              )}
+            </DropdownMenuItem>
+          ))
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
