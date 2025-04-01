@@ -6,7 +6,6 @@ import LlmSettingsPopover from './LlmSettingsPopover';
 import VoiceSettingsPopover from './VoiceSettingsPopover';
 import { VoiceModelOption } from '../hooks/useVoiceSettings';
 import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
 
 interface SelectorsRowProps {
   // LLM props
@@ -93,14 +92,6 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
             onSettingsClick={() => setIsLlmSettingsOpen(true)}
           />
         </div>
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="h-9 w-9 rounded-full"
-          onClick={() => setIsLlmSettingsOpen(true)}
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
         <LlmSettingsPopover
           isLlmSettingsOpen={isLlmSettingsOpen}
           setIsLlmSettingsOpen={setIsLlmSettingsOpen}
