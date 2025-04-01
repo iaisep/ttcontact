@@ -10,13 +10,31 @@ interface UseLlmSettingsProps {
 }
 
 // Helper function to map UI model names to API model values
-const getApiModelValue = (uiModelName: string): { s2s_model: string; model: null } => {
+const getApiModelValue = (uiModelName: string): { model: string; s2s_model: null } => {
   // This maps the UI-friendly names to the API values
-  // For all models we're currently setting s2s_model to "gpt-4o-realtime" and model to null
-  // according to the requirement
+  // Format required is { model: "gpt-4o", s2s_model: null }
+  let modelValue = "gpt-4o"; // Default value
+  
+  switch (uiModelName) {
+    case 'GPT 4o':
+      modelValue = "gpt-4o";
+      break;
+    case 'GPT 4o Mini':
+      modelValue = "gpt-4o-mini";
+      break;
+    case 'Claude 3 Opus':
+      modelValue = "claude-3-opus-20240229";
+      break;
+    case 'Claude 3 Sonnet':
+      modelValue = "claude-3-sonnet-20240229";
+      break;
+    default:
+      modelValue = "gpt-4o"; // Default to GPT-4o if no match
+  }
+  
   return {
-    s2s_model: "gpt-4o-realtime",
-    model: null
+    model: modelValue,
+    s2s_model: null
   };
 };
 
