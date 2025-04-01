@@ -54,7 +54,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   }, [llmId]);
 
   return (
-    <div className="space-y-6 text-[10px]">
+    <div className="space-y-6 ">
       <SelectorsRow
         // LLM settings props
         llmId={llmId}
