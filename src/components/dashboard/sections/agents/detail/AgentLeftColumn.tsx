@@ -50,6 +50,8 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
     <div className="space-y-6">
       <SelectorsRow
         // LLM settings props
+        llmId={llmId}
+        selectedModel={llmSettings.selectedModel}
         isLlmSettingsOpen={llmSettings.isLlmSettingsOpen}
         setIsLlmSettingsOpen={llmSettings.setIsLlmSettingsOpen}
         llmTemperature={llmSettings.llmTemperature}
@@ -58,6 +60,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         setStructuredOutput={llmSettings.setStructuredOutput}
         highPriority={llmSettings.highPriority}
         setHighPriority={llmSettings.setHighPriority}
+        handleLlmChange={llmSettings.handleLlmChange}
         handleSaveLlmSettings={llmSettings.handleSaveLlmSettings}
         
         // Voice settings props

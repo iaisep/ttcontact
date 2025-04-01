@@ -44,12 +44,6 @@ const LlmSettingsPopover: React.FC<LlmSettingsPopoverProps> = ({
 
   return (
     <Popover open={isLlmSettingsOpen} onOpenChange={setIsLlmSettingsOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="flex items-center gap-2">
-          <Settings className="h-4 w-4" />
-          <span>{t('llm_settings')}</span>
-        </Button>
-      </PopoverTrigger>
       <PopoverContent className="w-[300px]" align="start">
         <div className="space-y-4">
           <h4 className="font-medium text-sm">{t('llm_settings')}</h4>

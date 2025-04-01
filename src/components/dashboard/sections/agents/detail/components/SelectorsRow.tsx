@@ -2,12 +2,15 @@
 import React from 'react';
 import VoiceSelector from './VoiceSelector';
 import LanguageSelector from './LanguageSelector';
+import LlmSelector from './LlmSelector';
 import LlmSettingsPopover from './LlmSettingsPopover';
 import VoiceSettingsPopover from './VoiceSettingsPopover';
 import { VoiceModelOption } from '../hooks/useVoiceSettings';
 
 interface SelectorsRowProps {
   // LLM props
+  llmId: string | undefined;
+  selectedModel: string;
   isLlmSettingsOpen: boolean;
   setIsLlmSettingsOpen: (open: boolean) => void;
   llmTemperature: number;
@@ -16,6 +19,7 @@ interface SelectorsRowProps {
   setStructuredOutput: (structured: boolean) => void;
   highPriority: boolean;
   setHighPriority: (priority: boolean) => void;
+  handleLlmChange: (llmId: string) => void;
   handleSaveLlmSettings: () => void;
   
   // Voice props
@@ -42,6 +46,8 @@ interface SelectorsRowProps {
 
 const SelectorsRow: React.FC<SelectorsRowProps> = ({
   // LLM props
+  llmId,
+  selectedModel,
   isLlmSettingsOpen,
   setIsLlmSettingsOpen,
   llmTemperature,
@@ -50,6 +56,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   setStructuredOutput,
   highPriority,
   setHighPriority,
+  handleLlmChange,
   handleSaveLlmSettings,
   
   // Voice props
@@ -75,8 +82,14 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
 }) => {
   return (
     <div className="flex flex-wrap gap-3 mb-6">
-      {/* LLM Settings */}
+      {/* LLM Selector */}
       <div className="relative">
+        <LlmSelector
+          llmId={llmId}
+          selectedModel={selectedModel}
+          onLlmChange={handleLlmChange}
+          onSettingsClick={() => setIsLlmSettingsOpen(true)}
+        />
         <LlmSettingsPopover
           isLlmSettingsOpen={isLlmSettingsOpen}
           setIsLlmSettingsOpen={setIsLlmSettingsOpen}
