@@ -76,24 +76,25 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
       className="flex items-center justify-between w-full max-w-full gap-1 sm:gap-2 bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-2 sm:px-4 py-1 sm:py-2 h-auto overflow-hidden"
     >
       <div className="flex items-center gap-1 sm:gap-2 overflow-hidden flex-wrap">
-          <div className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-gray-600">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="3"
-              height="3"
-              viewBox="0 0 12 12"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-1.5 w-1.5 sm:h-2 sm:w-2"
-            >
-              <circle cx="6" cy="6" r="5" />
-              <path d="M4.545 4.5a1.5 1.5 0 0 1 2.915 0c0 1-1.5 1.5-1.5 1.5" />
-              <path d="M6 8.5h.005" />
-            </svg>
-          </div>
+          <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-gray-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="2"
+                height="2"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-1 w-1 sm:h-1.5 sm:w-1.5"
+              >
+                <circle cx="6" cy="6" r="5" />
+                <path d="M4.545 4.5a1.5 1.5 0 0 1 2.915 0c0 1-1.5 1.5-1.5 1.5" />
+                <path d="M6 8.5h.01" />
+              </svg>
+            </div>
+
         <span className="truncate text-xs sm:text-sm max-w-[100px] sm:max-w-[120px]">{currentLlm.name}</span>
       </div>
       
