@@ -33,10 +33,13 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
     
     setIsUpdating(true);
     try {
-      // Update the LLM
+      // Update the LLM with the correct payload format
       await fetchWithAuth(`/update-retell-llm/${newLlmId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ id: newLlmId })
+        body: JSON.stringify({ 
+          model: newLlmId,
+          s2s_model: null
+        })
       });
       
       // Fetch the updated LLM info
