@@ -53,6 +53,8 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
       <DropdownMenuContent 
         align="start" 
         className="bg-white w-64 shadow-lg border border-gray-200 z-50 rounded-md"
+        sideOffset={5}
+        avoidCollisions={true}
       >
         {isLoadingLlmOptions ? (
           <div className="flex items-center justify-center py-2">

@@ -33,6 +33,8 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <DropdownMenuContent 
         align="start" 
         className="bg-white w-48 shadow-lg border border-gray-200 z-50 rounded-md"
+        sideOffset={5}
+        avoidCollisions={true}
       >
         {languageOptions.map((option) => (
           <DropdownMenuItem 
