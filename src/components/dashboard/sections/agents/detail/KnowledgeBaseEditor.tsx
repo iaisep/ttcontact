@@ -43,7 +43,7 @@ const KnowledgeBaseEditor: React.FC<KnowledgeBaseEditorProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium">{t('knowledge_bases')}</h3>
+        <h3 className="text-[10px] font-medium">{t('knowledge_bases')}</h3>
         <Button variant="outline" size="sm">
           <Plus className="mr-2 h-4 w-4" />
           {t('add_knowledge_base')}
