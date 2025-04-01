@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { useApiContext } from '@/context/ApiContext';
@@ -11,12 +11,14 @@ import AgentLeftColumn from '@/components/dashboard/sections/agents/detail/Agent
 import AgentRightColumn from '@/components/dashboard/sections/agents/detail/AgentRightColumn';
 import AgentSettingsAccordion from '@/components/dashboard/sections/agents/detail/AgentSettingsAccordion';
 import { useAgentDetails } from '@/components/dashboard/sections/agents/hooks/useAgentDetails';
+import { RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
 
 const AgentDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { fetchWithAuth } = useApiContext();
+  const [availableLlms, setAvailableLlms] = useState<{ name: string; model: string }[]>([]);
   
   // Use our new hook to fetch all agent details
   const { 
@@ -28,6 +30,30 @@ const AgentDetailPage: React.FC = () => {
     error,
     refreshData
   } = useAgentDetails(slug);
+
+  // Fetch available LLMs when the component loads
+  useEffect(() => {
+    const fetchLlms = async () => {
+      try {
+        const response = await fetchWithAuth('/list-retell-llms');
+        
+        if (response && Array.isArray(response.llms)) {
+          // Map the LLMs to the format we need
+          const formattedLlms = response.llms.map((llm: RetellLLM) => ({
+            name: llm.name || llm.model,
+            model: llm.model
+          }));
+          
+          setAvailableLlms(formattedLlms);
+        }
+      } catch (error) {
+        console.error('Error fetching LLMs:', error);
+        toast.error(t('error_fetching_llms'));
+      }
+    };
+    
+    fetchLlms();
+  }, [fetchWithAuth, t]);
 
   const updateAgentField = async (fieldName: string, value: any) => {
     if (!agent) return;
@@ -112,6 +138,7 @@ const AgentDetailPage: React.FC = () => {
               llm={llm}
               updateAgentField={updateAgentField}
               refreshData={refreshData}
+              availableLlms={availableLlms}
             />
           </div>
 

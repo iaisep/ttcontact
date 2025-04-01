@@ -7,6 +7,7 @@ interface UseLlmSettingsProps {
   initialModel?: string;
   llmId?: string;
   updateAgentField: (fieldName: string, value: any) => void;
+  availableLlms?: { name: string; model: string }[];
 }
 
 // Helper function to map UI model names to API model values
@@ -29,7 +30,12 @@ const getApiModelValue = (uiModelName: string): { model: string; s2s_model: null
       modelValue = "claude-3-sonnet-20240229";
       break;
     default:
-      modelValue = "gpt-4o"; // Default to GPT-4o if no match
+      // Check if the uiModelName is actually the API model value itself
+      if (uiModelName && uiModelName.includes('-')) {
+        modelValue = uiModelName;
+      } else {
+        modelValue = "gpt-4o"; // Default to GPT-4o if no match
+      }
   }
   
   return {
@@ -38,7 +44,28 @@ const getApiModelValue = (uiModelName: string): { model: string; s2s_model: null
   };
 };
 
-export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentField }: UseLlmSettingsProps) => {
+// Helper function to get the display name for an API model value
+const getDisplayName = (apiModelValue: string): string => {
+  switch (apiModelValue) {
+    case "gpt-4o":
+      return 'GPT 4o';
+    case "gpt-4o-mini":
+      return 'GPT 4o Mini';
+    case "claude-3-opus-20240229":
+      return 'Claude 3 Opus';
+    case "claude-3-sonnet-20240229":
+      return 'Claude 3 Sonnet';
+    default:
+      return apiModelValue; // Return the API value itself if no match
+  }
+};
+
+export const useLlmSettings = ({ 
+  initialModel = 'GPT 4o', 
+  llmId, 
+  updateAgentField,
+  availableLlms = []
+}: UseLlmSettingsProps) => {
   const { fetchWithAuth } = useApiContext();
   const [selectedLlmModel, setSelectedLlmModel] = useState(initialModel);
   const [isLlmSettingsOpen, setIsLlmSettingsOpen] = useState(false);
@@ -46,12 +73,15 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
   const [structuredOutput, setStructuredOutput] = useState(false);
   const [highPriority, setHighPriority] = useState(false);
 
-  const llmOptions = [
-    'GPT 4o',
-    'GPT 4o Mini',
-    'Claude 3 Opus',
-    'Claude 3 Sonnet',
-  ];
+  // Generate LLM options from available LLMs
+  const llmOptions = availableLlms.length > 0 
+    ? availableLlms.map(llm => getDisplayName(llm.model))
+    : [
+        'GPT 4o',
+        'GPT 4o Mini',
+        'Claude 3 Opus',
+        'Claude 3 Sonnet',
+      ];
 
   const handleLlmChange = async (llm: string) => {
     try {
