@@ -16,15 +16,13 @@ interface AgentLeftColumnProps {
   llm?: RetellLLM | null;
   updateAgentField: (fieldName: string, value: any) => void;
   refreshData?: () => void;
-  availableLlms?: { name: string; model: string }[];
 }
 
 const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   agent,
   llm,
   updateAgentField,
-  refreshData,
-  availableLlms = []
+  refreshData
 }) => {
   // Use language context
   const { t } = useLanguage();
@@ -41,8 +39,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   const llmSettings = useLlmSettings({ 
     initialModel: agent.llm_model || 'GPT 4o',
     llmId,
-    updateAgentField,
-    availableLlms
+    updateAgentField 
   });
   
   const languageSelector = useLanguageSelector({ 
