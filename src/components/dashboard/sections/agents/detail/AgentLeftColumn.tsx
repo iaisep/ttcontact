@@ -54,7 +54,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
     <div className="space-y-6">
       <SelectorsRow
         // LLM settings props
-        selectedLlmModel={llmSettings.selectedLlmModel}
+        selectedLlmOption={llmSettings.selectedLlmOption}
         isLlmSettingsOpen={llmSettings.isLlmSettingsOpen}
         setIsLlmSettingsOpen={llmSettings.setIsLlmSettingsOpen}
         llmTemperature={llmSettings.llmTemperature}
@@ -64,7 +64,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         highPriority={llmSettings.highPriority}
         setHighPriority={llmSettings.setHighPriority}
         llmOptions={llmSettings.llmOptions}
-        handleLlmChange={llmSettings.handleLlmChange}
+        handleModelChange={llmSettings.handleModelChange}
         handleSaveLlmSettings={llmSettings.handleSaveLlmSettings}
         isLoadingLlmOptions={llmSettings.isLoading}
         

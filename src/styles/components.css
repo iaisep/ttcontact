@@ -22,4 +22,21 @@
   .dropdown-menu-item {
     @apply flex items-center justify-between py-2 px-3 hover:bg-gray-100 cursor-pointer;
   }
+
+  /* LLM Provider specific colors */
+  .provider-openai {
+    @apply text-green-600;
+  }
+  
+  .provider-anthropic {
+    @apply text-purple-600;
+  }
+  
+  .provider-google {
+    @apply text-blue-600;
+  }
+  
+  .provider-mistral {
+    @apply text-indigo-600;
+  }
 }
