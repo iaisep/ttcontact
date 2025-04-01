@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Settings } from 'lucide-react';
+import { Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiContext } from '@/context/ApiContext';
@@ -105,9 +105,9 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
         variant="ghost" 
         size="icon"
         onClick={onSettingsClick}
-        className="h-8 w-8 p-0"
+        className="rounded-full bg-gray-800 text-white hover:bg-gray-700 h-8 w-8 p-0"
       >
-        <Settings className="h-4 w-4 text-gray-500" />
+        <Settings2 className="h-4 w-4" />
       </Button>
     </Button>
   );
