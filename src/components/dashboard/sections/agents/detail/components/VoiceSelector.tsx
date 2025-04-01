@@ -6,6 +6,7 @@ import { User } from 'lucide-react';
 interface VoiceSelectorProps {
   selectedVoice: string;
   openVoiceModal: () => void;
+  onSettingsClick?: () => void;
 }
 
 const VoiceSelector: React.FC<VoiceSelectorProps> = ({

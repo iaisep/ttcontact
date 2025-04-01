@@ -1,4 +1,3 @@
-
 import React from 'react';
 import VoiceSelector from './VoiceSelector';
 import LanguageSelector from './LanguageSelector';
@@ -121,16 +120,9 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
           <VoiceSelector
             selectedVoice={selectedVoice}
             openVoiceModal={openVoiceModal}
+            onSettingsClick={() => setIsVoiceSettingsOpen(true)}
           />
         </div>
-        <Button 
-          variant="outline" 
-          size="icon" 
-          className="h-9 w-9 rounded-full"
-          onClick={() => setIsVoiceSettingsOpen(true)}
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
         <VoiceSettingsPopover
           isOpen={isVoiceSettingsOpen}
           setIsOpen={setIsVoiceSettingsOpen}
