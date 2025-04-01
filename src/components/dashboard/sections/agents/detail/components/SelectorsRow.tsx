@@ -1,11 +1,12 @@
-
 import React from 'react';
+import { Settings } from 'lucide-react';
 import VoiceSelector from './VoiceSelector';
 import LanguageSelector from './LanguageSelector';
 import LlmSelector from './LlmSelector';
 import LlmSettingsPopover from './LlmSettingsPopover';
 import VoiceSettingsPopover from './VoiceSettingsPopover';
 import { VoiceModelOption } from '../hooks/useVoiceSettings';
+import { Button } from '@/components/ui/button';
 
 interface SelectorsRowProps {
   // LLM props
@@ -83,13 +84,21 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   return (
     <div className="grid grid-cols-3 gap-3 mb-6">
       {/* LLM Selector */}
-      <div className="relative flex items-center">
+      <div className="relative flex items-center space-x-2">
         <LlmSelector
           llmId={llmId}
           selectedModel={selectedModel}
           onLlmChange={handleLlmChange}
           onSettingsClick={() => setIsLlmSettingsOpen(true)}
         />
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="rounded-full bg-gray-50 border-gray-200 hover:bg-gray-100 h-8 w-8"
+          onClick={() => setIsLlmSettingsOpen(true)}
+        >
+          <Settings className="h-4 w-4 text-gray-500" />
+        </Button>
         <LlmSettingsPopover
           isLlmSettingsOpen={isLlmSettingsOpen}
           setIsLlmSettingsOpen={setIsLlmSettingsOpen}
@@ -104,11 +113,19 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
       </div>
       
       {/* Voice Selector */}
-      <div className="relative flex items-center">
+      <div className="relative flex items-center space-x-2">
         <VoiceSelector
           selectedVoice={selectedVoice}
           openVoiceModal={openVoiceModal}
         />
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="rounded-full bg-gray-50 border-gray-200 hover:bg-gray-100 h-8 w-8"
+          onClick={() => setIsVoiceSettingsOpen(true)}
+        >
+          <Settings className="h-4 w-4 text-gray-500" />
+        </Button>
         <VoiceSettingsPopover
           isOpen={isVoiceSettingsOpen}
           setIsOpen={setIsVoiceSettingsOpen}
@@ -126,12 +143,19 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
       </div>
       
       {/* Language Selector */}
-      <div className="relative flex items-center">
+      <div className="relative flex items-center space-x-2">
         <LanguageSelector 
           selectedLanguage={selectedLanguage}
           languageOptions={languageOptions}
           handleLanguageChange={handleLanguageChange}
         />
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="rounded-full bg-gray-50 border-gray-200 hover:bg-gray-100 h-8 w-8"
+        >
+          <Settings className="h-4 w-4 text-gray-500" />
+        </Button>
       </div>
     </div>
   );
