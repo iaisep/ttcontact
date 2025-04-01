@@ -44,7 +44,7 @@ const getUiModelName = (apiModelValue: string): string => {
 const getApiModelValue = (uiModelName: string): { model: string; s2s_model: null } => {
   // This maps the UI-friendly names to the API values
   // Format required is { model: "gpt-4o", s2s_model: null }
-  let modelValue = "gpt-4o"; // Default value
+  let modelValue = ["gpt-4o","gpt-4o","gpt-4o"]; // Default value
   
   switch (uiModelName) {
     case 'GPT 4o':
