@@ -21,9 +21,51 @@ export const useVoiceFiltering = (initialProvider: string = 'ElevenLabs') => {
         return false;
       }
       
+      // Filter by gender
+      if (genderFilter !== 'all_genders') {
+        const genderMapping: Record<string, string[]> = {
+          'male': ['Male'],
+          'female': ['Female'],
+          'neutral': ['Neutral'],
+        };
+        
+        const targetGenders = genderMapping[genderFilter] || [];
+        if (targetGenders.length && !voice.traits.some(trait => targetGenders.includes(trait))) {
+          return false;
+        }
+      }
+      
+      // Filter by accent
+      if (accentFilter !== 'all_accents') {
+        const accentMapping: Record<string, string[]> = {
+          'american': ['American'],
+          'british': ['British'],
+          'indian': ['Indian'],
+        };
+        
+        const targetAccents = accentMapping[accentFilter] || [];
+        if (targetAccents.length && !voice.traits.some(trait => targetAccents.includes(trait))) {
+          return false;
+        }
+      }
+      
+      // Filter by type
+      if (typeFilter !== 'all_types') {
+        const typeMapping: Record<string, string[]> = {
+          'retail': ['Retail'],
+          'provider': ['Provider'],
+          'custom': ['Custom'],
+        };
+        
+        const targetTypes = typeMapping[typeFilter] || [];
+        if (targetTypes.length && !voice.traits.some(trait => targetTypes.includes(trait))) {
+          return false;
+        }
+      }
+      
       return true;
     });
-  }, [activeProvider, searchTerm]);
+  }, [activeProvider, searchTerm, genderFilter, accentFilter, typeFilter]);
 
   return {
     activeProvider,

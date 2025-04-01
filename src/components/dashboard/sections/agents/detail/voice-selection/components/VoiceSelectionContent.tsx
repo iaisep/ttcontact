@@ -37,27 +37,29 @@ const VoiceSelectionContent: React.FC<VoiceSelectionContentProps> = ({
   selectedVoice
 }) => {
   return (
-    <VoiceProviderTabs 
-      activeProvider={activeProvider}
-      setActiveProvider={setActiveProvider}
-    >
-      <VoiceFilterBar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        genderFilter={genderFilter}
-        setGenderFilter={setGenderFilter}
-        accentFilter={accentFilter}
-        setAccentFilter={setAccentFilter}
-        typeFilter={typeFilter}
-        setTypeFilter={setTypeFilter}
-      />
-      
-      <VoiceTable 
-        voices={filteredVoices}
-        onSelectVoice={onSelectVoice}
-        selectedVoiceId={selectedVoice}
-      />
-    </VoiceProviderTabs>
+    <div className="flex flex-col h-full">
+      <VoiceProviderTabs 
+        activeProvider={activeProvider}
+        setActiveProvider={setActiveProvider}
+      >
+        <VoiceFilterBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          genderFilter={genderFilter}
+          setGenderFilter={setGenderFilter}
+          accentFilter={accentFilter}
+          setAccentFilter={setAccentFilter}
+          typeFilter={typeFilter}
+          setTypeFilter={setTypeFilter}
+        />
+        
+        <VoiceTable 
+          voices={filteredVoices}
+          onSelectVoice={onSelectVoice}
+          selectedVoiceId={selectedVoice}
+        />
+      </VoiceProviderTabs>
+    </div>
   );
 };
 
