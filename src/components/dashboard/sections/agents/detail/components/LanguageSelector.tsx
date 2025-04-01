@@ -32,7 +32,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         <div className="h-6 w-6 sm:h-6 sm:w-6 rounded-full flex-shrink-0 flex items-center justify-center">
           <Globe className="h-5 w-5 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
         </div>
-        <span className="truncate text-xs sm:text-sm max-w-[100px] sm:max-w-[120px]">{selectedLanguage}</span>
+        <span className="truncate text-[10px] :text-[10px] max-w-[100px] sm:max-w-[120px]">{selectedLanguage}</span>
       </div>
       
       <DropdownMenu>
