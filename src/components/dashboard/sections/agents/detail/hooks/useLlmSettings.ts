@@ -35,7 +35,7 @@ const getApiModelValue = (uiModelName: string): { model: string; s2s_model: null
     modelValue = "claude-3-sonnet-20240229";
     break;
   case 'Claude 3 Haiku':
-    modelValue = "claude-3-haiku-20240306";
+    modelValue = "claude-3.5-haiku";
     break;
   case 'Gemini 1.5 Pro':
     modelValue = "gemini-1.5-pro";
