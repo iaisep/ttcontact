@@ -16,7 +16,6 @@ const LlmSelector: React.FC<Props> = ({
 }) => {
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor="llm-model" className="text-sm font-semibold">Selecciona modelo LLM:</label>
       <select
         id="llm-model"
         className="border px-2 py-1 rounded text-sm"
