@@ -1,13 +1,23 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Globe, Loader2 } from 'lucide-react';
+import { Globe, Loader2, Check } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+// Model pricing information mapped to model names
+const MODEL_PRICING: Record<string, string> = {
+  'GPT 4o': '($0.05/min)',
+  'GPT 4o Realtime': '($0.5/min)',
+  'GPT 4o mini': '($0.00s/min)',
+  'GPT 4o mini Realtime': '($0.125/min)',
+  'Claude 3.7 Sonnet': '($0.06/min)',
+  'Claude 3.5 Haiku': '($0.02/min)',
+};
 
 interface LlmSelectorProps {
   selectedLlmModel: string;
@@ -22,6 +32,12 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
   handleLlmChange,
   isLoadingLlmOptions = false,
 }) => {
+  // Add pricing information to model name
+  const getModelWithPricing = (model: string) => {
+    const pricing = MODEL_PRICING[model] || '';
+    return pricing ? `${model} ${pricing}` : model;
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -34,7 +50,7 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
           <span>{selectedLlmModel}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="bg-white">
+      <DropdownMenuContent align="start" className="bg-white w-64">
         {isLoadingLlmOptions ? (
           <div className="flex items-center justify-center py-2">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -42,8 +58,21 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
           </div>
         ) : (
           llmOptions.map((option) => (
-            <DropdownMenuItem key={option} onClick={() => handleLlmChange(option)}>
-              {option}
+            <DropdownMenuItem 
+              key={option} 
+              onClick={() => handleLlmChange(option)}
+              className="flex items-center justify-between py-2 px-3 hover:bg-gray-100"
+            >
+              <div className="flex items-center">
+                <Globe className="h-4 w-4 mr-2 text-gray-600" />
+                <div>
+                  <div className="font-medium">{option}</div>
+                  <div className="text-xs text-gray-500">{MODEL_PRICING[option] || ''}</div>
+                </div>
+              </div>
+              {selectedLlmModel === option && (
+                <Check className="h-4 w-4 text-green-500" />
+              )}
             </DropdownMenuItem>
           ))
         )}

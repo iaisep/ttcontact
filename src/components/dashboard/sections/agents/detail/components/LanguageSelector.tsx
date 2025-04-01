@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Check } from 'lucide-react';
 
 interface LanguageSelectorProps {
   selectedLanguage: string;
@@ -29,11 +30,20 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           <span>{selectedLanguage}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="bg-white">
+      <DropdownMenuContent align="start" className="bg-white w-48">
         {languageOptions.map((option) => (
-          <DropdownMenuItem key={option.value} onClick={() => handleLanguageChange(option.label)}>
-            <span className="mr-2">{option.icon}</span>
-            {option.label}
+          <DropdownMenuItem 
+            key={option.value} 
+            onClick={() => handleLanguageChange(option.label)}
+            className="flex items-center justify-between py-2 px-3 hover:bg-gray-100"
+          >
+            <div className="flex items-center">
+              <span className="mr-2 text-base">{option.icon}</span>
+              <span>{option.label}</span>
+            </div>
+            {selectedLanguage === option.label && (
+              <Check className="h-4 w-4 text-green-500" />
+            )}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
