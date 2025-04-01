@@ -41,7 +41,7 @@ const VoiceSettingsPopover: React.FC<VoiceSettingsPopoverProps> = ({
       <PopoverContent className="w-80 p-5">
         <div className="grid gap-5">
           <div>
-            <h3 className="text-sm font-medium mb-3">Voice Model</h3>
+            <h3 className="text-[10px] font-medium mb-3">Voice Model</h3>
             <RadioGroup 
               value={voiceModel} 
               onValueChange={setVoiceModel}
