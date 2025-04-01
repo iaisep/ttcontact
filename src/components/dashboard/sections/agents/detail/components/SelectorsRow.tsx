@@ -1,3 +1,4 @@
+
 import React from 'react';
 import VoiceSelector from './VoiceSelector';
 import LanguageSelector from './LanguageSelector';
@@ -81,10 +82,10 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   handleLanguageChange,
 }) => {
   return (
-    <div className="grid grid-cols-3 gap-3 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
       {/* LLM Selector */}
-      <div className="flex items-center space-x-2">
-        <div className="flex-grow">
+      <div className="flex items-center space-x-2 w-full overflow-hidden">
+        <div className="flex-grow w-full overflow-hidden">
           <LlmSelector
             llmId={llmId}
             selectedModel={selectedModel}
@@ -106,8 +107,8 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
       </div>
       
       {/* Voice Selector */}
-      <div className="flex items-center space-x-2">
-        <div className="flex-grow">
+      <div className="flex items-center space-x-2 w-full overflow-hidden">
+        <div className="flex-grow w-full overflow-hidden">
           <VoiceSelector
             selectedVoice={selectedVoice}
             openVoiceModal={openVoiceModal}
@@ -131,8 +132,8 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
       </div>
       
       {/* Language Selector */}
-      <div className="flex items-center space-x-2">
-        <div className="flex-grow">
+      <div className="flex items-center space-x-2 w-full overflow-hidden">
+        <div className="flex-grow w-full overflow-hidden">
           <LanguageSelector 
             selectedLanguage={selectedLanguage}
             languageOptions={languageOptions}

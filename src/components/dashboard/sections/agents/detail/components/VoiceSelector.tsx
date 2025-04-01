@@ -17,24 +17,24 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
   return (
     <Button 
       variant="outline" 
-      className="flex items-center justify-between w-full gap-2 bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-4 py-2 h-auto"
+      className="flex items-center justify-between w-full max-w-full gap-1 sm:gap-2 bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-2 sm:px-4 py-1 sm:py-2 h-auto overflow-hidden"
       onClick={openVoiceModal}
     >
-      <div className="flex items-center gap-2">
-        <div className="h-5 w-5 rounded-full bg-amber-500 flex items-center justify-center text-white">
-          <User className="h-3 w-3" />
+      <div className="flex items-center gap-1 sm:gap-2 overflow-hidden">
+        <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-amber-500 flex-shrink-0 flex items-center justify-center text-white">
+          <User className="h-2 w-2 sm:h-3 sm:w-3" />
         </div>
-        <span>{selectedVoice}</span>
+        <span className="truncate text-xs sm:text-sm max-w-[100px] sm:max-w-[120px]">{selectedVoice}</span>
       </div>
       {onSettingsClick && (
         <div 
-          className="flex items-center justify-center h-5 w-5 text-gray-500 hover:text-gray-700"
+          className="flex items-center justify-center h-4 w-4 sm:h-5 sm:w-5 text-gray-500 hover:text-gray-700 flex-shrink-0"
           onClick={(e) => {
             e.stopPropagation();
             onSettingsClick();
           }}
         >
-          <Settings className="h-3.5 w-3.5" />
+          <Settings className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
         </div>
       )}
     </Button>
