@@ -16,21 +16,43 @@ const getApiModelValue = (uiModelName: string): { model: string; s2s_model: null
   let modelValue = "gpt-4o"; // Default value
   
   switch (uiModelName) {
-    case 'GPT 4o':
-      modelValue = "gpt-4o";
-      break;
-    case 'GPT 4o Mini':
-      modelValue = "gpt-4o-mini";
-      break;
-    case 'Claude 3 Opus':
-      modelValue = "claude-3-opus-20240229";
-      break;
-    case 'Claude 3 Sonnet':
-      modelValue = "claude-3-sonnet-20240229";
-      break;
-    default:
-      modelValue = "gpt-4o"; // Default to GPT-4o if no match
-  }
+  case 'GPT 4o':
+    modelValue = "gpt-4o";
+    break;
+  case 'GPT 4o Mini':
+    modelValue = "gpt-4o-mini";
+    break;
+  case 'GPT-4 Turbo':
+    modelValue = "gpt-4-turbo";
+    break;
+  case 'GPT-3.5 Turbo':
+    modelValue = "gpt-3.5-turbo";
+    break;
+  case 'Claude 3 Opus':
+    modelValue = "claude-3-opus-20240229";
+    break;
+  case 'Claude 3 Sonnet':
+    modelValue = "claude-3-sonnet-20240229";
+    break;
+  case 'Claude 3 Haiku':
+    modelValue = "claude-3-haiku-20240306";
+    break;
+  case 'Gemini 1.5 Pro':
+    modelValue = "gemini-1.5-pro";
+    break;
+  case 'Gemini 1.0 Pro':
+    modelValue = "gemini-1.0-pro";
+    break;
+  case 'Mistral 7B':
+    modelValue = "mistral-7b";
+    break;
+  case 'Mixtral 8x7B':
+    modelValue = "mixtral-8x7b";
+    break;
+  default:
+    modelValue = "gpt-4o"; // Default fallback
+}
+
   
   return {
     model: modelValue,
