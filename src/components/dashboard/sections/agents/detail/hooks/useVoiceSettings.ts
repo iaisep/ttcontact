@@ -2,11 +2,14 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
+import { Voice } from '../voice-selection/types';
 
 // Define VoiceModelOption type
 export interface VoiceModelOption {
   value: string;
   label: string;
+  id: string;
+  description: string;
 }
 
 interface UseVoiceSettingsProps {
@@ -29,13 +32,16 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   
   // Voice model options with proper typing
   const voiceModelOptions: VoiceModelOption[] = [
-    { value: 'eleven-labs-v2', label: 'ElevenLabs V2' },
-    { value: 'playht', label: 'PlayHT' },
-    { value: 'deepgram', label: 'Deepgram' }
+    { value: 'eleven-labs-v2', label: 'ElevenLabs V2', id: 'eleven-labs-v2', description: 'High quality voice synthesis' },
+    { value: 'playht', label: 'PlayHT', id: 'playht', description: 'Fast voice synthesis' },
+    { value: 'deepgram', label: 'Deepgram', id: 'deepgram', description: 'Accurate voice synthesis' }
   ];
   
-  const handleVoiceChange = async (voiceId: string) => {
+  // Update to accept Voice object instead of just voiceId string
+  const handleVoiceChange = async (voice: Voice) => {
     try {
+      const voiceId = voice.voice_id; // Extract voice_id from Voice object
+      
       toast.loading('Updating voice...');
       
       // Update the agent
@@ -46,7 +52,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
         })
       });
       
-      setSelectedVoice(voiceId);
+      setSelectedVoice(voice.name || voiceId);
       updateAgentField('voice_id', voiceId);
       setIsVoiceModalOpen(false);
       

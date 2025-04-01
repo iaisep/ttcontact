@@ -6,16 +6,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-
-interface VoiceModelOption {
-  id: string;
-  label: string;
-  description: string;
-}
+import { VoiceModelOption } from '../hooks/useVoiceSettings';
 
 interface VoiceSettingsPopoverProps {
-  isVoiceSettingsOpen: boolean;
-  setIsVoiceSettingsOpen: (isOpen: boolean) => void;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
   voiceModel: string;
   setVoiceModel: (model: string) => void;
   voiceSpeed: number;
@@ -24,13 +19,13 @@ interface VoiceSettingsPopoverProps {
   setVoiceTemperature: (temp: number) => void;
   voiceVolume: number;
   setVoiceVolume: (volume: number) => void;
-  voiceModelOptions: Array<VoiceModelOption>;
-  handleSaveVoiceSettings: () => void;
+  voiceModelOptions: VoiceModelOption[];
+  onSave: () => void;
 }
 
 const VoiceSettingsPopover: React.FC<VoiceSettingsPopoverProps> = ({
-  isVoiceSettingsOpen,
-  setIsVoiceSettingsOpen,
+  isOpen,
+  setIsOpen,
   voiceModel,
   setVoiceModel,
   voiceSpeed,
@@ -40,10 +35,10 @@ const VoiceSettingsPopover: React.FC<VoiceSettingsPopoverProps> = ({
   voiceVolume,
   setVoiceVolume,
   voiceModelOptions,
-  handleSaveVoiceSettings,
+  onSave,
 }) => {
   return (
-    <Popover open={isVoiceSettingsOpen} onOpenChange={setIsVoiceSettingsOpen}>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="icon" className="rounded-full bg-gray-50">
           <Settings className="h-4 w-4" />
@@ -59,7 +54,7 @@ const VoiceSettingsPopover: React.FC<VoiceSettingsPopoverProps> = ({
           >
             {voiceModelOptions.map((option) => (
               <div key={option.id} className="flex items-start space-x-2">
-                <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                <RadioGroupItem value={option.value} id={option.id} className="mt-1" />
                 <div className="grid gap-1">
                   <Label htmlFor={option.id} className="font-normal">{option.label}</Label>
                   <p className="text-xs text-muted-foreground">{option.description}</p>
@@ -114,14 +109,14 @@ const VoiceSettingsPopover: React.FC<VoiceSettingsPopoverProps> = ({
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => setIsVoiceSettingsOpen(false)}
+              onClick={() => setIsOpen(false)}
             >
               Cancel
             </Button>
             <Button 
               variant="default" 
               size="sm"
-              onClick={handleSaveVoiceSettings}
+              onClick={onSave}
             >
               Save
             </Button>

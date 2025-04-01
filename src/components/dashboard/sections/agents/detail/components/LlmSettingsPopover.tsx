@@ -30,8 +30,9 @@ const LlmSettingsPopover: React.FC<LlmSettingsPopoverProps> = ({
   setHighPriority,
   handleSaveLlmSettings,
 }) => {
-  // Safe temperature display with fallback to 0 if undefined
-  const displayTemperature = typeof llmTemperature === 'number' ? llmTemperature.toFixed(2) : '0.00';
+  // Ensure temperature is a number and has a fallback
+  const temperature = typeof llmTemperature === 'number' ? llmTemperature : 0;
+  const displayTemperature = temperature.toFixed(2);
   
   return (
     <Popover open={isLlmSettingsOpen} onOpenChange={setIsLlmSettingsOpen}>
@@ -50,7 +51,7 @@ const LlmSettingsPopover: React.FC<LlmSettingsPopoverProps> = ({
               <span className="text-sm">{displayTemperature}</span>
             </div>
             <Slider
-              value={[typeof llmTemperature === 'number' ? llmTemperature : 0]}
+              value={[temperature]}
               min={0}
               max={1.0}
               step={0.01}

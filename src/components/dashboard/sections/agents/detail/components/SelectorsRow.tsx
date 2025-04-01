@@ -6,12 +6,7 @@ import LanguageSelector from './LanguageSelector';
 import LlmSettingsPopover from './LlmSettingsPopover';
 import VoiceSettingsPopover from './VoiceSettingsPopover';
 import { LlmOption } from '../hooks/useLlmSettings';
-
-// Define VoiceModelOption interface to fix type errors
-interface VoiceModelOption {
-  value: string;
-  label: string;
-}
+import { VoiceModelOption } from '../hooks/useVoiceSettings';
 
 interface SelectorsRowProps {
   // LLM props
@@ -41,7 +36,7 @@ interface SelectorsRowProps {
   setVoiceTemperature: (temp: number) => void;
   voiceVolume: number;
   setVoiceVolume: (volume: number) => void;
-  voiceModelOptions: VoiceModelOption[]; // Updated to match the expected type
+  voiceModelOptions: VoiceModelOption[]; 
   openVoiceModal: () => void;
   handleSaveVoiceSettings: () => void;
   
