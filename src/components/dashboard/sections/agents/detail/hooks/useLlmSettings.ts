@@ -3,6 +3,14 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
 
+export interface LlmOption {
+  displayName: string;
+  model: string;
+  provider: 'openai' | 'anthropic' | 'google' | 'mistral';
+  pricing?: string;
+  isRealtime?: boolean;
+}
+
 interface UseLlmSettingsProps {
   initialModel?: string;
   llmId?: string;
@@ -38,6 +46,21 @@ const getUiModelName = (apiModelValue: string): string => {
       // If model doesn't match any known value, return it as is
       return apiModelValue;
   }
+};
+
+// Helper function to determine provider based on model name
+const getProviderFromModel = (model: string): 'openai' | 'anthropic' | 'google' | 'mistral' => {
+  if (model.startsWith('gpt')) {
+    return 'openai';
+  } else if (model.startsWith('claude')) {
+    return 'anthropic';
+  } else if (model.startsWith('gemini')) {
+    return 'google';
+  } else if (model.startsWith('mistral') || model.startsWith('mixtral')) {
+    return 'mistral';
+  }
+  // Default to OpenAI if we can't determine
+  return 'openai';
 };
 
 // Helper function to map UI model names to API model values
@@ -90,14 +113,31 @@ const getApiModelValue = (uiModelName: string): { model: string; s2s_model: null
   };
 };
 
-export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentField }: UseLlmSettingsProps) => {
+// Convert model name to LlmOption with provider info
+const createLlmOption = (model: string, isRealtime: boolean = false): LlmOption => {
+  const displayName = getUiModelName(model);
+  const provider = getProviderFromModel(model);
+  
+  return {
+    displayName,
+    model,
+    provider,
+    isRealtime
+  };
+};
+
+export const useLlmSettings = ({ initialModel = 'gpt-4o', llmId, updateAgentField }: UseLlmSettingsProps) => {
   const { fetchWithAuth } = useApiContext();
-  const [selectedLlmModel, setSelectedLlmModel] = useState(initialModel);
+  const [selectedLlmOption, setSelectedLlmOption] = useState<LlmOption>({
+    displayName: getUiModelName(initialModel),
+    model: initialModel,
+    provider: getProviderFromModel(initialModel)
+  });
   const [isLlmSettingsOpen, setIsLlmSettingsOpen] = useState(false);
   const [llmTemperature, setLlmTemperature] = useState(0.0);
   const [structuredOutput, setStructuredOutput] = useState(false);
   const [highPriority, setHighPriority] = useState(false);
-  const [llmOptions, setLlmOptions] = useState<string[]>([]);
+  const [llmOptions, setLlmOptions] = useState<LlmOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Fetch available LLM models from the API
@@ -107,27 +147,29 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
       try {
         const response = await fetchWithAuth('/list-retell-llms');
         if (Array.isArray(response)) {
-          // Map API model values to UI-friendly names
-          const mappedOptions = response.map(llm => getUiModelName(llm.model));
-          // Remove duplicates
-          const uniqueOptions = Array.from(new Set(mappedOptions));
+          // Map API model values to UI-friendly LlmOptions with provider info
+          const mappedOptions = response.map(llm => createLlmOption(llm.model));
+          // Remove duplicates based on model name
+          const uniqueOptions = mappedOptions.filter((option, index, self) => 
+            index === self.findIndex(o => o.model === option.model)
+          );
           setLlmOptions(uniqueOptions);
         }
       } catch (error) {
         console.error('Error fetching LLM models:', error);
         // Set default options in case of error
         setLlmOptions([
-          'GPT 4o',
-          'GPT 4o Mini',
-          'GPT-4 Turbo',
-          'GPT-3.5 Turbo',
-          'Claude 3 Opus',
-          'Claude 3 Sonnet',
-          'Claude 3 Haiku',
-          'Gemini 1.5 Pro',
-          'Gemini 1.0 Pro',
-          'Mistral 7B',
-          'Mixtral 8x7B'
+          createLlmOption("gpt-4o"),
+          createLlmOption("gpt-4o-mini"),
+          createLlmOption("gpt-4-turbo"),
+          createLlmOption("gpt-3.5-turbo"),
+          createLlmOption("claude-3-opus-20240229"),
+          createLlmOption("claude-3-sonnet-20240229"),
+          createLlmOption("claude-3.5-haiku"),
+          createLlmOption("gemini-1.5-pro"),
+          createLlmOption("gemini-1.0-pro"),
+          createLlmOption("mistral-7b"),
+          createLlmOption("mixtral-8x7b")
         ]);
       } finally {
         setIsLoading(false);
@@ -159,8 +201,7 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
             
             // Set the selected LLM model using the API model value
             if (llmData.model) {
-              const uiModelName = getUiModelName(llmData.model);
-              setSelectedLlmModel(uiModelName);
+              setSelectedLlmOption(createLlmOption(llmData.model));
             }
           }
         } catch (error) {
@@ -172,13 +213,16 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
     }
   }, [llmId, fetchWithAuth]);
 
-  const handleLlmChange = async (llm: string) => {
+  const handleLlmChange = async (option: LlmOption) => {
     try {
       if (llmId) {
         toast.loading('Updating LLM model...');
         
         // Get the API model value based on UI selection
-        const modelPayload = getApiModelValue(llm);
+        const modelPayload = {
+          model: option.model,
+          s2s_model: null
+        };
         
         // Update the LLM using the update-retell-llm endpoint with PATCH method
         await fetchWithAuth(`/update-retell-llm/${llmId}`, {
@@ -190,7 +234,7 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
         await fetchWithAuth(`/get-retell-llm/${llmId}`);
         
         // Just update the local state without updating the agent
-        setSelectedLlmModel(llm);
+        setSelectedLlmOption(option);
         toast.success('LLM model updated successfully');
       }
     } catch (error) {
@@ -239,7 +283,7 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
   };
 
   return {
-    selectedLlmModel,
+    selectedLlmOption,
     isLlmSettingsOpen,
     setIsLlmSettingsOpen,
     llmTemperature,

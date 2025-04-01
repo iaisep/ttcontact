@@ -59,6 +59,16 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
   handleModelChange,
   isLoadingLlmOptions = false,
 }) => {
+  // Add fallback for undefined selectedLlmOption to prevent "provider" errors
+  const fallbackOption: LlmOption = {
+    displayName: 'Loading...',
+    model: 'unknown',
+    provider: 'openai'
+  };
+  
+  // Use fallback if selectedLlmOption is undefined
+  const safeSelectedOption = selectedLlmOption || fallbackOption;
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -66,9 +76,9 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
           {isLoadingLlmOptions ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <ProviderIcon provider={selectedLlmOption.provider} />
+            <ProviderIcon provider={safeSelectedOption.provider} />
           )}
-          <span>{selectedLlmOption.displayName}</span>
+          <span>{safeSelectedOption.displayName}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
@@ -98,7 +108,7 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
                   )}
                 </div>
               </div>
-              {selectedLlmOption.displayName === option.displayName && (
+              {safeSelectedOption.displayName === option.displayName && (
                 <Check className="h-4 w-4 text-green-500" />
               )}
             </DropdownMenuItem>

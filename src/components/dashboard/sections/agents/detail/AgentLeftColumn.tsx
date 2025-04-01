@@ -64,7 +64,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         highPriority={llmSettings.highPriority}
         setHighPriority={llmSettings.setHighPriority}
         llmOptions={llmSettings.llmOptions}
-        handleModelChange={llmSettings.handleModelChange}
+        handleModelChange={llmSettings.handleLlmChange}
         handleSaveLlmSettings={llmSettings.handleSaveLlmSettings}
         isLoadingLlmOptions={llmSettings.isLoading}
         
