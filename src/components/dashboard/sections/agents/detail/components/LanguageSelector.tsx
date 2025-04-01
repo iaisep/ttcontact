@@ -26,10 +26,12 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   return (
     <Button 
       variant="outline" 
-      className="flex items-center gap-2 bg-white text-gray-900 border-gray-200 rounded-xl hover:bg-gray-50"
+      className="flex items-center justify-between w-full gap-2 bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-4 py-2 h-auto"
     >
-      <Globe className="h-4 w-4 text-blue-500" />
-      <span className="flex-1 text-left">{selectedLanguage}</span>
+      <div className="flex items-center gap-2">
+        <Globe className="h-5 w-5 text-blue-500" />
+        <span>{selectedLanguage}</span>
+      </div>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

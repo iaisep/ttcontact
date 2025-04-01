@@ -81,7 +81,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   handleLanguageChange,
 }) => {
   return (
-    <div className="grid grid-cols-3 gap-3 mb-6 items-center">
+    <div className="grid grid-cols-3 gap-3 mb-6">
       {/* LLM Selector */}
       <div className="relative">
         <LlmSelector
