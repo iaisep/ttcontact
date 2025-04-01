@@ -77,7 +77,7 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
     >
       <div className="flex items-center gap-1 sm:gap-2 overflow-hidden flex-wrap">
         <div className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-gray-600">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 sm:h-4 sm:w-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="6" height="6" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 sm:h-4 sm:w-4">
             <circle cx="12" cy="12" r="10"/>
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
             <path d="M12 17h.01"/>
