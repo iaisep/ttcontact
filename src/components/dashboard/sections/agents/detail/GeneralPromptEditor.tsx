@@ -48,7 +48,7 @@ const GeneralPromptEditor: React.FC<GeneralPromptEditorProps> = ({
         <span className="text-sm font-medium">{t('llm_general_prompt')}</span>
         <button 
           onClick={() => setExpanded(!expanded)}
-          className="text-xs text-muted-foreground hover:text-foreground"
+          className="text-[10px] text-muted-foreground hover:text-foreground"
         >
           {expanded ? t('collapse') : t('expand')}
         </button>
@@ -87,7 +87,7 @@ const GeneralPromptEditor: React.FC<GeneralPromptEditorProps> = ({
         </>
       ) : (
         <div 
-          className="p-3 text-sm font-mono cursor-pointer max-h-[300px] overflow-y-auto whitespace-pre-wrap hover:bg-muted/20"
+          className="p-3 text-[10px] font-mono cursor-pointer max-h-[300px] overflow-y-auto whitespace-pre-wrap hover:bg-muted/20"
           onClick={() => setExpanded(true)}
         >
           {value || t('no_general_prompt')}
