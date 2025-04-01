@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
@@ -8,6 +9,13 @@ export interface LlmOption {
   provider: 'openai' | 'anthropic' | 'google' | 'mistral';
   isRealtime?: boolean;
   pricing?: string;
+}
+
+// Define the props interface
+interface UseLlmSettingsProps {
+  initialModel?: string;
+  llmId?: string;
+  updateAgentField: (fieldName: string, value: any) => void;
 }
 
 const DEFAULT_LLM_OPTIONS: LlmOption[] = [

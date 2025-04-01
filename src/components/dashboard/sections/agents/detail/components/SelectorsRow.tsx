@@ -7,6 +7,12 @@ import LlmSettingsPopover from './LlmSettingsPopover';
 import VoiceSettingsPopover from './VoiceSettingsPopover';
 import { LlmOption } from '../hooks/useLlmSettings';
 
+// Define VoiceModelOption interface to fix type errors
+interface VoiceModelOption {
+  value: string;
+  label: string;
+}
+
 interface SelectorsRowProps {
   // LLM props
   selectedLlmOption: LlmOption;
@@ -35,7 +41,7 @@ interface SelectorsRowProps {
   setVoiceTemperature: (temp: number) => void;
   voiceVolume: number;
   setVoiceVolume: (volume: number) => void;
-  voiceModelOptions: string[];
+  voiceModelOptions: VoiceModelOption[]; // Updated to match the expected type
   openVoiceModal: () => void;
   handleSaveVoiceSettings: () => void;
   
@@ -93,15 +99,15 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
           isLoadingLlmOptions={isLoadingLlmOptions}
         />
         <LlmSettingsPopover
-          isOpen={isLlmSettingsOpen}
-          setIsOpen={setIsLlmSettingsOpen}
-          temperature={llmTemperature}
-          setTemperature={setLlmTemperature}
+          isLlmSettingsOpen={isLlmSettingsOpen}
+          setIsLlmSettingsOpen={setIsLlmSettingsOpen}
+          llmTemperature={llmTemperature}
+          setLlmTemperature={setLlmTemperature}
           structuredOutput={structuredOutput}
           setStructuredOutput={setStructuredOutput}
           highPriority={highPriority}
           setHighPriority={setHighPriority}
-          onSave={handleSaveLlmSettings}
+          handleSaveLlmSettings={handleSaveLlmSettings}
         />
       </div>
       

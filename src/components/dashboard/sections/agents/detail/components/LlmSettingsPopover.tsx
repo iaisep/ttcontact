@@ -22,14 +22,17 @@ interface LlmSettingsPopoverProps {
 const LlmSettingsPopover: React.FC<LlmSettingsPopoverProps> = ({
   isLlmSettingsOpen,
   setIsLlmSettingsOpen,
-  llmTemperature,
+  llmTemperature = 0, // Provide default value to prevent undefined
   setLlmTemperature,
-  structuredOutput,
+  structuredOutput = false, // Provide default value
   setStructuredOutput,
-  highPriority,
+  highPriority = false, // Provide default value
   setHighPriority,
   handleSaveLlmSettings,
 }) => {
+  // Safe temperature display with fallback to 0 if undefined
+  const displayTemperature = typeof llmTemperature === 'number' ? llmTemperature.toFixed(2) : '0.00';
+  
   return (
     <Popover open={isLlmSettingsOpen} onOpenChange={setIsLlmSettingsOpen}>
       <PopoverTrigger asChild>
@@ -44,10 +47,10 @@ const LlmSettingsPopover: React.FC<LlmSettingsPopoverProps> = ({
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-sm"></span>
-              <span className="text-sm">{llmTemperature.toFixed(2)}</span>
+              <span className="text-sm">{displayTemperature}</span>
             </div>
             <Slider
-              value={[llmTemperature]}
+              value={[typeof llmTemperature === 'number' ? llmTemperature : 0]}
               min={0}
               max={1.0}
               step={0.01}
