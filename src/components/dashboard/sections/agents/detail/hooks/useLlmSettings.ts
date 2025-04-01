@@ -97,7 +97,13 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
   const [llmTemperature, setLlmTemperature] = useState(0.0);
   const [structuredOutput, setStructuredOutput] = useState(false);
   const [highPriority, setHighPriority] = useState(false);
-  const [llmOptions, setLlmOptions] = useState<string[]>([]);
+  const [llmOptions, setLlmOptions] = useState<{ value: string; label: string }[]>([
+  { value: "gpt-4o", label: "GPT 4o" },
+  { value: "gpt-4o-mini", label: "GPT 4o Mini" },
+  { value: "claude-3-sonnet", label: "Claude 3.5 Sonnet" },
+  { value: "claude-3-opus", label: "Claude 3.7 Opus" },
+]);
+
   const [isLoading, setIsLoading] = useState(false);
 
   // Fetch available LLM models from the API
