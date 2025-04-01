@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { User } from 'lucide-react';
+import { User, Settings } from 'lucide-react';
 
 interface VoiceSelectorProps {
   selectedVoice: string;
@@ -12,6 +12,7 @@ interface VoiceSelectorProps {
 const VoiceSelector: React.FC<VoiceSelectorProps> = ({
   selectedVoice,
   openVoiceModal,
+  onSettingsClick,
 }) => {
   return (
     <Button 
@@ -25,6 +26,17 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
         </div>
         <span>{selectedVoice}</span>
       </div>
+      {onSettingsClick && (
+        <div 
+          className="flex items-center justify-center h-5 w-5 text-gray-500 hover:text-gray-700"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSettingsClick();
+          }}
+        >
+          <Settings className="h-3.5 w-3.5" />
+        </div>
+      )}
     </Button>
   );
 };
