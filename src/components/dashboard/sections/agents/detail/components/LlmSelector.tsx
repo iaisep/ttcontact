@@ -33,8 +33,11 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
     
     setIsUpdating(true);
     try {
-      // Update the LLM with the correct payload format
-      await fetchWithAuth(`/update-retell-llm/${newLlmId}`, {
+      // Make sure we have the actual llm_id from the agent, not just the model name
+      const currentLlmId = llmId || '';
+      
+      // Update the LLM with the correct payload format and URL
+      await fetchWithAuth(`/update-retell-llm/${currentLlmId}`, {
         method: 'PATCH',
         body: JSON.stringify({ 
           model: newLlmId,
@@ -43,10 +46,10 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
       });
       
       // Fetch the updated LLM info
-      const updatedLlm = await fetchWithAuth(`/get-retell-llm/${newLlmId}`);
+      const updatedLlm = await fetchWithAuth(`/get-retell-llm/${currentLlmId}`);
       
-      // Call the onLlmChange callback with the new LLM ID
-      onLlmChange(newLlmId);
+      // Call the onLlmChange callback with the LLM ID
+      onLlmChange(currentLlmId);
       
       toast.success(t('llm_updated_successfully'));
     } catch (error) {
@@ -58,7 +61,7 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
   };
 
   // Find the current LLM details
-  const currentLlm = LLM_OPTIONS.find(option => option.id === llmId) || { id: llmId || '', name: selectedModel || 'Select LLM', provider: '' };
+  const currentLlm = LLM_OPTIONS.find(option => option.id === selectedModel) || { id: selectedModel || '', name: selectedModel || 'Select LLM', provider: '' };
 
   // SVG for the LLM logo
   const LlmLogo = () => (

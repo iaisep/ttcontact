@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import EditablePrompt from './EditablePrompt';
 import WelcomeMessageEditor from './WelcomeMessageEditor';
 import GeneralPromptEditor from './GeneralPromptEditor';
@@ -45,6 +45,13 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
     initialLanguage: agent.language || 'Spanish', 
     updateAgentField 
   });
+
+  // Fetch LLM data when component mounts or llmId changes
+  useEffect(() => {
+    if (llmId) {
+      llmSettings.fetchLlmData();
+    }
+  }, [llmId]);
 
   return (
     <div className="space-y-6">
