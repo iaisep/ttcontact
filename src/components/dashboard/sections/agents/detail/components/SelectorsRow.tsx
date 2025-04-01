@@ -81,7 +81,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   handleLanguageChange,
 }) => {
   return (
-    <div className="flex flex-wrap gap-3 mb-6">
+    <div className="grid grid-cols-3 gap-3 mb-6 items-center">
       {/* LLM Selector */}
       <div className="relative">
         <LlmSelector
@@ -103,7 +103,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
         />
       </div>
       
-      {/* Voice Selector with Settings */}
+      {/* Voice Selector */}
       <div className="relative">
         <VoiceSelector
           selectedVoice={selectedVoice}
@@ -126,11 +126,13 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
       </div>
       
       {/* Language Selector */}
-      <LanguageSelector 
-        selectedLanguage={selectedLanguage}
-        languageOptions={languageOptions}
-        handleLanguageChange={handleLanguageChange}
-      />
+      <div className="relative">
+        <LanguageSelector 
+          selectedLanguage={selectedLanguage}
+          languageOptions={languageOptions}
+          handleLanguageChange={handleLanguageChange}
+        />
+      </div>
     </div>
   );
 };
