@@ -83,7 +83,7 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
             <span className="sr-only">Close</span>
           </DialogClose>
         </div>
-        
+        /* 
         {/* Agent header section (only show if agent is provided) */}
         {agent && updateAgentField && (
           <AgentHeaderInfo
@@ -94,7 +94,7 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
             onDescriptionChange={handleDescriptionChange}
           />
         )}
-        
+        */
         <VoiceSelectionContent
           activeProvider={activeProvider}
           setActiveProvider={setActiveProvider}
