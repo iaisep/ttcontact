@@ -44,7 +44,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   return (
     <Accordion type="single" defaultValue="knowledge-base" className="w-full">
       <AccordionItem value="knowledge-base">
-        <AccordionTrigger className="px-4 py-2 text-sm font-medium rounded-t-md bg-gray-50 hover:bg-gray-100">
+        <AccordionTrigger className="px-4 py-2 text-[10px] font-medium rounded-t-md bg-gray-50 hover:bg-gray-100">
           {t('knowledge_base')}
         </AccordionTrigger>
         <AccordionContent className="border border-t-0 rounded-b-md p-4">
@@ -57,7 +57,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
       </AccordionItem>
       
       <AccordionItem value="speech-settings" className="mt-4">
-        <AccordionTrigger className="px-4 py-2 text-sm font-medium rounded-t-md bg-gray-50 hover:bg-gray-100">
+        <AccordionTrigger className="px-4 py-2 text-[10px] font-medium rounded-t-md bg-gray-50 hover:bg-gray-100">
           {t('speech_settings')}
         </AccordionTrigger>
         <AccordionContent className="border border-t-0 rounded-b-md p-4">
@@ -69,7 +69,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
       </AccordionItem>
       
       <AccordionItem value="agent-functions" className="mt-4">
-        <AccordionTrigger className="px-4 py-2 text-sm font-medium rounded-t-md bg-gray-50 hover:bg-gray-100">
+        <AccordionTrigger className="px-4 py-2 text-[10px] font-medium rounded-t-md bg-gray-50 hover:bg-gray-100">
           {t('agent_functions')}
         </AccordionTrigger>
         <AccordionContent className="border border-t-0 rounded-b-md p-4">
