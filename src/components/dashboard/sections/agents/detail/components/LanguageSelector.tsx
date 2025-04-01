@@ -30,12 +30,15 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           <span>{selectedLanguage}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="bg-white w-48">
+      <DropdownMenuContent 
+        align="start" 
+        className="bg-white w-48 shadow-lg border border-gray-200 z-50 rounded-md"
+      >
         {languageOptions.map((option) => (
           <DropdownMenuItem 
             key={option.value} 
             onClick={() => handleLanguageChange(option.label)}
-            className="flex items-center justify-between py-2 px-3 hover:bg-gray-100"
+            className="flex items-center justify-between py-2 px-3 hover:bg-gray-100 cursor-pointer"
           >
             <div className="flex items-center">
               <span className="mr-2 text-base">{option.icon}</span>

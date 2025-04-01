@@ -50,7 +50,10 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
           <span>{selectedLlmModel}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="bg-white w-64">
+      <DropdownMenuContent 
+        align="start" 
+        className="bg-white w-64 shadow-lg border border-gray-200 z-50 rounded-md"
+      >
         {isLoadingLlmOptions ? (
           <div className="flex items-center justify-center py-2">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -61,7 +64,7 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
             <DropdownMenuItem 
               key={option} 
               onClick={() => handleLlmChange(option)}
-              className="flex items-center justify-between py-2 px-3 hover:bg-gray-100"
+              className="flex items-center justify-between py-2 px-3 hover:bg-gray-100 cursor-pointer"
             >
               <div className="flex items-center">
                 <Globe className="h-4 w-4 mr-2 text-gray-600" />
