@@ -39,11 +39,6 @@ const VoiceSettingsPopover: React.FC<VoiceSettingsPopoverProps> = ({
 }) => {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" className="rounded-full bg-gray-50">
-          <Settings className="h-4 w-4" />
-        </Button>
-      </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-4">
           <h3 className="font-medium">Voice Model</h3>
