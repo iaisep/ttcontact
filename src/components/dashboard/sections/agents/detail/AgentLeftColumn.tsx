@@ -104,7 +104,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
 
       {/* Display LLM General Prompt if available */}
       {llm?.general_prompt && (
-        <div className=" text-[10px] mt-6 bg-gray-50 p-4 rounded-lg">
+        <div className=" mt-6 bg-gray-50 p-4 rounded-lg">
           <GeneralPromptEditor 
             generalPrompt={llm.general_prompt}
             onUpdate={(value) => updateAgentField('general_prompt', value)}
