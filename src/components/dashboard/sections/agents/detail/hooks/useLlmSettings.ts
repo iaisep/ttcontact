@@ -68,12 +68,19 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', llmId, updateAgentFiel
   const [structuredOutput, setStructuredOutput] = useState(false);
   const [highPriority, setHighPriority] = useState(false);
 
-  const llmOptions = [
-    'GPT 4o',
-    'GPT 4o Mini',
-    'Claude 3 Opus',
-    'Claude 3 Sonnet',
-  ];
+const llmOptions = [
+  'GPT 4o',
+  'GPT 4o Mini',
+  'GPT-4 Turbo',
+  'GPT-3.5 Turbo',
+  'Claude 3 Opus',
+  'Claude 3 Sonnet',
+  'Claude 3 Haiku',
+  'Gemini 1.5 Pro',
+  'Gemini 1.0 Pro',
+  'Mistral 7B',
+  'Mixtral 8x7B',
+];
 
   const handleLlmChange = async (llm: string) => {
     try {
