@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Settings } from 'lucide-react';
+import { Settings, HelpCircle, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useApiContext } from '@/context/ApiContext';
@@ -76,25 +76,9 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
       className="flex items-center justify-between w-full max-w-full gap-1 sm:gap-2 bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-2 sm:px-4 py-1 sm:py-2 h-auto overflow-hidden"
     >
       <div className="flex items-center gap-1 sm:gap-2 overflow-hidden flex-wrap">
-          <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-gray-600">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="2"
-                height="2"
-                viewBox="0 0 12 12"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-1 w-1 sm:h-1.5 sm:w-1.5"
-              >
-                <circle cx="6" cy="6" r="5" />
-                <path d="M4.545 4.5a1.5 1.5 0 0 1 2.915 0c0 1-1.5 1.5-1.5 1.5" />
-                <path d="M6 8.5h.01" />
-              </svg>
-            </div>
-
+        <div className="h-6 w-6 sm:h-6 sm:w-6 rounded-full flex-shrink-0 flex items-center justify-center">
+          <HelpCircle className="h-5 w-5 sm:h-5 sm:w-5 text-gray-700 flex-shrink-0" />
+        </div>
         <span className="truncate text-xs sm:text-sm max-w-[100px] sm:max-w-[120px]">{currentLlm.name}</span>
       </div>
       
@@ -104,22 +88,9 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
             <Button
               variant="ghost"
               size="icon"
-              className="h-3 w-3 sm:h-4 sm:w-4 p-0 flex-shrink-0"
+              className="h-6 w-6 sm:h-6 sm:w-6 p-0 flex-shrink-0"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="8"
-                height="8"
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                className="h-1.5 w-1.5 sm:h-2 sm:w-2 text-gray-600"
-              >
-                <path
-                  d="M9.99956 10.879L13.7121 7.1665L14.7726 8.227L9.99956 13L5.22656 8.227L6.28706 7.1665L9.99956 10.879Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
+              <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[200px] z-50 bg-white">
@@ -129,11 +100,7 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
                 onClick={() => handleLlmChange(option.id)}
                 className="flex items-center gap-2 text-xs sm:text-sm"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 text-gray-600">
-                  <circle cx="10" cy="10" r="8"/>
-                  <path d="M8 9a2 2 0 0 1 4 0c0 1.5-2 2-2 2"/>
-                  <path d="M10 14h.01"/>
-                </svg>
+                <HelpCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 text-gray-600" />
                 <span className="truncate">{option.name}</span>
               </DropdownMenuItem>
             ))}
@@ -147,9 +114,9 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
             e.stopPropagation();
             onSettingsClick();
           }}
-          className="h-6 w-6 sm:h-8 sm:w-8 p-0 flex-shrink-0"
+          className="h-6 w-6 sm:h-6 sm:w-6 p-0 flex-shrink-0"
         >
-          <Settings className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
+          <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600" />
         </Button>
       </div>
     </Button>

@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Check, Globe } from 'lucide-react';
+import { Check, Globe, ChevronDown } from 'lucide-react';
 
 interface LanguageSelectorProps {
   selectedLanguage: string;
@@ -29,16 +29,16 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       className="flex items-center justify-between w-full max-w-full gap-1 sm:gap-2 bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-2 sm:px-4 py-1 sm:py-2 h-auto overflow-hidden"
     >
       <div className="flex items-center gap-1 sm:gap-2 overflow-hidden flex-wrap">
-        <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+        <div className="h-6 w-6 sm:h-6 sm:w-6 rounded-full flex-shrink-0 flex items-center justify-center">
+          <Globe className="h-5 w-5 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+        </div>
         <span className="truncate text-xs sm:text-sm max-w-[100px] sm:max-w-[120px]">{selectedLanguage}</span>
       </div>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-8 sm:w-8 p-0 flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600">
-              <path d="M9.99956 10.879L13.7121 7.1665L14.7726 8.227L9.99956 13L5.22656 8.227L6.28706 7.1665L9.99956 10.879Z" fill="currentColor"></path>
-            </svg>
+          <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-6 sm:w-6 p-0 flex-shrink-0">
+            <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
