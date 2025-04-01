@@ -59,7 +59,7 @@ const GeneralPromptEditor: React.FC<GeneralPromptEditorProps> = ({
           <Textarea
             value={value}
             onChange={handleChange}
-            className="min-h-[200px] font-mono text-sm border-0 rounded-none focus-visible:ring-0"
+            className="min-h-[200px] font-mono text-[10px] border-0 rounded-none focus-visible:ring-0"
             placeholder={t('general_prompt_placeholder')}
           />
           {isEdited && (
