@@ -1,16 +1,13 @@
 
 import React from 'react';
 import VoiceSelector from './VoiceSelector';
-import LlmSelector from './LlmSelector';
 import LanguageSelector from './LanguageSelector';
 import LlmSettingsPopover from './LlmSettingsPopover';
 import VoiceSettingsPopover from './VoiceSettingsPopover';
-import { LlmOption } from '../hooks/useLlmSettings';
 import { VoiceModelOption } from '../hooks/useVoiceSettings';
 
 interface SelectorsRowProps {
   // LLM props
-  selectedLlmOption: LlmOption;
   isLlmSettingsOpen: boolean;
   setIsLlmSettingsOpen: (open: boolean) => void;
   llmTemperature: number;
@@ -19,10 +16,7 @@ interface SelectorsRowProps {
   setStructuredOutput: (structured: boolean) => void;
   highPriority: boolean;
   setHighPriority: (priority: boolean) => void;
-  llmOptions: LlmOption[];
-  handleModelChange: (option: LlmOption) => void;
   handleSaveLlmSettings: () => void;
-  isLoadingLlmOptions?: boolean;
   
   // Voice props
   selectedVoice: string;
@@ -48,7 +42,6 @@ interface SelectorsRowProps {
 
 const SelectorsRow: React.FC<SelectorsRowProps> = ({
   // LLM props
-  selectedLlmOption,
   isLlmSettingsOpen,
   setIsLlmSettingsOpen,
   llmTemperature,
@@ -57,10 +50,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   setStructuredOutput,
   highPriority,
   setHighPriority,
-  llmOptions,
-  handleModelChange,
   handleSaveLlmSettings,
-  isLoadingLlmOptions,
   
   // Voice props
   selectedVoice,
@@ -85,14 +75,8 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
 }) => {
   return (
     <div className="flex flex-wrap gap-3 mb-6">
-      {/* LLM Model Selector with Settings */}
+      {/* LLM Settings */}
       <div className="relative">
-        <LlmSelector
-          selectedLlmOption={selectedLlmOption}
-          llmOptions={llmOptions}
-          handleModelChange={handleModelChange}
-          isLoadingLlmOptions={isLoadingLlmOptions}
-        />
         <LlmSettingsPopover
           isLlmSettingsOpen={isLlmSettingsOpen}
           setIsLlmSettingsOpen={setIsLlmSettingsOpen}

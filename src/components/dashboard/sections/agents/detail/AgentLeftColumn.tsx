@@ -36,11 +36,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
     updateAgentField 
   });
   
-  // Pass the model from the llm object if available
-  const initialModel = llm?.model ? llm.model : 'gpt-4o';
-  
   const llmSettings = useLlmSettings({ 
-    initialModel,
     llmId,
     updateAgentField 
   });
@@ -54,7 +50,6 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
     <div className="space-y-6">
       <SelectorsRow
         // LLM settings props
-        selectedLlmOption={llmSettings.selectedLlmOption}
         isLlmSettingsOpen={llmSettings.isLlmSettingsOpen}
         setIsLlmSettingsOpen={llmSettings.setIsLlmSettingsOpen}
         llmTemperature={llmSettings.llmTemperature}
@@ -63,10 +58,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         setStructuredOutput={llmSettings.setStructuredOutput}
         highPriority={llmSettings.highPriority}
         setHighPriority={llmSettings.setHighPriority}
-        llmOptions={llmSettings.llmOptions}
-        handleModelChange={llmSettings.handleLlmChange}
         handleSaveLlmSettings={llmSettings.handleSaveLlmSettings}
-        isLoadingLlmOptions={llmSettings.isLoading}
         
         // Voice settings props
         selectedVoice={voiceSettings.selectedVoice}
