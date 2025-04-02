@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProviderTabsProps {
@@ -13,24 +13,33 @@ const ProviderTabs: React.FC<ProviderTabsProps> = ({
   setActiveProvider,
   children
 }) => {
+  // Effect to fetch voices when provider changes
+  useEffect(() => {
+    // This effect could trigger a refetch if needed
+  }, [activeProvider]);
+
+  const handleProviderChange = (provider: string) => {
+    setActiveProvider(provider);
+  };
+
   return (
     <Tabs value={activeProvider} className="w-full">
       <TabsList className="grid grid-cols-3">
         <TabsTrigger 
           value="elevenlabs" 
-          onClick={() => setActiveProvider('elevenlabs')}
+          onClick={() => handleProviderChange('elevenlabs')}
         >
           ElevenLabs
         </TabsTrigger>
         <TabsTrigger 
           value="playht" 
-          onClick={() => setActiveProvider('playht')}
+          onClick={() => handleProviderChange('playht')}
         >
           PlayHT
         </TabsTrigger>
         <TabsTrigger 
           value="openai" 
-          onClick={() => setActiveProvider('openai')}
+          onClick={() => handleProviderChange('openai')}
         >
           OpenAI
         </TabsTrigger>

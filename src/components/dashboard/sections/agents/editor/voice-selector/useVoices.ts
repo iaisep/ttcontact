@@ -1,107 +1,167 @@
+import { useState, useEffect, useCallback } from 'react';
+import { Voice } from '@/components/dashboard/sections/agents/detail/voice-selection/types';
 
-import { useState, useEffect } from 'react';
-import { Voice, mockVoices } from '@/components/dashboard/sections/agents/detail/voice-selection/types';
+// Sample data with provider information
+const mockVoices: Voice[] = [
+  {
+    id: 'voice-1',
+    name: 'Sarah',
+    provider: 'elevenlabs',
+    gender: 'female',
+    accent: 'american',
+    age: 'adult',
+    preview_audio_url: 'https://example.com/preview1.mp3',
+    description: 'Clear and professional female voice with American accent'
+  },
+  {
+    id: 'voice-2',
+    name: 'John',
+    provider: 'elevenlabs',
+    gender: 'male',
+    accent: 'british',
+    age: 'adult',
+    preview_audio_url: 'https://example.com/preview2.mp3',
+    description: 'Deep male voice with British accent'
+  },
+  {
+    id: 'voice-3',
+    name: 'Alex',
+    provider: 'playht',
+    gender: 'neutral',
+    accent: 'american',
+    age: 'young',
+    preview_audio_url: 'https://example.com/preview3.mp3',
+    description: 'Neutral voice with American accent'
+  },
+  {
+    id: 'voice-4',
+    name: 'Maria',
+    provider: 'playht',
+    gender: 'female',
+    accent: 'spanish',
+    age: 'adult',
+    preview_audio_url: 'https://example.com/preview4.mp3',
+    description: 'Female voice with Spanish accent'
+  },
+  {
+    id: 'voice-5',
+    name: 'David',
+    provider: 'openai',
+    gender: 'male',
+    accent: 'australian',
+    age: 'adult',
+    preview_audio_url: 'https://example.com/preview5.mp3',
+    description: 'Male voice with Australian accent'
+  },
+  {
+    id: 'voice-6',
+    name: 'Luna',
+    provider: 'openai',
+    gender: 'female',
+    accent: 'indian',
+    age: 'young',
+    preview_audio_url: 'https://example.com/preview6.mp3',
+    description: 'Female voice with Indian accent'
+  }
+];
 
 export const useVoices = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [allVoices, setAllVoices] = useState<Voice[]>([]);
   const [voices, setVoices] = useState<Voice[]>([]);
-  const [activeProvider, setActiveProvider] = useState<string>('elevenlabs');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [genderFilter, setGenderFilter] = useState<string>('all');
-  const [accentFilter, setAccentFilter] = useState<string>('all');
+  const [allVoices, setAllVoices] = useState<Voice[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [activeProvider, setActiveProvider] = useState('elevenlabs');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [genderFilter, setGenderFilter] = useState('all');
+  const [accentFilter, setAccentFilter] = useState('all');
 
-  // Mock fetch function (replace with actual API call)
-  const fetchVoices = async () => {
+  // Fetch voices (mock implementation)
+  const fetchVoices = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // In a real app, you would fetch from an API here
-      const fetchedVoices = mockVoices;
+      // Store all voices for reset functionality
+      setAllVoices(mockVoices);
       
-      setAllVoices(fetchedVoices);
-      filterVoices(fetchedVoices, activeProvider, searchQuery, genderFilter, accentFilter);
+      // Apply initial filtering by provider
+      const filteredByProvider = mockVoices.filter(voice => 
+        voice.provider === activeProvider
+      );
       
-    } catch (error) {
-      console.error('Error fetching voices:', error);
-      setError('Failed to load voices. Please try again.');
+      setVoices(filteredByProvider);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to fetch voices'));
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeProvider]);
 
-  // Reset all filters
-  const resetFilters = () => {
+  // Apply all filters
+  const applyFilters = useCallback(() => {
+    // Start with provider filter
+    let filteredVoices = allVoices.filter(voice => 
+      voice.provider === activeProvider
+    );
+    
+    // Apply search filter if there is a query
+    if (searchQuery) {
+      filteredVoices = filteredVoices.filter(voice =>
+        voice.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (voice.description && voice.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    }
+    
+    // Apply gender filter if not 'all'
+    if (genderFilter !== 'all') {
+      filteredVoices = filteredVoices.filter(voice =>
+        voice.gender?.toLowerCase() === genderFilter.toLowerCase()
+      );
+    }
+    
+    // Apply accent filter if not 'all'
+    if (accentFilter !== 'all') {
+      filteredVoices = filteredVoices.filter(voice =>
+        voice.accent?.toLowerCase() === accentFilter.toLowerCase()
+      );
+    }
+    
+    setVoices(filteredVoices);
+  }, [allVoices, activeProvider, searchQuery, genderFilter, accentFilter]);
+
+  // Reset all filters but keep the active provider
+  const resetFilters = useCallback(() => {
     setSearchQuery('');
     setGenderFilter('all');
     setAccentFilter('all');
-    filterVoices(allVoices, activeProvider, '', 'all', 'all');
-  };
+    
+    // Just apply the provider filter
+    const filteredByProvider = allVoices.filter(voice => 
+      voice.provider === activeProvider
+    );
+    
+    setVoices(filteredByProvider);
+  }, [allVoices, activeProvider]);
 
-  // Filter voices based on active provider and search query
-  const filterVoices = (
-    voices: Voice[], 
-    provider: string, 
-    search: string, 
-    gender: string, 
-    accent: string
-  ) => {
-    let filtered = [...voices];
-    
-    // Filter by provider
-    if (provider !== 'all') {
-      filtered = filtered.filter(voice => {
-        const voiceProvider = voice.provider.toLowerCase();
-        return voiceProvider.includes(provider.toLowerCase());
-      });
-    }
-    
-    // Filter by search query
-    if (search) {
-      const searchLower = search.toLowerCase();
-      filtered = filtered.filter(voice => 
-        voice.name.toLowerCase().includes(searchLower)
-      );
-    }
-    
-    // Filter by gender
-    if (gender !== 'all') {
-      filtered = filtered.filter(voice => 
-        voice.gender?.toLowerCase() === gender.toLowerCase()
-      );
-    }
-    
-    // Filter by accent
-    if (accent !== 'all') {
-      filtered = filtered.filter(voice => 
-        voice.accent?.toLowerCase() === accent.toLowerCase()
-      );
-    }
-    
-    setVoices(filtered);
-  };
-
-  // Fetch voices on component mount
+  // Initial data fetch
   useEffect(() => {
     fetchVoices();
-  }, []);
+  }, [fetchVoices]);
 
-  // Apply filters when filter criteria change
+  // Apply filters when any filter changes
   useEffect(() => {
     if (allVoices.length > 0) {
-      filterVoices(allVoices, activeProvider, searchQuery, genderFilter, accentFilter);
+      applyFilters();
     }
-  }, [activeProvider, searchQuery, genderFilter, accentFilter]);
+  }, [applyFilters, searchQuery, genderFilter, accentFilter, activeProvider]);
 
   return {
+    voices,
     isLoading,
     error,
-    voices,
     fetchVoices,
     activeProvider,
     setActiveProvider,

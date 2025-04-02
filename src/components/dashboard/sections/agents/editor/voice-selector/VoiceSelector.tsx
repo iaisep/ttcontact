@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import React from 'react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { X } from 'lucide-react';
 import { useVoices } from './useVoices';
 import FilterBar from './FilterBar';
@@ -54,10 +54,10 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Select Voice</h2>
-          <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogClose>
+          <X 
+            className="h-4 w-4 cursor-pointer opacity-70 ring-offset-background transition-opacity hover:opacity-100" 
+            onClick={onClose}
+          />
         </div>
 
         <ProviderTabs
