@@ -128,6 +128,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
           <GeneralPromptEditor 
             generalPrompt={llm.general_prompt}
             onUpdate={(value) => updateAgentField('general_prompt', value)}
+            llmId={llmId}
           />
         </div>
       )}
