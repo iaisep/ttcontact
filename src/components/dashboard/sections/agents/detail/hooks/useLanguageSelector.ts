@@ -18,9 +18,9 @@ export const useLanguageSelector = ({ initialLanguage = 'Spanish', updateAgentFi
     { value: 'it', label: 'Italian', icon: '🇮🇹' },
   ];
 
-  const handleLanguageChange = (lang: string) => {
+  const handleLanguageChange = async (lang: string): Promise<void> => {
     setSelectedLanguage(lang);
-    updateAgentField('language', lang);
+    await updateAgentField('language', lang);
   };
 
   return {

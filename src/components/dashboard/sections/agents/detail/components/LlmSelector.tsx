@@ -8,10 +8,10 @@ import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
 
 interface LlmSelectorProps {
-  llmId: string | undefined;
   selectedModel: string;
-  onLlmChange: (llmId: string) => void;
+  onLlmChange?: (llmId: string) => Promise<void>;
   onSettingsClick: () => void;
+  llmId?: string;
 }
 
 // OpenAI LLM options
@@ -29,7 +29,7 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleLlmChange = async (newLlmId: string) => {
-    if (newLlmId === selectedModel) return;
+    if (newLlmId === selectedModel || !onLlmChange) return;
     
     setIsUpdating(true);
     try {
@@ -52,7 +52,7 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({ llmId, selectedModel, onLlmCh
       const updatedModel = updatedLlm?.model || newLlmId;
       
       // Call the onLlmChange callback with the updated model
-      onLlmChange(updatedModel);
+      await onLlmChange(updatedModel);
       
       toast.success(t('llm_updated_successfully'));
     } catch (error) {

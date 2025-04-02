@@ -42,7 +42,7 @@ interface SelectorsRowProps {
   
   // Language props
   selectedLanguage: string;
-  languageOptions: { value: string; label: string }[];
+  languageOptions: { value: string; label: string; icon: string }[];
   handleLanguageChange: (language: string) => Promise<void>;
 }
 
@@ -90,19 +90,21 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
         <h3 className="text-[10px] font-medium mb-2">LLM</h3>
         <div className="relative">
           <LlmSelector 
-            selectedModel={selectedModel} 
-            openLlmSettings={() => setIsLlmSettingsOpen(true)}
+            selectedModel={selectedModel}
+            llmId={llmId}
+            onLlmChange={handleLlmChange}
+            onSettingsClick={() => setIsLlmSettingsOpen(true)}
           />
           <LlmSettingsPopover 
-            isOpen={isLlmSettingsOpen}
-            setIsOpen={setIsLlmSettingsOpen}
+            isLlmSettingsOpen={isLlmSettingsOpen}
+            setIsLlmSettingsOpen={setIsLlmSettingsOpen}
             llmTemperature={llmTemperature}
             setLlmTemperature={setLlmTemperature}
             structuredOutput={structuredOutput}
             setStructuredOutput={setStructuredOutput}
             highPriority={highPriority}
             setHighPriority={setHighPriority}
-            onSave={handleSaveLlmSettings}
+            handleSaveLlmSettings={handleSaveLlmSettings}
           />
         </div>
       </div>
@@ -140,7 +142,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
         <LanguageSelector 
           selectedLanguage={selectedLanguage}
           languageOptions={languageOptions}
-          onLanguageChange={handleLanguageChange}
+          handleLanguageChange={(lang) => handleLanguageChange(lang)}
         />
       </div>
     </div>
