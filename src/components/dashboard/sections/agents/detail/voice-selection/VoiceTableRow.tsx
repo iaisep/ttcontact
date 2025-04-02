@@ -70,7 +70,7 @@ const VoiceTableRow: React.FC<VoiceTableRowProps> = ({
         </div>
       </td>
       <td className="py-3 px-4 text-center">
-        {voice.preview_audio_url && <Button size="icon" variant="ghost" onClick={handlePlayPause} className="h-8 w-8 rounded-full mx-auto text-zinc-900">
+        {voice.preview_audio_url && <Button size="icon" variant="ghost" onClick={handlePlayPause} className="h-8 w-8 rounded-full mx-auto bg-blue-900 hover:bg-blue-800 text-slate-50">
             {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </Button>}
       </td>
