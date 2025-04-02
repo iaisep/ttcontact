@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
-import TestPanel from './TestPanel';
+import TestPanel from './components/test-panel';
 
 interface AgentRightColumnProps {
   agent: RetellAgent;

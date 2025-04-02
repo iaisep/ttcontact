@@ -3,10 +3,10 @@ import React from 'react';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import { Mic } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { useTestPanel } from './hooks/useTestPanel';
-import TestButtons from './components/TestButtons';
-import TranscriptPanel from './components/TranscriptPanel';
-import TestControlButton from './components/TestControlButton';
+import { useTestPanel } from '../../hooks/useTestPanel';
+import TestButtons from './TestButtons';
+import TranscriptPanel from '../TranscriptPanel';
+import TestControlButton from '../TestControlButton';
 
 interface TestPanelProps {
   agent: RetellAgent;
