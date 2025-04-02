@@ -36,6 +36,7 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
   const { t } = useLanguage();
 
   const resetFilters = () => {
+    // Reset filters to default values without reloading the page
     setSearchTerm('');
     setGenderFilter('all_genders');
     setAccentFilter('all_accents');
