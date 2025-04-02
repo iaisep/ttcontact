@@ -1,8 +1,9 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import SelectorsRow from './SelectorsRow';
 import { VoiceSelectionModal } from '../voice-selection';
+import VoiceSettingsModal from './VoiceSettingsModal';
 
 interface AgentSettingsRowProps {
   agent: RetellAgent;
@@ -89,6 +90,29 @@ export const AgentSettingsRow: React.FC<AgentSettingsRowProps> = ({
         selectedVoice={agent.voice_id}
         agent={agent}
         updateAgentField={updateAgentField}
+      />
+
+      {/* Voice Settings Modal */}
+      <VoiceSettingsModal
+        open={voiceSettings.isVoiceSettingsOpen}
+        onClose={() => voiceSettings.setIsVoiceSettingsOpen(false)}
+        voiceModel={voiceSettings.voiceModel}
+        setVoiceModel={voiceSettings.setVoiceModel}
+        voiceSpeed={voiceSettings.voiceSpeed}
+        setVoiceSpeed={voiceSettings.setVoiceSpeed}
+        voiceTemperature={voiceSettings.voiceTemperature}
+        setVoiceTemperature={voiceSettings.setVoiceTemperature}
+        voiceVolume={voiceSettings.voiceVolume}
+        setVoiceVolume={voiceSettings.setVoiceVolume}
+        onSettingsUpdated={() => {
+          // Refresh agent data to get updated voice settings
+          updateAgentField('voice_settings', {
+            voice_model: voiceSettings.voiceModel,
+            voice_speed: voiceSettings.voiceSpeed,
+            voice_temperature: voiceSettings.voiceTemperature,
+            volume: voiceSettings.voiceVolume
+          });
+        }}
       />
     </>
   );

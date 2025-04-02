@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/use-toast';
 import { useApiContext } from '@/context/ApiContext';
 import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import { useParams } from 'react-router-dom';
@@ -28,7 +28,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   const [isVoiceSettingsOpen, setIsVoiceSettingsOpen] = useState(false);
   
   // Voice settings state
-  const [voiceModel, setVoiceModel] = useState('eleven-labs-v2');
+  const [voiceModel, setVoiceModel] = useState('eleven_turbo_v2');
   const [voiceSpeed, setVoiceSpeed] = useState(1.0);
   const [voiceTemperature, setVoiceTemperature] = useState(0.3);
   const [voiceVolume, setVoiceVolume] = useState(1.0);
@@ -43,7 +43,11 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   // Update to handle RetellVoice object without triggering unnecessary fetches
   const handleVoiceChange = async (voice: RetellVoice) => {
     if (!slug) {
-      toast.error('Agent ID is missing');
+      toast({
+        title: 'Error',
+        description: 'Agent ID is missing',
+        variant: 'destructive'
+      });
       return;
     }
     
@@ -51,11 +55,17 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
       const voiceId = voice.voice_id || voice.id;
       
       if (!voiceId) {
-        toast.error('Voice ID is missing');
+        toast({
+          title: 'Error',
+          description: 'Voice ID is missing',
+          variant: 'destructive'
+        });
         return;
       }
       
-      toast.loading('Updating voice...');
+      toast({
+        title: 'Updating voice...',
+      });
       
       // Update the agent with the correct agent ID from the URL
       await fetchWithAuth(`/update-agent/${slug}`, {
@@ -80,38 +90,88 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
       
       setIsVoiceModalOpen(false);
       
-      toast.success('Voice updated successfully');
+      toast({
+        title: 'Success',
+        description: 'Voice updated successfully',
+      });
     } catch (error) {
       console.error('Error updating voice:', error);
-      toast.error('Failed to update voice');
+      toast({
+        title: 'Error',
+        description: 'Failed to update voice',
+        variant: 'destructive'
+      });
     }
   };
   
   const handleSaveVoiceSettings = async () => {
     try {
-      toast.loading('Saving voice settings...');
+      toast({
+        title: 'Saving voice settings...',
+      });
       
       // Update voice settings in the agent
       const voiceSettings = {
-        model: voiceModel,
-        speed: voiceSpeed,
-        temperature: voiceTemperature,
+        voice_model: voiceModel,
+        voice_speed: voiceSpeed,
+        voice_temperature: voiceTemperature,
         volume: voiceVolume
       };
       
       await updateAgentField('voice_settings', voiceSettings);
       setIsVoiceSettingsOpen(false);
       
-      toast.success('Voice settings saved');
+      toast({
+        title: 'Success',
+        description: 'Voice settings saved',
+      });
     } catch (error) {
       console.error('Error saving voice settings:', error);
-      toast.error('Failed to save voice settings');
+      toast({
+        title: 'Error',
+        description: 'Failed to save voice settings',
+        variant: 'destructive'
+      });
     }
   };
   
   const openVoiceModal = () => {
     setIsVoiceModalOpen(true);
   };
+  
+  // Load voice settings if available when the agent data changes
+  useEffect(() => {
+    const fetchAgentVoiceSettings = async () => {
+      if (!slug) return;
+      
+      try {
+        const agentData = await fetchWithAuth(`/get-agent/${slug}`);
+        if (agentData && agentData.voice_settings) {
+          const settings = agentData.voice_settings;
+          
+          if (settings.voice_model) {
+            setVoiceModel(settings.voice_model);
+          }
+          
+          if (settings.voice_speed !== undefined) {
+            setVoiceSpeed(settings.voice_speed);
+          }
+          
+          if (settings.voice_temperature !== undefined) {
+            setVoiceTemperature(settings.voice_temperature);
+          }
+          
+          if (settings.volume !== undefined) {
+            setVoiceVolume(settings.volume);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching agent voice settings:', error);
+      }
+    };
+    
+    fetchAgentVoiceSettings();
+  }, [slug, fetchWithAuth]);
   
   return {
     selectedVoice,
