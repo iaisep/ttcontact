@@ -37,10 +37,9 @@ export const useLanguageSelector = ({ initialLanguage, updateAgentField }: UseLa
     { value: 'multi', label: 'Multilingual', icon: '🌎' }
   ];
 
-  // Set initial language from props
+  // Update local state when initialLanguage prop changes
   useEffect(() => {
-    // If initialLanguage is provided and valid, use it
-    if (initialLanguage) {
+    if (initialLanguage && initialLanguage !== selectedLanguage) {
       setSelectedLanguage(initialLanguage);
     }
   }, [initialLanguage]);
@@ -54,10 +53,11 @@ export const useLanguageSelector = ({ initialLanguage, updateAgentField }: UseLa
       setSelectedLanguage(languageCode);
       
       // Update the agent in the database using updateAgentField
-      // This function should handle the API call to update the agent
+      // This function already handles the API call to update the agent
       await updateAgentField('language', languageCode);
       
-      toast.success(`Language updated to ${languageOptions.find(lang => lang.value === languageCode)?.label || languageCode}`);
+      const languageName = languageOptions.find(lang => lang.value === languageCode)?.label || languageCode;
+      toast.success(`Language updated to ${languageName}`);
     } catch (error) {
       console.error('Error updating language:', error);
       toast.error('Failed to update language. Please try again.');
