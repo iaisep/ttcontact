@@ -32,11 +32,21 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
 
   const [isVoiceSettingsModalOpen, setIsVoiceSettingsModalOpen] = React.useState(false);
   
-  // Default values for voice settings
-  const [voiceModel, setVoiceModel] = React.useState('eleven_turbo_v2');
-  const [voiceSpeed, setVoiceSpeed] = React.useState(1.0);
-  const [voiceTemperature, setVoiceTemperature] = React.useState(1.0);
-  const [voiceVolume, setVoiceVolume] = React.useState(1.0);
+  // We'll use the context hook to access the agent's voice settings
+  const { 
+    voiceModel, 
+    voiceSpeed, 
+    voiceTemperature, 
+    voiceVolume,
+    setVoiceModel,
+    setVoiceSpeed,
+    setVoiceTemperature,
+    setVoiceVolume,
+    handleSaveVoiceSettings
+  } = useVoiceSettings({ 
+    initialVoice: selectedVoice,
+    updateAgentField: () => {} // This will be used from the hook itself
+  });
 
   // Handle settings click - open the modal instead of using the passed function
   const handleSettingsClick = (e: React.MouseEvent) => {
@@ -98,9 +108,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
         setVoiceTemperature={setVoiceTemperature}
         voiceVolume={voiceVolume}
         setVoiceVolume={setVoiceVolume}
-        onSettingsUpdated={() => {
-          console.log('Voice settings updated');
-        }}
+        onSettingsUpdated={handleSaveVoiceSettings}
       />
     </>
   );

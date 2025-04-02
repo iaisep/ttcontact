@@ -32,6 +32,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   const [voiceSpeed, setVoiceSpeed] = useState(1.0);
   const [voiceTemperature, setVoiceTemperature] = useState(1.0);
   const [voiceVolume, setVoiceVolume] = useState(1.0);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
   
   // Voice model options with proper typing
   const voiceModelOptions: VoiceModelOption[] = [
@@ -139,10 +140,12 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   // Load voice settings if available when the agent data changes
   useEffect(() => {
     const fetchAgentVoiceSettings = async () => {
-      if (!slug) return;
+      if (!slug || settingsLoaded) return;
       
       try {
         const agentData = await fetchWithAuth(`/get-agent/${slug}`);
+        console.log('Fetched agent data for voice settings:', agentData);
+        
         if (agentData && agentData.voice_settings) {
           const settings = agentData.voice_settings;
           
@@ -161,6 +164,8 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
           if (settings.volume !== undefined) {
             setVoiceVolume(settings.volume);
           }
+          
+          setSettingsLoaded(true);
         }
       } catch (error) {
         console.error('Error fetching agent voice settings:', error);
@@ -168,7 +173,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
     };
     
     fetchAgentVoiceSettings();
-  }, [slug, fetchWithAuth]);
+  }, [slug, fetchWithAuth, settingsLoaded]);
   
   return {
     selectedVoice,
@@ -190,6 +195,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
     voiceModelOptions,
     handleVoiceChange,
     handleSaveVoiceSettings,
-    openVoiceModal
+    openVoiceModal,
+    settingsLoaded
   };
 };

@@ -45,7 +45,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   const [tempVoiceVolume, setTempVoiceVolume] = useState(voiceVolume);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Reset temporary settings when modal opens
+  // Reset temporary settings when modal opens or props change
   useEffect(() => {
     if (open) {
       setTempVoiceModel(voiceModel);
