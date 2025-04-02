@@ -1,15 +1,15 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import EditablePrompt from './EditablePrompt';
-import WelcomeMessageEditor from './WelcomeMessageEditor';
+import { WelcomeMessageEditor } from './welcome-message';
 import GeneralPromptEditor from './GeneralPromptEditor';
 import { RetellAgent, RetellLLM, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import { VoiceSelectionModal } from './voice-selection';
-import SelectorsRow from './components/SelectorsRow';
+import { AgentSettingsRow } from './components/AgentSettingsRow';
 import { useVoiceSettings } from './hooks/useVoiceSettings';
 import { useLlmSettings } from './hooks/useLlmSettings';
 import { useLanguageSelector } from './hooks/useLanguageSelector';
-import { useLanguage } from '@/context/LanguageContext';
+import { useAgentPrompt } from './hooks/useAgentPrompt';
 
 interface AgentLeftColumnProps {
   agent: RetellAgent;
@@ -26,9 +26,6 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   refreshData,
   voice
 }) => {
-  // Use language context
-  const { t } = useLanguage();
-  
   // Get the LLM ID safely
   const llmId = agent.response_engine?.llm_id || llm?.id;
   
@@ -48,83 +45,26 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
     updateAgentField 
   });
 
-  // Fetch LLM data when component mounts or llmId changes
-  useEffect(() => {
-    if (llmId) {
-      llmSettings.fetchLlmData();
-    }
-  }, [llmId]);
-
-  // Set voice avatar URL from the voice object if available
-  useEffect(() => {
-    if (voice?.avatar_url) {
-      // Ensure voiceSettings has the avatar URL
-      voiceSettings.setVoiceAvatarUrl(voice.avatar_url);
-    }
-  }, [voice]);
-
-  // Update selected voice when agent voice changes
-  useEffect(() => {
-    if (agent.voice) {
-      voiceSettings.setSelectedVoice(agent.voice);
-    } else if (voice?.name || voice?.voice_name) {
-      voiceSettings.setSelectedVoice(voice.name || voice.voice_name || 'Select Voice');
-    }
-  }, [agent.voice, voice]);
+  const promptManager = useAgentPrompt({
+    initialPrompt: agent.prompt,
+    onUpdate: (value) => updateAgentField('prompt', value)
+  });
 
   return (
-    <div className="space-y-6 ">
-      <SelectorsRow
-        // LLM settings props
-        llmId={llmId}
-        selectedModel={llmSettings.selectedModel}
-        isLlmSettingsOpen={llmSettings.isLlmSettingsOpen}
-        setIsLlmSettingsOpen={llmSettings.setIsLlmSettingsOpen}
-        llmTemperature={llmSettings.llmTemperature}
-        setLlmTemperature={llmSettings.setLlmTemperature}
-        structuredOutput={llmSettings.structuredOutput}
-        setStructuredOutput={llmSettings.setStructuredOutput}
-        highPriority={llmSettings.highPriority}
-        setHighPriority={llmSettings.setHighPriority}
-        handleLlmChange={llmSettings.handleLlmChange}
-        handleSaveLlmSettings={llmSettings.handleSaveLlmSettings}
-        
-        // Voice settings props
-        selectedVoice={voiceSettings.selectedVoice}
-        isVoiceSettingsOpen={voiceSettings.isVoiceSettingsOpen}
-        setIsVoiceSettingsOpen={voiceSettings.setIsVoiceSettingsOpen}
-        voiceModel={voiceSettings.voiceModel}
-        setVoiceModel={voiceSettings.setVoiceModel}
-        voiceSpeed={voiceSettings.voiceSpeed}
-        setVoiceSpeed={voiceSettings.setVoiceSpeed}
-        voiceTemperature={voiceSettings.voiceTemperature}
-        setVoiceTemperature={voiceSettings.setVoiceTemperature}
-        voiceVolume={voiceSettings.voiceVolume}
-        setVoiceVolume={voiceSettings.setVoiceVolume}
-        voiceModelOptions={voiceSettings.voiceModelOptions}
-        openVoiceModal={voiceSettings.openVoiceModal}
-        handleSaveVoiceSettings={voiceSettings.handleSaveVoiceSettings}
-        voiceAvatarUrl={voiceSettings.voiceAvatarUrl || voice?.avatar_url}
-        
-        // Language settings props
-        selectedLanguage={languageSelector.selectedLanguage}
-        languageOptions={languageSelector.languageOptions}
-        handleLanguageChange={languageSelector.handleLanguageChange}
-      />
-
-      {/* Voice Selection Modal */}
-      <VoiceSelectionModal
-        open={voiceSettings.isVoiceModalOpen}
-        onClose={() => voiceSettings.setIsVoiceModalOpen(false)}
-        onSelectVoice={voiceSettings.handleVoiceChange}
-        selectedVoice={agent.voice_id}
+    <div className="space-y-6">
+      <AgentSettingsRow
         agent={agent}
+        llmId={llmId}
+        llmSettings={llmSettings}
+        voiceSettings={voiceSettings}
+        languageSelector={languageSelector}
+        voice={voice}
         updateAgentField={updateAgentField}
       />
 
       {/* Display LLM General Prompt if available */}
       {llm?.general_prompt && (
-        <div className=" mt-6 bg-gray-50 p-4 rounded-lg">
+        <div className="mt-6 bg-gray-50 p-4 rounded-lg">
           <GeneralPromptEditor 
             generalPrompt={llm.general_prompt}
             onUpdate={(value) => updateAgentField('general_prompt', value)}
@@ -135,14 +75,22 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
 
       {/* Welcome Message */}
       <div className="mt-6">
-        <h3 className="text-[10px] font-medium mb-2">{t('welcome_message')}</h3>
-          <div className="text-[10px]">
-            <WelcomeMessageEditor 
-              welcomeMessage={agent.welcome_message || 'User initiates: AI remains silent until users speak first.'}
-              onUpdate={(value) => updateAgentField('welcome_message', value)}
-              llmId={llmId}
-            />
-          </div>
+        <h3 className="text-[10px] font-medium mb-2">Welcome Message</h3>
+        <div className="text-[10px]">
+          <WelcomeMessageEditor 
+            welcomeMessage={agent.welcome_message || 'User initiates: AI remains silent until users speak first.'}
+            onUpdate={(value) => updateAgentField('welcome_message', value)}
+            llmId={llmId}
+          />
+        </div>
+      </div>
+
+      {/* Agent Prompt */}
+      <div className="mt-6">
+        <EditablePrompt
+          prompt={promptManager.prompt}
+          onUpdate={promptManager.updatePrompt}
+        />
       </div>
     </div>
   );
