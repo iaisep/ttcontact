@@ -66,6 +66,8 @@ export const AgentSettingsRow: React.FC<AgentSettingsRowProps> = ({
       structuredOutput={llmSettings.structuredOutput}
       highPriority={llmSettings.highPriority}
       handleLlmChange={llmSettings.handleLlmChange}
+      isLlmSettingsOpen={llmSettings.isLlmSettingsOpen}
+      setIsLlmSettingsOpen={llmSettings.setIsLlmSettingsOpen}
       
       // Voice Settings
       selectedVoice={voiceSettings.selectedVoice}

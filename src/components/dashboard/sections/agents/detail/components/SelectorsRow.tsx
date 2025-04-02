@@ -15,6 +15,8 @@ interface LlmSettings {
   structuredOutput: boolean;
   highPriority: boolean;
   handleLlmChange: (newLlmId: string) => Promise<void>;
+  isLlmSettingsOpen?: boolean;
+  setIsLlmSettingsOpen?: (open: boolean) => void;
   onLlmSettingsUpdated?: () => void;
 }
 
@@ -54,6 +56,8 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   structuredOutput = false,
   highPriority = false,
   handleLlmChange,
+  isLlmSettingsOpen: providedIsLlmSettingsOpen,
+  setIsLlmSettingsOpen: providedSetIsLlmSettingsOpen,
   onLlmSettingsUpdated,
   
   // Voice Settings
@@ -82,7 +86,11 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   agent
 }) => {
   const { t } = useLanguage();
-  const [isLlmSettingsOpen, setIsLlmSettingsOpen] = React.useState(false);
+  const [internalLlmSettingsOpen, setInternalLlmSettingsOpen] = React.useState(false);
+
+  // Use provided state if available, otherwise use internal state
+  const isLlmSettingsOpen = providedIsLlmSettingsOpen !== undefined ? providedIsLlmSettingsOpen : internalLlmSettingsOpen;
+  const setIsLlmSettingsOpen = providedSetIsLlmSettingsOpen || setInternalLlmSettingsOpen;
 
   return (
     <div className="grid grid-cols-3 gap-2 mb-4">
