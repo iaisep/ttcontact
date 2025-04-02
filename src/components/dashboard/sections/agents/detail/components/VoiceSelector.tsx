@@ -5,6 +5,12 @@ import { User, Settings } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useVoiceSettings } from '../hooks/useVoiceSettings';
 import VoiceSettingsModal from './VoiceSettingsModal';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip';
 
 interface VoiceSelectorProps {
   selectedVoice: string;
@@ -63,12 +69,21 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
           </span>
         </div>
         
-        <div 
-          className="flex items-center justify-center h-6 w-6 sm:h-6 sm:w-6 ml-1 sm:ml-2 text-gray-500 hover:text-gray-700 flex-shrink-0"
-          onClick={handleSettingsClick}
-        >
-          <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div 
+                className="flex items-center justify-center h-6 w-6 sm:h-6 sm:w-6 ml-1 sm:ml-2 text-gray-500 hover:text-gray-700 flex-shrink-0"
+                onClick={handleSettingsClick}
+              >
+                <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Voice Settings</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </Button>
 
       {/* Voice Settings Modal */}
