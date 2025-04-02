@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/use-toast';
 import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useParams } from 'react-router-dom';
@@ -47,20 +47,19 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   const { fetchWithAuth } = useApiContext();
   const { slug } = useParams<{ slug: string }>();
   
-  const [tempVoiceModel, setTempVoiceModel] = useState(voiceModel || 'eleven_turbo_v2');
-  const [tempVoiceSpeed, setTempVoiceSpeed] = useState(voiceSpeed || 1.0);
-  const [tempVoiceTemperature, setTempVoiceTemperature] = useState(voiceTemperature || 0.3);
-  const [tempVoiceVolume, setTempVoiceVolume] = useState(voiceVolume || 1.0);
+  const [tempVoiceModel, setTempVoiceModel] = useState(voiceModel);
+  const [tempVoiceSpeed, setTempVoiceSpeed] = useState(voiceSpeed);
+  const [tempVoiceTemperature, setTempVoiceTemperature] = useState(voiceTemperature);
+  const [tempVoiceVolume, setTempVoiceVolume] = useState(voiceVolume);
   const [isSaving, setIsSaving] = useState(false);
-  const [hoveredSlider, setHoveredSlider] = useState<string | null>(null);
 
   // Reset temporary settings when modal opens
   useEffect(() => {
     if (open) {
-      setTempVoiceModel(voiceModel || 'eleven_turbo_v2');
-      setTempVoiceSpeed(voiceSpeed || 1.0);
-      setTempVoiceTemperature(voiceTemperature || 0.3);
-      setTempVoiceVolume(voiceVolume || 1.0);
+      setTempVoiceModel(voiceModel);
+      setTempVoiceSpeed(voiceSpeed);
+      setTempVoiceTemperature(voiceTemperature);
+      setTempVoiceVolume(voiceVolume);
     }
   }, [open, voiceModel, voiceSpeed, voiceTemperature, voiceVolume]);
 
@@ -75,30 +74,27 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
 
   const handleSave = async () => {
     if (!slug) {
-      toast.error('Agent ID is missing');
+      toast({
+        title: 'Error',
+        description: 'Agent ID is missing',
+        variant: 'destructive'
+      });
       return;
     }
 
     setIsSaving(true);
     
     try {
-      // Prepare payload according to the required format
-      const payload = {
-        voice_speed: tempVoiceSpeed,
-        volume: tempVoiceVolume,
-        voice_temperature: tempVoiceTemperature,
-        voice_model: tempVoiceModel
-      };
-
-      console.log('Updating agent voice settings with payload:', payload);
-      
-      // Make the API call to update the agent
-      const response = await fetchWithAuth(`/update-agent/${slug}`, {
+      // Update the voice settings on the server
+      await fetchWithAuth(`/update-agent/${slug}`, {
         method: 'PATCH',
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          voice_speed: tempVoiceSpeed,
+          volume: tempVoiceVolume,
+          voice_temperature: tempVoiceTemperature,
+          voice_model: tempVoiceModel
+        })
       });
-
-      console.log('Update agent response:', response);
 
       // Update the parent component's state
       setVoiceModel(tempVoiceModel);
@@ -111,18 +107,26 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
         onSettingsUpdated();
       }
 
-      toast.success('Voice settings updated successfully');
+      toast({
+        title: 'Success',
+        description: 'Voice settings updated successfully',
+      });
+
       onClose();
     } catch (error) {
       console.error('Error updating voice settings:', error);
-      toast.error('Failed to update voice settings');
+      toast({
+        title: 'Error',
+        description: 'Failed to update voice settings',
+        variant: 'destructive'
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const formatSliderValue = (value: number) => {
-    return value.toFixed(2);
+  const formatSliderValue = (value: number, min: number, max: number, precision: number = 2) => {
+    return value.toFixed(precision);
   };
 
   return (
@@ -159,11 +163,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               <Label htmlFor="voice-speed" className="text-sm">Voice Speed</Label>
               <div className="text-xs text-muted-foreground flex items-center gap-2">
                 <span className="text-muted-foreground text-xs">Slow</span>
-                {hoveredSlider === 'speed' ? (
-                  <span className="font-medium">{formatSliderValue(tempVoiceSpeed)}</span>
-                ) : (
-                  <span className="font-medium">{tempVoiceSpeed.toFixed(2)}</span>
-                )}
+                <span className="font-medium">{formatSliderValue(tempVoiceSpeed, 0.5, 2)}</span>
                 <span className="text-muted-foreground text-xs">Fast</span>
               </div>
             </div>
@@ -174,8 +174,6 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               step={0.01}
               value={[tempVoiceSpeed]}
               onValueChange={(values) => setTempVoiceSpeed(values[0])}
-              onMouseEnter={() => setHoveredSlider('speed')}
-              onMouseLeave={() => setHoveredSlider(null)}
             />
           </div>
 
@@ -184,11 +182,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               <Label htmlFor="voice-temperature" className="text-sm">Voice Temperature</Label>
               <div className="text-xs text-muted-foreground flex items-center gap-2">
                 <span className="text-muted-foreground text-xs">Calm</span>
-                {hoveredSlider === 'temperature' ? (
-                  <span className="font-medium">{formatSliderValue(tempVoiceTemperature)}</span>
-                ) : (
-                  <span className="font-medium">{tempVoiceTemperature.toFixed(2)}</span>
-                )}
+                <span className="font-medium">{formatSliderValue(tempVoiceTemperature, 0, 2)}</span>
                 <span className="text-muted-foreground text-xs">Emotional</span>
               </div>
             </div>
@@ -199,8 +193,6 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               step={0.01}
               value={[tempVoiceTemperature]}
               onValueChange={(values) => setTempVoiceTemperature(values[0])}
-              onMouseEnter={() => setHoveredSlider('temperature')}
-              onMouseLeave={() => setHoveredSlider(null)}
             />
           </div>
 
@@ -209,11 +201,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               <Label htmlFor="voice-volume" className="text-sm">Voice Volume</Label>
               <div className="text-xs text-muted-foreground flex items-center gap-2">
                 <span className="text-muted-foreground text-xs">Low</span>
-                {hoveredSlider === 'volume' ? (
-                  <span className="font-medium">{formatSliderValue(tempVoiceVolume)}</span>
-                ) : (
-                  <span className="font-medium">{tempVoiceVolume.toFixed(2)}</span>
-                )}
+                <span className="font-medium">{formatSliderValue(tempVoiceVolume, 0, 2)}</span>
                 <span className="text-muted-foreground text-xs">High</span>
               </div>
             </div>
@@ -224,8 +212,6 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               step={0.01}
               value={[tempVoiceVolume]}
               onValueChange={(values) => setTempVoiceVolume(values[0])}
-              onMouseEnter={() => setHoveredSlider('volume')}
-              onMouseLeave={() => setHoveredSlider(null)}
             />
           </div>
         </div>
@@ -241,7 +227,6 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
           <Button 
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-black text-white hover:bg-gray-800"
           >
             Save
           </Button>

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/use-toast';
 import { useApiContext } from '@/context/ApiContext';
 import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import { useParams } from 'react-router-dom';
@@ -27,7 +27,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isVoiceSettingsOpen, setIsVoiceSettingsOpen] = useState(false);
   
-  // Voice settings state with default values
+  // Voice settings state
   const [voiceModel, setVoiceModel] = useState('eleven_turbo_v2');
   const [voiceSpeed, setVoiceSpeed] = useState(1.0);
   const [voiceTemperature, setVoiceTemperature] = useState(0.3);
@@ -35,18 +35,19 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   
   // Voice model options with proper typing
   const voiceModelOptions: VoiceModelOption[] = [
-    { value: 'eleven_turbo_v2', label: 'Auto(Elevenlabs Turbo V2)', id: 'eleven_turbo_v2', description: 'English only, fast, high quality' },
-    { value: 'eleven_turbo_v2', label: 'Elevenlabs Turbo V2', id: 'eleven_turbo_v2', description: 'English only, fast, high quality' },
-    { value: 'eleven_flash_v2', label: 'Elevenlabs Flash V2', id: 'eleven_flash_v2', description: 'English only, fastest, medium quality' },
-    { value: 'eleven_turbo_v2_5', label: 'Elevenlabs Turbo V2.5', id: 'eleven_turbo_v2_5', description: 'Multilingual, fast, high quality' },
-    { value: 'eleven_flash_v2_5', label: 'Elevenlabs Flash V2.5', id: 'eleven_flash_v2_5', description: 'Multilingual, fastest, medium quality' },
-    { value: 'eleven_multilingual_v2', label: 'Elevenlabs Multilingual v2', id: 'eleven_multilingual_v2', description: 'Multilingual, slow, highest quality' }
+    { value: 'eleven-labs-v2', label: 'ElevenLabs V2', id: 'eleven-labs-v2', description: 'High quality voice synthesis' },
+    { value: 'playht', label: 'PlayHT', id: 'playht', description: 'Fast voice synthesis' },
+    { value: 'deepgram', label: 'Deepgram', id: 'deepgram', description: 'Accurate voice synthesis' }
   ];
   
   // Update to handle RetellVoice object without triggering unnecessary fetches
   const handleVoiceChange = async (voice: RetellVoice) => {
     if (!slug) {
-      toast.error('Agent ID is missing');
+      toast({
+        title: 'Error',
+        description: 'Agent ID is missing',
+        variant: 'destructive'
+      });
       return;
     }
     
@@ -54,11 +55,17 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
       const voiceId = voice.voice_id || voice.id;
       
       if (!voiceId) {
-        toast.error('Voice ID is missing');
+        toast({
+          title: 'Error',
+          description: 'Voice ID is missing',
+          variant: 'destructive'
+        });
         return;
       }
       
-      toast.success('Updating voice...');
+      toast({
+        title: 'Updating voice...',
+      });
       
       // Update the agent with the correct agent ID from the URL
       await fetchWithAuth(`/update-agent/${slug}`, {
@@ -83,52 +90,48 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
       
       setIsVoiceModalOpen(false);
       
-      toast.success('Voice updated successfully');
+      toast({
+        title: 'Success',
+        description: 'Voice updated successfully',
+      });
     } catch (error) {
       console.error('Error updating voice:', error);
-      toast.error('Failed to update voice');
+      toast({
+        title: 'Error',
+        description: 'Failed to update voice',
+        variant: 'destructive'
+      });
     }
   };
   
   const handleSaveVoiceSettings = async () => {
-    if (!slug) {
-      toast.error('Agent ID is missing');
-      return;
-    }
-    
     try {
-      toast.success('Saving voice settings...');
-      
-      // Prepare payload for the API call
-      const payload = {
-        voice_speed: voiceSpeed,
-        volume: voiceVolume,
-        voice_temperature: voiceTemperature,
-        voice_model: voiceModel
-      };
-      
-      console.log('Updating agent voice settings with payload:', payload);
-      
-      // Make the API call to update the agent
-      await fetchWithAuth(`/update-agent/${slug}`, {
-        method: 'PATCH',
-        body: JSON.stringify(payload)
+      toast({
+        title: 'Saving voice settings...',
       });
       
-      // Update the agent field in the parent component
-      updateAgentField('voice_settings', {
+      // Update voice settings in the agent
+      const voiceSettings = {
         voice_model: voiceModel,
         voice_speed: voiceSpeed,
         voice_temperature: voiceTemperature,
         volume: voiceVolume
-      });
+      };
       
+      await updateAgentField('voice_settings', voiceSettings);
       setIsVoiceSettingsOpen(false);
       
-      toast.success('Voice settings saved');
+      toast({
+        title: 'Success',
+        description: 'Voice settings saved',
+      });
     } catch (error) {
       console.error('Error saving voice settings:', error);
-      toast.error('Failed to save voice settings');
+      toast({
+        title: 'Error',
+        description: 'Failed to save voice settings',
+        variant: 'destructive'
+      });
     }
   };
   
