@@ -51,7 +51,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8"> {/* Increased from space-y-6 to space-y-8 */}
       <AgentSettingsRow
         agent={agent}
         llmId={llmId}
@@ -64,7 +64,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
 
       {/* Display LLM General Prompt if available */}
       {llm?.general_prompt && (
-        <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+        <div className="mt-8 bg-gray-50 p-4 rounded-lg"> {/* Increased from mt-6 to mt-8 */}
           <GeneralPromptEditor 
             generalPrompt={llm.general_prompt}
             onUpdate={(value) => updateAgentField('general_prompt', value)}
@@ -74,7 +74,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
       )}
 
       {/* Welcome Message */}
-      <div className="mt-6">
+      <div className="mt-8"> {/* Increased from mt-6 to mt-8 */}
         <h3 className="text-[10px] font-medium mb-2">Welcome Message</h3>
         <div className="text-[10px]">
           <WelcomeMessageEditor 
@@ -86,7 +86,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
       </div>
 
       {/* Agent Prompt */}
-      <div className="mt-6">
+      <div className="mt-8"> {/* Increased from mt-6 to mt-8 */}
         <EditablePrompt
           prompt={promptManager.prompt}
           onUpdate={promptManager.updatePrompt}
@@ -97,3 +97,4 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
 };
 
 export default AgentLeftColumn;
+
