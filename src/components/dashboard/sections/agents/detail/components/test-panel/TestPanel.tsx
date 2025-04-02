@@ -1,13 +1,12 @@
 
 import React, { useState } from 'react';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
-import { Mic, Info, Volume2, Clock } from 'lucide-react';
+import { Mic, Phone, TestTube } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTestPanel } from '../../hooks/useTestPanel';
 import TestButtons from './TestButtons';
 import TranscriptPanel from '../TranscriptPanel';
 import TestControlButton from '../TestControlButton';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
@@ -22,7 +21,6 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
   const { t } = useLanguage();
   const [audioVolume, setAudioVolume] = useState<number>(80);
   const [recordingDuration, setRecordingDuration] = useState<number>(0);
-  const [displayInfoTip, setDisplayInfoTip] = useState<boolean>(true);
   
   const {
     isLoading,
@@ -57,27 +55,8 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const dismissInfoTip = () => {
-    setDisplayInfoTip(false);
-  };
-
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
-      {displayInfoTip && (
-        <Alert className="bg-blue-50 border-blue-200 mb-4">
-          <Info className="h-4 w-4 text-blue-500" />
-          <AlertDescription className="text-xs text-blue-700 flex justify-between items-center">
-            <span>{t('test_mode_info_message') || 'Test your agent to ensure it responds correctly'}</span>
-            <button 
-              onClick={dismissInfoTip}
-              className="text-blue-600 hover:underline text-xs"
-            >
-              {t('dismiss') || 'Dismiss'}
-            </button>
-          </AlertDescription>
-        </Alert>
-      )}
-      
       <TestButtons 
         isLoading={isLoading}
         isRecording={isRecording}
