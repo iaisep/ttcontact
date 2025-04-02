@@ -9,6 +9,7 @@ import ProviderTabs from './ProviderTabs';
 import LoadingState from './LoadingState';
 import EmptyState from './EmptyState';
 import { Voice } from '@/components/dashboard/sections/agents/detail/voice-selection/types';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface VoiceSelectorProps {
   open: boolean;
@@ -50,7 +51,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Select Voice</h2>
           <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
@@ -84,13 +85,13 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
               {voices.length === 0 ? (
                 <EmptyState searchActive={isSearchActive} />
               ) : (
-                <div className="mt-6">
+                <ScrollArea className="h-[400px] mt-6">
                   <VoiceGrid
                     voices={voices}
                     selectedVoiceId={selectedVoiceId}
                     onSelectVoice={handleVoiceSelect}
                   />
-                </div>
+                </ScrollArea>
               )}
             </>
           )}

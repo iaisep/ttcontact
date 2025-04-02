@@ -1,102 +1,108 @@
 
 import { useState, useEffect } from 'react';
-import { useApiContext } from '@/context/ApiContext';
-import { toast } from 'sonner';
-import { Voice } from '@/components/dashboard/sections/agents/detail/voice-selection/types';
+import { Voice, mockVoices } from '@/components/dashboard/sections/agents/detail/voice-selection/types';
 
 export const useVoices = () => {
-  const { fetchWithAuth } = useApiContext();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [allVoices, setAllVoices] = useState<Voice[]>([]);
   const [voices, setVoices] = useState<Voice[]>([]);
-  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
+  const [activeProvider, setActiveProvider] = useState<string>('elevenlabs');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [genderFilter, setGenderFilter] = useState<string>('all');
+  const [accentFilter, setAccentFilter] = useState<string>('all');
 
-  // Filters state
-  const [activeProvider, setActiveProvider] = useState('elevenlabs');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [genderFilter, setGenderFilter] = useState('all');
-  const [accentFilter, setAccentFilter] = useState('all');
-
+  // Mock fetch function (replace with actual API call)
   const fetchVoices = async () => {
     setIsLoading(true);
     setError(null);
     
     try {
-      const response = await fetchWithAuth('/list-voices');
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      if (response && Array.isArray(response)) {
-        setVoices(response);
-      } else if (response && response.voices && Array.isArray(response.voices)) {
-        setVoices(response.voices);
-      } else {
-        console.error('Unexpected response format:', response);
-        setVoices([]);
-        setError('Unexpected response format');
-      }
+      // In a real app, you would fetch from an API here
+      const fetchedVoices = mockVoices;
+      
+      setAllVoices(fetchedVoices);
+      filterVoices(fetchedVoices, activeProvider, searchQuery, genderFilter, accentFilter);
+      
     } catch (error) {
       console.error('Error fetching voices:', error);
-      setError('Error loading voices');
-      toast.error('Error loading voices');
+      setError('Failed to load voices. Please try again.');
     } finally {
       setIsLoading(false);
-      setHasInitiallyLoaded(true);
     }
   };
 
-  // Load voices on initial mount
-  useEffect(() => {
-    if (!hasInitiallyLoaded) {
-      fetchVoices();
-    }
-  }, [hasInitiallyLoaded]);
-
+  // Reset all filters
   const resetFilters = () => {
     setSearchQuery('');
     setGenderFilter('all');
     setAccentFilter('all');
+    filterVoices(allVoices, activeProvider, '', 'all', 'all');
   };
 
-  // Filter voices based on user selections
-  const getFilteredVoices = () => {
-    return voices.filter(voice => {
-      // Filter by provider
-      if (activeProvider === 'elevenlabs' && !voice.id?.includes('eleven')) {
-        return false;
-      }
-      if (activeProvider === 'playht' && !voice.id?.includes('playht')) {
-        return false;
-      }
-      if (activeProvider === 'openai' && !voice.id?.includes('openai')) {
-        return false;
-      }
-
-      // Filter by search query
-      if (searchQuery && !(
-        voice.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        voice.id?.toLowerCase().includes(searchQuery.toLowerCase())
-      )) {
-        return false;
-      }
-
-      // Filter by gender
-      if (genderFilter !== 'all' && voice.gender?.toLowerCase() !== genderFilter.toLowerCase()) {
-        return false;
-      }
-
-      // Filter by accent
-      if (accentFilter !== 'all' && voice.accent?.toLowerCase() !== accentFilter.toLowerCase()) {
-        return false;
-      }
-
-      return true;
-    });
+  // Filter voices based on active provider and search query
+  const filterVoices = (
+    voices: Voice[], 
+    provider: string, 
+    search: string, 
+    gender: string, 
+    accent: string
+  ) => {
+    let filtered = [...voices];
+    
+    // Filter by provider
+    if (provider !== 'all') {
+      filtered = filtered.filter(voice => {
+        const voiceProvider = voice.provider.toLowerCase();
+        return voiceProvider.includes(provider.toLowerCase());
+      });
+    }
+    
+    // Filter by search query
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter(voice => 
+        voice.name.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Filter by gender
+    if (gender !== 'all') {
+      filtered = filtered.filter(voice => 
+        voice.gender?.toLowerCase() === gender.toLowerCase()
+      );
+    }
+    
+    // Filter by accent
+    if (accent !== 'all') {
+      filtered = filtered.filter(voice => 
+        voice.accent?.toLowerCase() === accent.toLowerCase()
+      );
+    }
+    
+    setVoices(filtered);
   };
+
+  // Fetch voices on component mount
+  useEffect(() => {
+    fetchVoices();
+  }, []);
+
+  // Apply filters when filter criteria change
+  useEffect(() => {
+    if (allVoices.length > 0) {
+      filterVoices(allVoices, activeProvider, searchQuery, genderFilter, accentFilter);
+    }
+  }, [activeProvider, searchQuery, genderFilter, accentFilter]);
 
   return {
     isLoading,
     error,
+    voices,
     fetchVoices,
-    voices: getFilteredVoices(),
     activeProvider,
     setActiveProvider,
     searchQuery,
