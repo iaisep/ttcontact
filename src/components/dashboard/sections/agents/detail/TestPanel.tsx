@@ -1,11 +1,12 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/context/LanguageContext';
+import React from 'react';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
-import { Phone, TestTube, Mic, PhoneOff, Square } from 'lucide-react';
-import { useApiContext } from '@/context/ApiContext';
-import { toast } from 'sonner';
+import { Mic } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
+import { useTestPanel } from './hooks/useTestPanel';
+import TestButtons from './components/TestButtons';
+import TranscriptPanel from './components/TranscriptPanel';
+import TestControlButton from './components/TestControlButton';
 
 interface TestPanelProps {
   agent: RetellAgent;
@@ -14,169 +15,30 @@ interface TestPanelProps {
 
 const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
   const { t } = useLanguage();
-  const { fetchWithAuth } = useApiContext();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState<string>('');
-  const [callId, setCallId] = useState<string | null>(null);
-  const audioElementRef = useRef<HTMLAudioElement | null>(null);
-
-  // Efecto para limpiar cualquier llamada activa cuando el componente se desmonta
-  useEffect(() => {
-    return () => {
-      if (callId) {
-        // Intentar finalizar la llamada si existe una activa
-        fetchWithAuth(`/end-call/${callId}`, { method: 'POST' })
-          .catch((error) => console.error('Error finalizando llamada:', error));
-      }
-    };
-  }, [callId, fetchWithAuth]);
-
-  const handleAudioTest = async () => {
-    setIsLoading(true);
-    try {
-      toast.info(t('testing_audio'));
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success(t('audio_test_complete'));
-    } catch (error) {
-      console.error('Error testing audio:', error);
-      toast.error(t('error_testing_audio'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLlmTest = async () => {
-    setIsLoading(true);
-    try {
-      toast.info(t('testing_llm'));
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success(t('llm_test_complete'));
-    } catch (error) {
-      console.error('Error testing LLM:', error);
-      toast.error(t('error_testing_llm'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleCodeTest = async () => {
-    setIsLoading(true);
-    try {
-      toast.info(t('testing_code'));
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success(t('code_test_complete'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleFullTest = async () => {
-    if (isRecording) {
-      // Si ya estamos grabando, detener la llamada
-      setIsRecording(false);
-      toast.info(t('processing_test'));
-      
-      if (callId) {
-        try {
-          // Intentar finalizar la llamada existente
-          await fetchWithAuth(`/end-call/${callId}`, { method: 'POST' });
-          console.log('Llamada finalizada correctamente');
-          setCallId(null);
-        } catch (error) {
-          console.error('Error finalizando llamada:', error);
-        }
-      }
-      
-      setTimeout(() => {
-        toast.success(t('test_complete'));
-        setTranscript('');
-      }, 2000);
-    } else {
-      // Iniciar una nueva llamada
-      setIsLoading(true);
-      try {
-        // Hacer la llamada al endpoint v2/create-web-call
-        const response = await fetchWithAuth('/v2/create-web-call', {
-          method: 'POST',
-          body: JSON.stringify({
-            agent_id: agent.agent_id
-          })
-        });
-        
-        console.log('Web call response:', response);
-        setCallId(response.call_id);
-        
-        // Solicitar permiso para usar el micrófono
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          // Solo solicitamos acceso al micrófono para iniciar el permiso
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          
-          // Configurar el audio para la llamada
-          if (response.audio_url && !audioElementRef.current) {
-            const audioElement = new Audio(response.audio_url);
-            audioElement.autoplay = true;
-            audioElementRef.current = audioElement;
-          }
-          
-          setIsRecording(true);
-          toast.success(t('call_connected'));
-          
-          // Simular transcripción gradual para propósitos de demostración
-          setTranscript('');
-          
-          setTimeout(() => {
-            setTranscript('¡Hola! Muy buen día, soy Karla Beltrán, asesora de admisiones de la Universidad Isép.');
-          }, 1000);
-          
-          setTimeout(() => {
-            setTranscript('¡Hola! Muy buen día, soy Karla Beltrán, asesora de admisiones de la Universidad Isép. Espero que estés teniendo');
-          }, 3000);
-          
-          setTimeout(() => {
-            if (isRecording) {
-              setTranscript('¡Hola! Muy buen día, soy Karla Beltrán, asesora de admisiones de la Universidad Isép. Espero que estés teniendo un excelente día. Vi que estás interesado en nuestras formaciones y quiero entender mejor lo que buscas para ayudarte a encontrar la mejor opción. ¿Cómo puedo ayudarte hoy?');
-            }
-          }, 5000);
-        } else {
-          throw new Error('Tu navegador no soporta acceso al micrófono');
-        }
-      } catch (error) {
-        console.error('Error iniciando la llamada web:', error);
-        toast.error(error.message || t('error_starting_call'));
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+  const {
+    isLoading,
+    isRecording,
+    transcript,
+    handleAudioTest,
+    handleLlmTest,
+    handleCodeTest,
+    handleFullTest
+  } = useTestPanel(agent);
 
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
-      <div className="w-full grid grid-cols-3 gap-2">
-        <Button variant="outline" onClick={handleAudioTest} className="w-full flex items-center justify-center text-[10px]" disabled={isLoading || isRecording}>
-          <Phone className="mr-2 h-4 w-4" /> 
-          {t('audio')}
-        </Button>
-        
-        <Button variant="outline" onClick={handleLlmTest} className="w-full flex items-center justify-center text-[10px]" disabled={isLoading || isRecording}>
-          <TestTube className="mr-2 h-4 w-4" /> 
-          {t('llm')}
-        </Button>
-        
-        <Button variant="outline" onClick={handleCodeTest} className="w-full flex items-center justify-center text-[10px]" disabled={isLoading || isRecording}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" className="mr-2 h-4 w-4">
-            <path d="M4 14.5V11.725C4 11.4266 3.88147 11.1405 3.6705 10.9295C3.45952 10.7185 3.17337 10.6 2.875 10.6H2.5V9.4H2.875C3.02274 9.4 3.16903 9.3709 3.30552 9.31436C3.44201 9.25783 3.56603 9.17496 3.6705 9.0705C3.77496 8.96603 3.85783 8.84201 3.91436 8.70552C3.9709 8.56903 4 8.42274 4 8.275V5.5C4 4.90326 4.23705 4.33097 4.65901 3.90901C5.08097 3.48705 5.65326 3.25 6.25 3.25H7V4.75H6.25C6.05109 4.75 5.86032 4.82902 5.71967 4.96967C5.57902 5.11032 5.5 5.30109 5.5 5.5V8.575C5.50008 8.89076 5.40051 9.19849 5.21548 9.45435C5.03045 9.71022 4.76939 9.90117 4.4695 10C4.76939 10.0988 5.03045 10.2898 5.21548 10.5456C5.40051 10.8015 5.50008 11.1092 5.5 11.425V14.5C5.5 14.6989 5.57902 14.8897 5.71967 15.0303C5.86032 15.171 6.05109 15.25 6.25 15.25H7V16.75H6.25C5.65326 16.75 5.08097 16.5129 4.65901 16.091C4.23705 15.669 4 15.0967 4 14.5ZM16 11.725V14.5C16 15.0967 15.7629 15.669 15.341 16.091C14.919 16.5129 14.3467 16.75 13.75 16.75H13V15.25H13.75C13.9489 15.25 14.1397 15.171 14.2803 15.0303C14.421 14.8897 14.5 14.6989 14.5 14.5V11.425C14.4999 11.1092 14.5995 10.8015 14.7845 10.5456C14.9696 10.2898 15.2306 10.0988 15.5305 10C15.2306 9.90117 14.9696 9.71022 14.7845 9.45435C14.5995 9.19849 14.4999 8.89076 14.5 8.575V5.5C14.5 5.30109 14.421 5.11032 14.2803 4.96967C14.1397 4.82902 13.9489 4.75 13.75 4.75H13V3.25H13.75C14.3467 3.25 14.919 3.48705 15.341 3.90901C15.7629 4.33097 16 4.90326 16 5.5V8.275C16 8.57337 16.1185 8.85952 16.3295 9.0705C16.5405 9.28147 16.8266 9.4 17.125 9.4H17.5V10.6H17.125C16.8266 10.6 16.5405 10.7185 16.3295 10.9295C16.1185 11.1405 16 11.4266 16 11.725Z" fill="black"/>
-          </svg>
-          {t('code')}
-        </Button>
-      </div>
+      <TestButtons 
+        isLoading={isLoading}
+        isRecording={isRecording}
+        onAudioTest={handleAudioTest}
+        onLlmTest={handleLlmTest}
+        onCodeTest={handleCodeTest}
+      />
       
-      {/* Transcription panel */}
-      {(transcript || isRecording) && (
-        <div className="w-full rounded-md bg-blue-50 p-4 text-sm text-blue-700 mt-2 mb-6 h-[200px] overflow-y-auto">
-          {transcript}
-        </div>
-      )}
+      <TranscriptPanel 
+        transcript={transcript} 
+        isVisible={transcript !== '' || isRecording} 
+      />
       
       <div className={`mb-4 rounded-full bg-gray-100 p-6 flex items-center justify-center ${isRecording ? 'bg-red-100 animate-pulse' : ''}`}>
         <Mic className={`h-8 w-8 ${isRecording ? 'text-red-500' : 'text-gray-400'}`} />
@@ -184,24 +46,11 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
       
       <p className="text-gray-500 mb-4">{isRecording ? t('listening') : t('test_your_agent')}</p>
       
-      {isRecording ? (
-        <Button 
-          onClick={handleFullTest}
-          variant="outline"
-          className="w-40 bg-white text-red-500 border-red-500 hover:bg-red-50"
-        >
-          <Square className="mr-2 h-4 w-4" />
-          {t('end_the_call')}
-        </Button>
-      ) : (
-        <Button 
-          onClick={handleFullTest}
-          variant="default"
-          disabled={isLoading}
-        >
-          {t('test')}
-        </Button>
-      )}
+      <TestControlButton 
+        isRecording={isRecording}
+        isLoading={isLoading}
+        onTest={handleFullTest}
+      />
     </div>
   );
 };
