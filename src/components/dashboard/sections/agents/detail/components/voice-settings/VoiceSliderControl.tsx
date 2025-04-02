@@ -53,7 +53,6 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
         onValueChange={(values) => onValueChange(values[0])}
         onMouseEnter={() => setIsActive(true)}
         onMouseLeave={() => setIsActive(false)}
-        className={isActive ? "cursor-pointer" : ""}
       />
     </div>
   );
