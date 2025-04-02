@@ -85,13 +85,13 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         </div>
       </div>
 
-      {/* Agent Prompt */}
+      {/* Agent Prompt
       <div className="mt-6">
         <EditablePrompt
           prompt={promptManager.prompt}
           onUpdate={promptManager.updatePrompt}
         />
-      </div>
+      </div> */}
     </div>
   );
 };
