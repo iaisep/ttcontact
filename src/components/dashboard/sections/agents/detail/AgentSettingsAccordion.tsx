@@ -46,7 +46,8 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   };
 
   const handleVoiceSelect = (voice: Voice) => {
-    updateAgentField('voice_id', voice.voice_id);
+    // Use the id property if voice_id is not available
+    updateAgentField('voice_id', voice.voice_id || voice.id);
   };
   
   return (

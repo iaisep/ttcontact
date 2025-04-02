@@ -76,7 +76,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
 
           <LoadingState 
             isLoading={isLoading} 
-            error={error} 
+            error={error ? error.toString() : null} 
             onRetry={fetchVoices} 
           />
 
