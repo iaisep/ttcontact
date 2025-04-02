@@ -34,7 +34,6 @@ export const useAgentDetails = (agentId: string | undefined) => {
     isLoading: false,
     error: null,
     availableVoices: []
-
   });
 
   const fetchAgentData = async () => {
@@ -85,7 +84,7 @@ export const useAgentDetails = (agentId: string | undefined) => {
         llm: llmData,
         voice: voiceData,
         knowledgeBases: agentKnowledgeBases,
-        availableVoices: voiceList ?? [],
+        availableVoices: voicesList ?? [],
         isLoading: false
       }));
       
