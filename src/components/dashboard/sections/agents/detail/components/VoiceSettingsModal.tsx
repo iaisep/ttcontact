@@ -2,19 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useParams } from 'react-router-dom';
-
-interface VoiceModel {
-  id: string;
-  label: string;
-  description: string;
-}
+import { VoiceModelSelector, VoiceSliderControl } from './voice-settings';
 
 interface VoiceSettingsModalProps {
   open: boolean;
@@ -52,7 +44,6 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   const [tempVoiceTemperature, setTempVoiceTemperature] = useState(voiceTemperature);
   const [tempVoiceVolume, setTempVoiceVolume] = useState(voiceVolume);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeSlider, setActiveSlider] = useState<string | null>(null);
 
   // Reset temporary settings when modal opens
   useEffect(() => {
@@ -63,15 +54,6 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
       setTempVoiceVolume(voiceVolume);
     }
   }, [open, voiceModel, voiceSpeed, voiceTemperature, voiceVolume]);
-
-  const voiceModels: VoiceModel[] = [
-    { id: 'eleven_turbo_v2', label: 'Auto(Elevenlabs Turbo V2)', description: 'English only, fast, high quality' },
-    { id: 'eleven_turbo_v2', label: 'Elevenlabs Turbo V2', description: 'English only, fast, high quality' },
-    { id: 'eleven_flash_v2', label: 'Elevenlabs Flash V2', description: 'English only, fastest, medium quality' },
-    { id: 'eleven_turbo_v2_5', label: 'Elevenlabs Turbo V2.5', description: 'Multilingual, fast, high quality' },
-    { id: 'eleven_flash_v2_5', label: 'Elevenlabs Flash V2.5', description: 'Multilingual, fastest, medium quality' },
-    { id: 'eleven_multilingual_v2', label: 'Elevenlabs Multilingual v2', description: 'Multilingual, slow, highest quality' },
-  ];
 
   const handleSave = async () => {
     if (!slug) {
@@ -119,115 +101,52 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
     }
   };
 
-  const handleSliderMouseEnter = (sliderId: string) => {
-    setActiveSlider(sliderId);
-  };
-
-  const handleSliderMouseLeave = () => {
-    setActiveSlider(null);
-  };
-
-  const formatSliderValue = (value: number) => {
-    return value.toFixed(2);
-  };
-
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogTitle>Voice Settings</DialogTitle>
         
         <div className="grid gap-4 py-4">
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">Voice Model</h3>
-            <RadioGroup 
-              value={tempVoiceModel} 
-              onValueChange={setTempVoiceModel}
-              className="space-y-1"
-            >
-              {voiceModels.map((model) => (
-                <div key={model.id + model.label} className="flex items-start space-x-2 rounded-md p-2 hover:bg-muted">
-                  <RadioGroupItem value={model.id} id={model.id + model.label} />
-                  <div className="grid gap-1">
-                    <Label htmlFor={model.id + model.label} className="text-sm font-medium">
-                      {model.label}
-                    </Label>
-                    <p className="text-xs text-muted-foreground">
-                      {model.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
+          <VoiceModelSelector 
+            voiceModel={tempVoiceModel}
+            setVoiceModel={setTempVoiceModel}
+          />
 
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <Label htmlFor="voice-speed" className="text-sm">Voice Speed</Label>
-              <div className="text-xs text-muted-foreground flex items-center gap-2">
-                <span className="text-muted-foreground text-xs">Slow</span>
-                <span className="font-medium bg-muted px-2 py-1 rounded-md">
-                  {formatSliderValue(tempVoiceSpeed)}
-                </span>
-                <span className="text-muted-foreground text-xs">Fast</span>
-              </div>
-            </div>
-            <Slider
-              id="voice-speed"
-              min={0.5}
-              max={2}
-              step={0.01}
-              value={[tempVoiceSpeed]}
-              onValueChange={(values) => setTempVoiceSpeed(values[0])}
-              onMouseEnter={() => handleSliderMouseEnter('voice-speed')}
-              onMouseLeave={handleSliderMouseLeave}
-            />
-          </div>
+          <VoiceSliderControl
+            id="voice-speed"
+            label="Voice Speed"
+            min={0.5}
+            max={2}
+            step={0.01}
+            value={tempVoiceSpeed}
+            onValueChange={setTempVoiceSpeed}
+            leftLabel="Slow"
+            rightLabel="Fast"
+          />
 
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <Label htmlFor="voice-temperature" className="text-sm">Voice Temperature</Label>
-              <div className="text-xs text-muted-foreground flex items-center gap-2">
-                <span className="text-muted-foreground text-xs">Calm</span>
-                <span className="font-medium bg-muted px-2 py-1 rounded-md">
-                  {formatSliderValue(tempVoiceTemperature)}
-                </span>
-                <span className="text-muted-foreground text-xs">Emotional</span>
-              </div>
-            </div>
-            <Slider
-              id="voice-temperature"
-              min={0}
-              max={2}
-              step={0.01}
-              value={[tempVoiceTemperature]}
-              onValueChange={(values) => setTempVoiceTemperature(values[0])}
-              onMouseEnter={() => handleSliderMouseEnter('voice-temperature')}
-              onMouseLeave={handleSliderMouseLeave}
-            />
-          </div>
+          <VoiceSliderControl
+            id="voice-temperature"
+            label="Voice Temperature"
+            min={0}
+            max={2}
+            step={0.01}
+            value={tempVoiceTemperature}
+            onValueChange={setTempVoiceTemperature}
+            leftLabel="Calm"
+            rightLabel="Emotional"
+          />
 
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <Label htmlFor="voice-volume" className="text-sm">Voice Volume</Label>
-              <div className="text-xs text-muted-foreground flex items-center gap-2">
-                <span className="text-muted-foreground text-xs">Low</span>
-                <span className="font-medium bg-muted px-2 py-1 rounded-md">
-                  {formatSliderValue(tempVoiceVolume)}
-                </span>
-                <span className="text-muted-foreground text-xs">High</span>
-              </div>
-            </div>
-            <Slider
-              id="voice-volume"
-              min={0}
-              max={2}
-              step={0.01}
-              value={[tempVoiceVolume]}
-              onValueChange={(values) => setTempVoiceVolume(values[0])}
-              onMouseEnter={() => handleSliderMouseEnter('voice-volume')}
-              onMouseLeave={handleSliderMouseLeave}
-            />
-          </div>
+          <VoiceSliderControl
+            id="voice-volume"
+            label="Voice Volume"
+            min={0}
+            max={2}
+            step={0.01}
+            value={tempVoiceVolume}
+            onValueChange={setTempVoiceVolume}
+            leftLabel="Low"
+            rightLabel="High"
+          />
         </div>
 
         <DialogFooter>
