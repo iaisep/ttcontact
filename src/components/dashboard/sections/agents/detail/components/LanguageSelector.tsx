@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Check, ChevronDown, Globe } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface LanguageSelectorProps {
   selectedLanguage: string;
@@ -15,9 +16,10 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   languageOptions,
   onLanguageChange 
 }) => {
+  const { t } = useLanguage();
   // Find the currently selected language
   const currentLanguage = languageOptions.find(lang => lang.value === selectedLanguage) || 
-    { value: selectedLanguage, label: selectedLanguage || 'Select Language', icon: '' };
+    { value: selectedLanguage, label: selectedLanguage || t('select_language'), icon: '' };
 
   return (
     <DropdownMenu>
