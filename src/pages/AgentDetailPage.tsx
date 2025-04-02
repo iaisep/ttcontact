@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
@@ -30,7 +29,7 @@ const AgentDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="p-6 flex justify-center items-center min-h-screen">
-        <div className="animate-spin h-12 w-12 border-4 border-t-primary rounded-full"></div>
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
