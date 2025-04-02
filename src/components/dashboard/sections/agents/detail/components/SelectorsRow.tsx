@@ -6,6 +6,7 @@ import LanguageSelector from './LanguageSelector';
 import LlmSettingsModal from './LlmSettingsModal';
 import VoiceSettingsModal from './VoiceSettingsModal';
 import { useLanguage } from '@/context/LanguageContext';
+import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface LlmSettings {
   llmId?: string;
@@ -41,7 +42,9 @@ interface LanguageSettings {
   handleLanguageChange: (newLanguage: string) => void;
 }
 
-type SelectorsRowProps = LlmSettings & VoiceSettings & LanguageSettings;
+interface SelectorsRowProps extends LlmSettings, VoiceSettings, LanguageSettings {
+  agent?: RetellAgent;
+}
 
 const SelectorsRow: React.FC<SelectorsRowProps> = ({
   // LLM Settings
@@ -73,7 +76,10 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   // Language Settings
   selectedLanguage,
   languageOptions,
-  handleLanguageChange
+  handleLanguageChange,
+  
+  // Agent
+  agent
 }) => {
   const { t } = useLanguage();
   const [isLlmSettingsOpen, setIsLlmSettingsOpen] = React.useState(false);
@@ -100,6 +106,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
           selectedVoice={selectedVoice} 
           openVoiceModal={openVoiceModal}
           voiceAvatarUrl={voiceAvatarUrl}
+          agent={agent}
         />
       </div>
       

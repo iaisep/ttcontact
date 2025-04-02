@@ -20,6 +20,7 @@ interface VoiceSettingsModalProps {
   voiceVolume: number;
   setVoiceVolume: (value: number) => void;
   onSettingsUpdated?: () => void;
+  agentId?: string;
 }
 
 const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
@@ -33,11 +34,13 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   setVoiceTemperature,
   voiceVolume,
   setVoiceVolume,
-  onSettingsUpdated
+  onSettingsUpdated,
+  agentId
 }) => {
   const { t } = useLanguage();
   const { fetchWithAuth } = useApiContext();
   const { slug } = useParams<{ slug: string }>();
+  const effectiveAgentId = agentId || slug;
   
   const [tempVoiceModel, setTempVoiceModel] = useState(voiceModel);
   const [tempVoiceSpeed, setTempVoiceSpeed] = useState(voiceSpeed);
@@ -45,7 +48,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   const [tempVoiceVolume, setTempVoiceVolume] = useState(voiceVolume);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Reset temporary settings when modal opens
+  // Reset temporary settings when modal opens or props change
   useEffect(() => {
     if (open) {
       setTempVoiceModel(voiceModel);
@@ -56,7 +59,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   }, [open, voiceModel, voiceSpeed, voiceTemperature, voiceVolume]);
 
   const handleSave = async () => {
-    if (!slug) {
+    if (!effectiveAgentId) {
       toast.error('Agent ID is missing');
       return;
     }
@@ -75,7 +78,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
       console.log('Sending update to agent with payload:', payload);
       
       // Call the update-agent endpoint with the payload
-      await fetchWithAuth(`/update-agent/${slug}`, {
+      await fetchWithAuth(`/update-agent/${effectiveAgentId}`, {
         method: 'PATCH',
         body: JSON.stringify(payload)
       });

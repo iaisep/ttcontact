@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
@@ -27,11 +27,21 @@ const VoiceModelSelector: React.FC<VoiceModelSelectorProps> = ({
     { id: 'eleven_multilingual_v2', label: 'Elevenlabs Multilingual v2', description: 'Multilingual, slow, highest quality' },
   ];
 
+  // Find the model with the closest ID match
+  const getDisplayModel = () => {
+    // Exact match first
+    const exactMatch = voiceModels.find(model => model.id === voiceModel);
+    if (exactMatch) return exactMatch.id;
+    
+    // Fallback to eleven_turbo_v2 if no match
+    return 'eleven_turbo_v2';
+  };
+
   return (
     <div className="space-y-2">
       <h3 className="text-sm font-medium">Voice Model</h3>
       <RadioGroup 
-        value={voiceModel} 
+        value={getDisplayModel()} 
         onValueChange={setVoiceModel}
         className="space-y-1"
       >
