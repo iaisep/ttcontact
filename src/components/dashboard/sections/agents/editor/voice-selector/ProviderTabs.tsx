@@ -32,8 +32,8 @@ const ProviderTabs: React.FC<ProviderTabsProps> = ({
           ElevenLabs
         </TabsTrigger>
         <TabsTrigger 
-          value="playht" 
-          onClick={() => handleProviderChange('playht')}
+          value="play" 
+          onClick={() => handleProviderChange('play')}
         >
           PlayHT
         </TabsTrigger>

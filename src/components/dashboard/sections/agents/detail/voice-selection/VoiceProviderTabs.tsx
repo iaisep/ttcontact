@@ -17,22 +17,22 @@ const VoiceProviderTabs: React.FC<VoiceProviderTabsProps> = ({
     <Tabs value={activeProvider} className="w-full h-full flex flex-col">
       <TabsList className="flex w-full h-10 border-b rounded-none bg-transparent">
         <TabsTrigger 
-          value="ElevenLabs" 
-          onClick={() => setActiveProvider('ElevenLabs')}
+          value="elevenlabs" 
+          onClick={() => setActiveProvider('elevenlabs')}
           className="flex-1 text-sm h-full rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:font-medium bg-transparent hover:bg-gray-50"
         >
           ElevenLabs
         </TabsTrigger>
         <TabsTrigger 
-          value="PlayHT" 
-          onClick={() => setActiveProvider('PlayHT')}
+          value="play" 
+          onClick={() => setActiveProvider('play')}
           className="flex-1 text-sm h-full rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:font-medium bg-transparent hover:bg-gray-50"
         >
           PlayHT
         </TabsTrigger>
         <TabsTrigger 
-          value="OpenAI" 
-          onClick={() => setActiveProvider('OpenAI')}
+          value="openai" 
+          onClick={() => setActiveProvider('openai')}
           className="flex-1 text-sm h-full rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:font-medium bg-transparent hover:bg-gray-50"
         >
           OpenAI

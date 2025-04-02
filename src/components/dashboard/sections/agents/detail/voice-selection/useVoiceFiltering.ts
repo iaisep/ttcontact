@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 
 export const useVoiceFiltering = () => {
-  const [activeProvider, setActiveProvider] = useState('all');
+  const [activeProvider, setActiveProvider] = useState('elevenlabs');
   const [searchTerm, setSearchTerm] = useState('');
   const [genderFilter, setGenderFilter] = useState('all');
   const [accentFilter, setAccentFilter] = useState('all');
@@ -18,13 +18,14 @@ export const useVoiceFiltering = () => {
       // Provider filter
       if (activeProvider !== 'all') {
         const provider = normalizeString(voice.provider);
-        if (activeProvider === 'elevenlabs' && !provider.includes('eleven')) {
+        
+        if (activeProvider === 'elevenlabs' && provider !== 'elevenlabs') {
           return false;
         }
-        if (activeProvider === 'playht' && !provider.includes('play')) {
+        if (activeProvider === 'play' && provider !== 'play') {
           return false;
         }
-        if (activeProvider === 'openai' && !provider.includes('openai')) {
+        if (activeProvider === 'openai' && provider !== 'openai') {
           return false;
         }
       }
