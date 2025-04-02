@@ -44,7 +44,7 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Left Column - Prompt Editor */}
-          <div className="md:col-span-5">
+          <div className="md:col-span-8">
             <AgentLeftColumn 
               agent={agent}
               llm={llm}
