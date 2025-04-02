@@ -12,8 +12,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import LanguageSelector from '../LanguageSelector';
-import { useLanguageSelector } from '../../hooks/useLanguageSelector';
 
 interface TestPanelProps {
   agent: RetellAgent;
@@ -35,19 +33,6 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
     handleCodeTest,
     handleFullTest
   } = useTestPanel(agent);
-
-  const {
-    selectedLanguage,
-    languageOptions,
-    handleLanguageChange
-  } = useLanguageSelector({
-    initialLanguage: agent.language || 'en-US',
-    updateAgentField: (fieldName, value) => {
-      // The language update will be handled by the hook without refreshing the page
-      console.log(`Updating field ${fieldName} to ${value}`);
-      return Promise.resolve();
-    }
-  });
 
   // Update recording timer
   React.useEffect(() => {
@@ -92,15 +77,7 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
           </AlertDescription>
         </Alert>
       )}
-
-      <div className="w-full">
-        <LanguageSelector
-          selectedLanguage={selectedLanguage}
-          languageOptions={languageOptions}
-          onLanguageChange={handleLanguageChange}
-        />
-      </div>
-
+      
       <TestButtons 
         isLoading={isLoading}
         isRecording={isRecording}
