@@ -55,7 +55,7 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
           </div>
 
           {/* Middle Column - Accordion Settings */}
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <AgentSettingsAccordion 
               agent={agent}
               knowledgeBases={knowledgeBases}
@@ -64,7 +64,7 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
           </div>
 
           {/* Right Column - Test Panel */}
-          <div className="md:col-span-3">
+          <div className="md:col-span-4">
             <AgentRightColumn 
               agent={agent}
               voice={voice}
