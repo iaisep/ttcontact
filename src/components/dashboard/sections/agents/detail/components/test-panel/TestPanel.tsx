@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
-import { Mic, Phone, TestTube } from 'lucide-react';
+import { Mic, Phone, TestTube, Volume, Clock as ClockIcon } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTestPanel } from '../../hooks/useTestPanel';
 import TestButtons from './TestButtons';
@@ -74,7 +74,7 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
         <Popover>
           <PopoverTrigger asChild>
             <button className="flex items-center text-gray-500 hover:text-gray-700">
-              <Volume2 className="h-4 w-4 mr-1" />
+              <Volume className="h-4 w-4 mr-1" />
               <span className="text-xs">{audioVolume}%</span>
             </button>
           </PopoverTrigger>
@@ -102,7 +102,7 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
         
         {isRecording && (
           <div className="flex items-center">
-            <Clock className="h-4 w-4 text-red-500 mr-1" />
+            <ClockIcon className="h-4 w-4 text-red-500 mr-1" />
             <span className="text-xs text-red-500">{formatTime(recordingDuration)}</span>
           </div>
         )}
