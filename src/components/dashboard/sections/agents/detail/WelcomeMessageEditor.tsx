@@ -38,19 +38,43 @@ const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({
   const [expanded, setExpanded] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   
+  // Fetch initial LLM data to get the actual begin_message value
   useEffect(() => {
-    setValue(welcomeMessage);
+    const fetchLlmData = async () => {
+      if (!llmId) {
+        setInitialLoading(false);
+        return;
+      }
+      
+      try {
+        setInitialLoading(true);
+        const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
+        
+        // Determine which option to select based on the begin_message value
+        if (llmData) {
+          if (llmData.begin_message === "") {
+            setSelectedOption(WELCOME_MESSAGE_OPTIONS.USER_INITIATES);
+            setValue(WELCOME_MESSAGE_OPTIONS.USER_INITIATES);
+          } else if (llmData.begin_message === null) {
+            setSelectedOption(WELCOME_MESSAGE_OPTIONS.AI_INITIATES_DYNAMIC);
+            setValue(WELCOME_MESSAGE_OPTIONS.AI_INITIATES_DYNAMIC);
+          } else {
+            setSelectedOption(WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM);
+            setValue(llmData.begin_message || "Hello, how can I help you today?");
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching LLM data:', error);
+        toast.error('Could not load welcome message settings');
+      } finally {
+        setInitialLoading(false);
+      }
+    };
     
-    // Determine which option is selected based on the welcome message value
-    if (welcomeMessage === WELCOME_MESSAGE_OPTIONS.USER_INITIATES) {
-      setSelectedOption(WELCOME_MESSAGE_OPTIONS.USER_INITIATES);
-    } else if (welcomeMessage === WELCOME_MESSAGE_OPTIONS.AI_INITIATES_DYNAMIC) {
-      setSelectedOption(WELCOME_MESSAGE_OPTIONS.AI_INITIATES_DYNAMIC);
-    } else {
-      setSelectedOption(WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM);
-    }
-  }, [welcomeMessage]);
+    fetchLlmData();
+  }, [llmId, fetchWithAuth]);
 
   const updateWelcomeMessage = async (option: string, customMessage?: string) => {
     if (!llmId) {
@@ -112,6 +136,19 @@ const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({
       updateWelcomeMessage(selectedValue);
     }
   };
+
+  if (initialLoading) {
+    return (
+      <div className="rounded-md border overflow-hidden">
+        <div className="bg-muted/30 px-4 py-2 border-b">
+          <span className="text-sm font-medium">Welcome Message</span>
+        </div>
+        <div className="p-4 flex justify-center items-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-md border overflow-hidden">
