@@ -52,16 +52,11 @@ export const AgentSettingsRow: React.FC<AgentSettingsRowProps> = ({
         // LLM settings props
         llmId={llmId}
         selectedModel={llmSettings.selectedModel}
-        isLlmSettingsOpen={llmSettings.isLlmSettingsOpen}
-        setIsLlmSettingsOpen={llmSettings.setIsLlmSettingsOpen}
         llmTemperature={llmSettings.llmTemperature}
-        setLlmTemperature={llmSettings.setLlmTemperature}
         structuredOutput={llmSettings.structuredOutput}
-        setStructuredOutput={llmSettings.setStructuredOutput}
         highPriority={llmSettings.highPriority}
-        setHighPriority={llmSettings.setHighPriority}
         handleLlmChange={llmSettings.handleLlmChange}
-        handleSaveLlmSettings={llmSettings.handleSaveLlmSettings}
+        onLlmSettingsUpdated={llmSettings.fetchLlmData}
         
         // Voice settings props
         selectedVoice={voiceSettings.selectedVoice}

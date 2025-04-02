@@ -1,27 +1,19 @@
-
 import React from 'react';
 import { Separator } from '@/components/ui/separator';
 import LlmSelector from './LlmSelector';
 import VoiceSelector from './VoiceSelector';
 import LanguageSelector from './LanguageSelector';
-import LlmSettingsPopover from './LlmSettingsPopover';
-import VoiceSettingsPopover from '../components/VoiceSettingsPopover';
 import { VoiceModelOption } from '../hooks/useVoiceSettings';
 
 interface SelectorsRowProps {
   // LLM props
   llmId?: string;
   selectedModel: string;
-  isLlmSettingsOpen: boolean;
-  setIsLlmSettingsOpen: (isOpen: boolean) => void;
   llmTemperature: number;
-  setLlmTemperature: (temp: number) => void;
   structuredOutput: boolean;
-  setStructuredOutput: (val: boolean) => void;
   highPriority: boolean;
-  setHighPriority: (val: boolean) => void;
   handleLlmChange?: (llmId: string) => Promise<void>;
-  handleSaveLlmSettings: () => Promise<void>;
+  onLlmSettingsUpdated: () => void;
 
   // Voice props
   selectedVoice: string;
@@ -54,16 +46,11 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   // LLM props
   llmId,
   selectedModel,
-  isLlmSettingsOpen,
-  setIsLlmSettingsOpen,
   llmTemperature,
-  setLlmTemperature,
   structuredOutput,
-  setStructuredOutput,
   highPriority,
-  setHighPriority,
   handleLlmChange,
-  handleSaveLlmSettings,
+  onLlmSettingsUpdated,
   // Voice props
   selectedVoice,
   isVoiceSettingsOpen,
@@ -94,19 +81,12 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
           <LlmSelector 
             selectedModel={selectedModel} 
             llmId={llmId} 
-            onLlmChange={handleLlmChange} 
-            onSettingsClick={() => setIsLlmSettingsOpen(true)} 
-          />
-          <LlmSettingsPopover 
-            isLlmSettingsOpen={isLlmSettingsOpen} 
-            setIsLlmSettingsOpen={setIsLlmSettingsOpen} 
-            llmTemperature={llmTemperature} 
-            setLlmTemperature={setLlmTemperature} 
-            structuredOutput={structuredOutput} 
-            setStructuredOutput={setStructuredOutput} 
-            highPriority={highPriority} 
-            setHighPriority={setHighPriority} 
-            handleSaveLlmSettings={handleSaveLlmSettings} 
+            onLlmChange={handleLlmChange}
+            onSettingsClick={() => {}} 
+            temperature={llmTemperature}
+            structuredOutput={structuredOutput}
+            highPriority={highPriority}
+            onSettingsUpdated={onLlmSettingsUpdated}
           />
         </div>
       </div>
@@ -120,20 +100,6 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
             openVoiceModal={openVoiceModal} 
             onSettingsClick={() => setIsVoiceSettingsOpen(true)} 
             voiceAvatarUrl={voiceAvatarUrl} 
-          />
-          <VoiceSettingsPopover 
-            isOpen={isVoiceSettingsOpen} 
-            setIsOpen={setIsVoiceSettingsOpen} 
-            voiceModel={voiceModel} 
-            setVoiceModel={setVoiceModel} 
-            voiceSpeed={voiceSpeed} 
-            setVoiceSpeed={setVoiceSpeed} 
-            voiceTemperature={voiceTemperature} 
-            setVoiceTemperature={setVoiceTemperature} 
-            voiceVolume={voiceVolume} 
-            setVoiceVolume={setVoiceVolume} 
-            voiceModelOptions={voiceModelOptions} 
-            onSave={handleSaveVoiceSettings} 
           />
         </div>
       </div>
