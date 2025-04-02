@@ -55,7 +55,7 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
           </div>
 
           {/* Middle Column - Accordion Settings */}
-          <div className="md:col-span-4">
+          <div className="md:col-span-3">
             <AgentSettingsAccordion 
               agent={agent}
               knowledgeBases={knowledgeBases}
