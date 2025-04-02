@@ -47,6 +47,7 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
     getFilteredVoices
   } = useVoiceFiltering();
 
+  // Only fetch voices when the modal is opened and hasn't loaded yet
   useEffect(() => {
     if (open && !hasInitiallyLoaded) {
       fetchVoices();
@@ -60,7 +61,6 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
     
     try {
       const response = await fetchWithAuth('/list-voices');
-      console.log('Voice API response:', response);
       
       if (response && Array.isArray(response)) {
         setVoices(response);

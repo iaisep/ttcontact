@@ -40,7 +40,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
     { value: 'deepgram', label: 'Deepgram', id: 'deepgram', description: 'Accurate voice synthesis' }
   ];
   
-  // Update to handle RetellVoice object 
+  // Update to handle RetellVoice object without triggering unnecessary fetches
   const handleVoiceChange = async (voice: RetellVoice) => {
     if (!slug) {
       toast.error('Agent ID is missing');
@@ -65,9 +65,6 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
         })
       });
       
-      // Fetch the updated agent to get the latest information
-      const updatedAgent = await fetchWithAuth(`/get-agent/${slug}`);
-      
       // Set the voice avatar URL
       if (voice.avatar_url) {
         setVoiceAvatarUrl(voice.avatar_url);
@@ -77,7 +74,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
       const voiceName = voice.voice_name || voice.name || voiceId;
       setSelectedVoice(voiceName);
       
-      // Update the agent field in the parent component
+      // Update the agent field in the parent component without triggering a full page refresh
       updateAgentField('voice_id', voiceId);
       updateAgentField('voice', voiceName);
       

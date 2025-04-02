@@ -61,7 +61,16 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
       // Ensure voiceSettings has the avatar URL
       voiceSettings.setVoiceAvatarUrl(voice.avatar_url);
     }
-  }, [voice, voiceSettings]);
+  }, [voice]);
+
+  // Update selected voice when agent voice changes
+  useEffect(() => {
+    if (agent.voice) {
+      voiceSettings.setSelectedVoice(agent.voice);
+    } else if (voice?.name || voice?.voice_name) {
+      voiceSettings.setSelectedVoice(voice.name || voice.voice_name || 'Select Voice');
+    }
+  }, [agent.voice, voice]);
 
   return (
     <div className="space-y-6 ">

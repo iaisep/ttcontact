@@ -2,8 +2,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
-import { useApiContext } from '@/context/ApiContext';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import AgentDetailHeader from '@/components/dashboard/sections/agents/detail/AgentDetailHeader';
@@ -16,9 +14,8 @@ const AgentDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { fetchWithAuth } = useApiContext();
   
-  // Use our new hook to fetch all agent details
+  // Use our optimized hook to fetch all agent details
   const { 
     agent, 
     llm, 
@@ -26,37 +23,9 @@ const AgentDetailPage: React.FC = () => {
     knowledgeBases, 
     isLoading, 
     error,
-    refreshData
+    refreshData,
+    updateAgentField
   } = useAgentDetails(slug);
-
-  const updateAgentField = async (fieldName: string, value: any) => {
-    if (!agent) return;
-    
-    try {
-      // Create a copy of the agent with the updated field
-      const updatedAgent = {
-        ...agent,
-        [fieldName]: value
-      };
-      
-      toast.loading(t('updating_field'));
-      
-      // Use fetchWithAuth instead of direct fetch
-      await fetchWithAuth(`/update-agent/${agent.agent_id || agent.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(updatedAgent)
-      });
-      
-      toast.success(t('field_updated'));
-      
-      // Refresh the data after successful update
-      if (refreshData) refreshData();
-      
-    } catch (error) {
-      console.error(`Error updating ${fieldName}:`, error);
-      toast.error(t('error_updating_field'));
-    }
-  };
 
   if (isLoading) {
     return (
@@ -110,6 +79,7 @@ const AgentDetailPage: React.FC = () => {
             <AgentLeftColumn 
               agent={agent}
               llm={llm}
+              voice={voice}
               updateAgentField={updateAgentField}
               refreshData={refreshData}
             />

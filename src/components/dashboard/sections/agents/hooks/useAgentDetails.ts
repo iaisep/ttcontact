@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
@@ -20,7 +20,6 @@ interface AgentDetailsState {
   availableVoices: RetellVoice[];
   isLoading: boolean;
   error: string | null;
-  
 }
 
 export const useAgentDetails = (agentId: string | undefined) => {
@@ -36,7 +35,7 @@ export const useAgentDetails = (agentId: string | undefined) => {
     availableVoices: []
   });
 
-  const fetchAgentData = async () => {
+  const fetchAgentData = useCallback(async () => {
     if (!agentId) return;
     
     setState(prev => ({ ...prev, isLoading: true, error: null }));
@@ -97,14 +96,63 @@ export const useAgentDetails = (agentId: string | undefined) => {
       }));
       toast.error(t('error_loading_agent_details'));
     }
-  };
+  }, [agentId, fetchWithAuth, t]);
 
+  // Only fetch agent data on initial load and when agent ID changes
   useEffect(() => {
     fetchAgentData();
-  }, [agentId, fetchWithAuth, t]);
+  }, [agentId, fetchAgentData]);
+
+  // Method to update agent data without full refresh
+  const updateAgentField = async (fieldName: string, value: any) => {
+    if (!state.agent) return;
+    
+    try {
+      // Create a copy of the agent with the updated field
+      const updatedAgent = {
+        ...state.agent,
+        [fieldName]: value
+      };
+      
+      // Update local state immediately for responsiveness
+      setState(prev => ({
+        ...prev,
+        agent: updatedAgent
+      }));
+      
+      // Handle special case for voice_id which requires fetching voice details
+      if (fieldName === 'voice_id' && value) {
+        try {
+          const voiceData = await fetchWithAuth(`/get-voice/${value}`);
+          if (voiceData) {
+            setState(prev => ({
+              ...prev,
+              voice: voiceData
+            }));
+          }
+        } catch (error) {
+          console.error('Error fetching voice details:', error);
+        }
+      }
+      
+      // Send the update to the server in the background
+      await fetchWithAuth(`/update-agent/${state.agent.agent_id || state.agent.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ [fieldName]: value })
+      });
+      
+    } catch (error) {
+      console.error(`Error updating ${fieldName}:`, error);
+      toast.error(t('error_updating_field'));
+      
+      // Revert to previous state in case of error
+      fetchAgentData();
+    }
+  };
 
   return {
     ...state,
-    refreshData: fetchAgentData
+    refreshData: fetchAgentData,
+    updateAgentField
   };
 };

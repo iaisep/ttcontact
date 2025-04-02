@@ -24,7 +24,7 @@ const VoiceTableRow: React.FC<VoiceTableRowProps> = ({ voice, onSelect, isSelect
   const handlePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    if (!audioRef.current) {
+    if (!audioRef.current && voice.preview_audio_url) {
       audioRef.current = new Audio(voice.preview_audio_url);
       
       audioRef.current.onended = () => {
@@ -32,14 +32,16 @@ const VoiceTableRow: React.FC<VoiceTableRowProps> = ({ voice, onSelect, isSelect
       };
     }
     
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play().catch(error => {
-        console.error('Error playing audio:', error);
-      });
-      setIsPlaying(true);
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current.play().catch(error => {
+          console.error('Error playing audio:', error);
+        });
+        setIsPlaying(true);
+      }
     }
   };
 
@@ -55,7 +57,7 @@ const VoiceTableRow: React.FC<VoiceTableRowProps> = ({ voice, onSelect, isSelect
           </Avatar>
           <div>
             <div className="font-medium text-sm">{voice.voice_name || voice.name}</div>
-            <div className="text-xs text-muted-foreground">{voice.voice_id}</div>
+            <div className="text-xs text-muted-foreground">{voice.voice_id || voice.id}</div>
           </div>
         </div>
       </td>
@@ -78,31 +80,31 @@ const VoiceTableRow: React.FC<VoiceTableRowProps> = ({ voice, onSelect, isSelect
           )}
         </div>
       </td>
-      <td className="py-3 px-4">
-        <div className="flex justify-end items-center gap-2">
-          {voice.preview_audio_url && (
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              className="h-8 w-8 rounded-full"
-              onClick={handlePlayPause}
-            >
-              {isPlaying ? (
-                <Pause className="h-4 w-4" />
-              ) : (
-                <Play className="h-4 w-4" />
-              )}
-            </Button>
-          )}
+      <td className="py-3 px-4 text-center">
+        {voice.preview_audio_url && (
           <Button 
-            size="sm"
-            onClick={onSelect}
-            variant={isSelected ? "default" : "outline"}
-            className="rounded-full px-4"
+            size="icon" 
+            variant="ghost" 
+            className="h-8 w-8 rounded-full mx-auto"
+            onClick={handlePlayPause}
           >
-            {isSelected ? "Selected" : "Use Voice"}
+            {isPlaying ? (
+              <Pause className="h-4 w-4" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
           </Button>
-        </div>
+        )}
+      </td>
+      <td className="py-3 px-4 text-right">
+        <Button 
+          size="sm"
+          onClick={onSelect}
+          variant={isSelected ? "default" : "outline"}
+          className="rounded-full px-4"
+        >
+          {isSelected ? "Selected" : "Use Voice"}
+        </Button>
       </td>
     </tr>
   );
