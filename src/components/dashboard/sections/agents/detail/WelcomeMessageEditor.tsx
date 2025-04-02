@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/context/LanguageContext';
-import { debounce } from 'lodash';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import {
@@ -116,15 +115,17 @@ const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({
     }
   };
   
-  // Create debounced update function for custom message
-  const debouncedUpdate = debounce((newValue) => {
-    updateWelcomeMessage(WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM, newValue);
-  }, 1000);
-  
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setValue(newValue);
-    debouncedUpdate(newValue);
+    // Removed debounced update to prevent fetching on every keystroke
+  };
+
+  // New handler for when text area loses focus
+  const handleBlur = () => {
+    if (selectedOption === WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM) {
+      updateWelcomeMessage(WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM, value);
+    }
   };
 
   const handleSelectChange = (selectedValue: string) => {
@@ -199,6 +200,7 @@ const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({
               <Textarea
                 value={value !== WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM ? value : ''}
                 onChange={handleChange}
+                onBlur={handleBlur} // Added onBlur event handler
                 className="min-h-[120px] font-mono text-sm border mt-3 rounded focus-visible:ring-0"
                 placeholder={t('welcome_message_placeholder')}
                 disabled={isLoading}
