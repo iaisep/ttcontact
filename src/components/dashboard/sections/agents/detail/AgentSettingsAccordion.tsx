@@ -28,7 +28,6 @@ interface AgentSettingsAccordionProps {
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
-// Default speech settings to use when not provided
 const defaultSpeechSettings = {
   stability: 0.5,
   similarity: 0.8,
@@ -44,20 +43,23 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   const { t } = useLanguage();
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   
-  // Ensure speech settings are complete with defaults
   const speechSettings = {
     ...defaultSpeechSettings,
     ...(agent.speech_settings || {})
   };
 
   const handleVoiceSelect = (voice: Voice) => {
-    // Use the id property if voice_id is not available
     updateAgentField('voice_id', voice.voice_id || voice.id);
   };
   
   return (
     <>
-      <Accordion type="single" defaultValue="functions" className="w-full">
+      <Accordion 
+        type="single" 
+        collapsible 
+        defaultValue=""
+        className="w-full"
+      >
         {/* Functions Section */}
         <AccordionItem value="functions" className="mt-4 border rounded-md overflow-hidden">
           <AccordionTrigger className="px-4 py-2 text-sm font-medium bg-gray-50 hover:bg-gray-100 flex items-center">
