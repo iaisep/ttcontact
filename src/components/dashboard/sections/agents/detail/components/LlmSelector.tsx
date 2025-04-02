@@ -98,11 +98,11 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
       variant="outline" 
       className="flex items-center justify-between w-full bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-2 sm:px-4 py-1 sm:py-2 h-auto"
     >
-      <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+      <div className="flex items-center gap-1 sm:gap-2 min-w-0 max-w-full">
         <div className="h-6 w-6 sm:h-6 sm:w-6 rounded-full flex-shrink-0 flex items-center justify-center">
           <HelpCircle className="h-5 w-5 sm:h-5 sm:w-5 text-gray-700 flex-shrink-0" />
         </div>
-        <span className="truncate text-[8px] " style={{ maxWidth: 'calc(100% - 48px)' }}>
+        <span className="text-xs sm:text-sm truncate flex-grow min-w-0 text-ellipsis overflow-hidden">
           {currentLlm.name}
         </span>
       </div>
