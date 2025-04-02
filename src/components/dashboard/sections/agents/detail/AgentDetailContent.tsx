@@ -64,7 +64,7 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
           </div>
 
           {/* Right Column - Test Panel */}
-          <div className="md:col-span-4">
+          <div className="md:col-span-3">
             <AgentRightColumn 
               agent={agent}
               voice={voice}
