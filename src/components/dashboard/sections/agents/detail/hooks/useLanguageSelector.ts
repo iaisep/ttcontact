@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -52,18 +51,27 @@ export const useLanguageSelector = ({ initialLanguage, updateAgentField }: UseLa
       // Update UI state immediately for better UX
       setSelectedLanguage(languageCode);
       
-      // Update the agent in the database using updateAgentField
-      // This function already handles the API call to update the agent
-      await updateAgentField('language', languageCode);
-      
-      const languageName = languageOptions.find(lang => lang.value === languageCode)?.label || languageCode;
-      toast.success(`Language updated to ${languageName}`);
+      // Try to update the agent in the database
+      try {
+        await updateAgentField('language', languageCode);
+        
+        const languageName = languageOptions.find(lang => lang.value === languageCode)?.label || languageCode;
+        toast.success(`Language updated to ${languageName}`);
+      } catch (error: any) {
+        // If there's an API error, show the error message in a toast
+        // but keep the UI updated with the user's selection
+        console.error('Error updating language:', error);
+        
+        // Display specific error message if available, or a generic one
+        const errorMessage = error.message || 'Failed to update language on the server';
+        toast.error(errorMessage);
+        
+        // Important: We don't revert the UI state here to avoid refreshing the page
+        // The UI will show the selected language even if the server update failed
+      }
     } catch (error) {
-      console.error('Error updating language:', error);
-      toast.error('Failed to update language. Please try again.');
-      
-      // Revert to the previous language if the update fails
-      setSelectedLanguage(initialLanguage);
+      console.error('Unexpected error in handleLanguageChange:', error);
+      toast.error('An unexpected error occurred');
     }
     
     return Promise.resolve();
