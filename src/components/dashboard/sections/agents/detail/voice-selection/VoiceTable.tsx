@@ -25,6 +25,7 @@ const VoiceTable: React.FC<VoiceTableProps> = ({ voices, onSelectVoice, selected
             <tr>
               <th className="text-left py-2 px-4 text-xs font-medium">{t('voice')}</th>
               <th className="text-left py-2 px-4 text-xs font-medium">{t('traits')}</th>
+              <th className="text-center py-2 px-4 text-xs font-medium">{t('preview') || 'Preview'}</th>
               <th className="text-right py-2 px-4 text-xs font-medium"></th>
             </tr>
           </thead>

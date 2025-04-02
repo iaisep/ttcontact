@@ -31,6 +31,7 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [voices, setVoices] = useState<RetellVoice[]>([]);
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   
   const {
     activeProvider,
@@ -47,10 +48,11 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
   } = useVoiceFiltering();
 
   useEffect(() => {
-    if (open) {
+    if (open && !hasInitiallyLoaded) {
       fetchVoices();
+      setHasInitiallyLoaded(true);
     }
-  }, [open]);
+  }, [open, hasInitiallyLoaded]);
 
   const fetchVoices = async () => {
     setIsLoading(true);
@@ -76,6 +78,10 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleTryAgain = () => {
+    fetchVoices();
   };
 
   const filteredVoices = getFilteredVoices(voices);
@@ -109,7 +115,7 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
           <div className="flex flex-col items-center justify-center py-12">
             <p className="text-sm text-destructive">{error}</p>
             <button 
-              onClick={fetchVoices}
+              onClick={handleTryAgain}
               className="mt-4 text-sm text-primary hover:underline"
             >
               {t('try_again') || 'Try again'}

@@ -142,7 +142,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
         <LanguageSelector 
           selectedLanguage={selectedLanguage}
           languageOptions={languageOptions}
-          handleLanguageChange={(lang) => handleLanguageChange(lang)}
+          handleLanguageChange={handleLanguageChange}
         />
       </div>
     </div>

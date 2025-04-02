@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import EditablePrompt from './EditablePrompt';
 import WelcomeMessageEditor from './WelcomeMessageEditor';
 import GeneralPromptEditor from './GeneralPromptEditor';
-import { RetellAgent, RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
+import { RetellAgent, RetellLLM, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import { VoiceSelectionModal } from './voice-selection';
 import SelectorsRow from './components/SelectorsRow';
 import { useVoiceSettings } from './hooks/useVoiceSettings';
@@ -16,7 +16,7 @@ interface AgentLeftColumnProps {
   llm?: RetellLLM | null;
   updateAgentField: (fieldName: string, value: any) => void;
   refreshData?: () => void;
-  voice?: any;
+  voice?: RetellVoice | null;
 }
 
 const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
@@ -59,9 +59,9 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   useEffect(() => {
     if (voice?.avatar_url) {
       // Ensure voiceSettings has the avatar URL
-      voiceSettings.setVoiceAvatarUrl?.(voice.avatar_url);
+      voiceSettings.setVoiceAvatarUrl(voice.avatar_url);
     }
-  }, [voice]);
+  }, [voice, voiceSettings]);
 
   return (
     <div className="space-y-6 ">

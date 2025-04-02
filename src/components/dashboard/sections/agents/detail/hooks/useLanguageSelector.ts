@@ -2,25 +2,35 @@
 import { useState } from 'react';
 
 interface UseLanguageSelectorProps {
-  initialLanguage?: string;
+  initialLanguage: string;
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
-export const useLanguageSelector = ({ initialLanguage = 'Spanish', updateAgentField }: UseLanguageSelectorProps) => {
+export const useLanguageSelector = ({ initialLanguage, updateAgentField }: UseLanguageSelectorProps) => {
   const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
-  
+
+  // Language options with icons
   const languageOptions = [
-    { value: 'es', label: 'Spanish', icon: '🇪🇸' },
-    { value: 'en', label: 'English', icon: '🇺🇸' },
-    { value: 'fr', label: 'French', icon: '🇫🇷' },
-    { value: 'de', label: 'German', icon: '🇩🇪' },
-    { value: 'pt', label: 'Portuguese', icon: '🇵🇹' },
-    { value: 'it', label: 'Italian', icon: '🇮🇹' },
+    { value: 'English', label: 'English', icon: '🇺🇸' },
+    { value: 'Spanish', label: 'Spanish', icon: '🇪🇸' },
+    { value: 'French', label: 'French', icon: '🇫🇷' },
+    { value: 'German', label: 'German', icon: '🇩🇪' },
+    { value: 'Italian', label: 'Italian', icon: '🇮🇹' },
+    { value: 'Portuguese', label: 'Portuguese', icon: '🇵🇹' },
+    { value: 'Dutch', label: 'Dutch', icon: '🇳🇱' },
+    { value: 'Chinese', label: 'Chinese', icon: '🇨🇳' },
+    { value: 'Japanese', label: 'Japanese', icon: '🇯🇵' },
+    { value: 'Korean', label: 'Korean', icon: '🇰🇷' },
+    { value: 'Arabic', label: 'Arabic', icon: '🇸🇦' },
+    { value: 'Russian', label: 'Russian', icon: '🇷🇺' },
+    { value: 'Hindi', label: 'Hindi', icon: '🇮🇳' }
   ];
 
-  const handleLanguageChange = async (lang: string): Promise<void> => {
-    setSelectedLanguage(lang);
-    await updateAgentField('language', lang);
+  // Handle language change as async to align with expected type
+  const handleLanguageChange = async (language: string): Promise<void> => {
+    setSelectedLanguage(language);
+    await updateAgentField('language', language);
+    return Promise.resolve();
   };
 
   return {

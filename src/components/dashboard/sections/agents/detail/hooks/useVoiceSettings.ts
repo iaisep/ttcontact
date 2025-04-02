@@ -69,7 +69,9 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
       const updatedAgent = await fetchWithAuth(`/get-agent/${slug}`);
       
       // Set the voice avatar URL
-      setVoiceAvatarUrl(voice.avatar_url);
+      if (voice.avatar_url) {
+        setVoiceAvatarUrl(voice.avatar_url);
+      }
       
       // Update local state with voice name
       const voiceName = voice.voice_name || voice.name || voiceId;
@@ -116,7 +118,9 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   
   return {
     selectedVoice,
+    setSelectedVoice,
     voiceAvatarUrl,
+    setVoiceAvatarUrl,
     isVoiceModalOpen,
     setIsVoiceModalOpen,
     isVoiceSettingsOpen,
