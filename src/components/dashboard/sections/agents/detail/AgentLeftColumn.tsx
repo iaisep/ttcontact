@@ -51,7 +51,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   });
 
   return (
-    <div className="space-y-15 width: 600px"> {/* Increased from space-y-6 to space-y-8 */}
+    <div className="space-y-15 width: 400px"> {/* Increased from space-y-6 to space-y-8 */}
       <AgentSettingsRow
         agent={agent}
         llmId={llmId}
