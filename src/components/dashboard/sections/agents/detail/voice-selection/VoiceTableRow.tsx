@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, CheckCircle } from 'lucide-react';
@@ -17,7 +18,7 @@ const VoiceTableRow: React.FC<VoiceTableRowProps> = ({
   isSelected
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [isRowHovered, setIsRowHovered] = useState(false);
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
   // Get initials for avatar fallback
@@ -50,6 +51,8 @@ const VoiceTableRow: React.FC<VoiceTableRowProps> = ({
     <tr 
       className="border-b hover:bg-muted/50 transition-colors cursor-pointer" 
       onClick={onSelect}
+      onMouseEnter={() => setIsRowHovered(true)}
+      onMouseLeave={() => setIsRowHovered(false)}
     >
       <td className="py-3 px-4">
         <div className="flex items-center gap-3">
@@ -84,18 +87,18 @@ const VoiceTableRow: React.FC<VoiceTableRowProps> = ({
           </Button>}
       </td>
       <td className="py-3 px-4 text-right">
-        <Button 
-          size="sm" 
-          onClick={onSelect} 
-          variant={isSelected ? "default" : "outline"} 
-          className={`rounded-full px-4 transition-all duration-300 ${
-            !isSelected ? 'hover:bg-primary hover:text-white hover:border-primary' : ''
-          }`}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {isSelected ? "Selected" : "Use Voice"}
-        </Button>
+        {(isSelected || isRowHovered) && (
+          <Button 
+            size="sm" 
+            onClick={onSelect} 
+            variant={isSelected ? "default" : "outline"} 
+            className={`rounded-full px-4 transition-all duration-300 ${
+              !isSelected ? 'hover:bg-primary hover:text-white hover:border-primary' : ''
+            }`}
+          >
+            {isSelected ? "Selected" : "Use Voice"}
+          </Button>
+        )}
       </td>
     </tr>
   );
