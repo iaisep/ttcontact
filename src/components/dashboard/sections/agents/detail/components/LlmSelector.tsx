@@ -111,7 +111,7 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild disabled={isUpdating}>
             <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-6 sm:w-6 p-0 flex-shrink-0">
-              <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600" />
+              <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600 text-[10px]" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[200px] z-50 bg-white border border-gray-200 shadow-md">
