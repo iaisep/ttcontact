@@ -17,9 +17,10 @@ interface AgentDetailsState {
   llm: RetellLLM | null;
   voice: RetellVoice | null;
   knowledgeBases: KnowledgeBase[];
+  availableVoices: RetellVoice[];
   isLoading: boolean;
   error: string | null;
-  availableVoices: RetellVoice[];
+  
 }
 
 export const useAgentDetails = (agentId: string | undefined) => {
@@ -60,7 +61,7 @@ export const useAgentDetails = (agentId: string | undefined) => {
       const knowledgeBaseIds = formattedAgent.knowledge_base_ids || [];
       
       // Step 2: Fetch LLM, voice, and knowledge bases in parallel using fetchWithAuth
-      const [llmData, voiceData, allKnowledgeBases] = await Promise.all([
+      const [llmData, voiceData, allKnowledgeBases, voicesList] = await Promise.all([
         llmId ? fetchWithAuth(`/get-retell-llm/${llmId}`) : null,
         voiceId ? fetchWithAuth(`/get-voice/${voiceId}`) : null,
         fetchWithAuth('/list-knowledge-bases'),
