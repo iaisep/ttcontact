@@ -2,18 +2,26 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { User, Settings } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface VoiceSelectorProps {
   selectedVoice: string;
   openVoiceModal: () => void;
   onSettingsClick?: () => void;
+  voiceAvatarUrl?: string;
 }
 
 const VoiceSelector: React.FC<VoiceSelectorProps> = ({
   selectedVoice,
   openVoiceModal,
   onSettingsClick,
+  voiceAvatarUrl
 }) => {
+  // Get initials for avatar fallback
+  const getInitials = (name: string) => {
+    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+  };
+
   return (
     <Button 
       variant="outline" 
@@ -21,8 +29,17 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
       onClick={openVoiceModal}
     >
       <div className="flex items-center gap-1 sm:gap-2 overflow-hidden">
-        <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-amber-500 flex-shrink-0 flex items-center justify-center text-white">
-          <User className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+        <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-amber-500 flex-shrink-0 flex items-center justify-center text-white overflow-hidden">
+          {voiceAvatarUrl ? (
+            <Avatar className="h-full w-full">
+              <AvatarImage src={voiceAvatarUrl} alt={selectedVoice} />
+              <AvatarFallback className="bg-amber-500 text-white">
+                {getInitials(selectedVoice)}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <User className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+          )}
         </div>
         <span className="truncate text-[10px] sm:text-xs max-w-[100px] sm:max-w-[120px]">{selectedVoice}</span>
       </div>

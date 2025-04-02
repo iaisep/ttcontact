@@ -1,10 +1,8 @@
 
 import React from 'react';
-import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
-import { User, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface VoiceTableRowProps {
   voice: RetellVoice;
@@ -17,102 +15,62 @@ const VoiceTableRow: React.FC<VoiceTableRowProps> = ({
   isSelected,
   onSelect
 }) => {
-  // Extract traits from the voice data
+  // Extract traits from voice properties
   const getTraits = () => {
     const traits = [];
     
-    // Add accent
-    if (voice.accent) {
-      traits.push(voice.accent);
-    }
+    if (voice.gender) traits.push(voice.gender);
+    if (voice.accent) traits.push(voice.accent);
+    if (voice.age) traits.push(voice.age);
+    if (voice.provider) traits.push(voice.provider);
     
-    // Add gender
-    if (voice.gender) {
-      traits.push(voice.gender);
-    }
-    
-    // Add age
-    if (voice.age) {
-      traits.push(voice.age);
-    }
-    
-    // Add provider as trait
-    if (voice.provider) {
-      traits.push(voice.provider);
-    }
-    
-    // Add voice type as trait
-    if (voice.standard_voice_type) {
-      traits.push(voice.standard_voice_type);
-    }
-
-    // Add language
-    if (voice.language) {
-      traits.push(voice.language);
-    }
-    
-    return traits.length > 0 ? traits : ['No traits available'];
+    return traits.filter(Boolean).slice(0, 3); // Limit to 3 traits
   };
   
   const traits = getTraits();
+  const displayName = voice.name || 'Unnamed Voice';
+  const voiceId = voice.id || 'unknown-id';
   
-  // Get badge color based on trait
-  const getBadgeVariant = (trait: string): "default" | "secondary" | "outline" | "destructive" => {
-    if (trait.toLowerCase().includes('american') || trait.toLowerCase().includes('british') || trait.toLowerCase().includes('indian')) {
-      return 'secondary';
-    } else if (trait.toLowerCase().includes('young') || trait.toLowerCase().includes('middle') || trait.toLowerCase().includes('old')) {
-      return 'outline';
-    } else if (trait.toLowerCase().includes('male') || trait.toLowerCase().includes('female') || trait.toLowerCase().includes('neutral')) {
-      return 'default';
-    } else {
-      return 'outline';
-    }
+  // Get initials for avatar fallback
+  const getInitials = (name: string) => {
+    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
   };
   
   return (
-    <div className={`grid grid-cols-4 p-4 border-b hover:bg-gray-50 transition-colors ${isSelected ? 'bg-blue-50' : ''}`}>
+    <div className="grid grid-cols-4 p-4 border-b hover:bg-gray-50 transition-colors">
       <div className="flex items-center gap-3">
-        {voice.preview_audio_url && (
-          <button 
-            className="text-gray-600 hover:text-black p-1.5 rounded-full hover:bg-gray-100 transition-colors" 
-            title="Play voice sample"
-            onClick={(e) => {
-              e.stopPropagation();
-              const audio = new Audio(voice.preview_audio_url);
-              audio.play().catch(err => console.error('Failed to play audio:', err));
-            }}
-          >
-            <Play className="h-4 w-4" />
-          </button>
-        )}
-        
-        <Avatar className="h-8 w-8 rounded-full border border-gray-200">
+        <Avatar className="h-10 w-10 bg-amber-500">
           {voice.avatar_url ? (
-            <AvatarImage src={voice.avatar_url} alt={voice.name || ''} />
-          ) : null}
-          <AvatarFallback className="bg-gray-100 text-gray-700">
-            {voice.name ? voice.name.substring(0, 2).toUpperCase() : <User className="h-4 w-4" />}
-          </AvatarFallback>
+            <AvatarImage src={voice.avatar_url} alt={displayName} />
+          ) : (
+            <AvatarFallback className="bg-amber-500 text-white">
+              {getInitials(displayName)}
+            </AvatarFallback>
+          )}
         </Avatar>
-        
-        <div className="font-medium text-gray-800 truncate">{voice.name || 'Unnamed Voice'}</div>
+        <span className="font-medium">{displayName}</span>
       </div>
       
-      <div className="flex items-center flex-wrap gap-1.5">
-        {traits.map((trait, index) => (
-          <Badge 
-            key={index}
-            variant={getBadgeVariant(trait)}
-            className="text-xs px-2 py-0.5 rounded-full"
-          >
-            {trait}
-          </Badge>
-        ))}
+      <div className="flex items-center gap-1 flex-wrap">
+        {traits.length > 0 ? (
+          traits.map((trait, index) => (
+            <span 
+              key={index} 
+              className="text-xs bg-gray-100 text-gray-700 rounded-full px-2 py-0.5 truncate"
+            >
+              {trait}
+            </span>
+          ))
+        ) : (
+          <span className="text-xs text-gray-500">No traits</span>
+        )}
       </div>
       
-      <div className="flex items-center text-gray-600 text-sm truncate">{voice.id || 'No ID'}</div>
+      <div className="flex items-center">
+        <span className="text-xs text-gray-500 truncate">{voiceId}</span>
+      </div>
       
-      <div className="flex justify-end">
+      <div className="flex items-center justify-end">
         <Button 
           size="sm"
           onClick={onSelect}

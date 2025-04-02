@@ -1,8 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
 import { Voice } from '../voice-selection/types';
+import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
+import { useParams } from 'react-router-dom';
 
 // Define VoiceModelOption type
 export interface VoiceModelOption {
@@ -19,6 +21,7 @@ interface UseVoiceSettingsProps {
 
 export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSettingsProps) => {
   const { fetchWithAuth } = useApiContext();
+  const { slug } = useParams<{ slug: string }>();
   
   const [selectedVoice, setSelectedVoice] = useState(initialVoice);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
@@ -37,23 +40,45 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
     { value: 'deepgram', label: 'Deepgram', id: 'deepgram', description: 'Accurate voice synthesis' }
   ];
   
-  // Update to accept Voice object instead of just voiceId string
-  const handleVoiceChange = async (voice: Voice) => {
+  // Update to handle RetellVoice object 
+  const handleVoiceChange = async (voice: RetellVoice) => {
+    if (!slug) {
+      toast.error('Agent ID is missing');
+      return;
+    }
+    
     try {
-      const voiceId = voice.voice_id; // Extract voice_id from Voice object
+      const voiceId = voice.id;
+      
+      if (!voiceId) {
+        toast.error('Voice ID is missing');
+        return;
+      }
       
       toast.loading('Updating voice...');
       
-      // Update the agent
-      await fetchWithAuth(`/update-agent/${voiceId}`, {
+      // Update the agent with the correct agent ID from the URL
+      await fetchWithAuth(`/update-agent/${slug}`, {
         method: 'PATCH',
         body: JSON.stringify({
           voice_id: voiceId
         })
       });
       
-      setSelectedVoice(voice.name || voiceId);
+      // Fetch the updated agent to get the latest information
+      const updatedAgent = await fetchWithAuth(`/get-agent/${slug}`);
+      
+      // Get the voice information separately
+      const voiceInfo = await fetchWithAuth(`/get-voice/${voiceId}`);
+      
+      // Update local state with voice name
+      const voiceName = voiceInfo?.name || voice.name || voiceId;
+      setSelectedVoice(voiceName);
+      
+      // Update the agent field in the parent component
       updateAgentField('voice_id', voiceId);
+      updateAgentField('voice', voiceName);
+      
       setIsVoiceModalOpen(false);
       
       toast.success('Voice updated successfully');

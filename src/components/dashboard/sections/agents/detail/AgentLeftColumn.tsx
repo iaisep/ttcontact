@@ -16,13 +16,15 @@ interface AgentLeftColumnProps {
   llm?: RetellLLM | null;
   updateAgentField: (fieldName: string, value: any) => void;
   refreshData?: () => void;
+  voice?: any;
 }
 
 const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   agent,
   llm,
   updateAgentField,
-  refreshData
+  refreshData,
+  voice
 }) => {
   // Use language context
   const { t } = useLanguage();
@@ -32,7 +34,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   
   // Use custom hooks to manage state and logic
   const voiceSettings = useVoiceSettings({ 
-    initialVoice: agent.voice || 'Adrian', 
+    initialVoice: agent.voice || (voice?.name || 'Select Voice'), 
     updateAgentField 
   });
   
@@ -85,6 +87,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         voiceModelOptions={voiceSettings.voiceModelOptions}
         openVoiceModal={voiceSettings.openVoiceModal}
         handleSaveVoiceSettings={voiceSettings.handleSaveVoiceSettings}
+        voiceAvatarUrl={voice?.avatar_url}
         
         // Language settings props
         selectedLanguage={languageSelector.selectedLanguage}

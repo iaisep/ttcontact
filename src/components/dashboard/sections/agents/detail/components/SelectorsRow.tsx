@@ -1,32 +1,32 @@
 
 import React from 'react';
+import { Separator } from '@/components/ui/separator';
+import LlmSelector from './LlmSelector';
 import VoiceSelector from './VoiceSelector';
 import LanguageSelector from './LanguageSelector';
-import LlmSelector from './LlmSelector';
 import LlmSettingsPopover from './LlmSettingsPopover';
-import VoiceSettingsPopover from './VoiceSettingsPopover';
+import VoiceSettingsPopover from '../components/VoiceSettingsPopover';
 import { VoiceModelOption } from '../hooks/useVoiceSettings';
-import { Button } from '@/components/ui/button';
 
 interface SelectorsRowProps {
   // LLM props
-  llmId: string | undefined;
+  llmId?: string;
   selectedModel: string;
   isLlmSettingsOpen: boolean;
-  setIsLlmSettingsOpen: (open: boolean) => void;
+  setIsLlmSettingsOpen: (isOpen: boolean) => void;
   llmTemperature: number;
   setLlmTemperature: (temp: number) => void;
   structuredOutput: boolean;
-  setStructuredOutput: (structured: boolean) => void;
+  setStructuredOutput: (val: boolean) => void;
   highPriority: boolean;
-  setHighPriority: (priority: boolean) => void;
-  handleLlmChange: (llmId: string) => void;
-  handleSaveLlmSettings: () => void;
+  setHighPriority: (val: boolean) => void;
+  handleLlmChange?: (llmId: string) => Promise<void>;
+  handleSaveLlmSettings: () => Promise<void>;
   
   // Voice props
   selectedVoice: string;
   isVoiceSettingsOpen: boolean;
-  setIsVoiceSettingsOpen: (open: boolean) => void;
+  setIsVoiceSettingsOpen: (isOpen: boolean) => void;
   voiceModel: string;
   setVoiceModel: (model: string) => void;
   voiceSpeed: number;
@@ -35,14 +35,15 @@ interface SelectorsRowProps {
   setVoiceTemperature: (temp: number) => void;
   voiceVolume: number;
   setVoiceVolume: (volume: number) => void;
-  voiceModelOptions: VoiceModelOption[]; 
+  voiceModelOptions: VoiceModelOption[];
   openVoiceModal: () => void;
-  handleSaveVoiceSettings: () => void;
+  handleSaveVoiceSettings: () => Promise<void>;
+  voiceAvatarUrl?: string;
   
   // Language props
   selectedLanguage: string;
-  languageOptions: Array<{ value: string; label: string; icon: string }>;
-  handleLanguageChange: (language: string) => void;
+  languageOptions: { value: string; label: string }[];
+  handleLanguageChange: (language: string) => Promise<void>;
 }
 
 const SelectorsRow: React.FC<SelectorsRowProps> = ({
@@ -75,6 +76,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   voiceModelOptions,
   openVoiceModal,
   handleSaveVoiceSettings,
+  voiceAvatarUrl,
   
   // Language props
   selectedLanguage,
@@ -82,64 +84,64 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   handleLanguageChange,
 }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[0.15rem] mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
       {/* LLM Selector */}
-      <div className="flex items-center space-x-2 w-full overflow-hidden">
-        <div className="flex-grow w-full overflow-hidden">
-          <LlmSelector
-            llmId={llmId}
-            selectedModel={selectedModel}
-            onLlmChange={handleLlmChange}
-            onSettingsClick={() => setIsLlmSettingsOpen(true)}
+      <div>
+        <h3 className="text-[10px] font-medium mb-2">LLM</h3>
+        <div className="relative">
+          <LlmSelector 
+            selectedModel={selectedModel} 
+            openLlmSettings={() => setIsLlmSettingsOpen(true)}
+          />
+          <LlmSettingsPopover 
+            isOpen={isLlmSettingsOpen}
+            setIsOpen={setIsLlmSettingsOpen}
+            llmTemperature={llmTemperature}
+            setLlmTemperature={setLlmTemperature}
+            structuredOutput={structuredOutput}
+            setStructuredOutput={setStructuredOutput}
+            highPriority={highPriority}
+            setHighPriority={setHighPriority}
+            onSave={handleSaveLlmSettings}
           />
         </div>
-        <LlmSettingsPopover
-          isLlmSettingsOpen={isLlmSettingsOpen}
-          setIsLlmSettingsOpen={setIsLlmSettingsOpen}
-          llmTemperature={llmTemperature}
-          setLlmTemperature={setLlmTemperature}
-          structuredOutput={structuredOutput}
-          setStructuredOutput={setStructuredOutput}
-          highPriority={highPriority}
-          setHighPriority={setHighPriority}
-          handleSaveLlmSettings={handleSaveLlmSettings}
-        />
       </div>
       
       {/* Voice Selector */}
-      <div className="flex items-center space-x-2 w-full overflow-hidden">
-        <div className="flex-grow w-full overflow-hidden">
-          <VoiceSelector
-            selectedVoice={selectedVoice}
+      <div>
+        <h3 className="text-[10px] font-medium mb-2">Voice</h3>
+        <div className="relative">
+          <VoiceSelector 
+            selectedVoice={selectedVoice} 
             openVoiceModal={openVoiceModal}
             onSettingsClick={() => setIsVoiceSettingsOpen(true)}
+            voiceAvatarUrl={voiceAvatarUrl}
+          />
+          <VoiceSettingsPopover 
+            isOpen={isVoiceSettingsOpen}
+            setIsOpen={setIsVoiceSettingsOpen}
+            voiceModel={voiceModel}
+            setVoiceModel={setVoiceModel}
+            voiceSpeed={voiceSpeed}
+            setVoiceSpeed={setVoiceSpeed}
+            voiceTemperature={voiceTemperature}
+            setVoiceTemperature={setVoiceTemperature}
+            voiceVolume={voiceVolume}
+            setVoiceVolume={setVoiceVolume}
+            voiceModelOptions={voiceModelOptions}
+            onSave={handleSaveVoiceSettings}
           />
         </div>
-        <VoiceSettingsPopover
-          isOpen={isVoiceSettingsOpen}
-          setIsOpen={setIsVoiceSettingsOpen}
-          voiceModel={voiceModel}
-          setVoiceModel={setVoiceModel}
-          voiceSpeed={voiceSpeed}
-          setVoiceSpeed={setVoiceSpeed}
-          voiceTemperature={voiceTemperature}
-          setVoiceTemperature={setVoiceTemperature}
-          voiceVolume={voiceVolume}
-          setVoiceVolume={setVoiceVolume}
-          voiceModelOptions={voiceModelOptions}
-          onSave={handleSaveVoiceSettings}
-        />
       </div>
       
       {/* Language Selector */}
-      <div className="flex items-center space-x-2 w-full overflow-hidden">
-        <div className="flex-grow w-full overflow-hidden">
-          <LanguageSelector 
-            selectedLanguage={selectedLanguage}
-            languageOptions={languageOptions}
-            handleLanguageChange={handleLanguageChange}
-          />
-        </div>
+      <div>
+        <h3 className="text-[10px] font-medium mb-2">Language</h3>
+        <LanguageSelector 
+          selectedLanguage={selectedLanguage}
+          languageOptions={languageOptions}
+          onLanguageChange={handleLanguageChange}
+        />
       </div>
     </div>
   );
