@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { X, Loader2 } from 'lucide-react';
 import { useVoiceFiltering } from './useVoiceFiltering';
-import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
+import { RetellVoice, RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import { useLanguage } from '@/context/LanguageContext';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -14,13 +14,17 @@ interface VoiceSelectionModalProps {
   onClose: () => void;
   onSelectVoice: (voice: RetellVoice) => void;
   selectedVoice?: string;
+  agent?: RetellAgent;
+  updateAgentField?: (fieldName: string, value: any) => void;
 }
 
 const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
   open,
   onClose,
   onSelectVoice,
-  selectedVoice
+  selectedVoice,
+  agent,
+  updateAgentField
 }) => {
   const { t } = useLanguage();
   const { fetchWithAuth } = useApiContext();

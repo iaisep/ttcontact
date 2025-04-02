@@ -16,7 +16,7 @@ const VoiceTable: React.FC<VoiceTableProps> = ({
   selectedVoiceId
 }) => {
   return (
-    <div className="border rounded-md mt-4">
+    <div className="border rounded-md mt-4 overflow-hidden">
       <div className="grid grid-cols-4 p-4 border-b bg-gray-50">
         <div className="font-medium text-gray-700">Voice</div>
         <div className="font-medium text-gray-700">Traits</div>
