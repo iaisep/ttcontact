@@ -1,6 +1,6 @@
 
-import { useState, useMemo } from 'react';
-import { Voice, mockVoices } from './types';
+import { useState, useCallback } from 'react';
+import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 
 export const useVoiceFiltering = (initialProvider: string = 'ElevenLabs') => {
   const [activeProvider, setActiveProvider] = useState(initialProvider);
@@ -9,11 +9,17 @@ export const useVoiceFiltering = (initialProvider: string = 'ElevenLabs') => {
   const [accentFilter, setAccentFilter] = useState<string>('all_accents');
   const [typeFilter, setTypeFilter] = useState<string>('all_types');
 
-  const filteredVoices = useMemo(() => {
-    return mockVoices.filter(voice => {
+  const getFilteredVoices = useCallback((voices: RetellVoice[]) => {
+    return voices.filter(voice => {
       // Filter by provider
-      if (activeProvider !== 'All' && voice.provider !== activeProvider) {
-        return false;
+      if (activeProvider !== 'All') {
+        if (activeProvider === 'ElevenLabs' && !voice.id.includes('11labs')) {
+          return false;
+        } else if (activeProvider === 'PlayHT' && !voice.id.includes('play')) {
+          return false;
+        } else if (activeProvider === 'OpenAI' && !voice.id.includes('openai')) {
+          return false;
+        }
       }
       
       // Filter by search term
@@ -23,42 +29,39 @@ export const useVoiceFiltering = (initialProvider: string = 'ElevenLabs') => {
       
       // Filter by gender
       if (genderFilter !== 'all_genders') {
-        const genderMapping: Record<string, string[]> = {
-          'male': ['Male'],
-          'female': ['Female'],
-          'neutral': ['Neutral'],
+        const genderMap: Record<string, string> = {
+          'male': 'male',
+          'female': 'female',
+          'neutral': 'neutral',
         };
         
-        const targetGenders = genderMapping[genderFilter] || [];
-        if (targetGenders.length && !voice.traits.some(trait => targetGenders.includes(trait))) {
+        if (genderMap[genderFilter] && voice.gender !== genderMap[genderFilter]) {
           return false;
         }
       }
       
       // Filter by accent
       if (accentFilter !== 'all_accents') {
-        const accentMapping: Record<string, string[]> = {
-          'american': ['American'],
-          'british': ['British'],
-          'indian': ['Indian'],
+        const accentMap: Record<string, string> = {
+          'american': 'American',
+          'british': 'British',
+          'indian': 'Indian',
         };
         
-        const targetAccents = accentMapping[accentFilter] || [];
-        if (targetAccents.length && !voice.traits.some(trait => targetAccents.includes(trait))) {
+        if (accentMap[accentFilter] && voice.accent !== accentMap[accentFilter]) {
           return false;
         }
       }
       
       // Filter by type
       if (typeFilter !== 'all_types') {
-        const typeMapping: Record<string, string[]> = {
-          'retail': ['Retail'],
-          'provider': ['Provider'],
-          'custom': ['Custom'],
-        };
-        
-        const targetTypes = typeMapping[typeFilter] || [];
-        if (targetTypes.length && !voice.traits.some(trait => targetTypes.includes(trait))) {
+        // Since the API data might not have a direct "type" field,
+        // we need to infer the type from the voice_id or other properties
+        if (typeFilter === 'retail' && !voice.standard_voice_type?.includes('retell')) {
+          return false;
+        } else if (typeFilter === 'provider' && !voice.standard_voice_type?.includes('preset')) {
+          return false;
+        } else if (typeFilter === 'custom' && !voice.id.includes('custom')) {
           return false;
         }
       }
@@ -78,6 +81,6 @@ export const useVoiceFiltering = (initialProvider: string = 'ElevenLabs') => {
     setAccentFilter,
     typeFilter,
     setTypeFilter,
-    filteredVoices
+    getFilteredVoices
   };
 };
