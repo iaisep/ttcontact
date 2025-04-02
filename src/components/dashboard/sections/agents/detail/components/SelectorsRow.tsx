@@ -12,7 +12,7 @@ interface LlmSettings {
   llmTemperature: number;
   structuredOutput: boolean;
   highPriority: boolean;
-  handleLlmChange: (newLlmId: string) => void;
+  handleLlmChange: (newLlmId: string) => Promise<void>;
   onLlmSettingsUpdated?: () => void;
 }
 
@@ -36,7 +36,7 @@ interface VoiceSettings {
 
 interface LanguageSettings {
   selectedLanguage: string;
-  languageOptions: {value: string; label: string}[];
+  languageOptions: {value: string; label: string; icon?: string}[];
   handleLanguageChange: (newLanguage: string) => void;
 }
 
@@ -85,6 +85,11 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
           selectedModel={selectedModel} 
           onLlmChange={handleLlmChange}
           onSettingsClick={() => setIsLlmSettingsOpen(true)}
+          llmId={llmId}
+          temperature={llmTemperature}
+          structuredOutput={structuredOutput}
+          highPriority={highPriority}
+          onSettingsUpdated={onLlmSettingsUpdated || (() => {})}
         />
       </div>
       
@@ -112,10 +117,10 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
         open={isLlmSettingsOpen}
         onClose={() => setIsLlmSettingsOpen(false)}
         llmId={llmId}
-        temperature={llmTemperature}
-        structuredOutput={structuredOutput}
-        highPriority={highPriority}
-        onSettingsUpdated={onLlmSettingsUpdated}
+        initialTemperature={llmTemperature}
+        initialStructuredOutput={structuredOutput}
+        initialHighPriority={highPriority}
+        onSettingsUpdated={onLlmSettingsUpdated || (() => {})}
       />
     </div>
   );

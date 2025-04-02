@@ -87,10 +87,10 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
 
       // Call the onLlmChange callback with the updated model
       await onLlmChange(updatedModel);
-      toast.success(t('llm_updated_successfully'));
+      toast.success(t('llm_updated_successfully') || 'LLM updated successfully');
     } catch (error) {
       console.error('Error updating LLM:', error);
-      toast.error(t('error_updating_llm'));
+      toast.error(t('error_updating_llm') || 'Error updating LLM');
     } finally {
       setIsUpdating(false);
     }

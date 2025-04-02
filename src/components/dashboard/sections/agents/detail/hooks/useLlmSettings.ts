@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
@@ -14,9 +14,9 @@ export const useLlmSettings = ({ llmId, updateAgentField }: UseLlmSettingsProps)
   const { t } = useLanguage();
   
   const [selectedModel, setSelectedModel] = useState<string>('');
-  const [llmTemperature, setLlmTemperature] = useState(0.7);
-  const [structuredOutput, setStructuredOutput] = useState(false);
-  const [highPriority, setHighPriority] = useState(false);
+  const [llmTemperature, setLlmTemperature] = useState<number>(0.7);
+  const [structuredOutput, setStructuredOutput] = useState<boolean>(false);
+  const [highPriority, setHighPriority] = useState<boolean>(false);
   
   // Fetch LLM data when llmId changes
   const fetchLlmData = useCallback(async () => {
@@ -43,10 +43,16 @@ export const useLlmSettings = ({ llmId, updateAgentField }: UseLlmSettingsProps)
     }
   }, [llmId, fetchWithAuth]);
 
+  // Initial fetch when component mounts
+  useEffect(() => {
+    fetchLlmData();
+  }, [fetchLlmData]);
+
   // Handle LLM change
   const handleLlmChange = async (newLlmId: string) => {
     setSelectedModel(newLlmId);
     // The actual API call is handled in the LlmSelector component
+    return Promise.resolve();
   };
 
   return {

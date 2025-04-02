@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -37,10 +37,23 @@ const LlmSettingsModal: React.FC<LlmSettingsModalProps> = ({
   const { fetchWithAuth } = useApiContext();
   const { t } = useLanguage();
   
-  const [temperature, setTemperature] = useState(initialTemperature);
-  const [structuredOutput, setStructuredOutput] = useState(initialStructuredOutput);
-  const [highPriority, setHighPriority] = useState(initialHighPriority);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [temperature, setTemperature] = useState<number>(initialTemperature || 0.7);
+  const [structuredOutput, setStructuredOutput] = useState<boolean>(initialStructuredOutput || false);
+  const [highPriority, setHighPriority] = useState<boolean>(initialHighPriority || false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Update state when props change
+  useEffect(() => {
+    if (initialTemperature !== undefined) {
+      setTemperature(initialTemperature);
+    }
+    if (initialStructuredOutput !== undefined) {
+      setStructuredOutput(initialStructuredOutput);
+    }
+    if (initialHighPriority !== undefined) {
+      setHighPriority(initialHighPriority);
+    }
+  }, [initialTemperature, initialStructuredOutput, initialHighPriority, open]);
 
   const handleTemperatureChange = (values: number[]) => {
     setTemperature(values[0]);
@@ -60,20 +73,12 @@ const LlmSettingsModal: React.FC<LlmSettingsModalProps> = ({
         })
       });
       
-      toast({
-        title: t('settings_updated'),
-        description: t('llm_settings_updated_successfully'),
-      });
-      
+      toast.success(t('settings_updated') || 'LLM settings updated successfully');
       onSettingsUpdated();
       onClose();
     } catch (error) {
       console.error('Error updating LLM settings:', error);
-      toast({
-        title: t('error'),
-        description: t('error_updating_llm_settings'),
-        variant: "destructive",
-      });
+      toast.error(t('error_updating_llm_settings') || 'Error updating LLM settings');
     } finally {
       setIsSubmitting(false);
     }
