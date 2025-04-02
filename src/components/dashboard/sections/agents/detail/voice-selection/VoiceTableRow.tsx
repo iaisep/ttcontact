@@ -1,86 +1,110 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Play, Pause, CheckCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface VoiceTableRowProps {
   voice: RetellVoice;
-  isSelected: boolean;
   onSelect: () => void;
+  isSelected: boolean;
 }
 
-const VoiceTableRow: React.FC<VoiceTableRowProps> = ({
-  voice,
-  isSelected,
-  onSelect
-}) => {
-  // Extract traits from voice properties
-  const getTraits = () => {
-    const traits = [];
-    
-    if (voice.gender) traits.push(voice.gender);
-    if (voice.accent) traits.push(voice.accent);
-    if (voice.age) traits.push(voice.age);
-    if (voice.provider) traits.push(voice.provider);
-    
-    return traits.filter(Boolean).slice(0, 3); // Limit to 3 traits
-  };
-  
-  const traits = getTraits();
-  const displayName = voice.name || 'Unnamed Voice';
-  const voiceId = voice.id || 'unknown-id';
-  
+const VoiceTableRow: React.FC<VoiceTableRowProps> = ({ voice, onSelect, isSelected }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+
   // Get initials for avatar fallback
   const getInitials = (name: string) => {
     return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
   };
-  
+
+  const handlePlayPause = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!audioRef.current) {
+      audioRef.current = new Audio(voice.preview_audio_url);
+      
+      audioRef.current.onended = () => {
+        setIsPlaying(false);
+      };
+    }
+    
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play().catch(error => {
+        console.error('Error playing audio:', error);
+      });
+      setIsPlaying(true);
+    }
+  };
+
   return (
-    <div className="grid grid-cols-4 p-4 border-b hover:bg-gray-50 transition-colors">
-      <div className="flex items-center gap-3">
-        <Avatar className="h-10 w-10 bg-amber-500">
-          {voice.avatar_url ? (
-            <AvatarImage src={voice.avatar_url} alt={displayName} />
-          ) : (
-            <AvatarFallback className="bg-amber-500 text-white">
-              {getInitials(displayName)}
+    <tr className="border-b hover:bg-muted/50 transition-colors cursor-pointer" onClick={onSelect}>
+      <td className="py-3 px-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10 rounded-full">
+            <AvatarImage src={voice.avatar_url} alt={voice.voice_name || voice.name} />
+            <AvatarFallback className="bg-primary/10 text-primary">
+              {getInitials(voice.voice_name || voice.name || '')}
             </AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="font-medium text-sm">{voice.voice_name || voice.name}</div>
+            <div className="text-xs text-muted-foreground">{voice.voice_id}</div>
+          </div>
+        </div>
+      </td>
+      <td className="py-3 px-4">
+        <div className="flex flex-wrap gap-1">
+          {voice.gender && (
+            <Badge variant="outline" className="text-xs px-2 py-0">
+              {voice.gender}
+            </Badge>
           )}
-        </Avatar>
-        <span className="font-medium">{displayName}</span>
-      </div>
-      
-      <div className="flex items-center gap-1 flex-wrap">
-        {traits.length > 0 ? (
-          traits.map((trait, index) => (
-            <span 
-              key={index} 
-              className="text-xs bg-gray-100 text-gray-700 rounded-full px-2 py-0.5 truncate"
+          {voice.accent && (
+            <Badge variant="outline" className="text-xs px-2 py-0">
+              {voice.accent}
+            </Badge>
+          )}
+          {voice.age && (
+            <Badge variant="outline" className="text-xs px-2 py-0">
+              {voice.age}
+            </Badge>
+          )}
+        </div>
+      </td>
+      <td className="py-3 px-4">
+        <div className="flex justify-end items-center gap-2">
+          {voice.preview_audio_url && (
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              className="h-8 w-8 rounded-full"
+              onClick={handlePlayPause}
             >
-              {trait}
-            </span>
-          ))
-        ) : (
-          <span className="text-xs text-gray-500">No traits</span>
-        )}
-      </div>
-      
-      <div className="flex items-center">
-        <span className="text-xs text-gray-500 truncate">{voiceId}</span>
-      </div>
-      
-      <div className="flex items-center justify-end">
-        <Button 
-          size="sm"
-          onClick={onSelect}
-          variant={isSelected ? "default" : "outline"}
-          className="rounded-full px-4"
-        >
-          {isSelected ? "Selected" : "Use Voice"}
-        </Button>
-      </div>
-    </div>
+              {isPlaying ? (
+                <Pause className="h-4 w-4" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
+            </Button>
+          )}
+          <Button 
+            size="sm"
+            onClick={onSelect}
+            variant={isSelected ? "default" : "outline"}
+            className="rounded-full px-4"
+          >
+            {isSelected ? "Selected" : "Use Voice"}
+          </Button>
+        </div>
+      </td>
+    </tr>
   );
 };
 

@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import VoiceTableRow from './VoiceTableRow';
+import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface VoiceTableProps {
   voices: RetellVoice[];
@@ -9,36 +10,36 @@ interface VoiceTableProps {
   selectedVoiceId?: string;
 }
 
-const VoiceTable: React.FC<VoiceTableProps> = ({
-  voices,
-  onSelectVoice,
-  selectedVoiceId
-}) => {
+const VoiceTable: React.FC<VoiceTableProps> = ({ voices, onSelectVoice, selectedVoiceId }) => {
+  const { t } = useLanguage();
+  
   return (
-    <div className="border rounded-md mt-4 overflow-hidden bg-white">
-      <div className="grid grid-cols-4 p-4 border-b bg-gray-50">
-        <div className="font-medium text-gray-700">Voice</div>
-        <div className="font-medium text-gray-700">Traits</div>
-        <div className="font-medium text-gray-700">Voice ID</div>
-        <div className="font-medium text-gray-700 text-right">Action</div>
-      </div>
-      
-      <div className="max-h-[400px] overflow-y-auto">
-        {voices.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            No voices found that match your filters
-          </div>
-        ) : (
-          voices.map((voice, index) => (
-            <VoiceTableRow 
-              key={voice.id || `voice-${index}`} 
-              voice={voice} 
-              isSelected={selectedVoiceId === voice.id}
-              onSelect={() => onSelectVoice(voice)}
-            />
-          ))
-        )}
-      </div>
+    <div className="overflow-auto">
+      {voices.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          {t('no_voices_found')}
+        </div>
+      ) : (
+        <table className="w-full">
+          <thead className="bg-muted/50">
+            <tr>
+              <th className="text-left py-2 px-4 text-xs font-medium">{t('voice')}</th>
+              <th className="text-left py-2 px-4 text-xs font-medium">{t('traits')}</th>
+              <th className="text-right py-2 px-4 text-xs font-medium"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {voices.map((voice) => (
+              <VoiceTableRow
+                key={voice.voice_id || voice.id}
+                voice={voice}
+                onSelect={() => onSelectVoice(voice)}
+                isSelected={selectedVoiceId === voice.voice_id || selectedVoiceId === voice.id}
+              />
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };

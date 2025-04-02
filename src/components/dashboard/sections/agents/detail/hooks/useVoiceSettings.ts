@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
-import { Voice } from '../voice-selection/types';
 import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import { useParams } from 'react-router-dom';
 
@@ -24,6 +23,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   const { slug } = useParams<{ slug: string }>();
   
   const [selectedVoice, setSelectedVoice] = useState(initialVoice);
+  const [voiceAvatarUrl, setVoiceAvatarUrl] = useState<string | undefined>(undefined);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isVoiceSettingsOpen, setIsVoiceSettingsOpen] = useState(false);
   
@@ -48,7 +48,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
     }
     
     try {
-      const voiceId = voice.id;
+      const voiceId = voice.voice_id || voice.id;
       
       if (!voiceId) {
         toast.error('Voice ID is missing');
@@ -68,11 +68,11 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
       // Fetch the updated agent to get the latest information
       const updatedAgent = await fetchWithAuth(`/get-agent/${slug}`);
       
-      // Get the voice information separately
-      const voiceInfo = await fetchWithAuth(`/get-voice/${voiceId}`);
+      // Set the voice avatar URL
+      setVoiceAvatarUrl(voice.avatar_url);
       
       // Update local state with voice name
-      const voiceName = voiceInfo?.name || voice.name || voiceId;
+      const voiceName = voice.voice_name || voice.name || voiceId;
       setSelectedVoice(voiceName);
       
       // Update the agent field in the parent component
@@ -100,7 +100,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
         volume: voiceVolume
       };
       
-      updateAgentField('voice_settings', voiceSettings);
+      await updateAgentField('voice_settings', voiceSettings);
       setIsVoiceSettingsOpen(false);
       
       toast.success('Voice settings saved');
@@ -116,6 +116,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   
   return {
     selectedVoice,
+    voiceAvatarUrl,
     isVoiceModalOpen,
     setIsVoiceModalOpen,
     isVoiceSettingsOpen,

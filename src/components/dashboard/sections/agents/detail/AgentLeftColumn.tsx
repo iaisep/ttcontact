@@ -34,7 +34,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   
   // Use custom hooks to manage state and logic
   const voiceSettings = useVoiceSettings({ 
-    initialVoice: agent.voice || (voice?.name || 'Select Voice'), 
+    initialVoice: agent.voice || (voice?.name || voice?.voice_name || 'Select Voice'), 
     updateAgentField 
   });
   
@@ -54,6 +54,14 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
       llmSettings.fetchLlmData();
     }
   }, [llmId]);
+
+  // Set voice avatar URL from the voice object if available
+  useEffect(() => {
+    if (voice?.avatar_url) {
+      // Ensure voiceSettings has the avatar URL
+      voiceSettings.setVoiceAvatarUrl?.(voice.avatar_url);
+    }
+  }, [voice]);
 
   return (
     <div className="space-y-6 ">
@@ -87,7 +95,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         voiceModelOptions={voiceSettings.voiceModelOptions}
         openVoiceModal={voiceSettings.openVoiceModal}
         handleSaveVoiceSettings={voiceSettings.handleSaveVoiceSettings}
-        voiceAvatarUrl={voice?.avatar_url}
+        voiceAvatarUrl={voiceSettings.voiceAvatarUrl || voice?.avatar_url}
         
         // Language settings props
         selectedLanguage={languageSelector.selectedLanguage}
