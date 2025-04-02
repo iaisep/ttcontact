@@ -51,7 +51,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   });
 
   return (
-    <div className="space-y-8"> {/* Increased from space-y-6 to space-y-8 */}
+    <div className="space-y-15"> {/* Increased from space-y-6 to space-y-8 */}
       <AgentSettingsRow
         agent={agent}
         llmId={llmId}
@@ -86,12 +86,6 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
       </div>
 
       {/* Agent Prompt */}
-      <div className="mt-8"> {/* Increased from mt-6 to mt-8 */}
-        <EditablePrompt
-          prompt={promptManager.prompt}
-          onUpdate={promptManager.updatePrompt}
-        />
-      </div>
     </div>
   );
 };
