@@ -28,7 +28,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
       className="flex items-center justify-between w-full bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-2 sm:px-4 py-1 sm:py-2 h-auto"
       onClick={openVoiceModal}
     >
-      <div className="flex items-center gap-1 sm:gap-0.2 min-w-0">
+      <div className="flex items-center gap-1 sm:gap-0.2 min-w-0 max-w-full">
         <div className="h-6 w-6 sm:h-6 sm:w-6 rounded-full bg-amber-500 flex-shrink-0 flex items-center justify-center text-white overflow-hidden">
           {voiceAvatarUrl ? (
             <Avatar className="h-full w-full">
@@ -41,7 +41,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
             <User className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
           )}
         </div>
-        <span className="truncate text-[10px] sm:text-xs" style={{ maxWidth: 'calc(100% - 48px)' }}>
+        <span className="text-xs sm:text-sm truncate flex-grow min-w-0 text-ellipsis overflow-hidden">
           {selectedVoice}
         </span>
       </div>
