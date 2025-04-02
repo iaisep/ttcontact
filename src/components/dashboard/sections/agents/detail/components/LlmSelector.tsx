@@ -102,7 +102,7 @@ const LlmSelector: React.FC<LlmSelectorProps> = ({
         <div className="h-6 w-6 sm:h-6 sm:w-6 rounded-full flex-shrink-0 flex items-center justify-center">
           <HelpCircle className="h-5 w-5 sm:h-5 sm:w-5 text-gray-700 flex-shrink-0" />
         </div>
-        <span className="truncate text-[10px]  gap-1" style={{ maxWidth: 'calc(100% - 48px)' }}>
+        <span className="truncate text-[10px] " style={{ maxWidth: 'calc(100% - 48px)' }}>
           {currentLlm.name}
         </span>
       </div>
