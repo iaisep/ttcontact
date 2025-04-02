@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useParams } from 'react-router-dom';
@@ -52,6 +52,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   const [tempVoiceTemperature, setTempVoiceTemperature] = useState(voiceTemperature);
   const [tempVoiceVolume, setTempVoiceVolume] = useState(voiceVolume);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeSlider, setActiveSlider] = useState<string | null>(null);
 
   // Reset temporary settings when modal opens
   useEffect(() => {
@@ -74,26 +75,27 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
 
   const handleSave = async () => {
     if (!slug) {
-      toast({
-        title: 'Error',
-        description: 'Agent ID is missing',
-        variant: 'destructive'
-      });
+      toast.error('Agent ID is missing');
       return;
     }
 
     setIsSaving(true);
     
     try {
-      // Update the voice settings on the server
+      // Prepare the payload for the update-agent endpoint
+      const payload = {
+        voice_speed: tempVoiceSpeed,
+        volume: tempVoiceVolume,
+        voice_temperature: tempVoiceTemperature,
+        voice_model: tempVoiceModel
+      };
+      
+      console.log('Sending update to agent with payload:', payload);
+      
+      // Call the update-agent endpoint with the payload
       await fetchWithAuth(`/update-agent/${slug}`, {
         method: 'PATCH',
-        body: JSON.stringify({
-          voice_speed: tempVoiceSpeed,
-          volume: tempVoiceVolume,
-          voice_temperature: tempVoiceTemperature,
-          voice_model: tempVoiceModel
-        })
+        body: JSON.stringify(payload)
       });
 
       // Update the parent component's state
@@ -107,26 +109,26 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
         onSettingsUpdated();
       }
 
-      toast({
-        title: 'Success',
-        description: 'Voice settings updated successfully',
-      });
-
+      toast.success('Voice settings updated successfully');
       onClose();
     } catch (error) {
       console.error('Error updating voice settings:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update voice settings',
-        variant: 'destructive'
-      });
+      toast.error('Failed to update voice settings');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const formatSliderValue = (value: number, min: number, max: number, precision: number = 2) => {
-    return value.toFixed(precision);
+  const handleSliderMouseEnter = (sliderId: string) => {
+    setActiveSlider(sliderId);
+  };
+
+  const handleSliderMouseLeave = () => {
+    setActiveSlider(null);
+  };
+
+  const formatSliderValue = (value: number) => {
+    return value.toFixed(2);
   };
 
   return (
@@ -163,7 +165,9 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               <Label htmlFor="voice-speed" className="text-sm">Voice Speed</Label>
               <div className="text-xs text-muted-foreground flex items-center gap-2">
                 <span className="text-muted-foreground text-xs">Slow</span>
-                <span className="font-medium">{formatSliderValue(tempVoiceSpeed, 0.5, 2)}</span>
+                <span className="font-medium bg-muted px-2 py-1 rounded-md">
+                  {formatSliderValue(tempVoiceSpeed)}
+                </span>
                 <span className="text-muted-foreground text-xs">Fast</span>
               </div>
             </div>
@@ -174,6 +178,8 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               step={0.01}
               value={[tempVoiceSpeed]}
               onValueChange={(values) => setTempVoiceSpeed(values[0])}
+              onMouseEnter={() => handleSliderMouseEnter('voice-speed')}
+              onMouseLeave={handleSliderMouseLeave}
             />
           </div>
 
@@ -182,7 +188,9 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               <Label htmlFor="voice-temperature" className="text-sm">Voice Temperature</Label>
               <div className="text-xs text-muted-foreground flex items-center gap-2">
                 <span className="text-muted-foreground text-xs">Calm</span>
-                <span className="font-medium">{formatSliderValue(tempVoiceTemperature, 0, 2)}</span>
+                <span className="font-medium bg-muted px-2 py-1 rounded-md">
+                  {formatSliderValue(tempVoiceTemperature)}
+                </span>
                 <span className="text-muted-foreground text-xs">Emotional</span>
               </div>
             </div>
@@ -193,6 +201,8 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               step={0.01}
               value={[tempVoiceTemperature]}
               onValueChange={(values) => setTempVoiceTemperature(values[0])}
+              onMouseEnter={() => handleSliderMouseEnter('voice-temperature')}
+              onMouseLeave={handleSliderMouseLeave}
             />
           </div>
 
@@ -201,7 +211,9 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               <Label htmlFor="voice-volume" className="text-sm">Voice Volume</Label>
               <div className="text-xs text-muted-foreground flex items-center gap-2">
                 <span className="text-muted-foreground text-xs">Low</span>
-                <span className="font-medium">{formatSliderValue(tempVoiceVolume, 0, 2)}</span>
+                <span className="font-medium bg-muted px-2 py-1 rounded-md">
+                  {formatSliderValue(tempVoiceVolume)}
+                </span>
                 <span className="text-muted-foreground text-xs">High</span>
               </div>
             </div>
@@ -212,6 +224,8 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
               step={0.01}
               value={[tempVoiceVolume]}
               onValueChange={(values) => setTempVoiceVolume(values[0])}
+              onMouseEnter={() => handleSliderMouseEnter('voice-volume')}
+              onMouseLeave={handleSliderMouseLeave}
             />
           </div>
         </div>

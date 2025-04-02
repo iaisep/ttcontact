@@ -4,6 +4,7 @@ import LlmSelector from './LlmSelector';
 import VoiceSelector from './VoiceSelector';
 import LanguageSelector from './LanguageSelector';
 import LlmSettingsModal from './LlmSettingsModal';
+import VoiceSettingsModal from './VoiceSettingsModal';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface LlmSettings {
@@ -44,11 +45,11 @@ type SelectorsRowProps = LlmSettings & VoiceSettings & LanguageSettings;
 
 const SelectorsRow: React.FC<SelectorsRowProps> = ({
   // LLM Settings
-  llmId,
+  llmId = '',
   selectedModel,
-  llmTemperature,
-  structuredOutput,
-  highPriority,
+  llmTemperature = 0.7,
+  structuredOutput = false,
+  highPriority = false,
   handleLlmChange,
   onLlmSettingsUpdated,
   
@@ -98,7 +99,6 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
         <VoiceSelector 
           selectedVoice={selectedVoice} 
           openVoiceModal={openVoiceModal}
-          onSettingsClick={() => setIsVoiceSettingsOpen(true)}
           voiceAvatarUrl={voiceAvatarUrl}
         />
       </div>
@@ -117,7 +117,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
         open={isLlmSettingsOpen}
         onClose={() => setIsLlmSettingsOpen(false)}
         llmId={llmId}
-        initialTemperature={llmTemperature}
+        initialTemperature={llmTemperature || 0.7}
         initialStructuredOutput={structuredOutput}
         initialHighPriority={highPriority}
         onSettingsUpdated={onLlmSettingsUpdated || (() => {})}
