@@ -13,17 +13,18 @@ export const useVoiceFiltering = (initialProvider: string = 'ElevenLabs') => {
     return voices.filter(voice => {
       // Filter by provider
       if (activeProvider !== 'All') {
-        if (activeProvider === 'ElevenLabs' && !voice.id.includes('11labs')) {
+        const voiceId = voice.id || '';
+        if (activeProvider === 'ElevenLabs' && !voiceId.includes('11labs')) {
           return false;
-        } else if (activeProvider === 'PlayHT' && !voice.id.includes('play')) {
+        } else if (activeProvider === 'PlayHT' && !voiceId.includes('play')) {
           return false;
-        } else if (activeProvider === 'OpenAI' && !voice.id.includes('openai')) {
+        } else if (activeProvider === 'OpenAI' && !voiceId.includes('openai')) {
           return false;
         }
       }
       
       // Filter by search term
-      if (searchTerm && !voice.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+      if (searchTerm && voice.name && !voice.name.toLowerCase().includes(searchTerm.toLowerCase())) {
         return false;
       }
       
@@ -57,11 +58,13 @@ export const useVoiceFiltering = (initialProvider: string = 'ElevenLabs') => {
       if (typeFilter !== 'all_types') {
         // Since the API data might not have a direct "type" field,
         // we need to infer the type from the voice_id or other properties
-        if (typeFilter === 'retail' && !voice.standard_voice_type?.includes('retell')) {
+        const standardVoiceType = voice.standard_voice_type || '';
+        
+        if (typeFilter === 'retail' && !standardVoiceType.includes('retell')) {
           return false;
-        } else if (typeFilter === 'provider' && !voice.standard_voice_type?.includes('preset')) {
+        } else if (typeFilter === 'provider' && !standardVoiceType.includes('preset')) {
           return false;
-        } else if (typeFilter === 'custom' && !voice.id.includes('custom')) {
+        } else if (typeFilter === 'custom' && !(voice.id || '').includes('custom')) {
           return false;
         }
       }

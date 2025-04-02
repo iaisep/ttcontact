@@ -2,7 +2,6 @@
 import React from 'react';
 import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import VoiceTableRow from './VoiceTableRow';
-import { Button } from '@/components/ui/button';
 
 interface VoiceTableProps {
   voices: RetellVoice[];
@@ -32,7 +31,7 @@ const VoiceTable: React.FC<VoiceTableProps> = ({
         ) : (
           voices.map(voice => (
             <VoiceTableRow 
-              key={voice.id} 
+              key={voice.id || `voice-${Math.random()}`} 
               voice={voice} 
               isSelected={selectedVoiceId === voice.id}
               onSelect={() => onSelectVoice(voice)}
