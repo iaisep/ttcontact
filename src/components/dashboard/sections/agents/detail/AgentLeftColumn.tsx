@@ -140,6 +140,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
             <WelcomeMessageEditor 
               welcomeMessage={agent.welcome_message || 'User initiates: AI remains silent until users speak first.'}
               onUpdate={(value) => updateAgentField('welcome_message', value)}
+              llmId={llmId}
             />
           </div>
       </div>

@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from '@/context/LanguageContext';
 import { debounce } from 'lodash';
+import { useApiContext } from '@/context/ApiContext';
+import { toast } from 'sonner';
 import {
   Select,
   SelectContent,
@@ -10,10 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
 
 interface WelcomeMessageEditorProps {
   welcomeMessage: string;
   onUpdate: (value: string) => void;
+  llmId?: string;
 }
 
 // Define the welcome message options
@@ -23,11 +27,17 @@ const WELCOME_MESSAGE_OPTIONS = {
   AI_INITIATES_CUSTOM: 'AI initiates: AI begins with your defined begin message.',
 };
 
-const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({ welcomeMessage, onUpdate }) => {
+const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({ 
+  welcomeMessage, 
+  onUpdate,
+  llmId 
+}) => {
   const { t } = useLanguage();
+  const { fetchWithAuth } = useApiContext();
   const [value, setValue] = useState(welcomeMessage);
   const [expanded, setExpanded] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
   useEffect(() => {
     setValue(welcomeMessage);
@@ -42,8 +52,50 @@ const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({ welcomeMess
     }
   }, [welcomeMessage]);
 
-  // Create debounced update function
-  const debouncedUpdate = debounce((value) => onUpdate(value), 1000);
+  const updateWelcomeMessage = async (option: string, customMessage?: string) => {
+    if (!llmId) {
+      console.error('LLM ID is required to update welcome message');
+      toast.error('Could not update welcome message: Missing LLM ID');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      let payload;
+      
+      if (option === WELCOME_MESSAGE_OPTIONS.USER_INITIATES) {
+        payload = { begin_message: "" };
+      } else if (option === WELCOME_MESSAGE_OPTIONS.AI_INITIATES_DYNAMIC) {
+        payload = { begin_message: null };
+      } else {
+        // For custom message option
+        payload = { begin_message: customMessage || "Hello, how can I help you today?" };
+      }
+      
+      // Make the API call to update the LLM's welcome message
+      await fetchWithAuth(`/update-retell-llm/${llmId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload)
+      });
+      
+      // Update local state
+      onUpdate(option === WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM && customMessage 
+        ? customMessage 
+        : option);
+      
+      toast.success('Welcome message updated successfully');
+    } catch (error) {
+      console.error('Error updating welcome message:', error);
+      toast.error('Failed to update welcome message');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Create debounced update function for custom message
+  const debouncedUpdate = debounce((newValue) => {
+    updateWelcomeMessage(WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM, newValue);
+  }, 1000);
   
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
@@ -57,7 +109,7 @@ const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({ welcomeMess
     // If the selected option is not custom, update the welcome message directly
     if (selectedValue !== WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM) {
       setValue(selectedValue);
-      onUpdate(selectedValue);
+      updateWelcomeMessage(selectedValue);
     }
   };
 
@@ -69,6 +121,7 @@ const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({ welcomeMess
           <button 
             onClick={() => setExpanded(!expanded)}
             className="text-xs text-muted-foreground hover:text-foreground"
+            disabled={isLoading}
           >
             {expanded ? 'Collapse' : 'Expand'}
           </button>
@@ -76,25 +129,32 @@ const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({ welcomeMess
       </div>
       
       <div className="p-3">
-        <Select 
-          value={selectedOption} 
-          onValueChange={handleSelectChange}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a welcome message type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={WELCOME_MESSAGE_OPTIONS.USER_INITIATES}>
-              {WELCOME_MESSAGE_OPTIONS.USER_INITIATES}
-            </SelectItem>
-            <SelectItem value={WELCOME_MESSAGE_OPTIONS.AI_INITIATES_DYNAMIC}>
-              {WELCOME_MESSAGE_OPTIONS.AI_INITIATES_DYNAMIC}
-            </SelectItem>
-            <SelectItem value={WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM}>
-              {WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM}
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select 
+            value={selectedOption} 
+            onValueChange={handleSelectChange}
+            disabled={isLoading}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a welcome message type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={WELCOME_MESSAGE_OPTIONS.USER_INITIATES}>
+                {WELCOME_MESSAGE_OPTIONS.USER_INITIATES}
+              </SelectItem>
+              <SelectItem value={WELCOME_MESSAGE_OPTIONS.AI_INITIATES_DYNAMIC}>
+                {WELCOME_MESSAGE_OPTIONS.AI_INITIATES_DYNAMIC}
+              </SelectItem>
+              <SelectItem value={WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM}>
+                {WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {isLoading && (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          )}
+        </div>
         
         {selectedOption === WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM && (
           <>
@@ -104,13 +164,14 @@ const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({ welcomeMess
                 onChange={handleChange}
                 className="min-h-[120px] font-mono text-sm border mt-3 rounded focus-visible:ring-0"
                 placeholder={t('welcome_message_placeholder')}
+                disabled={isLoading}
               />
             ) : (
               <div 
                 className="mt-3 p-3 text-sm font-mono cursor-pointer border rounded hover:bg-muted/20"
                 onClick={() => setExpanded(true)}
               >
-                {value !== WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM ? value : 'Hola {name}, que gusto volver a saludarte.'}
+                {value !== WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM ? value : 'Hello, how can I help you today?'}
               </div>
             )}
           </>
