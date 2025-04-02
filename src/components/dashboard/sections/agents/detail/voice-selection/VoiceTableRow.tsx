@@ -1,56 +1,100 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, CheckCircle } from 'lucide-react';
-import { Voice } from './types';
+import { Play, Pause, CheckCircle } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface VoiceTableRowProps {
-  voice: Voice;
-  onSelectVoice: (voice: Voice) => void;
-  isSelected?: boolean;
+  voice: RetellVoice;
+  onSelect: () => void;
+  isSelected: boolean;
 }
 
 const VoiceTableRow: React.FC<VoiceTableRowProps> = ({
   voice,
-  onSelectVoice,
-  isSelected = false
+  onSelect,
+  isSelected
 }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isRowHovered, setIsRowHovered] = useState(false);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  const handlePlayPause = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!audioRef.current && voice.preview_audio_url) {
+      audioRef.current = new Audio(voice.preview_audio_url);
+      audioRef.current.onended = () => {
+        setIsPlaying(false);
+      };
+    }
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current.play().catch(error => {
+          console.error('Error playing audio:', error);
+        });
+        setIsPlaying(true);
+      }
+    }
+  };
+
   return (
     <tr 
-      onClick={() => onSelectVoice(voice)}
-      className={`hover:bg-gray-50 cursor-pointer border-b ${isSelected ? 'bg-blue-50' : ''}`}
+      className="border-b hover:bg-muted/50 transition-colors cursor-pointer" 
+      onClick={onSelect}
+      onMouseEnter={() => setIsRowHovered(true)}
+      onMouseLeave={() => setIsRowHovered(false)}
     >
-      <td className="p-2 text-center">
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <Play className="h-4 w-4" />
-        </Button>
-      </td>
-      <td className="p-2">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
-            {voice.avatar_url ? (
-              <img src={voice.avatar_url} alt={voice.name} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-xs">{voice.name.substring(0, 2)}</span>
-            )}
-          </div>
-          <div className="flex items-center">
-            <span>{voice.name}</span>
-            {isSelected && <CheckCircle className="ml-2 h-4 w-4 text-green-500" />}
+      <td className="py-3 px-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10 rounded-full">
+            <AvatarImage src={voice.avatar_url} alt={voice.voice_name || voice.name} />
+            <AvatarFallback className="bg-primary/10 text-primary">
+              {getInitials(voice.voice_name || voice.name || '')}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="font-medium text-sm">{voice.voice_name || voice.name}</div>
+            <div className="text-xs text-muted-foreground">{voice.voice_id || voice.id}</div>
           </div>
         </div>
       </td>
-      <td className="p-2">
+      <td className="py-3 px-4">
         <div className="flex flex-wrap gap-1">
-          {voice.traits.map((trait, i) => (
-            <span key={i} className="text-xs">
-              {trait}{i < voice.traits.length - 1 ? ', ' : ''}
-            </span>
-          ))}
+          {voice.gender && <Badge variant="outline" className="text-xs px-2 py-0">
+              {voice.gender}
+            </Badge>}
+          {voice.accent && <Badge variant="outline" className="text-xs px-2 py-0">
+              {voice.accent}
+            </Badge>}
+          {voice.age && <Badge variant="outline" className="text-xs px-2 py-0">
+              {voice.age}
+            </Badge>}
         </div>
       </td>
-      <td className="p-2 font-mono text-xs text-gray-500">
-        {voice.voice_id}
+      <td className="py-3 px-4 text-center">
+        {voice.preview_audio_url && <Button size="icon" variant="ghost" onClick={handlePlayPause} className="h-8 w-8 rounded-full mx-auto bg-blue-900 hover:bg-blue-800 text-slate-50">
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          </Button>}
+      </td>
+      <td className="py-3 px-4 text-right">
+        {isRowHovered && (
+          <Button 
+            size="sm" 
+            onClick={onSelect} 
+            variant="outline" 
+            className="rounded-full px-4 transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
+          >
+            Use Voice
+          </Button>
+        )}
       </td>
     </tr>
   );

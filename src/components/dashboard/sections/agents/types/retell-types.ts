@@ -8,7 +8,10 @@ export interface RetellAgent {
   folder: string;
   agent_id: string;
   agent_name: string;
-  response_engine?: { type: string };
+  response_engine?: { 
+    type: string;
+    llm_id?: string;
+  };
   prompt?: string;
   welcome_message?: string;
   language?: string;

@@ -1,41 +1,79 @@
 
 import { useState } from 'react';
+import { useApiContext } from '@/context/ApiContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
 
 interface UseLlmSettingsProps {
-  initialModel?: string;
+  llmId: string | undefined;
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
-export const useLlmSettings = ({ initialModel = 'GPT 4o', updateAgentField }: UseLlmSettingsProps) => {
-  const [selectedLlmModel, setSelectedLlmModel] = useState(initialModel);
+export const useLlmSettings = ({ llmId, updateAgentField }: UseLlmSettingsProps) => {
+  const { fetchWithAuth } = useApiContext();
+  const { t } = useLanguage();
+  
   const [isLlmSettingsOpen, setIsLlmSettingsOpen] = useState(false);
-  const [llmTemperature, setLlmTemperature] = useState(0.0);
+  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [llmTemperature, setLlmTemperature] = useState(0.7);
   const [structuredOutput, setStructuredOutput] = useState(false);
   const [highPriority, setHighPriority] = useState(false);
-
-  const llmOptions = [
-    'GPT 4o',
-    'GPT 4o Mini',
-    'Claude 3 Opus',
-    'Claude 3 Sonnet',
-  ];
-
-  const handleLlmChange = (llm: string) => {
-    setSelectedLlmModel(llm);
-    updateAgentField('llm_model', llm);
+  
+  // Fetch LLM data when llmId changes
+  const fetchLlmData = async () => {
+    if (!llmId) return;
+    
+    try {
+      const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
+      if (llmData && llmData.model) {
+        setSelectedModel(llmData.model);
+        
+        // Set other LLM settings if available
+        if (llmData.temperature !== undefined) {
+          setLlmTemperature(llmData.temperature);
+        }
+        if (llmData.structured_output !== undefined) {
+          setStructuredOutput(llmData.structured_output);
+        }
+        if (llmData.high_priority !== undefined) {
+          setHighPriority(llmData.high_priority);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching LLM data:', error);
+    }
   };
 
-  const handleSaveLlmSettings = () => {
-    updateAgentField('llm_temperature', llmTemperature);
-    updateAgentField('structured_output', structuredOutput);
-    updateAgentField('high_priority', highPriority);
-    toast.success('LLM settings saved');
-    setIsLlmSettingsOpen(false);
+  // Handle LLM change
+  const handleLlmChange = async (newLlmId: string) => {
+    setSelectedModel(newLlmId);
+    // The actual API call is handled in the LlmSelector component
+  };
+
+  // Handle saving LLM settings
+  const handleSaveLlmSettings = async () => {
+    if (!llmId) return;
+    
+    try {
+      await fetchWithAuth(`/update-retell-llm/${llmId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          temperature: llmTemperature,
+          structured_output: structuredOutput,
+          high_priority: highPriority
+        })
+      });
+      
+      setIsLlmSettingsOpen(false);
+      toast.success(t('llm_settings_updated'));
+    } catch (error) {
+      console.error('Error updating LLM settings:', error);
+      toast.error(t('error_updating_llm_settings'));
+    }
   };
 
   return {
-    selectedLlmModel,
+    selectedModel,
     isLlmSettingsOpen,
     setIsLlmSettingsOpen,
     llmTemperature,
@@ -44,8 +82,8 @@ export const useLlmSettings = ({ initialModel = 'GPT 4o', updateAgentField }: Us
     setStructuredOutput,
     highPriority,
     setHighPriority,
-    llmOptions,
     handleLlmChange,
-    handleSaveLlmSettings
+    handleSaveLlmSettings,
+    fetchLlmData
   };
 };

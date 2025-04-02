@@ -21,7 +21,7 @@ interface ApiProviderProps {
 }
 
 export const ApiProvider = ({ children }: ApiProviderProps) => {
-  const [apiKey, setApiKey] = useState<string>('key_618d2cf39b2593b13f65725245ea');
+  const [apiKey, setApiKey] = useState<string>('key_3e56474d09efbd04003f891fae5c');
   const [baseURL, setBaseURL] = useState<string>('https://api.retellai.com');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     localStorage.getItem('auth_token') !== null

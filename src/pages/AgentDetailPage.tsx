@@ -2,7 +2,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import AgentDetailHeader from '@/components/dashboard/sections/agents/detail/AgentDetailHeader';
@@ -16,48 +15,17 @@ const AgentDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   
-  // Use our new hook to fetch all agent details
+  // Use our optimized hook to fetch all agent details
   const { 
     agent, 
     llm, 
     voice, 
     knowledgeBases, 
     isLoading, 
-    error 
+    error,
+    refreshData,
+    updateAgentField
   } = useAgentDetails(slug);
-
-  const updateAgentField = async (fieldName: string, value: any) => {
-    if (!agent) return;
-    
-    try {
-      // Create a copy of the agent with the updated field
-      const updatedAgent = {
-        ...agent,
-        [fieldName]: value
-      };
-      
-      toast.loading(t('updating_field'));
-      
-      // Update the API
-      await fetch(`https://api.retellai.com/update-agent/${agent.agent_id || agent.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
-        },
-        body: JSON.stringify(updatedAgent)
-      });
-      
-      toast.success(t('field_updated'));
-      
-      // We don't need to update local state since the page will refresh
-      // on the next navigation or manual refresh
-      
-    } catch (error) {
-      console.error(`Error updating ${fieldName}:`, error);
-      toast.error(t('error_updating_field'));
-    }
-  };
 
   if (isLoading) {
     return (
@@ -111,7 +79,9 @@ const AgentDetailPage: React.FC = () => {
             <AgentLeftColumn 
               agent={agent}
               llm={llm}
+              voice={voice}
               updateAgentField={updateAgentField}
+              refreshData={refreshData}
             />
           </div>
 

@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import EditablePrompt from './EditablePrompt';
 import WelcomeMessageEditor from './WelcomeMessageEditor';
 import GeneralPromptEditor from './GeneralPromptEditor';
-import { RetellAgent, RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
+import { RetellAgent, RetellLLM, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import { VoiceSelectionModal } from './voice-selection';
 import SelectorsRow from './components/SelectorsRow';
 import { useVoiceSettings } from './hooks/useVoiceSettings';
@@ -15,24 +15,31 @@ interface AgentLeftColumnProps {
   agent: RetellAgent;
   llm?: RetellLLM | null;
   updateAgentField: (fieldName: string, value: any) => void;
+  refreshData?: () => void;
+  voice?: RetellVoice | null;
 }
 
 const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   agent,
   llm,
-  updateAgentField
+  updateAgentField,
+  refreshData,
+  voice
 }) => {
   // Use language context
   const { t } = useLanguage();
   
+  // Get the LLM ID safely
+  const llmId = agent.response_engine?.llm_id || llm?.id;
+  
   // Use custom hooks to manage state and logic
   const voiceSettings = useVoiceSettings({ 
-    initialVoice: agent.voice || 'Adrian', 
+    initialVoice: agent.voice || (voice?.name || voice?.voice_name || 'Select Voice'), 
     updateAgentField 
   });
   
   const llmSettings = useLlmSettings({ 
-    initialModel: agent.llm_model || 'GPT 4o', 
+    llmId,
     updateAgentField 
   });
   
@@ -41,11 +48,36 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
     updateAgentField 
   });
 
+  // Fetch LLM data when component mounts or llmId changes
+  useEffect(() => {
+    if (llmId) {
+      llmSettings.fetchLlmData();
+    }
+  }, [llmId]);
+
+  // Set voice avatar URL from the voice object if available
+  useEffect(() => {
+    if (voice?.avatar_url) {
+      // Ensure voiceSettings has the avatar URL
+      voiceSettings.setVoiceAvatarUrl(voice.avatar_url);
+    }
+  }, [voice]);
+
+  // Update selected voice when agent voice changes
+  useEffect(() => {
+    if (agent.voice) {
+      voiceSettings.setSelectedVoice(agent.voice);
+    } else if (voice?.name || voice?.voice_name) {
+      voiceSettings.setSelectedVoice(voice.name || voice.voice_name || 'Select Voice');
+    }
+  }, [agent.voice, voice]);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       <SelectorsRow
         // LLM settings props
-        selectedLlmModel={llmSettings.selectedLlmModel}
+        llmId={llmId}
+        selectedModel={llmSettings.selectedModel}
         isLlmSettingsOpen={llmSettings.isLlmSettingsOpen}
         setIsLlmSettingsOpen={llmSettings.setIsLlmSettingsOpen}
         llmTemperature={llmSettings.llmTemperature}
@@ -54,7 +86,6 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         setStructuredOutput={llmSettings.setStructuredOutput}
         highPriority={llmSettings.highPriority}
         setHighPriority={llmSettings.setHighPriority}
-        llmOptions={llmSettings.llmOptions}
         handleLlmChange={llmSettings.handleLlmChange}
         handleSaveLlmSettings={llmSettings.handleSaveLlmSettings}
         
@@ -73,6 +104,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         voiceModelOptions={voiceSettings.voiceModelOptions}
         openVoiceModal={voiceSettings.openVoiceModal}
         handleSaveVoiceSettings={voiceSettings.handleSaveVoiceSettings}
+        voiceAvatarUrl={voiceSettings.voiceAvatarUrl || voice?.avatar_url}
         
         // Language settings props
         selectedLanguage={languageSelector.selectedLanguage}
@@ -92,7 +124,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
 
       {/* Display LLM General Prompt if available */}
       {llm?.general_prompt && (
-        <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+        <div className=" mt-6 bg-gray-50 p-4 rounded-lg">
           <GeneralPromptEditor 
             generalPrompt={llm.general_prompt}
             onUpdate={(value) => updateAgentField('general_prompt', value)}
@@ -102,11 +134,13 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
 
       {/* Welcome Message */}
       <div className="mt-6">
-        <h3 className="text-sm font-medium mb-2">{t('welcome_message')}</h3>
-        <WelcomeMessageEditor
-          welcomeMessage={agent.welcome_message || 'User initiates: AI remains silent until users speak first.'}
-          onUpdate={(value) => updateAgentField('welcome_message', value)}
-        />
+        <h3 className="text-[10px] font-medium mb-2">{t('welcome_message')}</h3>
+          <div className="text-[10px]">
+            <WelcomeMessageEditor 
+              welcomeMessage={agent.welcome_message || 'User initiates: AI remains silent until users speak first.'}
+              onUpdate={(value) => updateAgentField('welcome_message', value)}
+            />
+          </div>
       </div>
     </div>
   );

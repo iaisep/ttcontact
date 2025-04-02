@@ -1,29 +1,72 @@
 
-import { useState, useMemo } from 'react';
-import { Voice, mockVoices } from './types';
+import { useState } from 'react';
+import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 
-export const useVoiceFiltering = (initialProvider: string = 'ElevenLabs') => {
-  const [activeProvider, setActiveProvider] = useState(initialProvider);
+export const useVoiceFiltering = () => {
+  const [activeProvider, setActiveProvider] = useState('elevenlabs');
   const [searchTerm, setSearchTerm] = useState('');
-  const [genderFilter, setGenderFilter] = useState<string>('all_genders');
-  const [accentFilter, setAccentFilter] = useState<string>('all_accents');
-  const [typeFilter, setTypeFilter] = useState<string>('all_types');
+  const [genderFilter, setGenderFilter] = useState('all');
+  const [accentFilter, setAccentFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
 
-  const filteredVoices = useMemo(() => {
-    return mockVoices.filter(voice => {
-      // Filter by provider
-      if (activeProvider !== 'All' && voice.provider !== activeProvider) {
-        return false;
+  const normalizeString = (str: string | undefined | null): string => {
+    return (str || '').trim().toLowerCase();
+  };
+
+  const getFilteredVoices = (voices: RetellVoice[]) => {
+    return voices.filter(voice => {
+      // Provider filter
+      if (activeProvider !== 'all') {
+        const provider = normalizeString(voice.provider);
+        
+        if (activeProvider === 'elevenlabs' && provider !== 'elevenlabs') {
+          return false;
+        }
+        if (activeProvider === 'play' && provider !== 'play') {
+          return false;
+        }
+        if (activeProvider === 'openai' && provider !== 'openai') {
+          return false;
+        }
       }
-      
-      // Filter by search term
-      if (searchTerm && !voice.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-        return false;
+
+      // Search filter
+      if (searchTerm) {
+        const voiceName = normalizeString(voice.voice_name || voice.name);
+        const searchLower = searchTerm.toLowerCase();
+        
+        if (!voiceName.includes(searchLower)) {
+          return false;
+        }
       }
-      
+
+      // Gender filter
+      if (genderFilter !== 'all') {
+        const gender = normalizeString(voice.gender);
+        if (gender !== genderFilter.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // Accent filter
+      if (accentFilter !== 'all') {
+        const accent = normalizeString(voice.accent);
+        if (accent !== accentFilter.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // Type filter
+      if (typeFilter !== 'all') {
+        const voiceType = normalizeString(voice.voice_type);
+        if (voiceType !== typeFilter.toLowerCase()) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [activeProvider, searchTerm]);
+  };
 
   return {
     activeProvider,
@@ -36,6 +79,6 @@ export const useVoiceFiltering = (initialProvider: string = 'ElevenLabs') => {
     setAccentFilter,
     typeFilter,
     setTypeFilter,
-    filteredVoices
+    getFilteredVoices
   };
 };

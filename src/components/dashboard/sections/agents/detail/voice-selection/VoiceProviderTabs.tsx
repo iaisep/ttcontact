@@ -14,32 +14,32 @@ const VoiceProviderTabs: React.FC<VoiceProviderTabsProps> = ({
   children
 }) => {
   return (
-    <Tabs defaultValue={activeProvider} className="w-full">
-      <TabsList className="px-6 border-b rounded-none justify-start">
+    <Tabs value={activeProvider} className="w-full h-full flex flex-col">
+      <TabsList className="flex w-full h-10 border-b rounded-none bg-transparent">
         <TabsTrigger 
-          value="ElevenLabs" 
-          onClick={() => setActiveProvider('ElevenLabs')}
-          className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+          value="elevenlabs" 
+          onClick={() => setActiveProvider('elevenlabs')}
+          className="flex-1 text-sm h-full rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:font-medium bg-transparent hover:bg-gray-50"
         >
           ElevenLabs
         </TabsTrigger>
         <TabsTrigger 
-          value="PlayHT" 
-          onClick={() => setActiveProvider('PlayHT')}
-          className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+          value="play" 
+          onClick={() => setActiveProvider('play')}
+          className="flex-1 text-sm h-full rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:font-medium bg-transparent hover:bg-gray-50"
         >
           PlayHT
         </TabsTrigger>
         <TabsTrigger 
-          value="OpenAI" 
-          onClick={() => setActiveProvider('OpenAI')}
-          className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+          value="openai" 
+          onClick={() => setActiveProvider('openai')}
+          className="flex-1 text-sm h-full rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:font-medium bg-transparent hover:bg-gray-50"
         >
           OpenAI
         </TabsTrigger>
       </TabsList>
       
-      <div className="p-4">
+      <div className="p-4 overflow-y-auto flex-1">
         {children}
       </div>
     </Tabs>

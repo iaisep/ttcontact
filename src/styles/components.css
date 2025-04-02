@@ -13,4 +13,30 @@
   .circle-highlight {
     @apply bg-white/10 border border-white/20 dark:bg-gray-800/50 dark:border-white/10 rounded-full;
   }
+
+  /* Dropdown menu with proper z-index and visibility */
+  .dropdown-menu-content {
+    @apply z-50 bg-white border border-gray-200 shadow-lg rounded-md overflow-hidden;
+  }
+  
+  .dropdown-menu-item {
+    @apply flex items-center justify-between py-2 px-3 hover:bg-gray-100 cursor-pointer;
+  }
+
+  /* LLM Provider specific colors */
+  .provider-openai {
+    @apply text-green-600;
+  }
+  
+  .provider-anthropic {
+    @apply text-purple-600;
+  }
+  
+  .provider-google {
+    @apply text-blue-600;
+  }
+  
+  .provider-mistral {
+    @apply text-indigo-600;
+  }
 }

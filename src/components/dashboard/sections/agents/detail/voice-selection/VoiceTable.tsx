@@ -1,42 +1,48 @@
 
 import React from 'react';
 import VoiceTableRow from './VoiceTableRow';
-import { Voice } from './types';
+import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
+import { useLanguage } from '@/context/LanguageContext';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface VoiceTableProps {
-  voices: Voice[];
-  onSelectVoice: (voice: Voice) => void;
+  voices: RetellVoice[];
+  onSelectVoice: (voice: RetellVoice) => void;
   selectedVoiceId?: string;
 }
 
-const VoiceTable: React.FC<VoiceTableProps> = ({
-  voices,
-  onSelectVoice,
-  selectedVoiceId
-}) => {
+const VoiceTable: React.FC<VoiceTableProps> = ({ voices, onSelectVoice, selectedVoiceId }) => {
+  const { t } = useLanguage();
+  
   return (
-    <div className="overflow-auto h-[400px] border rounded-md">
-      <table className="w-full">
-        <thead className="sticky top-0 bg-white border-b">
-          <tr>
-            <th className="w-12"></th>
-            <th className="text-left p-2 font-medium">Voice</th>
-            <th className="text-left p-2 font-medium">Trait</th>
-            <th className="text-left p-2 font-medium">Voice ID</th>
-          </tr>
-        </thead>
-        <tbody>
-          {voices.map((voice) => (
-            <VoiceTableRow 
-              key={voice.id} 
-              voice={voice} 
-              onSelectVoice={onSelectVoice} 
-              isSelected={selectedVoiceId === voice.voice_id}
-            />
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <ScrollArea className="h-[400px] overflow-auto">
+      {voices.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          {t('no_voices_found')}
+        </div>
+      ) : (
+        <table className="w-full">
+          <thead className="bg-muted/50 sticky top-0 z-10">
+            <tr>
+              <th className="text-left py-2 px-4 text-xs font-medium">{t('voice')}</th>
+              <th className="text-left py-2 px-4 text-xs font-medium">{t('traits')}</th>
+              <th className="text-center py-2 px-4 text-xs font-medium">{t('preview') || 'Preview'}</th>
+              <th className="text-right py-2 px-4 text-xs font-medium"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {voices.map((voice) => (
+              <VoiceTableRow
+                key={voice.voice_id || voice.id}
+                voice={voice}
+                onSelect={() => onSelectVoice(voice)}
+                isSelected={selectedVoiceId === voice.voice_id || selectedVoiceId === voice.id}
+              />
+            ))}
+          </tbody>
+        </table>
+      )}
+    </ScrollArea>
   );
 };
 
