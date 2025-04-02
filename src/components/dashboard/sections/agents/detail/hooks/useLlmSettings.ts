@@ -17,7 +17,6 @@ export const useLlmSettings = ({ llmId, updateAgentField }: UseLlmSettingsProps)
   const [llmTemperature, setLlmTemperature] = useState<number>(0.7);
   const [structuredOutput, setStructuredOutput] = useState<boolean>(false);
   const [highPriority, setHighPriority] = useState<boolean>(false);
-  const [isLlmSettingsOpen, setIsLlmSettingsOpen] = useState<boolean>(false);
   
   // Fetch LLM data when llmId changes
   const fetchLlmData = useCallback(async () => {
@@ -65,8 +64,6 @@ export const useLlmSettings = ({ llmId, updateAgentField }: UseLlmSettingsProps)
     highPriority,
     setHighPriority,
     handleLlmChange,
-    fetchLlmData,
-    isLlmSettingsOpen,
-    setIsLlmSettingsOpen
+    fetchLlmData
   };
 };

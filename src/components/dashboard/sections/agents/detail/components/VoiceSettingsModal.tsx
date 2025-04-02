@@ -20,7 +20,6 @@ interface VoiceSettingsModalProps {
   voiceVolume: number;
   setVoiceVolume: (value: number) => void;
   onSettingsUpdated?: () => void;
-  agentId?: string;
 }
 
 const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
@@ -34,13 +33,11 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   setVoiceTemperature,
   voiceVolume,
   setVoiceVolume,
-  onSettingsUpdated,
-  agentId
+  onSettingsUpdated
 }) => {
   const { t } = useLanguage();
   const { fetchWithAuth } = useApiContext();
   const { slug } = useParams<{ slug: string }>();
-  const effectiveAgentId = agentId || slug;
   
   const [tempVoiceModel, setTempVoiceModel] = useState(voiceModel);
   const [tempVoiceSpeed, setTempVoiceSpeed] = useState(voiceSpeed);
@@ -59,7 +56,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   }, [open, voiceModel, voiceSpeed, voiceTemperature, voiceVolume]);
 
   const handleSave = async () => {
-    if (!effectiveAgentId) {
+    if (!slug) {
       toast.error('Agent ID is missing');
       return;
     }
@@ -78,7 +75,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
       console.log('Sending update to agent with payload:', payload);
       
       // Call the update-agent endpoint with the payload
-      await fetchWithAuth(`/update-agent/${effectiveAgentId}`, {
+      await fetchWithAuth(`/update-agent/${slug}`, {
         method: 'PATCH',
         body: JSON.stringify(payload)
       });

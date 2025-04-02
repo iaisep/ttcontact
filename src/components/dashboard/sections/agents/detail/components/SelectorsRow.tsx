@@ -6,7 +6,6 @@ import LanguageSelector from './LanguageSelector';
 import LlmSettingsModal from './LlmSettingsModal';
 import VoiceSettingsModal from './VoiceSettingsModal';
 import { useLanguage } from '@/context/LanguageContext';
-import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface LlmSettings {
   llmId?: string;
@@ -15,8 +14,6 @@ interface LlmSettings {
   structuredOutput: boolean;
   highPriority: boolean;
   handleLlmChange: (newLlmId: string) => Promise<void>;
-  isLlmSettingsOpen?: boolean;
-  setIsLlmSettingsOpen?: (open: boolean) => void;
   onLlmSettingsUpdated?: () => void;
 }
 
@@ -44,9 +41,7 @@ interface LanguageSettings {
   handleLanguageChange: (newLanguage: string) => void;
 }
 
-interface SelectorsRowProps extends LlmSettings, VoiceSettings, LanguageSettings {
-  agent?: RetellAgent;
-}
+type SelectorsRowProps = LlmSettings & VoiceSettings & LanguageSettings;
 
 const SelectorsRow: React.FC<SelectorsRowProps> = ({
   // LLM Settings
@@ -56,8 +51,6 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   structuredOutput = false,
   highPriority = false,
   handleLlmChange,
-  isLlmSettingsOpen: providedIsLlmSettingsOpen,
-  setIsLlmSettingsOpen: providedSetIsLlmSettingsOpen,
   onLlmSettingsUpdated,
   
   // Voice Settings
@@ -80,17 +73,10 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
   // Language Settings
   selectedLanguage,
   languageOptions,
-  handleLanguageChange,
-  
-  // Agent
-  agent
+  handleLanguageChange
 }) => {
   const { t } = useLanguage();
-  const [internalLlmSettingsOpen, setInternalLlmSettingsOpen] = React.useState(false);
-
-  // Use provided state if available, otherwise use internal state
-  const isLlmSettingsOpen = providedIsLlmSettingsOpen !== undefined ? providedIsLlmSettingsOpen : internalLlmSettingsOpen;
-  const setIsLlmSettingsOpen = providedSetIsLlmSettingsOpen || setInternalLlmSettingsOpen;
+  const [isLlmSettingsOpen, setIsLlmSettingsOpen] = React.useState(false);
 
   return (
     <div className="grid grid-cols-3 gap-2 mb-4">
@@ -114,7 +100,6 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
           selectedVoice={selectedVoice} 
           openVoiceModal={openVoiceModal}
           voiceAvatarUrl={voiceAvatarUrl}
-          agent={agent}
         />
       </div>
       

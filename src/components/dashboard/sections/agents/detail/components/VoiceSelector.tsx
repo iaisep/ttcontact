@@ -11,22 +11,19 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip';
-import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface VoiceSelectorProps {
   selectedVoice: string;
   openVoiceModal: () => void;
   onSettingsClick?: () => void;
   voiceAvatarUrl?: string;
-  agent?: RetellAgent;
 }
 
 const VoiceSelector: React.FC<VoiceSelectorProps> = ({
   selectedVoice,
   openVoiceModal,
   onSettingsClick,
-  voiceAvatarUrl,
-  agent
+  voiceAvatarUrl
 }) => {
   // Get initials for avatar fallback
   const getInitials = (name: string) => {
@@ -35,32 +32,21 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
 
   const [isVoiceSettingsModalOpen, setIsVoiceSettingsModalOpen] = React.useState(false);
   
-  // Get voice settings from agent if available
-  const voiceSettings = agent?.voice_settings || {};
-  
-  // Default values for voice settings
-  const [voiceModel, setVoiceModel] = React.useState(voiceSettings.voice_model || 'eleven_turbo_v2');
-  const [voiceSpeed, setVoiceSpeed] = React.useState(voiceSettings.voice_speed !== undefined ? voiceSettings.voice_speed : 1.0);
-  const [voiceTemperature, setVoiceTemperature] = React.useState(voiceSettings.voice_temperature !== undefined ? voiceSettings.voice_temperature : 1.0);
-  const [voiceVolume, setVoiceVolume] = React.useState(voiceSettings.volume !== undefined ? voiceSettings.volume : 1.0);
-
-  // Update state when agent changes
-  React.useEffect(() => {
-    if (agent?.voice_settings) {
-      if (agent.voice_settings.voice_model) {
-        setVoiceModel(agent.voice_settings.voice_model);
-      }
-      if (agent.voice_settings.voice_speed !== undefined) {
-        setVoiceSpeed(agent.voice_settings.voice_speed);
-      }
-      if (agent.voice_settings.voice_temperature !== undefined) {
-        setVoiceTemperature(agent.voice_settings.voice_temperature);
-      }
-      if (agent.voice_settings.volume !== undefined) {
-        setVoiceVolume(agent.voice_settings.volume);
-      }
-    }
-  }, [agent]);
+  // We'll use the context hook to access the agent's voice settings
+  const { 
+    voiceModel, 
+    voiceSpeed, 
+    voiceTemperature, 
+    voiceVolume,
+    setVoiceModel,
+    setVoiceSpeed,
+    setVoiceTemperature,
+    setVoiceVolume,
+    handleSaveVoiceSettings
+  } = useVoiceSettings({ 
+    initialVoice: selectedVoice,
+    updateAgentField: () => {} // This will be used from the hook itself
+  });
 
   // Handle settings click - open the modal instead of using the passed function
   const handleSettingsClick = (e: React.MouseEvent) => {
@@ -122,10 +108,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
         setVoiceTemperature={setVoiceTemperature}
         voiceVolume={voiceVolume}
         setVoiceVolume={setVoiceVolume}
-        onSettingsUpdated={() => {
-          console.log('Voice settings updated');
-        }}
-        agentId={agent?.agent_id || agent?.id}
+        onSettingsUpdated={handleSaveVoiceSettings}
       />
     </>
   );

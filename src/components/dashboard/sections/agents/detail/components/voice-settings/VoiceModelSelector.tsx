@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
@@ -18,8 +18,9 @@ const VoiceModelSelector: React.FC<VoiceModelSelectorProps> = ({
   voiceModel,
   setVoiceModel,
 }) => {
+  // Make sure all models have unique IDs for the radio group
   const voiceModels: VoiceModel[] = [
-    { id: 'eleven_turbo_v2', label: 'Auto(Elevenlabs Turbo V2)', description: 'English only, fast, high quality' },
+    { id: 'eleven_turbo_v2_auto', label: 'Auto(Elevenlabs Turbo V2)', description: 'English only, fast, high quality' },
     { id: 'eleven_turbo_v2', label: 'Elevenlabs Turbo V2', description: 'English only, fast, high quality' },
     { id: 'eleven_flash_v2', label: 'Elevenlabs Flash V2', description: 'English only, fastest, medium quality' },
     { id: 'eleven_turbo_v2_5', label: 'Elevenlabs Turbo V2.5', description: 'Multilingual, fast, high quality' },
@@ -27,37 +28,32 @@ const VoiceModelSelector: React.FC<VoiceModelSelectorProps> = ({
     { id: 'eleven_multilingual_v2', label: 'Elevenlabs Multilingual v2', description: 'Multilingual, slow, highest quality' },
   ];
 
-  // Find the model with the closest ID match
-  const getDisplayModel = () => {
-    // Exact match first
-    const exactMatch = voiceModels.find(model => model.id === voiceModel);
-    if (exactMatch) return exactMatch.id;
-    
-    // Fallback to eleven_turbo_v2 if no match
-    return 'eleven_turbo_v2';
-  };
-
   return (
     <div className="space-y-2">
       <h3 className="text-sm font-medium">Voice Model</h3>
       <RadioGroup 
-        value={getDisplayModel()} 
+        value={voiceModel} 
         onValueChange={setVoiceModel}
         className="space-y-1"
       >
-        {voiceModels.map((model) => (
-          <div key={model.id + model.label} className="flex items-start space-x-2 rounded-md p-2 hover:bg-muted">
-            <RadioGroupItem value={model.id} id={model.id + model.label} />
-            <div className="grid gap-1">
-              <Label htmlFor={model.id + model.label} className="text-sm font-medium">
-                {model.label}
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                {model.description}
-              </p>
+        {voiceModels.map((model) => {
+          // For the first "Auto" option, use eleven_turbo_v2 as value
+          const radioValue = model.id === 'eleven_turbo_v2_auto' ? 'eleven_turbo_v2' : model.id;
+          
+          return (
+            <div key={model.id} className="flex items-start space-x-2 rounded-md p-2 hover:bg-muted">
+              <RadioGroupItem value={radioValue} id={model.id} />
+              <div className="grid gap-1">
+                <Label htmlFor={model.id} className="text-sm font-medium">
+                  {model.label}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {model.description}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </RadioGroup>
     </div>
   );
