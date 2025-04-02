@@ -59,4 +59,3 @@ usa la función agendar si el usuario solicita que lo llamen en otro momento, o 
 };
 
 export default EditablePrompt;
-

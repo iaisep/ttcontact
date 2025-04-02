@@ -27,18 +27,20 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     <div className="relative">
       <Button 
         variant="outline" 
-        className="flex items-center justify-between w-full max-w-full gap-1 sm:gap-2 bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-2 sm:px-4 py-1 sm:py-2 h-auto overflow-hidden"
+        className="flex items-center justify-between w-full bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-2 sm:px-4 py-1 sm:py-2 h-auto"
       >
-        <div className="flex items-center gap-1 sm:gap-2 overflow-hidden flex-wrap">
+        <div className="flex items-center gap-1 sm:gap-2 min-w-0">
           <div className="h-6 w-6 sm:h-6 sm:w-6 rounded-full flex-shrink-0 flex items-center justify-center">
             <Globe className="h-5 w-5 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
           </div>
-          <span className="truncate text-[10px] sm:text-xs max-w-[100px] sm:max-w-[120px]">{selectedLanguage}</span>
+          <span className="truncate text-[10px] sm:text-xs" style={{ maxWidth: 'calc(100% - 48px)' }}>
+            {selectedLanguage}
+          </span>
         </div>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="h-6 w-6 sm:h-6 sm:w-6 p-0 flex-shrink-0 flex items-center justify-center">
+            <div className="h-6 w-6 sm:h-6 sm:w-6 ml-1 sm:ml-2 p-0 flex-shrink-0 flex items-center justify-center">
               <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600" />
             </div>
           </DropdownMenuTrigger>
