@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
@@ -18,6 +18,19 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState<string>('');
+  const [callId, setCallId] = useState<string | null>(null);
+  const audioElementRef = useRef<HTMLAudioElement | null>(null);
+
+  // Efecto para limpiar cualquier llamada activa cuando el componente se desmonta
+  useEffect(() => {
+    return () => {
+      if (callId) {
+        // Intentar finalizar la llamada si existe una activa
+        fetchWithAuth(`/end-call/${callId}`, { method: 'POST' })
+          .catch((error) => console.error('Error finalizando llamada:', error));
+      }
+    };
+  }, [callId, fetchWithAuth]);
 
   const handleAudioTest = async () => {
     setIsLoading(true);
@@ -60,33 +73,80 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
   
   const handleFullTest = async () => {
     if (isRecording) {
+      // Si ya estamos grabando, detener la llamada
       setIsRecording(false);
       toast.info(t('processing_test'));
+      
+      if (callId) {
+        try {
+          // Intentar finalizar la llamada existente
+          await fetchWithAuth(`/end-call/${callId}`, { method: 'POST' });
+          console.log('Llamada finalizada correctamente');
+          setCallId(null);
+        } catch (error) {
+          console.error('Error finalizando llamada:', error);
+        }
+      }
       
       setTimeout(() => {
         toast.success(t('test_complete'));
         setTranscript('');
       }, 2000);
     } else {
-      setIsRecording(true);
-      toast.info(t('test_started'));
-      
-      // Simular la transcripción que aparece gradualmente
-      setTranscript('');
-      
-      setTimeout(() => {
-        setTranscript('¡Hola! Muy buen día, soy Karla Beltrán, asesora de admisiones de la Universidad Isép.');
-      }, 1000);
-      
-      setTimeout(() => {
-        setTranscript('¡Hola! Muy buen día, soy Karla Beltrán, asesora de admisiones de la Universidad Isép. Espero que estés teniendo');
-      }, 3000);
-      
-      setTimeout(() => {
-        if (isRecording) {
-          setTranscript('¡Hola! Muy buen día, soy Karla Beltrán, asesora de admisiones de la Universidad Isép. Espero que estés teniendo un excelente día. Vi que estás interesado en nuestras formaciones y quiero entender mejor lo que buscas para ayudarte a encontrar la mejor opción. ¿Cómo puedo ayudarte hoy?');
+      // Iniciar una nueva llamada
+      setIsLoading(true);
+      try {
+        // Hacer la llamada al endpoint v2/create-web-call
+        const response = await fetchWithAuth('/v2/create-web-call', {
+          method: 'POST',
+          body: JSON.stringify({
+            agent_id: agent.agent_id
+          })
+        });
+        
+        console.log('Web call response:', response);
+        setCallId(response.call_id);
+        
+        // Solicitar permiso para usar el micrófono
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          // Solo solicitamos acceso al micrófono para iniciar el permiso
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          
+          // Configurar el audio para la llamada
+          if (response.audio_url && !audioElementRef.current) {
+            const audioElement = new Audio(response.audio_url);
+            audioElement.autoplay = true;
+            audioElementRef.current = audioElement;
+          }
+          
+          setIsRecording(true);
+          toast.success(t('call_connected'));
+          
+          // Simular transcripción gradual para propósitos de demostración
+          setTranscript('');
+          
+          setTimeout(() => {
+            setTranscript('¡Hola! Muy buen día, soy Karla Beltrán, asesora de admisiones de la Universidad Isép.');
+          }, 1000);
+          
+          setTimeout(() => {
+            setTranscript('¡Hola! Muy buen día, soy Karla Beltrán, asesora de admisiones de la Universidad Isép. Espero que estés teniendo');
+          }, 3000);
+          
+          setTimeout(() => {
+            if (isRecording) {
+              setTranscript('¡Hola! Muy buen día, soy Karla Beltrán, asesora de admisiones de la Universidad Isép. Espero que estés teniendo un excelente día. Vi que estás interesado en nuestras formaciones y quiero entender mejor lo que buscas para ayudarte a encontrar la mejor opción. ¿Cómo puedo ayudarte hoy?');
+            }
+          }, 5000);
+        } else {
+          throw new Error('Tu navegador no soporta acceso al micrófono');
         }
-      }, 5000);
+      } catch (error) {
+        console.error('Error iniciando la llamada web:', error);
+        toast.error(error.message || t('error_starting_call'));
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
