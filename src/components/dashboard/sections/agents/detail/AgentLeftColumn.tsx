@@ -62,7 +62,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
         updateAgentField={updateAgentField}
       />
 
-      {/* Display LLM General Prompt if available 
+      {/* Display LLM General Prompt if available */}
       {llm?.general_prompt && (
         <div className="mt-6 bg-gray-50 p-4 rounded-lg">
           <GeneralPromptEditor 
@@ -71,7 +71,7 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
             llmId={llmId}
           />
         </div>
-      )}*/}
+      )}
 
       {/* Welcome Message */}
       <div className="mt-6">
