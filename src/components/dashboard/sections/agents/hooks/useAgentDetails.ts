@@ -19,6 +19,7 @@ interface AgentDetailsState {
   knowledgeBases: KnowledgeBase[];
   isLoading: boolean;
   error: string | null;
+  availableVoices: RetellVoice[];
 }
 
 export const useAgentDetails = (agentId: string | undefined) => {
@@ -30,7 +31,9 @@ export const useAgentDetails = (agentId: string | undefined) => {
     voice: null,
     knowledgeBases: [],
     isLoading: false,
-    error: null
+    error: null,
+    availableVoices: []
+
   });
 
   const fetchAgentData = async () => {
@@ -60,7 +63,8 @@ export const useAgentDetails = (agentId: string | undefined) => {
       const [llmData, voiceData, allKnowledgeBases] = await Promise.all([
         llmId ? fetchWithAuth(`/get-retell-llm/${llmId}`) : null,
         voiceId ? fetchWithAuth(`/get-voice/${voiceId}`) : null,
-        fetchWithAuth('/list-knowledge-bases')
+        fetchWithAuth('/list-knowledge-bases'),
+        fetchWithAuth('/list-voices') 
       ]);
       
       // If the LLM data doesn't contain the ID, add it from the agent
@@ -80,6 +84,7 @@ export const useAgentDetails = (agentId: string | undefined) => {
         llm: llmData,
         voice: voiceData,
         knowledgeBases: agentKnowledgeBases,
+        availableVoices: voiceList ?? [],
         isLoading: false
       }));
       
