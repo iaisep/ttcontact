@@ -43,7 +43,7 @@ usa la función agendar si el usuario solicita que lo llamen en otro momento, o 
   };
 
   return (
-    <div className="rounded-md border overflow-hidden">
+    <>
       <div className="bg-muted/30 px-4 py-2 border-b flex justify-between items-center">
         <span className="text-sm font-medium">Agent Prompt</span>
         <span className="text-xs text-muted-foreground">{value.length} characters</span>
@@ -54,8 +54,9 @@ usa la función agendar si el usuario solicita que lo llamen en otro momento, o 
         className="min-h-[500px] font-mono text-sm border-0 rounded-none focus-visible:ring-0 resize-none"
         placeholder={t('prompt_placeholder')}
       />
-    </div>
+    </>
   );
 };
 
 export default EditablePrompt;
+
