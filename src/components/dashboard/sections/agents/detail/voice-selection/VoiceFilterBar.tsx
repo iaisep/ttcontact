@@ -9,7 +9,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface VoiceFilterBarProps {
@@ -35,16 +35,48 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
 }) => {
   const { t } = useLanguage();
 
+  const resetFilters = () => {
+    setSearchTerm('');
+    setGenderFilter('all_genders');
+    setAccentFilter('all_accents');
+    setTypeFilter('all_types');
+  };
+
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-4">
-      <Button variant="outline" className="h-9 gap-2 bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200">
-        <Plus className="h-4 w-4" />
-        {t('add_custom_voice') || 'Add custom voice'}
-      </Button>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <Button 
+          variant="outline" 
+          className="h-9 gap-2 bg-white hover:bg-gray-50 text-gray-700 border-gray-200 rounded-full"
+        >
+          <Plus className="h-4 w-4" />
+          {t('add_custom_voice') || 'Add custom voice'}
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={resetFilters}
+          className="h-9 gap-2 text-gray-500 hover:text-gray-700"
+        >
+          <RefreshCw className="h-3.5 w-3.5" />
+          {t('reset_filters') || 'Reset filters'}
+        </Button>
+      </div>
       
-      <div className="flex-1 flex flex-wrap gap-3">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input 
+          placeholder={t('search_voices') || 'Search voices...'} 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10 h-10 border-gray-200 bg-white rounded-full"
+        />
+      </div>
+      
+      <div className="flex flex-wrap gap-3">
         <Select value={genderFilter} onValueChange={setGenderFilter}>
-          <SelectTrigger className="w-28 h-9 bg-white border-gray-200">
+          <SelectTrigger className="w-32 h-9 bg-white border-gray-200 rounded-full">
             <SelectValue placeholder={t('gender') || 'Gender'} />
           </SelectTrigger>
           <SelectContent>
@@ -56,7 +88,7 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
         </Select>
         
         <Select value={accentFilter} onValueChange={setAccentFilter}>
-          <SelectTrigger className="w-28 h-9 bg-white border-gray-200">
+          <SelectTrigger className="w-32 h-9 bg-white border-gray-200 rounded-full">
             <SelectValue placeholder={t('accent') || 'Accent'} />
           </SelectTrigger>
           <SelectContent>
@@ -64,11 +96,14 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
             <SelectItem value="american">{t('american') || 'American'}</SelectItem>
             <SelectItem value="british">{t('british') || 'British'}</SelectItem>
             <SelectItem value="indian">{t('indian') || 'Indian'}</SelectItem>
+            <SelectItem value="australian">{t('australian') || 'Australian'}</SelectItem>
+            <SelectItem value="spanish">{t('spanish') || 'Spanish'}</SelectItem>
+            <SelectItem value="french">{t('french') || 'French'}</SelectItem>
           </SelectContent>
         </Select>
         
         <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="w-28 h-9 bg-white border-gray-200">
+          <SelectTrigger className="w-32 h-9 bg-white border-gray-200 rounded-full">
             <SelectValue placeholder={t('types') || 'Types'} />
           </SelectTrigger>
           <SelectContent>
@@ -78,16 +113,6 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
             <SelectItem value="custom">{t('custom') || 'Custom'}</SelectItem>
           </SelectContent>
         </Select>
-        
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input 
-            placeholder={t('search') || 'Search...'} 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-9 border-gray-200 bg-white"
-          />
-        </div>
       </div>
     </div>
   );

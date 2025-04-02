@@ -57,8 +57,18 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
     setError(null);
     
     try {
-      const voicesList = await fetchWithAuth('/list-voices');
-      setVoices(voicesList || []);
+      const response = await fetchWithAuth('/list-voices');
+      console.log('Voice API response:', response);
+      
+      if (response && Array.isArray(response)) {
+        setVoices(response);
+      } else if (response && response.voices && Array.isArray(response.voices)) {
+        setVoices(response.voices);
+      } else {
+        console.error('Unexpected response format:', response);
+        setVoices([]);
+        setError(t('error_unexpected_response_format') || 'Unexpected response format');
+      }
     } catch (error) {
       console.error('Error fetching voices:', error);
       setError(t('error_loading_voices') || 'Error loading voices');

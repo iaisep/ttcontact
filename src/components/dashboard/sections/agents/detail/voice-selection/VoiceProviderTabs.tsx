@@ -14,7 +14,7 @@ const VoiceProviderTabs: React.FC<VoiceProviderTabsProps> = ({
   children
 }) => {
   return (
-    <Tabs defaultValue={activeProvider} className="w-full">
+    <Tabs value={activeProvider} className="w-full h-full flex flex-col">
       <TabsList className="flex w-full h-10 border-b rounded-none bg-transparent">
         <TabsTrigger 
           value="ElevenLabs" 
@@ -39,7 +39,7 @@ const VoiceProviderTabs: React.FC<VoiceProviderTabsProps> = ({
         </TabsTrigger>
       </TabsList>
       
-      <div className="px-6 py-4">
+      <div className="p-4 overflow-y-auto flex-1">
         {children}
       </div>
     </Tabs>
