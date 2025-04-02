@@ -1,5 +1,7 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useApiContext } from '@/context/ApiContext';
+import { toast } from 'sonner';
 
 interface UseLanguageSelectorProps {
   initialLanguage: string;
@@ -7,6 +9,7 @@ interface UseLanguageSelectorProps {
 }
 
 export const useLanguageSelector = ({ initialLanguage, updateAgentField }: UseLanguageSelectorProps) => {
+  const { fetchWithAuth } = useApiContext();
   const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
 
   // Language options with icons and API-compatible language codes
@@ -34,38 +37,33 @@ export const useLanguageSelector = ({ initialLanguage, updateAgentField }: UseLa
     { value: 'multi', label: 'Multilingual', icon: '🌎' }
   ];
 
-  // Find the matching language option or default to English (US)
-  const findLanguageOption = (langCode: string) => {
-    return languageOptions.find(opt => opt.value === langCode) || 
-           languageOptions.find(opt => opt.label.includes(langCode)) || 
-           languageOptions[0]; // default to English (US)
-  };
+  // Set initial language from props
+  useEffect(() => {
+    // If initialLanguage is provided and valid, use it
+    if (initialLanguage) {
+      setSelectedLanguage(initialLanguage);
+    }
+  }, [initialLanguage]);
 
-  // Initialize with the correct language option based on initialLanguage
-  useState(() => {
-    const langOption = findLanguageOption(initialLanguage);
-    setSelectedLanguage(langOption.label);
-  });
-
-  // Handle language change as async to align with expected type
-  const handleLanguageChange = async (displayName: string): Promise<void> => {
+  // Handle language change
+  const handleLanguageChange = async (languageCode: string): Promise<void> => {
     try {
-      // Find the selected language option
-      const selectedOption = languageOptions.find(opt => opt.label === displayName);
+      console.log(`Updating language to: ${languageCode}`);
       
-      if (selectedOption) {
-        // Set the display name in UI
-        setSelectedLanguage(displayName);
-        
-        // Use the API-compatible value for the update
-        await updateAgentField('language', selectedOption.value);
-        
-        console.log(`Language updated to: ${selectedOption.value}`);
-      } else {
-        console.error(`Language option not found: ${displayName}`);
-      }
+      // Update UI state immediately for better UX
+      setSelectedLanguage(languageCode);
+      
+      // Update the agent in the database using updateAgentField
+      // This function should handle the API call to update the agent
+      await updateAgentField('language', languageCode);
+      
+      toast.success(`Language updated to ${languageOptions.find(lang => lang.value === languageCode)?.label || languageCode}`);
     } catch (error) {
       console.error('Error updating language:', error);
+      toast.error('Failed to update language. Please try again.');
+      
+      // Revert to the previous language if the update fails
+      setSelectedLanguage(initialLanguage);
     }
     
     return Promise.resolve();

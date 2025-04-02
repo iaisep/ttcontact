@@ -17,6 +17,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   onLanguageChange 
 }) => {
   const { t } = useLanguage();
+  
   // Find the currently selected language
   const currentLanguage = languageOptions.find(lang => lang.value === selectedLanguage) || 
     { value: selectedLanguage, label: selectedLanguage || t('select_language'), icon: '' };
