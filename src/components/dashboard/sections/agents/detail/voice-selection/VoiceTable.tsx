@@ -3,6 +3,7 @@ import React from 'react';
 import VoiceTableRow from './VoiceTableRow';
 import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import { useLanguage } from '@/context/LanguageContext';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface VoiceTableProps {
   voices: RetellVoice[];
@@ -14,14 +15,14 @@ const VoiceTable: React.FC<VoiceTableProps> = ({ voices, onSelectVoice, selected
   const { t } = useLanguage();
   
   return (
-    <div className="overflow-auto">
+    <ScrollArea className="h-[400px] overflow-auto">
       {voices.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           {t('no_voices_found')}
         </div>
       ) : (
         <table className="w-full">
-          <thead className="bg-muted/50">
+          <thead className="bg-muted/50 sticky top-0 z-10">
             <tr>
               <th className="text-left py-2 px-4 text-xs font-medium">{t('voice')}</th>
               <th className="text-left py-2 px-4 text-xs font-medium">{t('traits')}</th>
@@ -41,7 +42,7 @@ const VoiceTable: React.FC<VoiceTableProps> = ({ voices, onSelectVoice, selected
           </tbody>
         </table>
       )}
-    </div>
+    </ScrollArea>
   );
 };
 
