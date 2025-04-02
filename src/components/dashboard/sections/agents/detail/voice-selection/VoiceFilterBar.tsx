@@ -38,9 +38,9 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
   const resetFilters = () => {
     // Reset filters to default values without reloading the page
     setSearchTerm('');
-    setGenderFilter('all_genders');
-    setAccentFilter('all_accents');
-    setTypeFilter('all_types');
+    setGenderFilter('all');
+    setAccentFilter('all');
+    setTypeFilter('all');
   };
 
   return (
@@ -81,7 +81,7 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
             <SelectValue placeholder={t('gender') || 'Gender'} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all_genders">{t('all_genders') || 'All Genders'}</SelectItem>
+            <SelectItem value="all">{t('all_genders') || 'All Genders'}</SelectItem>
             <SelectItem value="male">{t('male') || 'Male'}</SelectItem>
             <SelectItem value="female">{t('female') || 'Female'}</SelectItem>
             <SelectItem value="neutral">{t('neutral') || 'Neutral'}</SelectItem>
@@ -93,7 +93,7 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
             <SelectValue placeholder={t('accent') || 'Accent'} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all_accents">{t('all_accents') || 'All Accents'}</SelectItem>
+            <SelectItem value="all">{t('all_accents') || 'All Accents'}</SelectItem>
             <SelectItem value="american">{t('american') || 'American'}</SelectItem>
             <SelectItem value="british">{t('british') || 'British'}</SelectItem>
             <SelectItem value="indian">{t('indian') || 'Indian'}</SelectItem>
@@ -108,7 +108,7 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
             <SelectValue placeholder={t('types') || 'Types'} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all_types">{t('all_types') || 'All Types'}</SelectItem>
+            <SelectItem value="all">{t('all_types') || 'All Types'}</SelectItem>
             <SelectItem value="retail">{t('retail') || 'Retail'}</SelectItem>
             <SelectItem value="provider">{t('provider') || 'Provider'}</SelectItem>
             <SelectItem value="custom">{t('custom') || 'Custom'}</SelectItem>
