@@ -9,6 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Trash2 } from 'lucide-react';
 
@@ -25,8 +26,21 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
   onConfirm,
   functionName,
 }) => {
+  // Handle confirmation properly to ensure UI stays responsive
+  const handleConfirm = () => {
+    // First close the dialog to avoid UI freeze
+    onClose();
+    // Then perform the delete operation
+    setTimeout(() => {
+      onConfirm();
+    }, 100);
+  };
+
   return (
-    <AlertDialog open={isOpen} onOpenChange={onClose}>
+    <AlertDialog open={isOpen} onOpenChange={(open) => {
+      // Only call onClose when dialog is being closed
+      if (!open) onClose();
+    }}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center">
@@ -39,9 +53,14 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={(e) => {
+            e.preventDefault();
+            onClose();
+          }}>
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction 
-            onClick={onConfirm}
+            onClick={handleConfirm}
             className="bg-red-500 hover:bg-red-600"
           >
             Delete

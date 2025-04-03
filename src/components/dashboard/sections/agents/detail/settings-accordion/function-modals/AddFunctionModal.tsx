@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -63,6 +63,8 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
       setSpeakAfter(true);
       setParameters('{}');
     }
+    // Clear errors when modal opens/closes
+    setErrors({});
   }, [functionData, isOpen]);
 
   const validate = (): boolean => {
@@ -119,19 +121,30 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
       // End call functions don't need additional properties
     }
     
-    onAdd(newFunction);
+    // First close the modal cleanly to prevent UI freezes
+    onClose();
+    
+    // Use setTimeout to ensure the UI updates before processing the add operation
+    setTimeout(() => {
+      onAdd(newFunction);
+    }, 100);
   };
 
   const isCustomFunction = type === 'custom';
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) onClose();
+    }}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <Plus className="h-5 w-5 mr-2" />
             Add New Function
           </DialogTitle>
+          <DialogDescription>
+            Create a new function or tool for your agent to use during conversations.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
@@ -222,7 +235,15 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button 
+            variant="outline" 
+            onClick={(e) => {
+              e.preventDefault(); 
+              onClose();
+            }}
+          >
+            Cancel
+          </Button>
           <Button onClick={handleSubmit}>Add Function</Button>
         </DialogFooter>
       </DialogContent>
