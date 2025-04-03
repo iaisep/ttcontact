@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 
 // Lazy load all dashboard sections
 const AgentsSection = React.lazy(() => import('./sections/AgentsSection'));
-const KnowledgeBaseSection = React.lazy(() => import('./sections/KnowledgeBaseSection'));
+const KnowledgeBaseSection = React.lazy(() => import('./sections/knowledge-base'));
 const PhoneNumbersSection = React.lazy(() => import('./sections/PhoneNumbersSection'));
 const BatchCallSection = React.lazy(() => import('./sections/BatchCallSection'));
 const CallHistorySection = React.lazy(() => import('./sections/CallHistorySection'));

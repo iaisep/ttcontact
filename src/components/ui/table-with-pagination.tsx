@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -24,9 +24,12 @@ interface TableWithPaginationProps<T> {
   emptyState?: React.ReactNode;
   className?: string;
   rowClassName?: string | ((item: T) => string);
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }
 
-function TableWithPagination<T>({
+export function TableWithPagination<T>({
   data,
   columns,
   initialPageSize = 10,
@@ -34,22 +37,11 @@ function TableWithPagination<T>({
   onRowClick,
   emptyState,
   className,
-  rowClassName
+  rowClassName,
+  currentPage,
+  onPageChange,
+  onPageSizeChange
 }: TableWithPaginationProps<T>) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(initialPageSize);
-
-  // Reset to first page when data changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [data.length]);
-
-  // Calculate paginated data
-  const paginatedData = data.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-  
   const getRowClassName = (item: T): string => {
     if (typeof rowClassName === 'function') {
       return rowClassName(item);
@@ -71,14 +63,14 @@ function TableWithPagination<T>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.length === 0 ? (
+            {data.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
                   {emptyState || 'No data found'}
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedData.map((item, index) => (
+              data.map((item, index) => (
                 <TableRow 
                   key={index} 
                   className={getRowClassName(item)}
@@ -100,15 +92,13 @@ function TableWithPagination<T>({
       {data.length > 0 && (
         <PaginationControls
           totalItems={data.length}
-          pageSize={pageSize}
+          pageSize={initialPageSize}
           currentPage={currentPage}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={setPageSize}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
           pageSizeOptions={pageSizeOptions}
         />
       )}
     </div>
   );
 }
-
-export default TableWithPagination;
