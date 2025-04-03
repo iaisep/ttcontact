@@ -72,7 +72,7 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
                 {source.type === 'url' && (
                   <div className="flex items-center">
                     <Globe className="h-4 w-4 mr-2 text-blue-500" />
-                    <span className="text-sm">{source.title}</span>
+                    <span className="text-sm" title={source.url}>{source.title || source.url}</span>
                     {source.auto_sync && (
                       <TooltipProvider>
                         <Tooltip>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
@@ -72,9 +71,25 @@ const KnowledgeBaseTable: React.FC<KnowledgeBaseTableProps> = ({
       cell: (kb: KnowledgeBase) => (
         <div className="flex justify-end gap-2">
           {hasUrlSources(kb) && (
-            <Button variant="ghost" size="icon" onClick={() => onResync(kb)}>
-              <RefreshCw className="h-4 w-4 text-blue-500" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => {
+                      console.log('Refresh clicked for KB:', kb.id);
+                      onResync(kb);
+                    }}
+                  >
+                    <RefreshCw className="h-4 w-4 text-blue-500" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Refresh knowledge base</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           <Button variant="ghost" size="icon" onClick={() => onEdit(kb)}>
             <Pencil className="h-4 w-4" />

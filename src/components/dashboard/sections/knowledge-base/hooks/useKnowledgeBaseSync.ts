@@ -17,11 +17,17 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
         return;
       }
       
-      // Call the API endpoint to resync each URL source
+      // Call the API endpoint to resync the knowledge base with the website URLs
       for (const source of urlSources) {
         if (source.url) {
-          await fetchWithAuth(`/resync-knowledge-base-source/${kb.id}/source/${source.id}`, {
+          console.log(`Resyncing KB ${kb.id} with URL: ${source.url}`);
+          
+          // Use the correct API endpoint format and payload structure
+          await fetchWithAuth(`/refresh-knowledge-base/${kb.id}`, {
             method: 'POST',
+            body: JSON.stringify({ 
+              website_url: source.url 
+            }),
           });
         }
       }
