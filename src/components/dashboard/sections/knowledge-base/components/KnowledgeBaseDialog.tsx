@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { 
@@ -88,6 +87,14 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     }
   }, [knowledgeBase, form]);
 
+  useEffect(() => {
+    if (!open) {
+      setCurrentSourceType(null);
+      setSourceToDelete(null);
+      setDeleteSourceDialogOpen(false);
+    }
+  }, [open]);
+
   const handleSave = async (data: { name: string }) => {
     try {
       const savedKb = await onSave(data.name, currentKb);
@@ -153,8 +160,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     try {
       const updatedKb = await onDeleteSource(currentKb.id, sourceToDelete.id);
       setCurrentKb(updatedKb);
-      setDeleteSourceDialogOpen(false);
-      setSourceToDelete(null);
     } catch (error) {
       console.error('Failed to delete source:', error);
     }
@@ -320,7 +325,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Source Modals */}
       <AddUrlSourceModal
         open={currentSourceType === 'url'}
         onOpenChange={(open) => !open && setCurrentSourceType(null)}
@@ -340,7 +344,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         onSubmit={handleAddTextSource}
       />
 
-      {/* Delete Source Dialog */}
       <SourceDeleteDialog
         open={deleteSourceDialogOpen}
         onOpenChange={setDeleteSourceDialogOpen}

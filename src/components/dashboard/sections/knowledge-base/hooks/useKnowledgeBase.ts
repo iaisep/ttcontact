@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../types';
@@ -21,7 +20,6 @@ export const useKnowledgeBase = () => {
   const fetchKnowledgeBases = async () => {
     setLoading(true);
     try {
-      // In a real implementation, this would be replaced with /list-knowledge-bases
       const mockData: KnowledgeBase[] = [
         {
           id: 'kb_123456',
@@ -94,13 +92,6 @@ export const useKnowledgeBase = () => {
   const createKnowledgeBase = async (name: string) => {
     try {
       setLoading(true);
-      // In a real implementation, this would be:
-      // const response = await fetchWithAuth('/create-knowledge-base', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ name }),
-      // });
-      
-      // Mock the response
       const newKb: KnowledgeBase = {
         id: `kb_${Date.now()}`,
         name,
@@ -126,12 +117,6 @@ export const useKnowledgeBase = () => {
   const updateKnowledgeBase = async (kb: KnowledgeBase) => {
     try {
       setLoading(true);
-      // In a real implementation, this would be:
-      // const response = await fetchWithAuth(`/update-knowledge-base/${kb.id}`, {
-      //   method: 'PUT',
-      //   body: JSON.stringify({ name: kb.name, auto_sync: kb.auto_sync }),
-      // });
-      
       setKnowledgeBases(knowledgeBases.map(item => 
         item.id === kb.id ? kb : item
       ));
@@ -150,11 +135,6 @@ export const useKnowledgeBase = () => {
   const deleteKnowledgeBase = async (kbId: string) => {
     try {
       setLoading(true);
-      // In a real implementation, this would be:
-      // await fetchWithAuth(`/delete-knowledge-base/${kbId}`, {
-      //   method: 'DELETE',
-      // });
-      
       setKnowledgeBases(knowledgeBases.filter(kb => kb.id !== kbId));
       toast.success('Knowledge base deleted');
     } catch (error) {
@@ -186,7 +166,6 @@ export const useKnowledgeBase = () => {
       let newSource: KnowledgeBaseSource | null = null;
       
       if (sourceType === 'url') {
-        // In a real implementation, this would call the API
         newSource = {
           id: `src_url_${Date.now()}`,
           type: 'url',
@@ -196,7 +175,6 @@ export const useKnowledgeBase = () => {
           auto_sync: sourceData.autoSync
         };
       } else if (sourceType === 'file' && sourceData.file) {
-        // In a real implementation, this would upload the file
         newSource = {
           id: `src_file_${Date.now()}`,
           type: 'file',
@@ -205,7 +183,6 @@ export const useKnowledgeBase = () => {
           created_at: new Date().toISOString()
         };
       } else if (sourceType === 'text') {
-        // In a real implementation, this would call the API
         newSource = {
           id: `src_text_${Date.now()}`,
           type: 'text',
@@ -242,25 +219,20 @@ export const useKnowledgeBase = () => {
     }
   };
 
-  const deleteSource = async (kbId: string, sourceId: string) => {
+  const deleteSource = useCallback(async (kbId: string, sourceId: string) => {
     try {
       setLoading(true);
       
       const kb = knowledgeBases.find(kb => kb.id === kbId);
       if (!kb) throw new Error('Knowledge base not found');
       
-      // In a real implementation, this would be:
-      // await fetchWithAuth(`/delete-knowledge-base-source/${kbId}/source/${sourceId}`, {
-      //   method: 'DELETE',
-      // });
-      
       const updatedKb = {...kb};
       updatedKb.sources = updatedKb.sources.filter(src => src.id !== sourceId);
       updatedKb.source_count = updatedKb.sources.length;
       
-      setKnowledgeBases(knowledgeBases.map(item => 
-        item.id === kbId ? updatedKb : item
-      ));
+      setKnowledgeBases(prevKbs => 
+        prevKbs.map(item => item.id === kbId ? updatedKb : item)
+      );
       
       toast.success('Source deleted from knowledge base');
       return updatedKb;
@@ -271,12 +243,11 @@ export const useKnowledgeBase = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [knowledgeBases, setLoading]);
 
   const resyncKnowledgeBase = async (kb: KnowledgeBase) => {
     try {
       setLoading(true);
-      // Find URL sources to resync
       const urlSources = kb.sources.filter(src => src.type === 'url');
       
       if (urlSources.length === 0) {
@@ -284,7 +255,6 @@ export const useKnowledgeBase = () => {
         return;
       }
       
-      // For each URL source, re-fetch sitemap
       for (const source of urlSources) {
         if (source.url) {
           // In a real implementation, this would call the API
@@ -307,13 +277,6 @@ export const useKnowledgeBase = () => {
   const fetchSitemap = async (url: string) => {
     try {
       setLoading(true);
-      // In a real implementation, this would fetch from API
-      // const response = await fetchWithAuth('/list-sitemap', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ website_url: url }),
-      // });
-      
-      // Mock pages
       const mockPages = [
         { url: `${url}/about`, title: 'About Us', selected: false },
         { url: `${url}/products`, title: 'Products', selected: false },
@@ -339,7 +302,6 @@ export const useKnowledgeBase = () => {
     kb.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Get paginated data
   const paginatedKnowledgeBases = filteredKnowledgeBases.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize

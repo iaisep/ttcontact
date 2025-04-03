@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +25,21 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
   source,
   onConfirm
 }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirm = async () => {
+    try {
+      setIsDeleting(true);
+      await onConfirm();
+    } catch (error) {
+      console.error('Error deleting source:', error);
+    } finally {
+      setIsDeleting(false);
+      // Ensure dialog closes after deletion attempt, regardless of success/failure
+      onOpenChange(false);
+    }
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -35,12 +50,13 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
           <AlertDialogAction 
             className="bg-destructive text-destructive-foreground"
-            onClick={onConfirm}
+            onClick={handleConfirm}
+            disabled={isDeleting}
           >
-            Delete
+            {isDeleting ? 'Deleting...' : 'Delete'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
