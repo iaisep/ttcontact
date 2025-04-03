@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Plus, Search } from 'lucide-react';
 import { useKnowledgeBase } from './hooks/useKnowledgeBase';
 import KnowledgeBaseTable from './components/KnowledgeBaseTable';
-import KnowledgeBaseDialog from './components/KnowledgeBaseDialog';
+import KnowledgeBaseDialog from './components/dialogs/KnowledgeBaseDialog';
 import KnowledgeBaseDeleteDialog from './components/KnowledgeBaseDeleteDialog';
 import { KnowledgeBase } from './types';
 
@@ -100,6 +100,8 @@ const KnowledgeBaseSection: React.FC = () => {
   const handleDeleteSource = async (kbId: string, sourceId: string) => {
     return await deleteSource(kbId, sourceId);
   };
+
+  console.log('Rendering with knowledge bases:', paginatedKnowledgeBases);
 
   return (
     <div className="space-y-6">

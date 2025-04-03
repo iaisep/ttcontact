@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -21,9 +20,30 @@ export const useKnowledgeBases = () => {
   const fetchKnowledgeBases = async () => {
     setLoading(true);
     try {
-      // Use real API endpoint when available
+      // Use the real API endpoint
       const response = await fetchWithAuth('/list-knowledge-bases');
-      setKnowledgeBases(response);
+      console.log('Knowledge base response:', response);
+      
+      // Transform API response to match our KnowledgeBase type if needed
+      const transformedData = response.map((kb: any) => ({
+        id: kb.knowledge_base_id || kb.id,
+        name: kb.knowledge_base_name || kb.name,
+        created_at: new Date(kb.user_modified_timestamp).toISOString(),
+        updated_at: new Date(kb.user_modified_timestamp).toISOString(),
+        source_count: kb.knowledge_base_sources?.length || 0,
+        sources: kb.knowledge_base_sources?.map((source: any) => ({
+          id: source.source_id,
+          type: source.type,
+          title: source.filename || source.url || 'Source',
+          url: source.url || '',
+          file_name: source.filename || '',
+          content: source.content || '',
+          created_at: new Date().toISOString(),
+        })) || [],
+        auto_sync: kb.enable_auto_refresh || false
+      }));
+      
+      setKnowledgeBases(transformedData);
     } catch (error) {
       console.error('Failed to fetch knowledge bases:', error);
       toast.error('Failed to fetch knowledge bases');
@@ -185,7 +205,7 @@ export const useKnowledgeBases = () => {
     }
   };
 
-  // Fix to safely handle possibly undefined name properties
+  // Safe filtering for knowledgebases with potentially undefined name
   const filteredKnowledgeBases = knowledgeBases.filter(kb =>
     kb.name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false
   );
