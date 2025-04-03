@@ -125,7 +125,8 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
     onClose();
     
     // Use setTimeout to ensure the UI updates before processing the add operation
-    setTimeout(() => {
+    // Fix: setTimeout expects a callback and delay, we had a naming conflict with our state setter
+    window.setTimeout(() => {
       onAdd(newFunction);
     }, 100);
   };
