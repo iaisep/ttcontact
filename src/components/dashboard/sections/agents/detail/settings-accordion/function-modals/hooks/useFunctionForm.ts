@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { AgentFunction } from '../../functions/types';
 import { FunctionFormData, FunctionFormErrors } from '../types';
 
@@ -50,28 +50,13 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen: bool
     setErrors({});
   }, [functionData, isOpen]);
   
-  // Explicitly reset the form
-  const resetForm = useCallback(() => {
-    setFormData({
-      name: '',
-      description: '',
-      url: '',
-      type: 'custom',
-      timeoutMs: '30000',
-      speakDuring: false,
-      speakAfter: true,
-      parameters: '{}'
-    });
-    setErrors({});
-  }, []);
-  
   // Handle form field changes
-  const handleChange = useCallback((field: keyof FunctionFormData, value: any) => {
+  const handleChange = (field: keyof FunctionFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  }, []);
+  };
   
   // Validate form fields
-  const validate = useCallback((): boolean => {
+  const validate = (): boolean => {
     const newErrors: FunctionFormErrors = {};
     
     if (!formData.name.trim()) {
@@ -96,10 +81,10 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen: bool
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData]);
+  };
   
   // Build AgentFunction object from form data
-  const buildFunctionObject = useCallback((): AgentFunction => {
+  const buildFunctionObject = (): AgentFunction => {
     let parsedParameters;
     try {
       parsedParameters = formData.parameters ? JSON.parse(formData.parameters) : undefined;
@@ -122,7 +107,7 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen: bool
     }
     
     return newFunction;
-  }, [formData]);
+  };
   
   return {
     formData,
@@ -130,7 +115,6 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen: bool
     handleChange,
     validate,
     buildFunctionObject,
-    resetForm,
     isCustomFunction: formData.type === 'custom'
   };
 };

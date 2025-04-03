@@ -1,5 +1,5 @@
 
-import React, { useCallback, useState, useEffect } from 'react';
+import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -13,9 +13,6 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
   onAdd, 
   functionData 
 }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUnmounting, setIsUnmounting] = useState(false);
-
   // Use our custom hook to manage form state and validation
   const {
     formData,
@@ -24,72 +21,28 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
     validate,
     buildFunctionObject,
     isCustomFunction,
-    resetForm
   } = useFunctionForm(functionData, isOpen);
 
-  // Reset the unmounting state when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setIsUnmounting(false);
-      setIsSubmitting(false);
-    }
-  }, [isOpen]);
-
   // Handle form submission
-  const handleSubmit = useCallback(() => {
-    if (isSubmitting || isUnmounting) return;
-    
+  const handleSubmit = () => {
     if (!validate()) return;
     
-    setIsSubmitting(true);
-    
-    // Build the function object from form data
     const newFunction = buildFunctionObject();
+    onClose();
     
-    // Mark as unmounting first
-    setIsUnmounting(true);
-    
-    // Use setTimeout for safer animation timing
+    // Use setTimeout to ensure the modal has time to close
+    // before triggering potentially heavy state updates
     setTimeout(() => {
-      onClose();
-      
-      // Use setTimeout to ensure the modal has time to animate out
-      // before triggering potentially heavy state updates
-      setTimeout(() => {
-        onAdd(newFunction);
-        setIsSubmitting(false);
-      }, 100);
-    }, 100);
-  }, [isSubmitting, isUnmounting, validate, buildFunctionObject, onClose, onAdd]);
-
-  // Handle clean close
-  const handleCleanClose = useCallback(() => {
-    if (isSubmitting || isUnmounting) return;
-    
-    setIsUnmounting(true);
-    
-    // Use setTimeout for safer animation timing
-    setTimeout(() => {
-      onClose();
-      resetForm();
-      
-      // Reset state after animation completes
-      setTimeout(() => {
-        setIsUnmounting(false);
-        setIsSubmitting(false);
-      }, 100);
-    }, 100);
-  }, [isSubmitting, isUnmounting, onClose, resetForm]);
-
-  // Prevent rendering modal content when not open
-  if (!isOpen) return null;
+      onAdd(newFunction);
+    }, 200);
+  };
 
   return (
     <Dialog 
       open={isOpen} 
       onOpenChange={(open) => {
-        if (!open && !isSubmitting && !isUnmounting) {
-          handleCleanClose();
+        if (!open) {
+          onClose();
         }
       }}
     >
@@ -114,18 +67,12 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
         <DialogFooter>
           <Button 
             variant="outline" 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleCleanClose();
-            }}
-            disabled={isSubmitting || isUnmounting}
+            onClick={onClose}
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSubmit}
-            disabled={isSubmitting || isUnmounting}
           >
             Add Function
           </Button>

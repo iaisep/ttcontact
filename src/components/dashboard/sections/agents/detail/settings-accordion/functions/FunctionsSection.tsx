@@ -1,5 +1,5 @@
 
-import React, { useCallback } from 'react';
+import React from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { FileText } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -30,42 +30,23 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
     handleUpdateFunction,
     handleAddFunction,
     confirmDeleteFunction,
-    resetState
   } = useFunctions(agent);
 
-  // Handle safely closing modals
-  const handleCloseEditModal = useCallback(() => {
+  // Handle closing modals
+  const handleCloseEditModal = () => {
     setEditModalOpen(false);
-    // Small delay before resetting selected function to avoid UI flicker
-    setTimeout(() => {
-      if (!deleteDialogOpen && !addModalOpen) {
-        setSelectedFunction(null);
-      }
-    }, 300);
-  }, [setEditModalOpen, deleteDialogOpen, addModalOpen, setSelectedFunction]);
+  };
 
-  const handleCloseAddModal = useCallback(() => {
+  const handleCloseAddModal = () => {
     setAddModalOpen(false);
-    // Small delay before resetting selected function to avoid UI flicker
-    setTimeout(() => {
-      if (!deleteDialogOpen && !editModalOpen) {
-        setSelectedFunction(null);
-      }
-    }, 300);
-  }, [setAddModalOpen, deleteDialogOpen, editModalOpen, setSelectedFunction]);
+  };
 
-  const handleCloseDeleteDialog = useCallback(() => {
+  const handleCloseDeleteDialog = () => {
     setDeleteDialogOpen(false);
-    // Small delay before resetting selected function to avoid UI flicker
-    setTimeout(() => {
-      if (!editModalOpen && !addModalOpen) {
-        setSelectedFunction(null);
-      }
-    }, 300);
-  }, [setDeleteDialogOpen, editModalOpen, addModalOpen, setSelectedFunction]);
+  };
 
   // Handle adding a function from template
-  const handleAddFunctionTemplate = useCallback((type: string) => {
+  const handleAddFunctionTemplate = (type: string) => {
     const newFunction = createFunctionFromTemplate(type);
     setSelectedFunction(newFunction);
     
@@ -76,7 +57,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
       // For other templates, open the editor
       setAddModalOpen(true);
     }
-  }, [setSelectedFunction, setAddModalOpen, handleAddFunction]);
+  };
 
   return (
     <AccordionItem value="functions" className="mt-4 border rounded-md overflow-hidden">
@@ -113,33 +94,27 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
           </div>
         </div>
 
-        {/* Modals and dialogs - mounted only when open */}
-        {editModalOpen && (
-          <EditFunctionModal
-            isOpen={editModalOpen}
-            onClose={handleCloseEditModal}
-            onUpdate={handleUpdateFunction}
-            functionData={selectedFunction}
-          />
-        )}
+        {/* Modals and dialogs */}
+        <EditFunctionModal
+          isOpen={editModalOpen}
+          onClose={handleCloseEditModal}
+          onUpdate={handleUpdateFunction}
+          functionData={selectedFunction}
+        />
 
-        {addModalOpen && (
-          <AddFunctionModal
-            isOpen={addModalOpen}
-            onClose={handleCloseAddModal}
-            onAdd={handleAddFunction}
-            functionData={selectedFunction}
-          />
-        )}
+        <AddFunctionModal
+          isOpen={addModalOpen}
+          onClose={handleCloseAddModal}
+          onAdd={handleAddFunction}
+          functionData={selectedFunction}
+        />
 
-        {deleteDialogOpen && (
-          <DeleteFunctionDialog
-            isOpen={deleteDialogOpen}
-            onClose={handleCloseDeleteDialog}
-            onConfirm={confirmDeleteFunction}
-            functionName={selectedFunction?.name || ''}
-          />
-        )}
+        <DeleteFunctionDialog
+          isOpen={deleteDialogOpen}
+          onClose={handleCloseDeleteDialog}
+          onConfirm={confirmDeleteFunction}
+          functionName={selectedFunction?.name || ''}
+        />
       </AccordionContent>
     </AccordionItem>
   );

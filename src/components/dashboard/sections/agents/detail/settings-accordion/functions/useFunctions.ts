@@ -64,19 +64,6 @@ export const useFunctions = (agent: RetellAgent) => {
     }
   }, [llmId, fetchWithAuth, t, isProcessing]);
 
-  // Reset all modals and selections
-  const resetState = useCallback(() => {
-    // Close all modals first
-    setEditModalOpen(false);
-    setAddModalOpen(false);
-    setDeleteDialogOpen(false);
-    
-    // Then after a small delay, reset the selected function
-    setTimeout(() => {
-      setSelectedFunction(null);
-    }, 300);
-  }, []);
-
   // Handle function edit
   const handleEditFunction = useCallback((func: AgentFunction) => {
     if (isProcessing) return;
@@ -141,7 +128,6 @@ export const useFunctions = (agent: RetellAgent) => {
     handleDeleteFunction,
     handleUpdateFunction,
     handleAddFunction,
-    confirmDeleteFunction,
-    resetState
+    confirmDeleteFunction
   };
 };
