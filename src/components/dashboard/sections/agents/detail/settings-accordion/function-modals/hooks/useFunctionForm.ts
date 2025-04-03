@@ -1,25 +1,26 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AgentFunction } from '../../functions/types';
 import { FunctionFormData, FunctionFormErrors } from '../types';
 
-export const useFunctionForm = (functionData: AgentFunction | null, isOpen: boolean) => {
-  const [formData, setFormData] = useState<FunctionFormData>({
-    name: '',
-    description: '',
-    url: '',
-    timeoutMs: '30000',
-    parameters: '{}',
-    speakDuring: false,
-    speakAfter: true,
-    type: 'custom'
-  });
-  
+const defaultFormData: FunctionFormData = {
+  name: '',
+  description: '',
+  url: '',
+  timeoutMs: '30000',
+  parameters: '{}',
+  speakDuring: false,
+  speakAfter: true,
+  type: 'custom'
+};
+
+export const useFunctionForm = (functionData: AgentFunction | null, isOpen?: boolean) => {
+  const [formData, setFormData] = useState<FunctionFormData>(defaultFormData);
   const [errors, setErrors] = useState<FunctionFormErrors>({});
   
-  // Reset form when modal opens/closes or functionData changes
-  useEffect(() => {
-    if (isOpen && functionData) {
+  // Reset form to default state or initialize with functionData
+  const resetForm = useCallback(() => {
+    if (functionData) {
       setFormData({
         name: functionData.name || '',
         description: functionData.description || '',
@@ -32,31 +33,26 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen: bool
           ? JSON.stringify(functionData.parameters, null, 2) 
           : '{}'
       });
-    } else if (isOpen) {
-      // Reset form for new function
-      setFormData({
-        name: '',
-        description: '',
-        url: '',
-        type: 'custom',
-        timeoutMs: '30000',
-        speakDuring: false,
-        speakAfter: true,
-        parameters: '{}'
-      });
+    } else {
+      setFormData(defaultFormData);
     }
     
-    // Clear errors when modal opens/closes
+    // Clear errors when resetting
     setErrors({});
-  }, [functionData, isOpen]);
+  }, [functionData]);
+  
+  // Initialize form data when component mounts or functionData changes
+  useEffect(() => {
+    resetForm();
+  }, [functionData, resetForm]);
   
   // Handle form field changes
-  const handleChange = (field: keyof FunctionFormData, value: any) => {
+  const handleChange = useCallback((field: keyof FunctionFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  }, []);
   
   // Validate form fields
-  const validate = (): boolean => {
+  const validate = useCallback((): boolean => {
     const newErrors: FunctionFormErrors = {};
     
     if (!formData.name.trim()) {
@@ -81,10 +77,10 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen: bool
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [formData]);
   
   // Build AgentFunction object from form data
-  const buildFunctionObject = (): AgentFunction => {
+  const buildFunctionObject = useCallback((): AgentFunction => {
     let parsedParameters;
     try {
       parsedParameters = formData.parameters ? JSON.parse(formData.parameters) : undefined;
@@ -107,7 +103,7 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen: bool
     }
     
     return newFunction;
-  };
+  }, [formData]);
   
   return {
     formData,
@@ -115,6 +111,7 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen: bool
     handleChange,
     validate,
     buildFunctionObject,
-    isCustomFunction: formData.type === 'custom'
+    isCustomFunction: formData.type === 'custom',
+    resetForm
   };
 };

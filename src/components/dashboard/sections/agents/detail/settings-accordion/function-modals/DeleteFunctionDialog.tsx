@@ -10,14 +10,20 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
   onConfirm,
   functionName,
 }) => {
-  // Handle confirm action
+  // Handle confirm action safely
   const handleConfirm = () => {
+    // First close the dialog
     onClose();
-    // Use setTimeout to ensure the dialog has time to close
-    // before triggering potentially heavy state updates
-    setTimeout(() => {
+    
+    // Then confirm deletion after a short delay
+    window.setTimeout(() => {
       onConfirm();
-    }, 200);
+    }, 50);
+  };
+
+  // Handle close safely
+  const handleClose = () => {
+    onClose();
   };
 
   return (
@@ -25,7 +31,7 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
       open={isOpen} 
       onOpenChange={(open) => {
         if (!open) {
-          onClose();
+          handleClose();
         }
       }}
     >
@@ -40,7 +46,7 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>
+          <AlertDialogCancel onClick={handleClose}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction

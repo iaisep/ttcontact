@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -21,20 +21,35 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
     validate,
     buildFunctionObject,
     isCustomFunction,
-  } = useFunctionForm(functionData, isOpen);
+    resetForm
+  } = useFunctionForm(functionData);
+
+  // Reset form data when modal opens or closes
+  useEffect(() => {
+    if (!isOpen) {
+      // Only reset when closed to prevent issues during unmounting
+      resetForm();
+    }
+  }, [isOpen, resetForm]);
 
   // Handle form submission
   const handleSubmit = () => {
     if (!validate()) return;
     
     const newFunction = buildFunctionObject();
+    
+    // First close the modal
     onClose();
     
-    // Use setTimeout to ensure the modal has time to close
-    // before triggering potentially heavy state updates
-    setTimeout(() => {
+    // Then add the function after a short delay
+    window.setTimeout(() => {
       onAdd(newFunction);
-    }, 200);
+    }, 50);
+  };
+
+  // Handle close safely
+  const handleClose = () => {
+    onClose();
   };
 
   return (
@@ -42,7 +57,7 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
       open={isOpen} 
       onOpenChange={(open) => {
         if (!open) {
-          onClose();
+          handleClose();
         }
       }}
     >
@@ -67,12 +82,14 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
         <DialogFooter>
           <Button 
             variant="outline" 
-            onClick={onClose}
+            onClick={handleClose}
+            type="button"
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSubmit}
+            type="button"
           >
             Add Function
           </Button>

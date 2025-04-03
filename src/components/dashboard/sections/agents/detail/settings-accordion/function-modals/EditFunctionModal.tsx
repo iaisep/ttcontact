@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Edit } from 'lucide-react';
@@ -7,11 +7,11 @@ import { EditFunctionModalProps } from './types';
 import FunctionForm from './components/FunctionForm';
 import { useFunctionForm } from './hooks/useFunctionForm';
 
-export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
-  isOpen,
-  onClose,
-  onUpdate,
-  functionData
+export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onUpdate, 
+  functionData 
 }) => {
   // Use our custom hook to manage form state and validation
   const {
@@ -21,20 +21,35 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
     validate,
     buildFunctionObject,
     isCustomFunction,
-  } = useFunctionForm(functionData, isOpen);
+    resetForm
+  } = useFunctionForm(functionData);
+
+  // Reset form data when modal opens with new data or closes
+  useEffect(() => {
+    if (!isOpen) {
+      // Only reset when closed to prevent issues during unmounting
+      resetForm();
+    }
+  }, [isOpen, resetForm]);
 
   // Handle form submission
   const handleSubmit = () => {
     if (!validate()) return;
     
     const updatedFunction = buildFunctionObject();
+    
+    // First close the modal
     onClose();
     
-    // Use setTimeout to ensure the modal has time to close
-    // before triggering potentially heavy state updates
-    setTimeout(() => {
+    // Then update the function after a short delay
+    window.setTimeout(() => {
       onUpdate(updatedFunction);
-    }, 200);
+    }, 50);
+  };
+
+  // Handle close safely
+  const handleClose = () => {
+    onClose();
   };
 
   return (
@@ -42,7 +57,7 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
       open={isOpen} 
       onOpenChange={(open) => {
         if (!open) {
-          onClose();
+          handleClose();
         }
       }}
     >
@@ -53,7 +68,7 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
             Edit Function
           </DialogTitle>
           <DialogDescription>
-            Update this function's configuration.
+            Update the function configuration for your agent.
           </DialogDescription>
         </DialogHeader>
         
@@ -67,12 +82,14 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
         <DialogFooter>
           <Button 
             variant="outline" 
-            onClick={onClose}
+            onClick={handleClose}
+            type="button"
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSubmit}
+            type="button"
           >
             Update Function
           </Button>

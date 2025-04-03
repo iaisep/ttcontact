@@ -64,18 +64,38 @@ export const useFunctions = (agent: RetellAgent) => {
     }
   }, [llmId, fetchWithAuth, t, isProcessing]);
 
-  // Handle function edit
+  // Handle function edit - ensure modal state is set properly
   const handleEditFunction = useCallback((func: AgentFunction) => {
     if (isProcessing) return;
+    
+    // Close any open modals first
+    setAddModalOpen(false);
+    setDeleteDialogOpen(false);
+    
+    // Set the selected function
     setSelectedFunction(func);
-    setEditModalOpen(true);
+    
+    // Open the edit modal after a short delay
+    window.setTimeout(() => {
+      setEditModalOpen(true);
+    }, 0);
   }, [isProcessing]);
 
-  // Handle function delete 
+  // Handle function delete - ensure modal state is set properly
   const handleDeleteFunction = useCallback((func: AgentFunction) => {
     if (isProcessing) return;
+    
+    // Close any open modals first
+    setAddModalOpen(false);
+    setEditModalOpen(false);
+    
+    // Set the selected function
     setSelectedFunction(func);
-    setDeleteDialogOpen(true);
+    
+    // Open the delete dialog after a short delay
+    window.setTimeout(() => {
+      setDeleteDialogOpen(true);
+    }, 0);
   }, [isProcessing]);
   
   // Perform function delete
