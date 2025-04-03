@@ -66,10 +66,15 @@ export const useFunctions = (agent: RetellAgent) => {
 
   // Reset all modals and selections
   const resetState = useCallback(() => {
-    setSelectedFunction(null);
+    // Close all modals first
     setEditModalOpen(false);
     setAddModalOpen(false);
     setDeleteDialogOpen(false);
+    
+    // Then after a small delay, reset the selected function
+    setTimeout(() => {
+      setSelectedFunction(null);
+    }, 300);
   }, []);
 
   // Handle function edit
@@ -92,7 +97,6 @@ export const useFunctions = (agent: RetellAgent) => {
     
     const updatedFunctions = functions.filter(f => f.name !== selectedFunction.name);
     await updateLLMFunctions(updatedFunctions);
-    setSelectedFunction(null);
   }, [selectedFunction, functions, updateLLMFunctions, isProcessing]);
 
   // Handle function update
@@ -104,7 +108,6 @@ export const useFunctions = (agent: RetellAgent) => {
     );
     
     await updateLLMFunctions(updatedFunctions);
-    setSelectedFunction(null);
   }, [functions, selectedFunction, updateLLMFunctions, isProcessing]);
 
   // Handle function add
@@ -121,7 +124,6 @@ export const useFunctions = (agent: RetellAgent) => {
     
     const updatedFunctions = [...functions, newFunction];
     await updateLLMFunctions(updatedFunctions);
-    setSelectedFunction(null);
   }, [functions, updateLLMFunctions, t, isProcessing]);
 
   return {

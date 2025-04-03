@@ -36,34 +36,45 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
   // Handle safely closing modals
   const handleCloseEditModal = useCallback(() => {
     setEditModalOpen(false);
-  }, [setEditModalOpen]);
+    // Small delay before resetting selected function to avoid UI flicker
+    setTimeout(() => {
+      if (!deleteDialogOpen && !addModalOpen) {
+        setSelectedFunction(null);
+      }
+    }, 300);
+  }, [setEditModalOpen, deleteDialogOpen, addModalOpen, setSelectedFunction]);
 
   const handleCloseAddModal = useCallback(() => {
     setAddModalOpen(false);
-  }, [setAddModalOpen]);
+    // Small delay before resetting selected function to avoid UI flicker
+    setTimeout(() => {
+      if (!deleteDialogOpen && !editModalOpen) {
+        setSelectedFunction(null);
+      }
+    }, 300);
+  }, [setAddModalOpen, deleteDialogOpen, editModalOpen, setSelectedFunction]);
 
   const handleCloseDeleteDialog = useCallback(() => {
     setDeleteDialogOpen(false);
-  }, [setDeleteDialogOpen]);
+    // Small delay before resetting selected function to avoid UI flicker
+    setTimeout(() => {
+      if (!editModalOpen && !addModalOpen) {
+        setSelectedFunction(null);
+      }
+    }, 300);
+  }, [setDeleteDialogOpen, editModalOpen, addModalOpen, setSelectedFunction]);
 
   // Handle adding a function from template
   const handleAddFunctionTemplate = useCallback((type: string) => {
-    if (type === 'custom') {
-      // For custom function, open the add modal with empty template
-      setSelectedFunction(createFunctionFromTemplate(type));
-      setAddModalOpen(true);
+    const newFunction = createFunctionFromTemplate(type);
+    setSelectedFunction(newFunction);
+    
+    // If it's a simple function like end_call, add it directly
+    if (type === 'end_call') {
+      handleAddFunction(newFunction);
     } else {
-      // For other function types, prepare the template and confirm
-      const newFunction = createFunctionFromTemplate(type);
-      setSelectedFunction(newFunction);
-      
-      // If it's a simple function like end_call, add it directly
-      if (type === 'end_call') {
-        handleAddFunction(newFunction);
-      } else {
-        // For other templates, open the editor
-        setAddModalOpen(true);
-      }
+      // For other templates, open the editor
+      setAddModalOpen(true);
     }
   }, [setSelectedFunction, setAddModalOpen, handleAddFunction]);
 

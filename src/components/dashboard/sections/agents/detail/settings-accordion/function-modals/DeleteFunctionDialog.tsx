@@ -13,7 +13,7 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUnmounting, setIsUnmounting] = useState(false);
 
-  // Reset states when dialog opens/closes
+  // Reset states when dialog opens
   useEffect(() => {
     if (isOpen) {
       setIsUnmounting(false);
@@ -26,15 +26,15 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
     if (isDeleting || isUnmounting) return;
     
     setIsUnmounting(true);
-    onClose();
-    
-    // Reset state after animation completes
-    const timer = setTimeout(() => {
-      setIsUnmounting(false);
-      setIsDeleting(false);
-    }, 300);
-    
-    return () => clearTimeout(timer);
+    // Use setTimeout to allow time for animation
+    setTimeout(() => {
+      onClose();
+      // Reset state after animation completes
+      setTimeout(() => {
+        setIsUnmounting(false);
+        setIsDeleting(false);
+      }, 100);
+    }, 100);
   }, [isDeleting, isUnmounting, onClose]);
 
   // Handle confirm action
@@ -43,14 +43,16 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
     
     setIsDeleting(true);
     setIsUnmounting(true);
-    onClose();
-    
-    // Use requestAnimationFrame to ensure the dialog has time to animate out
-    // before triggering potentially heavy state updates
-    requestAnimationFrame(() => {
-      onConfirm();
-      setIsDeleting(false);
-    });
+    // Use setTimeout to allow time for animation
+    setTimeout(() => {
+      onClose();
+      // Use setTimeout to ensure the dialog has time to animate out
+      // before triggering potentially heavy state updates
+      setTimeout(() => {
+        onConfirm();
+        setIsDeleting(false);
+      }, 100);
+    }, 100);
   }, [isDeleting, isUnmounting, onClose, onConfirm]);
 
   // Prevent rendering content when not open

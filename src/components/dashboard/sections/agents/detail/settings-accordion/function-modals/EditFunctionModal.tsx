@@ -27,7 +27,7 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
     resetForm
   } = useFunctionForm(functionData, isOpen);
 
-  // Reset the unmounting state when modal opens/closes
+  // Reset the unmounting state when modal opens
   useEffect(() => {
     if (isOpen) {
       setIsUnmounting(false);
@@ -46,16 +46,20 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
     // Build the function object from form data
     const updatedFunction = buildFunctionObject();
     
-    // Mark as unmounting and close the modal
+    // Mark as unmounting first
     setIsUnmounting(true);
-    onClose();
     
-    // Use requestAnimationFrame to ensure the modal has time to animate out
-    // before triggering potentially heavy state updates
-    requestAnimationFrame(() => {
-      onUpdate(updatedFunction);
-      setIsSubmitting(false);
-    });
+    // Use setTimeout for safer animation timing
+    setTimeout(() => {
+      onClose();
+      
+      // Use setTimeout to ensure the modal has time to animate out
+      // before triggering potentially heavy state updates
+      setTimeout(() => {
+        onUpdate(updatedFunction);
+        setIsSubmitting(false);
+      }, 100);
+    }, 100);
   }, [isSubmitting, isUnmounting, validate, buildFunctionObject, onClose, onUpdate]);
 
   // Handle clean close
@@ -63,16 +67,18 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
     if (isSubmitting || isUnmounting) return;
     
     setIsUnmounting(true);
-    resetForm();
-    onClose();
     
-    // Reset state after animation completes
-    const timer = setTimeout(() => {
-      setIsUnmounting(false);
-      setIsSubmitting(false);
-    }, 300);
-    
-    return () => clearTimeout(timer);
+    // Use setTimeout for safer animation timing
+    setTimeout(() => {
+      onClose();
+      resetForm();
+      
+      // Reset state after animation completes
+      setTimeout(() => {
+        setIsUnmounting(false);
+        setIsSubmitting(false);
+      }, 100);
+    }, 100);
   }, [isSubmitting, isUnmounting, onClose, resetForm]);
 
   // Prevent rendering modal content when not open
