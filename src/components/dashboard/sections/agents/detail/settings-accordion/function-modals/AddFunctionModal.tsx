@@ -1,20 +1,11 @@
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { AgentFunction } from '../functions/types';
-import { Sparkles, Plus } from 'lucide-react';
-
-interface AddFunctionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAdd: (newFunction: AgentFunction) => void;
-  functionData: AgentFunction | null;
-}
+import { Plus } from 'lucide-react';
+import { AddFunctionModalProps } from './types';
+import FunctionForm from './components/FunctionForm';
+import { useFunctionForm } from './hooks/useFunctionForm';
 
 export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({ 
   isOpen, 
@@ -22,27 +13,49 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
   onAdd, 
   functionData 
 }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [url, setUrl] = useState('');
-  const [timeoutMs, setTimeoutMs] = useState('30000');
-  const [parameters, setParameters] = useState('{}');
-  const [speakDuring, setSpeakDuring] = useState(false);
-  const [speakAfter, setSpeakAfter] = useState(true);
-  const [type, setType] = useState('custom');
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Add a ref to track if the component is mounted
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const isMountedRef = useRef(true);
 
+  // Use our custom hook to manage form state and validation
+  const {
+    formData,
+    errors,
+    handleChange,
+    validate,
+    buildFunctionObject,
+    isCustomFunction
+  } = useFunctionForm(functionData, isOpen);
+
   // Update the mounted ref on cleanup
-  useEffect(() => {
+  React.useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
   }, []);
+
+  // Handle form submission
+  const handleSubmit = useCallback(() => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    
+    if (!validate()) return;
+    
+    setIsSubmitting(true);
+    
+    // Build the function object from form data
+    const newFunction = buildFunctionObject();
+    
+    // First close the modal cleanly to prevent UI freezes
+    onClose();
+    
+    // Use a small delay to ensure modal is unmounted before processing
+    setTimeout(() => {
+      // Only proceed if component is still mounted
+      if (isMountedRef.current) {
+        onAdd(newFunction);
+      }
+    }, 100);
+  }, [isSubmitting, validate, buildFunctionObject, onClose, onAdd]);
 
   // Use a memoized close handler to avoid recreating it on each render
   const handleCleanClose = useCallback(() => {
@@ -50,120 +63,8 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
     onClose();
   }, [isSubmitting, onClose]);
 
-  useEffect(() => {
-    if (isOpen && functionData) {
-      setName(functionData.name || '');
-      setDescription(functionData.description || '');
-      setUrl(functionData.url || '');
-      setType(functionData.type || 'custom');
-      setTimeoutMs(functionData.timeout_ms?.toString() || '30000');
-      setSpeakDuring(functionData.speak_during_execution || false);
-      setSpeakAfter(functionData.speak_after_execution || true);
-      
-      // Format parameters as JSON string for editing
-      if (functionData.parameters) {
-        try {
-          setParameters(JSON.stringify(functionData.parameters, null, 2));
-        } catch (e) {
-          setParameters('{}');
-        }
-      } else {
-        setParameters('{}');
-      }
-    } else if (isOpen) {
-      // Reset form for new function
-      setName('');
-      setDescription('');
-      setUrl('');
-      setType('custom');
-      setTimeoutMs('30000');
-      setSpeakDuring(false);
-      setSpeakAfter(true);
-      setParameters('{}');
-    }
-    
-    // Clear errors when modal opens/closes
-    setErrors({});
-    // Reset submission state
-    setIsSubmitting(false);
-  }, [functionData, isOpen]);
-
-  const validate = useCallback((): boolean => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!name.trim()) {
-      newErrors.name = 'Function name is required';
-    }
-    
-    if (!description.trim()) {
-      newErrors.description = 'Description is required';
-    }
-    
-    if (type === 'custom' && !url.trim()) {
-      newErrors.url = 'URL is required for custom functions';
-    }
-    
-    try {
-      if (parameters) {
-        JSON.parse(parameters);
-      }
-    } catch (e) {
-      newErrors.parameters = 'Invalid JSON format';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [name, description, type, url, parameters]);
-
-  const handleSubmit = useCallback(() => {
-    if (isSubmitting) return; // Prevent multiple submissions
-    
-    if (!validate()) return;
-    
-    let parsedParameters;
-    try {
-      parsedParameters = parameters ? JSON.parse(parameters) : undefined;
-    } catch (e) {
-      setErrors(prev => ({ ...prev, parameters: 'Invalid JSON format' }));
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    const newFunction: AgentFunction = {
-      name,
-      description,
-      type,
-    };
-    
-    if (type === 'custom') {
-      newFunction.url = url;
-      newFunction.timeout_ms = parseInt(timeoutMs, 10);
-      newFunction.parameters = parsedParameters;
-      newFunction.speak_during_execution = speakDuring;
-      newFunction.speak_after_execution = speakAfter;
-    }
-    
-    // First close the modal cleanly to prevent UI freezes
-    onClose();
-    
-    // Use a small delay to ensure modal is unmounted before processing
-    // Don't use state for this as it could be part of the freezing issue
-    setTimeout(() => {
-      // Only proceed if component is still mounted
-      if (isMountedRef.current) {
-        onAdd(newFunction);
-      }
-    }, 100);
-  }, [
-    isSubmitting, validate, parameters, name, description, type, 
-    url, timeoutMs, speakDuring, speakAfter, onClose, onAdd
-  ]);
-
-  const isCustomFunction = type === 'custom';
-
   // Use useEffect for cleanup on unmount
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       // Cleanup any pending state or operations when modal is closed
       setIsSubmitting(false);
@@ -190,92 +91,12 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="col-span-3"
-            />
-            {errors.name && <p className="text-red-500 text-xs col-start-2 col-span-3">{errors.name}</p>}
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="text-right">Description</Label>
-            <Input
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="col-span-3"
-            />
-            {errors.description && <p className="text-red-500 text-xs col-start-2 col-span-3">{errors.description}</p>}
-          </div>
-          
-          {isCustomFunction && (
-            <>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="url" className="text-right">Webhook URL</Label>
-                <Input
-                  id="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="col-span-3"
-                  placeholder="https://example.com/webhook"
-                />
-                {errors.url && <p className="text-red-500 text-xs col-start-2 col-span-3">{errors.url}</p>}
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="timeoutMs" className="text-right">Timeout (ms)</Label>
-                <Input
-                  id="timeoutMs"
-                  type="number"
-                  value={timeoutMs}
-                  onChange={(e) => setTimeoutMs(e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
-              
-              <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="parameters" className="text-right pt-2">Parameters (JSON)</Label>
-                <Textarea
-                  id="parameters"
-                  value={parameters}
-                  onChange={(e) => setParameters(e.target.value)}
-                  className="col-span-3 font-mono text-xs"
-                  rows={8}
-                />
-                {errors.parameters && <p className="text-red-500 text-xs col-start-2 col-span-3">{errors.parameters}</p>}
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="speakDuring" className="text-right">Speak During Execution</Label>
-                <div className="flex items-center space-x-2 col-span-3">
-                  <Switch
-                    id="speakDuring"
-                    checked={speakDuring}
-                    onCheckedChange={setSpeakDuring}
-                  />
-                  <Label htmlFor="speakDuring" className="text-sm text-gray-500">Agent speaks while function is running</Label>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="speakAfter" className="text-right">Speak After Execution</Label>
-                <div className="flex items-center space-x-2 col-span-3">
-                  <Switch
-                    id="speakAfter"
-                    checked={speakAfter}
-                    onCheckedChange={setSpeakAfter}
-                  />
-                  <Label htmlFor="speakAfter" className="text-sm text-gray-500">Agent speaks after function completes</Label>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+        <FunctionForm 
+          formData={formData}
+          errors={errors}
+          onChange={handleChange}
+          isCustomFunction={isCustomFunction}
+        />
         
         <DialogFooter>
           <Button 
