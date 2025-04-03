@@ -1,14 +1,8 @@
 
 import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-
-interface DeleteFunctionDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  functionName: string;
-}
+import { Trash2 } from 'lucide-react';
+import { DeleteFunctionDialogProps } from './types';
 
 export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
   isOpen,
@@ -66,7 +60,10 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Function</AlertDialogTitle>
+          <AlertDialogTitle className="flex items-center">
+            <Trash2 className="h-5 w-5 mr-2 text-destructive" />
+            Delete Function
+          </AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete the function "{functionName}"? This action cannot be undone.
           </AlertDialogDescription>
@@ -85,7 +82,7 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isDeleting}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-destructive hover:bg-destructive/90"
           >
             Delete
           </AlertDialogAction>

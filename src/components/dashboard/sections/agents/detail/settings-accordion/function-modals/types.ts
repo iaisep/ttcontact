@@ -15,6 +15,13 @@ export interface EditFunctionModalProps extends BaseFunctionModalProps {
   onUpdate: (updatedFunction: AgentFunction) => void;
 }
 
+export interface DeleteFunctionDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  functionName: string;
+}
+
 export interface FunctionFormData {
   name: string;
   description: string;
