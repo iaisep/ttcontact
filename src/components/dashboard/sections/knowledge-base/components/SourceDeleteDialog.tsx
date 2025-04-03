@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,7 +8,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { KnowledgeBaseSource } from '../types';
 
@@ -23,9 +23,16 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
   open,
   onOpenChange,
   source,
-  onConfirm
+  onConfirm,
 }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  // Reset state when dialog opens or closes
+  React.useEffect(() => {
+    if (!open) {
+      setIsDeleting(false);
+    }
+  }, [open]);
 
   const handleConfirm = async () => {
     try {
@@ -35,7 +42,6 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
       console.error('Error deleting source:', error);
     } finally {
       setIsDeleting(false);
-      // Ensure dialog closes after deletion attempt, regardless of success/failure
       onOpenChange(false);
     }
   };
@@ -46,17 +52,21 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Source</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{source?.title}"? This action cannot be undone.
+            Are you sure you want to delete this source?
+            {source && <div className="font-semibold mt-1">{source.title}</div>}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
           <AlertDialogAction 
-            className="bg-destructive text-destructive-foreground"
-            onClick={handleConfirm}
+            onClick={(e) => {
+              e.preventDefault();
+              handleConfirm();
+            }}
             disabled={isDeleting}
+            className={isDeleting ? "opacity-50 cursor-not-allowed" : ""}
           >
-            {isDeleting ? 'Deleting...' : 'Delete'}
+            {isDeleting ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

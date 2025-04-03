@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { 
@@ -70,6 +71,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   const [sourceToDelete, setSourceToDelete] = useState<KnowledgeBaseSource | null>(null);
   const [deleteSourceDialogOpen, setDeleteSourceDialogOpen] = useState(false);
   const [currentKb, setCurrentKb] = useState<KnowledgeBase | null>(knowledgeBase);
+  const [isSaving, setIsSaving] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -87,16 +89,25 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     }
   }, [knowledgeBase, form]);
 
+  // Reset source modals when main dialog closes
   useEffect(() => {
     if (!open) {
-      setCurrentSourceType(null);
-      setSourceToDelete(null);
-      setDeleteSourceDialogOpen(false);
+      // Use timeout to ensure state updates don't conflict
+      const timeout = setTimeout(() => {
+        setCurrentSourceType(null);
+        setSourceToDelete(null);
+        setDeleteSourceDialogOpen(false);
+      }, 100);
+      
+      return () => clearTimeout(timeout);
     }
   }, [open]);
 
   const handleSave = async (data: { name: string }) => {
+    if (isSaving) return;
+    
     try {
+      setIsSaving(true);
       const savedKb = await onSave(data.name, currentKb);
       setCurrentKb(savedKb);
       if (isCreating) {
@@ -104,13 +115,14 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
       }
     } catch (error) {
       console.error('Failed to save knowledge base:', error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleReset = () => {
     form.reset();
     setCurrentKb(null);
-    setCurrentSourceType(null);
   };
 
   const handleAddSourceClick = (type: 'url' | 'file' | 'text') => {
@@ -127,6 +139,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         webPages: selectedPages
       });
       setCurrentKb(updatedKb);
+      setCurrentSourceType(null);
     } catch (error) {
       console.error('Failed to add URL source:', error);
     }
@@ -138,6 +151,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     try {
       const updatedKb = await onAddSource(currentKb.id, 'file', { file });
       setCurrentKb(updatedKb);
+      setCurrentSourceType(null);
     } catch (error) {
       console.error('Failed to add file source:', error);
     }
@@ -149,6 +163,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     try {
       const updatedKb = await onAddSource(currentKb.id, 'text', { fileName, content });
       setCurrentKb(updatedKb);
+      setCurrentSourceType(null);
     } catch (error) {
       console.error('Failed to add text source:', error);
     }
@@ -160,6 +175,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     try {
       const updatedKb = await onDeleteSource(currentKb.id, sourceToDelete.id);
       setCurrentKb(updatedKb);
+      // Don't set setDeleteSourceDialogOpen(false) here - let the component handle it
     } catch (error) {
       console.error('Failed to delete source:', error);
     }
@@ -177,8 +193,11 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
       <Dialog 
         open={open} 
         onOpenChange={(open) => {
-          onOpenChange(open);
-          if (!open) handleReset();
+          // Only allow closing if we're not in the middle of an operation
+          if (!isSaving) {
+            onOpenChange(open);
+            if (!open) handleReset();
+          }
         }}
       >
         <DialogContent className="sm:max-w-[600px]">
@@ -310,14 +329,15 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                     onOpenChange(false);
                     handleReset();
                   }}
+                  disabled={isSaving}
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit"
-                  disabled={!form.formState.isDirty && isCreating}
+                  disabled={(!form.formState.isDirty && isCreating) || isSaving}
                 >
-                  {isCreating ? 'Create' : 'Update'}
+                  {isSaving ? "Saving..." : (isCreating ? 'Create' : 'Update')}
                 </Button>
               </DialogFooter>
             </form>
@@ -325,6 +345,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         </DialogContent>
       </Dialog>
 
+      {/* Child modals - using open state patterns to prevent UI freezes */}
       <AddUrlSourceModal
         open={currentSourceType === 'url'}
         onOpenChange={(open) => !open && setCurrentSourceType(null)}
@@ -344,12 +365,15 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         onSubmit={handleAddTextSource}
       />
 
-      <SourceDeleteDialog
-        open={deleteSourceDialogOpen}
-        onOpenChange={setDeleteSourceDialogOpen}
-        source={sourceToDelete}
-        onConfirm={handleDeleteSource}
-      />
+      {/* Use a controlled pattern for the delete dialog */}
+      {deleteSourceDialogOpen && (
+        <SourceDeleteDialog
+          open={deleteSourceDialogOpen}
+          onOpenChange={setDeleteSourceDialogOpen}
+          source={sourceToDelete}
+          onConfirm={handleDeleteSource}
+        />
+      )}
     </>
   );
 };

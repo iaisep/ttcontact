@@ -8,6 +8,8 @@ export const useKnowledgeBaseSources = (
   setKnowledgeBases: React.Dispatch<React.SetStateAction<KnowledgeBase[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const addSourceToKnowledgeBase = async (
     kbId: string, 
     sourceType: 'url' | 'file' | 'text',
@@ -20,7 +22,10 @@ export const useKnowledgeBaseSources = (
       webPages?: WebPage[]
     }
   ) => {
+    if (isProcessing) return Promise.reject(new Error('Operation in progress'));
+    
     try {
+      setIsProcessing(true);
       setLoading(true);
       const kb = knowledgeBases.find(kb => kb.id === kbId);
       if (!kb) throw new Error('Knowledge base not found');
@@ -63,7 +68,7 @@ export const useKnowledgeBaseSources = (
           updatedKb.auto_sync = true;
         }
         
-        setKnowledgeBases(knowledgeBases.map(item => 
+        setKnowledgeBases(prevKbs => prevKbs.map(item => 
           item.id === kbId ? updatedKb : item
         ));
         
@@ -77,12 +82,16 @@ export const useKnowledgeBaseSources = (
       console.error(error);
       throw error;
     } finally {
+      setIsProcessing(false);
       setLoading(false);
     }
   };
 
   const deleteSource = useCallback(async (kbId: string, sourceId: string) => {
+    if (isProcessing) return Promise.reject(new Error('Operation in progress'));
+    
     try {
+      setIsProcessing(true);
       setLoading(true);
       
       const kb = knowledgeBases.find(kb => kb.id === kbId);
@@ -92,6 +101,7 @@ export const useKnowledgeBaseSources = (
       updatedKb.sources = updatedKb.sources.filter(src => src.id !== sourceId);
       updatedKb.source_count = updatedKb.sources.length;
       
+      // Use functional updates to ensure we're working with the latest state
       setKnowledgeBases(prevKbs => 
         prevKbs.map(item => item.id === kbId ? updatedKb : item)
       );
@@ -103,12 +113,14 @@ export const useKnowledgeBaseSources = (
       console.error(error);
       throw error;
     } finally {
+      setIsProcessing(false);
       setLoading(false);
     }
-  }, [knowledgeBases, setKnowledgeBases, setLoading]);
+  }, [knowledgeBases, setKnowledgeBases, setLoading, isProcessing]);
 
   return {
     addSourceToKnowledgeBase,
-    deleteSource
+    deleteSource,
+    isProcessing
   };
 };
