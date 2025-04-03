@@ -1,5 +1,5 @@
 
-import React, { useRef, useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Edit } from 'lucide-react';
@@ -7,14 +7,14 @@ import { EditFunctionModalProps } from './types';
 import FunctionForm from './components/FunctionForm';
 import { useFunctionForm } from './hooks/useFunctionForm';
 
-export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  onUpdate, 
-  functionData 
+export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
+  isOpen,
+  onClose,
+  onUpdate,
+  functionData
 }) => {
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const isMountedRef = useRef(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUnmounting, setIsUnmounting] = useState(false);
 
   // Use our custom hook to manage form state and validation
   const {
@@ -23,20 +23,21 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
     handleChange,
     validate,
     buildFunctionObject,
-    isCustomFunction
+    isCustomFunction,
+    resetForm
   } = useFunctionForm(functionData, isOpen);
 
-  // Update the mounted ref on cleanup
-  React.useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+  // Reset the unmounting state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setIsUnmounting(false);
+      setIsSubmitting(false);
+    }
+  }, [isOpen]);
 
   // Handle form submission
   const handleSubmit = useCallback(() => {
-    if (isSubmitting) return; // Prevent multiple submissions
+    if (isSubmitting || isUnmounting) return;
     
     if (!validate()) return;
     
@@ -45,39 +46,45 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
     // Build the function object from form data
     const updatedFunction = buildFunctionObject();
     
-    // First close the modal cleanly to prevent UI freezes
+    // Mark as unmounting and close the modal
+    setIsUnmounting(true);
     onClose();
     
-    // Use a small delay to ensure modal is unmounted before processing
-    setTimeout(() => {
-      // Only proceed if component is still mounted
-      if (isMountedRef.current) {
-        onUpdate(updatedFunction);
-      }
-    }, 100);
-  }, [isSubmitting, validate, buildFunctionObject, onClose, onUpdate]);
-
-  // Use a memoized close handler to avoid recreating it on each render
-  const handleCleanClose = useCallback(() => {
-    if (isSubmitting) return;
-    onClose();
-  }, [isSubmitting, onClose]);
-
-  // Use useEffect for cleanup on unmount
-  React.useEffect(() => {
-    return () => {
-      // Cleanup any pending state or operations when modal is closed
+    // Use requestAnimationFrame to ensure the modal has time to animate out
+    // before triggering potentially heavy state updates
+    requestAnimationFrame(() => {
+      onUpdate(updatedFunction);
       setIsSubmitting(false);
-    };
-  }, []);
+    });
+  }, [isSubmitting, isUnmounting, validate, buildFunctionObject, onClose, onUpdate]);
 
+  // Handle clean close
+  const handleCleanClose = useCallback(() => {
+    if (isSubmitting || isUnmounting) return;
+    
+    setIsUnmounting(true);
+    resetForm();
+    onClose();
+    
+    // Reset state after animation completes
+    const timer = setTimeout(() => {
+      setIsUnmounting(false);
+      setIsSubmitting(false);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [isSubmitting, isUnmounting, onClose, resetForm]);
+
+  // Prevent rendering modal content when not open
   if (!isOpen) return null;
 
   return (
     <Dialog 
       open={isOpen} 
       onOpenChange={(open) => {
-        if (!open && !isSubmitting) handleCleanClose();
+        if (!open && !isSubmitting && !isUnmounting) {
+          handleCleanClose();
+        }
       }}
     >
       <DialogContent className="sm:max-w-[500px]">
@@ -87,7 +94,7 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
             Edit Function
           </DialogTitle>
           <DialogDescription>
-            Modify this function's properties and behavior.
+            Update this function's configuration.
           </DialogDescription>
         </DialogHeader>
         
@@ -106,13 +113,13 @@ export const EditFunctionModal: React.FC<EditFunctionModalProps> = ({
               e.stopPropagation();
               handleCleanClose();
             }}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isUnmounting}
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSubmit}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isUnmounting}
           >
             Update Function
           </Button>

@@ -36,21 +36,15 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
   // Handle safely closing modals
   const handleCloseEditModal = useCallback(() => {
     setEditModalOpen(false);
-    // Use a timeout to ensure state is updated after modal animation
-    setTimeout(() => setSelectedFunction(null), 150);
-  }, [setEditModalOpen, setSelectedFunction]);
+  }, [setEditModalOpen]);
 
   const handleCloseAddModal = useCallback(() => {
     setAddModalOpen(false);
-    // Use a timeout to ensure state is updated after modal animation
-    setTimeout(() => setSelectedFunction(null), 150);
-  }, [setAddModalOpen, setSelectedFunction]);
+  }, [setAddModalOpen]);
 
   const handleCloseDeleteDialog = useCallback(() => {
     setDeleteDialogOpen(false);
-    // Use a timeout to ensure state is updated after modal animation
-    setTimeout(() => setSelectedFunction(null), 150);
-  }, [setDeleteDialogOpen, setSelectedFunction]);
+  }, [setDeleteDialogOpen]);
 
   // Handle adding a function from template
   const handleAddFunctionTemplate = useCallback((type: string) => {
@@ -108,29 +102,33 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
           </div>
         </div>
 
-        {/* Edit Function Modal */}
-        <EditFunctionModal
-          isOpen={editModalOpen}
-          onClose={handleCloseEditModal}
-          onUpdate={handleUpdateFunction}
-          functionData={selectedFunction}
-        />
+        {/* Modals and dialogs - mounted only when open */}
+        {editModalOpen && (
+          <EditFunctionModal
+            isOpen={editModalOpen}
+            onClose={handleCloseEditModal}
+            onUpdate={handleUpdateFunction}
+            functionData={selectedFunction}
+          />
+        )}
 
-        {/* Add Function Modal */}
-        <AddFunctionModal
-          isOpen={addModalOpen}
-          onClose={handleCloseAddModal}
-          onAdd={handleAddFunction}
-          functionData={selectedFunction}
-        />
+        {addModalOpen && (
+          <AddFunctionModal
+            isOpen={addModalOpen}
+            onClose={handleCloseAddModal}
+            onAdd={handleAddFunction}
+            functionData={selectedFunction}
+          />
+        )}
 
-        {/* Delete Function Dialog */}
-        <DeleteFunctionDialog
-          isOpen={deleteDialogOpen}
-          onClose={handleCloseDeleteDialog}
-          onConfirm={confirmDeleteFunction}
-          functionName={selectedFunction?.name || ''}
-        />
+        {deleteDialogOpen && (
+          <DeleteFunctionDialog
+            isOpen={deleteDialogOpen}
+            onClose={handleCloseDeleteDialog}
+            onConfirm={confirmDeleteFunction}
+            functionName={selectedFunction?.name || ''}
+          />
+        )}
       </AccordionContent>
     </AccordionItem>
   );

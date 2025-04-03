@@ -1,5 +1,5 @@
 
-import React, { useCallback, useState, useRef, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { Trash2 } from 'lucide-react';
 import { DeleteFunctionDialogProps } from './types';
@@ -11,51 +11,58 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
   functionName,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const isMountedRef = useRef(true);
+  const [isUnmounting, setIsUnmounting] = useState(false);
 
-  // Update the mounted ref on cleanup
+  // Reset states when dialog opens/closes
   useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+    if (isOpen) {
+      setIsUnmounting(false);
+      setIsDeleting(false);
+    }
+  }, [isOpen]);
 
+  // Handle clean close
   const handleCleanClose = useCallback(() => {
-    if (isDeleting) return;
+    if (isDeleting || isUnmounting) return;
+    
+    setIsUnmounting(true);
     onClose();
-  }, [isDeleting, onClose]);
+    
+    // Reset state after animation completes
+    const timer = setTimeout(() => {
+      setIsUnmounting(false);
+      setIsDeleting(false);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [isDeleting, isUnmounting, onClose]);
 
+  // Handle confirm action
   const handleConfirm = useCallback(() => {
-    if (isDeleting) return;
+    if (isDeleting || isUnmounting) return;
     
     setIsDeleting(true);
-    
-    // Close the dialog first
+    setIsUnmounting(true);
     onClose();
     
-    // Use a small delay to ensure dialog is unmounted before processing
-    setTimeout(() => {
-      if (isMountedRef.current) {
-        onConfirm();
-      }
-    }, 100);
-  }, [isDeleting, onClose, onConfirm]);
-
-  // Use useEffect for cleanup on unmount
-  useEffect(() => {
-    return () => {
+    // Use requestAnimationFrame to ensure the dialog has time to animate out
+    // before triggering potentially heavy state updates
+    requestAnimationFrame(() => {
+      onConfirm();
       setIsDeleting(false);
-    };
-  }, []);
+    });
+  }, [isDeleting, isUnmounting, onClose, onConfirm]);
 
+  // Prevent rendering content when not open
   if (!isOpen) return null;
 
   return (
     <AlertDialog 
       open={isOpen} 
       onOpenChange={(open) => {
-        if (!open && !isDeleting) handleCleanClose();
+        if (!open && !isDeleting && !isUnmounting) {
+          handleCleanClose();
+        }
       }}
     >
       <AlertDialogContent>
@@ -75,13 +82,13 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
               e.stopPropagation();
               handleCleanClose();
             }}
-            disabled={isDeleting}
+            disabled={isDeleting || isUnmounting}
           >
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
-            disabled={isDeleting}
+            disabled={isDeleting || isUnmounting}
             className="bg-destructive hover:bg-destructive/90"
           >
             Delete

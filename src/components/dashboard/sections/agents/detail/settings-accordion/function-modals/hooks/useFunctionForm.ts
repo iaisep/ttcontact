@@ -50,6 +50,21 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen: bool
     setErrors({});
   }, [functionData, isOpen]);
   
+  // Explicitly reset the form
+  const resetForm = useCallback(() => {
+    setFormData({
+      name: '',
+      description: '',
+      url: '',
+      type: 'custom',
+      timeoutMs: '30000',
+      speakDuring: false,
+      speakAfter: true,
+      parameters: '{}'
+    });
+    setErrors({});
+  }, []);
+  
   // Handle form field changes
   const handleChange = useCallback((field: keyof FunctionFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -115,6 +130,7 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen: bool
     handleChange,
     validate,
     buildFunctionObject,
+    resetForm,
     isCustomFunction: formData.type === 'custom'
   };
 };
