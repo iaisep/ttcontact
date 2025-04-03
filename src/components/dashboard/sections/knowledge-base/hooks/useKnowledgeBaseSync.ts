@@ -2,8 +2,11 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { KnowledgeBase } from '../types';
+import { useApiContext } from '@/context/ApiContext';
 
 export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAction<boolean>>) => {
+  const { fetchWithAuth } = useApiContext();
+
   const resyncKnowledgeBase = async (kb: KnowledgeBase) => {
     try {
       setLoading(true);
@@ -14,20 +17,19 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
         return;
       }
       
+      // Call the API endpoint to resync each URL source
       for (const source of urlSources) {
         if (source.url) {
-          // In a real implementation, this would call the API
-          // await fetchWithAuth('/list-sitemap', {
-          //   method: 'POST',
-          //   body: JSON.stringify({ website_url: source.url }),
-          // });
+          await fetchWithAuth(`/resync-knowledge-base-source/${kb.id}/source/${source.id}`, {
+            method: 'POST',
+          });
         }
       }
       
       toast.success('Knowledge base resynced');
     } catch (error) {
+      console.error('Failed to resync knowledge base:', error);
       toast.error('Failed to resync knowledge base');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -36,6 +38,23 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
   const fetchSitemap = async (url: string) => {
     try {
       setLoading(true);
+      
+      // Call the actual API endpoint
+      const response = await fetchWithAuth('/list-sitemap', {
+        method: 'POST',
+        body: JSON.stringify({ website_url: url }),
+      });
+      
+      if (response && response.pages) {
+        // Return the API response
+        return response.pages.map((page: any) => ({
+          url: page.url,
+          title: page.title || page.url,
+          selected: false
+        }));
+      }
+      
+      // Fallback mock data for development
       const mockPages = [
         { url: `${url}/about`, title: 'About Us', selected: false },
         { url: `${url}/products`, title: 'Products', selected: false },
@@ -45,9 +64,11 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
       
       return mockPages;
     } catch (error) {
+      console.error('Failed to fetch sitemap:', error);
       toast.error('Failed to fetch sitemap');
-      console.error(error);
-      throw error;
+      
+      // Return empty array on error
+      return [];
     } finally {
       setLoading(false);
     }

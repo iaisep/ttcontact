@@ -36,6 +36,7 @@ const KnowledgeBaseSection: React.FC = () => {
   const [currentKb, setCurrentKb] = useState<KnowledgeBase | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [kbToDelete, setKbToDelete] = useState<KnowledgeBase | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Reset to first page when search query or page size changes
   useEffect(() => {
@@ -54,14 +55,21 @@ const KnowledgeBaseSection: React.FC = () => {
     setKbDialogOpen(true);
   };
 
-  const handleSaveKnowledgeBase = async (name: string, kb: KnowledgeBase | null) => {
-    if (isCreating) {
-      return await createKnowledgeBase(name);
-    } else if (kb) {
-      const updatedKb = { ...kb, name };
-      return await updateKnowledgeBase(updatedKb);
+  const handleSaveKnowledgeBase = async (data: { name: string }) => {
+    setIsSaving(true);
+    try {
+      if (isCreating) {
+        await createKnowledgeBase(data.name);
+      } else if (currentKb) {
+        const updatedKb = { ...currentKb, name: data.name };
+        await updateKnowledgeBase(updatedKb);
+      }
+      setKbDialogOpen(false);
+    } catch (error) {
+      console.error('Error saving knowledge base:', error);
+    } finally {
+      setIsSaving(false);
     }
-    throw new Error('Invalid operation');
   };
 
   const handleDeleteClick = (kb: KnowledgeBase) => {
@@ -71,9 +79,13 @@ const KnowledgeBaseSection: React.FC = () => {
 
   const handleConfirmDelete = async () => {
     if (kbToDelete) {
-      await deleteKnowledgeBase(kbToDelete.id);
-      setDeleteDialogOpen(false);
-      setKbToDelete(null);
+      try {
+        await deleteKnowledgeBase(kbToDelete.id);
+        setDeleteDialogOpen(false);
+        setKbToDelete(null);
+      } catch (error) {
+        console.error('Error deleting knowledge base:', error);
+      }
     }
   };
 
@@ -139,6 +151,7 @@ const KnowledgeBaseSection: React.FC = () => {
         onAddSource={handleAddSource}
         onDeleteSource={handleDeleteSource}
         onFetchSitemap={fetchSitemap}
+        isSaving={isSaving}
       />
 
       {/* Delete Knowledge Base Dialog */}

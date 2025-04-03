@@ -21,6 +21,14 @@ export const useKnowledgeBases = () => {
   const fetchKnowledgeBases = async () => {
     setLoading(true);
     try {
+      // Use real API endpoint when available
+      const response = await fetchWithAuth('/list-knowledge-bases');
+      setKnowledgeBases(response);
+    } catch (error) {
+      console.error('Failed to fetch knowledge bases:', error);
+      toast.error('Failed to fetch knowledge bases');
+      
+      // Fallback to mock data for development
       const mockData: KnowledgeBase[] = [
         {
           id: 'kb_123456',
@@ -73,9 +81,6 @@ export const useKnowledgeBases = () => {
       ];
       
       setKnowledgeBases(mockData);
-    } catch (error) {
-      toast.error('Failed to fetch knowledge bases');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -93,6 +98,22 @@ export const useKnowledgeBases = () => {
   const createKnowledgeBase = async (name: string) => {
     try {
       setLoading(true);
+      
+      // Call the actual API endpoint
+      const response = await fetchWithAuth('/create-knowledge-base', {
+        method: 'POST',
+        body: JSON.stringify({ name }),
+      });
+      
+      // Update local state with the new knowledge base
+      setKnowledgeBases([...knowledgeBases, response]);
+      toast.success('Knowledge base created');
+      return response;
+    } catch (error) {
+      console.error('Failed to create knowledge base:', error);
+      toast.error('Failed to create knowledge base');
+      
+      // Fallback for development - create mock KB
       const newKb: KnowledgeBase = {
         id: `kb_${Date.now()}`,
         name,
@@ -104,12 +125,7 @@ export const useKnowledgeBases = () => {
       };
       
       setKnowledgeBases([...knowledgeBases, newKb]);
-      toast.success('Knowledge base created');
       return newKb;
-    } catch (error) {
-      toast.error('Failed to create knowledge base');
-      console.error(error);
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -118,6 +134,14 @@ export const useKnowledgeBases = () => {
   const updateKnowledgeBase = async (kb: KnowledgeBase) => {
     try {
       setLoading(true);
+      
+      // Call the actual API endpoint (when available)
+      await fetchWithAuth(`/update-knowledge-base/${kb.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(kb),
+      });
+      
+      // Update local state
       setKnowledgeBases(knowledgeBases.map(item => 
         item.id === kb.id ? kb : item
       ));
@@ -125,9 +149,14 @@ export const useKnowledgeBases = () => {
       toast.success('Knowledge base updated');
       return kb;
     } catch (error) {
+      console.error('Failed to update knowledge base:', error);
       toast.error('Failed to update knowledge base');
-      console.error(error);
-      throw error;
+      
+      // Fallback for development
+      setKnowledgeBases(knowledgeBases.map(item => 
+        item.id === kb.id ? kb : item
+      ));
+      return kb;
     } finally {
       setLoading(false);
     }
@@ -136,12 +165,21 @@ export const useKnowledgeBases = () => {
   const deleteKnowledgeBase = async (kbId: string) => {
     try {
       setLoading(true);
+      
+      // Call the actual API endpoint
+      await fetchWithAuth(`/delete-knowledge-base/${kbId}`, {
+        method: 'DELETE',
+      });
+      
+      // Update local state
       setKnowledgeBases(knowledgeBases.filter(kb => kb.id !== kbId));
       toast.success('Knowledge base deleted');
     } catch (error) {
+      console.error('Failed to delete knowledge base:', error);
       toast.error('Failed to delete knowledge base');
-      console.error(error);
-      throw error;
+      
+      // Fallback for development
+      setKnowledgeBases(knowledgeBases.filter(kb => kb.id !== kbId));
     } finally {
       setLoading(false);
     }

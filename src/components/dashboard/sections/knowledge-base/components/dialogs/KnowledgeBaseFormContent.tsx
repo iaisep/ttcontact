@@ -39,13 +39,17 @@ const KnowledgeBaseFormContent: React.FC<KnowledgeBaseFormContentProps> = ({
     }
   }, [knowledgeBase, form]);
 
-  const handleReset = () => {
-    form.reset();
+  const handleSubmit = async (data: { name: string }) => {
+    try {
+      await onSave(data);
+    } catch (error) {
+      console.error('Error saving knowledge base:', error);
+    }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSave)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -53,7 +57,11 @@ const KnowledgeBaseFormContent: React.FC<KnowledgeBaseFormContentProps> = ({
             <FormItem>
               <FormLabel>Knowledge Base Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter a name" {...field} />
+                <Input 
+                  placeholder="Enter a name" 
+                  {...field} 
+                  disabled={isSaving}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
