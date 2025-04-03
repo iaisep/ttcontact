@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -65,6 +64,7 @@ import {
   SheetFooter 
 } from '@/components/ui/sheet';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import {
   Form,
   FormControl,
@@ -74,6 +74,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface KnowledgeEntry {
   id: string;
@@ -91,6 +92,7 @@ interface KnowledgeBase {
   updated_at: string;
   source_count: number;
   sources: KnowledgeBaseSource[];
+  auto_sync?: boolean;
 }
 
 interface KnowledgeBaseSource {
@@ -101,6 +103,7 @@ interface KnowledgeBaseSource {
   url?: string;
   file_name?: string;
   created_at: string;
+  auto_sync?: boolean;
 }
 
 interface WebPage {
@@ -182,7 +185,8 @@ const KnowledgeBaseSection = () => {
               content: 'Our API uses REST principles and returns JSON responses.',
               created_at: new Date().toISOString(),
             }
-          ]
+          ],
+          auto_sync: false
         },
         {
           id: 'kb_789012',
@@ -198,7 +202,8 @@ const KnowledgeBaseSection = () => {
               content: 'Q: How do I reset my password? A: Visit the login page and click "Forgot Password".',
               created_at: new Date().toISOString(),
             }
-          ]
+          ],
+          auto_sync: false
         }
       ];
       
@@ -243,7 +248,8 @@ const KnowledgeBaseSection = () => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         source_count: 0,
-        sources: []
+        sources: [],
+        auto_sync: false
       };
       
       setKnowledgeBases([...knowledgeBases, newKb]);
@@ -272,6 +278,7 @@ const KnowledgeBaseSection = () => {
         //   method: 'POST',
         //   body: JSON.stringify({
         //     knowledge_base_urls: webPages.filter(wp => wp.selected).map(wp => wp.url),
+        //     auto_sync: autoSync
         //   }),
         // });
         
@@ -281,7 +288,8 @@ const KnowledgeBaseSection = () => {
           type: 'url',
           title: sourceUrl,
           url: sourceUrl,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          auto_sync: autoSync
         };
       } else if (currentSourceType === 'file' && selectedFile) {
         // In a real implementation, this would use FormData to upload the file
@@ -329,6 +337,10 @@ const KnowledgeBaseSection = () => {
         updatedKb.sources = [...updatedKb.sources, newSource];
         updatedKb.source_count = updatedKb.sources.length;
         
+        if (currentSourceType === 'url' && autoSync) {
+          updatedKb.auto_sync = true;
+        }
+        
         setKnowledgeBases(knowledgeBases.map(kb => 
           kb.id === currentKb.id ? updatedKb : kb
         ));
@@ -343,6 +355,7 @@ const KnowledgeBaseSection = () => {
       setSourceContent('');
       setSelectedFile(null);
       setWebPages([]);
+      setAutoSync(false); // Reset auto sync option
       setSourceDialogOpen(false);
       setSitemapDialogOpen(false);
       setCurrentSourceType(null);
@@ -581,7 +594,25 @@ const KnowledgeBaseSection = () => {
                 ) : (
                   paginatedKnowledgeBases.map((kb) => (
                     <TableRow key={kb.id}>
-                      <TableCell className="font-medium">{kb.name}</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center">
+                          {kb.name}
+                          {kb.auto_sync && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="ml-2">
+                                    <RefreshCcw className="h-3 w-3 text-blue-500" />
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Auto-sync enabled</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>{kb.source_count} sources</TableCell>
                       <TableCell>{new Date(kb.created_at).toLocaleDateString()}</TableCell>
                       <TableCell className="text-right">
@@ -717,10 +748,34 @@ const KnowledgeBaseSection = () => {
                       currentKb.sources.map((source) => (
                         <div key={source.id} className="flex items-center justify-between p-3">
                           <div className="flex items-center">
-                            {source.type === 'url' && <Globe className="h-4 w-4 mr-2 text-blue-500" />}
-                            {source.type === 'file' && <File className="h-4 w-4 mr-2 text-amber-500" />}
-                            {source.type === 'text' && <FileText className="h-4 w-4 mr-2 text-green-500" />}
-                            <span className="text-sm">{source.title}</span>
+                            {source.type === 'url' && (
+                              <div className="flex items-center">
+                                <Globe className="h-4 w-4 mr-2 text-blue-500" />
+                                <span className="text-sm">{source.title}</span>
+                                {source.auto_sync && (
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <div className="ml-2">
+                                          <RefreshCcw className="h-3 w-3 text-blue-500" />
+                                        </div>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Auto-sync enabled</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                )}
+                              </div>
+                            )}
+                            {source.type === 'file' && <div className="flex items-center">
+                              <File className="h-4 w-4 mr-2 text-amber-500" />
+                              <span className="text-sm">{source.title}</span>
+                            </div>}
+                            {source.type === 'text' && <div className="flex items-center">
+                              <FileText className="h-4 w-4 mr-2 text-green-500" />
+                              <span className="text-sm">{source.title}</span>
+                            </div>}
                           </div>
                           <Button 
                             variant="ghost" 
@@ -736,6 +791,25 @@ const KnowledgeBaseSection = () => {
                       ))
                     )}
                   </div>
+                  
+                  {currentKb.sources.some(source => source.type === 'url') && (
+                    <div className="flex items-center space-x-2 mt-4">
+                      <Switch
+                        id="kb-auto-sync"
+                        checked={currentKb.auto_sync || false}
+                        onCheckedChange={(checked) => {
+                          const updatedKb = {...currentKb, auto_sync: checked};
+                          setCurrentKb(updatedKb);
+                          setKnowledgeBases(knowledgeBases.map(kb => 
+                            kb.id === currentKb.id ? updatedKb : kb
+                          ));
+                        }}
+                      />
+                      <Label htmlFor="kb-auto-sync" className="text-sm cursor-pointer">
+                        Auto sync web pages every 24 hours
+                      </Label>
+                    </div>
+                  )}
                 </div>
               )}
               
@@ -752,7 +826,7 @@ const KnowledgeBaseSection = () => {
                 </Button>
                 <Button 
                   type="submit"
-                  disabled={!kbForm.formState.isDirty || !kbForm.getValues('name')}
+                  disabled={!kbForm.formState.isDirty && isCreating}
                 >
                   {isCreating ? 'Create' : 'Update'}
                 </Button>
@@ -782,109 +856,6 @@ const KnowledgeBaseSection = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Add Source Dialog - URL */}
-      {currentSourceType === 'url' && (
-        <Dialog 
-          open={sourceDialogOpen} 
-          onOpenChange={(open) => {
-            setSourceDialogOpen(open);
-            if (!open) {
-              setSourceUrl('');
-              setWebPages([]);
-              setSitemapDialogOpen(false);
-            }
-          }}
-        >
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Add Web Pages</DialogTitle>
-              <DialogDescription>
-                Enter a website URL to import content from web pages.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <div className="grid gap-2">
-                <Label htmlFor="url">Website URL</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="url"
-                    placeholder="https://example.com"
-                    value={sourceUrl}
-                    onChange={(e) => setSourceUrl(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button 
-                    type="button" 
-                    onClick={handleFetchSitemap}
-                    disabled={!sourceUrl}
-                  >
-                    Fetch
-                  </Button>
-                </div>
-              </div>
-              
-              {webPages.length > 0 && (
-                <div className="space-y-2">
-                  <Label>Selected Pages</Label>
-                  <div className="border rounded-md divide-y max-h-[200px] overflow-y-auto">
-                    {webPages.map((page, index) => (
-                      <div key={index} className="flex items-center p-2">
-                        <Checkbox 
-                          id={`page-${index}`}
-                          checked={page.selected}
-                          onCheckedChange={() => toggleWebPageSelection(index)}
-                          className="mr-2"
-                        />
-                        <Label 
-                          htmlFor={`page-${index}`}
-                          className="text-sm flex-1 cursor-pointer"
-                        >
-                          {page.title || page.url}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <Checkbox 
-                      id="auto-sync"
-                      checked={autoSync}
-                      onCheckedChange={(checked) => setAutoSync(checked === true)}
-                      className="mr-2"
-                    />
-                    <Label htmlFor="auto-sync" className="text-sm cursor-pointer">
-                      Auto sync web pages every 24 hours
-                    </Label>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={() => {
-                  setSourceDialogOpen(false);
-                  setSourceUrl('');
-                  setWebPages([]);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="button"
-                onClick={handleAddSource}
-                disabled={webPages.length === 0 || !webPages.some(p => p.selected)}
-              >
-                Add Selected Pages
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
 
       {/* Add Source Dialog - File */}
       {currentSourceType === 'file' && (
@@ -1027,19 +998,4 @@ const KnowledgeBaseSection = () => {
               >
                 Cancel
               </Button>
-              <Button 
-                type="button"
-                onClick={handleAddSource}
-                disabled={!sourceFileName || !sourceContent}
-              >
-                Add Text
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
-    </div>
-  );
-};
-
-export default KnowledgeBaseSection;
+              <Button
