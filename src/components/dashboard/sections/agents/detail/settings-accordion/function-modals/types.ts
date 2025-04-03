@@ -31,6 +31,7 @@ export interface FunctionFormData {
   speakDuring: boolean;
   speakAfter: boolean;
   type: string;
+  executionMessage?: string;
 }
 
 export interface FunctionFormErrors {

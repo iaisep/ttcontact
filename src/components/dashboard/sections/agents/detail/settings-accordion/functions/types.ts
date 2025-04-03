@@ -1,6 +1,4 @@
 
-import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
-
 export interface FunctionParameter {
   type: string;
   description: string;
@@ -12,27 +10,18 @@ export interface AgentFunction {
   name: string;
   description: string;
   type: string;
+  url?: string;
+  parameters?: FunctionParameter;
   timeout_ms?: number;
   speak_during_execution?: boolean;
   speak_after_execution?: boolean;
-  parameters?: FunctionParameter;
-  url?: string;
+  execution_message?: string;
 }
 
-export interface FunctionsSectionProps {
-  agent: RetellAgent;
-  updateAgentField?: (fieldName: string, value: any) => void;
-}
-
-export interface FunctionItemProps {
-  func: AgentFunction;
-  onEdit: (func: AgentFunction) => void;
-  onDelete: (func: AgentFunction) => void;
-}
-
-export interface FunctionTemplateType {
-  name: string;
-  type: string;
-  icon: JSX.Element;
-  description: string;
+export interface FunctionsContextProps {
+  functions: AgentFunction[];
+  addFunction: (newFunction: AgentFunction) => void;
+  updateFunction: (index: number, updatedFunction: AgentFunction) => void;
+  deleteFunction: (index: number) => void;
+  getFunctionByName: (name: string) => AgentFunction | undefined;
 }

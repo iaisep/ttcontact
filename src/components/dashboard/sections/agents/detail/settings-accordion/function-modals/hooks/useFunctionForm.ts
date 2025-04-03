@@ -11,7 +11,8 @@ const defaultFormData: FunctionFormData = {
   parameters: '{}',
   speakDuring: false,
   speakAfter: true,
-  type: 'custom'
+  type: 'custom',
+  executionMessage: ''
 };
 
 export const useFunctionForm = (functionData: AgentFunction | null, isOpen?: boolean) => {
@@ -29,6 +30,7 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen?: boo
         timeoutMs: functionData.timeout_ms?.toString() || '30000',
         speakDuring: functionData.speak_during_execution || false,
         speakAfter: functionData.speak_after_execution || true,
+        executionMessage: functionData.execution_message || '',
         parameters: functionData.parameters 
           ? JSON.stringify(functionData.parameters, null, 2) 
           : '{}'
@@ -100,6 +102,10 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen?: boo
       newFunction.parameters = parsedParameters;
       newFunction.speak_during_execution = formData.speakDuring;
       newFunction.speak_after_execution = formData.speakAfter;
+      
+      if (formData.speakDuring && formData.executionMessage) {
+        newFunction.execution_message = formData.executionMessage;
+      }
     }
     
     return newFunction;

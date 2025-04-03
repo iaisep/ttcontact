@@ -29,7 +29,8 @@ export const createFunctionFromTemplate = (type: string): AgentFunction => {
         },
         timeout_ms: 30000,
         speak_during_execution: true,
-        speak_after_execution: false
+        speak_after_execution: false,
+        execution_message: 'Let me transfer you to the right person.'
       };
       
     case 'calendar_booking':
@@ -63,7 +64,8 @@ export const createFunctionFromTemplate = (type: string): AgentFunction => {
         },
         timeout_ms: 30000,
         speak_during_execution: true,
-        speak_after_execution: true
+        speak_after_execution: true,
+        execution_message: 'Let me check our calendar for availability.'
       };
       
     case 'end_call':
