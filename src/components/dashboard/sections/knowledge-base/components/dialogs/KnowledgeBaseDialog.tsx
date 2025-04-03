@@ -48,14 +48,19 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   const [sourceToDelete, setSourceToDelete] = useState<KnowledgeBaseSource | null>(null);
   const [deleteSourceDialogOpen, setDeleteSourceDialogOpen] = useState(false);
   const [currentKb, setCurrentKb] = useState<KnowledgeBase | null>(knowledgeBase);
+  const [creationComplete, setCreationComplete] = useState(false);
 
   useEffect(() => {
     if (knowledgeBase) {
       setCurrentKb(knowledgeBase);
+      if (isCreating && knowledgeBase.id) {
+        setCreationComplete(true);
+      }
     } else {
       setCurrentKb(null);
+      setCreationComplete(false);
     }
-  }, [knowledgeBase]);
+  }, [knowledgeBase, isCreating]);
 
   // Reset source modals when main dialog closes
   useEffect(() => {
@@ -65,6 +70,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         setCurrentSourceType(null);
         setSourceToDelete(null);
         setDeleteSourceDialogOpen(false);
+        setCreationComplete(false);
       }, 100);
       
       return () => clearTimeout(timeout);
@@ -134,6 +140,17 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     setCurrentKb(updatedKb);
   };
 
+  const handleKnowledgeBaseSave = async (data: { name: string }) => {
+    try {
+      await onSave(data);
+      if (isCreating) {
+        setCreationComplete(true);
+      }
+    } catch (error) {
+      console.error('Error saving knowledge base:', error);
+    }
+  };
+
   return (
     <>
       <Dialog 
@@ -149,29 +166,40 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
           <DialogHeader>
             <DialogTitle>{isCreating ? 'Add Knowledge Base' : 'Edit Knowledge Base'}</DialogTitle>
             <DialogDescription>
-              {isCreating 
+              {isCreating && !creationComplete
                 ? 'Create a new knowledge base for your AI agents to use during calls.' 
                 : 'Update your knowledge base information and sources.'}
             </DialogDescription>
           </DialogHeader>
           
-          <KnowledgeBaseFormContent 
-            knowledgeBase={currentKb} 
-            onOpenChange={onOpenChange} 
-            isSaving={isSaving} 
-            onSave={onSave}
-          />
-          
-          {!isCreating && currentKb && (
-            <SourcesSection 
-              knowledgeBase={currentKb}
-              onAddSourceClick={handleAddSourceClick}
-              onDeleteSourceClick={(source) => {
-                setSourceToDelete(source);
-                setDeleteSourceDialogOpen(true);
-              }}
-              onAutoSyncChange={handleAutoSyncChange}
+          {isCreating && !creationComplete ? (
+            <KnowledgeBaseFormContent 
+              knowledgeBase={currentKb} 
+              onOpenChange={onOpenChange} 
+              isSaving={isSaving} 
+              onSave={handleKnowledgeBaseSave}
             />
+          ) : (
+            <>
+              <KnowledgeBaseFormContent 
+                knowledgeBase={currentKb} 
+                onOpenChange={onOpenChange} 
+                isSaving={isSaving} 
+                onSave={handleKnowledgeBaseSave}
+              />
+              
+              {currentKb && (
+                <SourcesSection 
+                  knowledgeBase={currentKb}
+                  onAddSourceClick={handleAddSourceClick}
+                  onDeleteSourceClick={(source) => {
+                    setSourceToDelete(source);
+                    setDeleteSourceDialogOpen(true);
+                  }}
+                  onAutoSyncChange={handleAutoSyncChange}
+                />
+              )}
+            </>
           )}
           
           <DialogFooter>
@@ -188,7 +216,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
               form="knowledge-base-form"
               disabled={isSaving}
             >
-              {isSaving ? "Saving..." : (isCreating ? 'Create' : 'Update')}
+              {isSaving ? "Saving..." : (isCreating && !creationComplete ? 'Create' : 'Update')}
             </Button>
           </DialogFooter>
         </DialogContent>
