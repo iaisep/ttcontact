@@ -1,59 +1,87 @@
 
-import React, { useState, useEffect } from 'react';
-import { Textarea } from '@/components/ui/textarea';
+import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { debounce } from 'lodash';
+import { Loader2 } from 'lucide-react';
+import {
+  WelcomeMessageOptions,
+  CustomMessageEditor,
+  LoadingState,
+  useWelcomeMessage,
+  WELCOME_MESSAGE_OPTIONS
+} from './welcome-message';
 
 interface WelcomeMessageEditorProps {
   welcomeMessage: string;
   onUpdate: (value: string) => void;
+  llmId?: string;
 }
 
-const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({ welcomeMessage, onUpdate }) => {
+const WelcomeMessageEditor: React.FC<WelcomeMessageEditorProps> = ({ 
+  welcomeMessage, 
+  onUpdate,
+  llmId 
+}) => {
   const { t } = useLanguage();
-  const [value, setValue] = useState(welcomeMessage);
-  const [expanded, setExpanded] = useState(false);
   
-  useEffect(() => {
-    setValue(welcomeMessage);
-  }, [welcomeMessage]);
+  const {
+    value,
+    expanded,
+    setExpanded,
+    selectedOption,
+    isLoading,
+    initialLoading,
+    handleChange,
+    handleBlur,
+    handleSelectChange
+  } = useWelcomeMessage({
+    welcomeMessage,
+    onUpdate,
+    llmId
+  });
 
-  // Create debounced update function
-  const debouncedUpdate = debounce((value) => onUpdate(value), 1000);
-  
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    setValue(newValue);
-    debouncedUpdate(newValue);
-  };
+  if (initialLoading) {
+    return <LoadingState />;
+  }
 
   return (
     <div className="rounded-md border overflow-hidden">
       <div className="bg-muted/30 px-4 py-2 border-b flex justify-between items-center">
         <span className="text-sm font-medium">Welcome Message</span>
-        <button 
-          onClick={() => setExpanded(!expanded)}
-          className="text-xs text-muted-foreground hover:text-foreground"
-        >
-          {expanded ? 'Collapse' : 'Expand'}
-        </button>
+        {selectedOption === WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM && (
+          <button 
+            onClick={() => setExpanded(!expanded)}
+            className="text-xs text-muted-foreground hover:text-foreground"
+            disabled={isLoading}
+          >
+            {expanded ? 'Collapse' : 'Expand'}
+          </button>
+        )}
       </div>
       
-      {expanded ? (
-        <Textarea
-          value={value}
-          onChange={handleChange}
-          className="min-h-[120px] font-mono text-sm border-0 rounded-none focus-visible:ring-0"
-          placeholder={t('welcome_message_placeholder')}
-        />
-      ) : (
-        <div 
-          className="p-3 text-sm font-mono cursor-pointer hover:bg-muted/20"
-          onClick={() => setExpanded(true)}
-        >
-          {value || 'Hola {name}, que gusto volver a saludarte.'}
+      <div className="p-3">
+        <div className="flex items-center gap-2">
+          <WelcomeMessageOptions
+            selectedOption={selectedOption}
+            handleSelectChange={handleSelectChange}
+            isLoading={isLoading}
+          />
+          
+          {isLoading && (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          )}
         </div>
-      )}
+        
+        {selectedOption === WELCOME_MESSAGE_OPTIONS.AI_INITIATES_CUSTOM && (
+          <CustomMessageEditor
+            value={value}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            expanded={expanded}
+            setExpanded={setExpanded}
+            isLoading={isLoading}
+          />
+        )}
+      </div>
     </div>
   );
 };

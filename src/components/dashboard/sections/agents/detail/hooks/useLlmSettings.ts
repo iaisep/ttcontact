@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
@@ -13,14 +13,13 @@ export const useLlmSettings = ({ llmId, updateAgentField }: UseLlmSettingsProps)
   const { fetchWithAuth } = useApiContext();
   const { t } = useLanguage();
   
-  const [isLlmSettingsOpen, setIsLlmSettingsOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string>('');
-  const [llmTemperature, setLlmTemperature] = useState(0.7);
-  const [structuredOutput, setStructuredOutput] = useState(false);
-  const [highPriority, setHighPriority] = useState(false);
+  const [llmTemperature, setLlmTemperature] = useState<number>(0.7);
+  const [structuredOutput, setStructuredOutput] = useState<boolean>(false);
+  const [highPriority, setHighPriority] = useState<boolean>(false);
   
   // Fetch LLM data when llmId changes
-  const fetchLlmData = async () => {
+  const fetchLlmData = useCallback(async () => {
     if (!llmId) return;
     
     try {
@@ -29,53 +28,35 @@ export const useLlmSettings = ({ llmId, updateAgentField }: UseLlmSettingsProps)
         setSelectedModel(llmData.model);
         
         // Set other LLM settings if available
-        if (llmData.temperature !== undefined) {
-          setLlmTemperature(llmData.temperature);
+        if (llmData.model_temperature !== undefined) {
+          setLlmTemperature(llmData.model_temperature);
         }
-        if (llmData.structured_output !== undefined) {
-          setStructuredOutput(llmData.structured_output);
+        if (llmData.tool_call_strict_mode !== undefined) {
+          setStructuredOutput(llmData.tool_call_strict_mode);
         }
-        if (llmData.high_priority !== undefined) {
-          setHighPriority(llmData.high_priority);
+        if (llmData.model_high_priority !== undefined) {
+          setHighPriority(llmData.model_high_priority);
         }
       }
     } catch (error) {
       console.error('Error fetching LLM data:', error);
     }
-  };
+  }, [llmId, fetchWithAuth]);
+
+  // Initial fetch when component mounts
+  useEffect(() => {
+    fetchLlmData();
+  }, [fetchLlmData]);
 
   // Handle LLM change
   const handleLlmChange = async (newLlmId: string) => {
     setSelectedModel(newLlmId);
     // The actual API call is handled in the LlmSelector component
-  };
-
-  // Handle saving LLM settings
-  const handleSaveLlmSettings = async () => {
-    if (!llmId) return;
-    
-    try {
-      await fetchWithAuth(`/update-retell-llm/${llmId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({
-          temperature: llmTemperature,
-          structured_output: structuredOutput,
-          high_priority: highPriority
-        })
-      });
-      
-      setIsLlmSettingsOpen(false);
-      toast.success(t('llm_settings_updated'));
-    } catch (error) {
-      console.error('Error updating LLM settings:', error);
-      toast.error(t('error_updating_llm_settings'));
-    }
+    return Promise.resolve();
   };
 
   return {
     selectedModel,
-    isLlmSettingsOpen,
-    setIsLlmSettingsOpen,
     llmTemperature,
     setLlmTemperature,
     structuredOutput,
@@ -83,7 +64,6 @@ export const useLlmSettings = ({ llmId, updateAgentField }: UseLlmSettingsProps)
     highPriority,
     setHighPriority,
     handleLlmChange,
-    handleSaveLlmSettings,
     fetchLlmData
   };
 };

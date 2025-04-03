@@ -27,17 +27,21 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isVoiceSettingsOpen, setIsVoiceSettingsOpen] = useState(false);
   
-  // Voice settings state
-  const [voiceModel, setVoiceModel] = useState('eleven-labs-v2');
+  // Voice settings state with default values
+  const [voiceModel, setVoiceModel] = useState('eleven_turbo_v2');
   const [voiceSpeed, setVoiceSpeed] = useState(1.0);
-  const [voiceTemperature, setVoiceTemperature] = useState(0.3);
+  const [voiceTemperature, setVoiceTemperature] = useState(1.0);
   const [voiceVolume, setVoiceVolume] = useState(1.0);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
   
   // Voice model options with proper typing
   const voiceModelOptions: VoiceModelOption[] = [
-    { value: 'eleven-labs-v2', label: 'ElevenLabs V2', id: 'eleven-labs-v2', description: 'High quality voice synthesis' },
-    { value: 'playht', label: 'PlayHT', id: 'playht', description: 'Fast voice synthesis' },
-    { value: 'deepgram', label: 'Deepgram', id: 'deepgram', description: 'Accurate voice synthesis' }
+    { value: 'eleven_turbo_v2', label: 'Auto(Elevenlabs Turbo V2)', id: 'eleven_turbo_v2', description: 'English only, fast, high quality' },
+    { value: 'eleven_turbo_v2', label: 'Elevenlabs Turbo V2', id: 'eleven_turbo_v2-normal', description: 'English only, fast, high quality' },
+    { value: 'eleven_flash_v2', label: 'Elevenlabs Flash V2', id: 'eleven_flash_v2', description: 'English only, fastest, medium quality' },
+    { value: 'eleven_turbo_v2_5', label: 'Elevenlabs Turbo V2.5', id: 'eleven_turbo_v2_5', description: 'Multilingual, fast, high quality' },
+    { value: 'eleven_flash_v2_5', label: 'Elevenlabs Flash V2.5', id: 'eleven_flash_v2_5', description: 'Multilingual, fastest, medium quality' },
+    { value: 'eleven_multilingual_v2', label: 'Elevenlabs Multilingual v2', id: 'eleven_multilingual_v2', description: 'Multilingual, slow, highest quality' },
   ];
   
   // Update to handle RetellVoice object without triggering unnecessary fetches
@@ -55,7 +59,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
         return;
       }
       
-      toast.loading('Updating voice...');
+      toast.info('Updating voice...');
       
       // Update the agent with the correct agent ID from the URL
       await fetchWithAuth(`/update-agent/${slug}`, {
@@ -88,18 +92,38 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   };
   
   const handleSaveVoiceSettings = async () => {
+    if (!slug) {
+      toast.error('Agent ID is missing');
+      return;
+    }
+    
     try {
-      toast.loading('Saving voice settings...');
+      toast.info('Saving voice settings...');
       
-      // Update voice settings in the agent
-      const voiceSettings = {
-        model: voiceModel,
-        speed: voiceSpeed,
-        temperature: voiceTemperature,
-        volume: voiceVolume
+      // Prepare the payload for the update-agent endpoint
+      const payload = {
+        voice_speed: voiceSpeed,
+        volume: voiceVolume,
+        voice_temperature: voiceTemperature,
+        voice_model: voiceModel
       };
       
-      await updateAgentField('voice_settings', voiceSettings);
+      console.log('Sending voice settings update with payload:', payload);
+      
+      // Call the update-agent endpoint with the payload
+      await fetchWithAuth(`/update-agent/${slug}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload)
+      });
+      
+      // Update agent field in the parent component
+      updateAgentField('voice_settings', {
+        voice_model: voiceModel,
+        voice_speed: voiceSpeed,
+        voice_temperature: voiceTemperature,
+        volume: voiceVolume
+      });
+      
       setIsVoiceSettingsOpen(false);
       
       toast.success('Voice settings saved');
@@ -112,6 +136,44 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
   const openVoiceModal = () => {
     setIsVoiceModalOpen(true);
   };
+  
+  // Load voice settings if available when the agent data changes
+  useEffect(() => {
+    const fetchAgentVoiceSettings = async () => {
+      if (!slug || settingsLoaded) return;
+      
+      try {
+        const agentData = await fetchWithAuth(`/get-agent/${slug}`);
+        console.log('Fetched agent data for voice settings:', agentData);
+        
+        if (agentData && agentData.voice_settings) {
+          const settings = agentData.voice_settings;
+          
+          if (settings.voice_model) {
+            setVoiceModel(settings.voice_model);
+          }
+          
+          if (settings.voice_speed !== undefined) {
+            setVoiceSpeed(settings.voice_speed);
+          }
+          
+          if (settings.voice_temperature !== undefined) {
+            setVoiceTemperature(settings.voice_temperature);
+          }
+          
+          if (settings.volume !== undefined) {
+            setVoiceVolume(settings.volume);
+          }
+          
+          setSettingsLoaded(true);
+        }
+      } catch (error) {
+        console.error('Error fetching agent voice settings:', error);
+      }
+    };
+    
+    fetchAgentVoiceSettings();
+  }, [slug, fetchWithAuth, settingsLoaded]);
   
   return {
     selectedVoice,
@@ -133,6 +195,7 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
     voiceModelOptions,
     handleVoiceChange,
     handleSaveVoiceSettings,
-    openVoiceModal
+    openVoiceModal,
+    settingsLoaded
   };
 };

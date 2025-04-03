@@ -1,68 +1,60 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Check, Globe, ChevronDown } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Check, ChevronDown, Globe } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface LanguageSelectorProps {
   selectedLanguage: string;
-  languageOptions: Array<{ value: string, label: string, icon: string }>;
-  handleLanguageChange: (lang: string) => void;
+  languageOptions: {value: string; label: string; icon?: string}[];
+  onLanguageChange: (language: string) => void;
 }
 
-const LanguageSelector: React.FC<LanguageSelectorProps> = ({
-  selectedLanguage,
+const LanguageSelector: React.FC<LanguageSelectorProps> = ({ 
+  selectedLanguage, 
   languageOptions,
-  handleLanguageChange,
+  onLanguageChange 
 }) => {
-  // Find the current language option
-  const currentLanguage = languageOptions.find(l => l.label === selectedLanguage) || languageOptions[0];
+  const { t } = useLanguage();
   
+  // Find the currently selected language
+  const currentLanguage = languageOptions.find(lang => lang.value === selectedLanguage) || 
+    { value: selectedLanguage, label: selectedLanguage || t('select_language'), icon: '' };
+
   return (
-    <Button 
-      variant="outline" 
-      className="flex items-center justify-between w-full max-w-full gap-1 sm:gap-2 bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-2 sm:px-4 py-1 sm:py-2 h-auto overflow-hidden"
-    >
-      <div className="flex items-center gap-1 sm:gap-2 overflow-hidden flex-wrap">
-        <div className="h-6 w-6 sm:h-6 sm:w-6 rounded-full flex-shrink-0 flex items-center justify-center">
-          <Globe className="h-5 w-5 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
-        </div>
-        <span className="truncate text-[10px] :text-[10px] max-w-[100px] sm:max-w-[120px]">{selectedLanguage}</span>
-      </div>
-      
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-6 sm:w-6 p-0 flex-shrink-0">
-            <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="end" 
-          className="w-[200px] bg-white border border-gray-200 shadow-lg z-50 rounded-lg"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button 
+          variant="outline" 
+          className="flex items-center justify-between w-full bg-white text-gray-900 border-gray-200 rounded-full hover:bg-gray-50 px-2 sm:px-4 py-1 sm:py-2 h-auto"
         >
-          {languageOptions.map((option) => (
-            <DropdownMenuItem 
-              key={option.value} 
-              onClick={() => handleLanguageChange(option.label)}
-              className="flex items-center justify-between py-2 px-3 hover:bg-gray-50 cursor-pointer text-xs sm:text-sm"
-            >
-              <div className="flex items-center gap-1 sm:gap-2">
-                <span className="mr-1 sm:mr-2">{option.icon}</span>
-                <span className="truncate">{option.label}</span>
-              </div>
-              {selectedLanguage === option.label && (
-                <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0" />
-              )}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </Button>
+          <div className="flex items-center gap-1 sm:gap-2 min-w-0 max-w-full">
+            <div className="h-6 w-6 sm:h-6 sm:w-6 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center text-blue-600">
+              <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </div>
+            <span className="text-xs sm:text-sm truncate flex-grow min-w-0 text-ellipsis overflow-hidden">
+              {currentLanguage.label}
+            </span>
+          </div>
+          <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-1 sm:ml-2 text-gray-600 flex-shrink-0" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[180px] max-h-[300px] overflow-y-auto">
+        {languageOptions.map((lang) => (
+          <DropdownMenuItem
+            key={lang.value}
+            className="flex items-center gap-2 text-xs sm:text-sm cursor-pointer"
+            onClick={() => onLanguageChange(lang.value)}
+          >
+            {selectedLanguage === lang.value && (
+              <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500" />
+            )}
+            <span>{lang.label}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

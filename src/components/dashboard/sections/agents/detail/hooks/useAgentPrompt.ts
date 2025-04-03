@@ -1,18 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { useLanguage } from '@/context/LanguageContext';
+import { useState, useEffect } from 'react';
 import { debounce } from 'lodash';
 
-interface EditablePromptProps {
-  prompt: string;
+interface UseAgentPromptProps {
+  initialPrompt?: string;
   onUpdate: (value: string) => void;
 }
 
-const EditablePrompt: React.FC<EditablePromptProps> = ({ prompt, onUpdate }) => {
-  const { t } = useLanguage();
-  const [value, setValue] = useState(prompt || 
-`##Identidad:
+export const useAgentPrompt = ({ initialPrompt, onUpdate }: UseAgentPromptProps) => {
+  const defaultPrompt = `##Identidad:
 Te llamas Laura Ibarra, asesora de admisiones de la Universidad Isep. Contactas a prospectos que ya tuvieron una primera llamada y mostraron interés en nuestras formaciones. Tu misión ✅ Retomar la conversación previa y resolver dudas pendientes.
 ✅ Generar confianza y destacar los beneficios del programa. ✅ Motivar al prospecto a completar su inscripción en esta llamada.
 
@@ -25,37 +21,27 @@ usa la función agendar si el usuario solicita que lo llamen en otro momento, o 
 
 ##Objetivo de la Llamada
 ✅ Resolver dudas y motivar al prospecto a tomar acción.
-✅ Refrescar la información clave sobre el programa, sin repetir todo desde cero.`);
+✅ Refrescar la información clave sobre el programa, sin repetir todo desde cero.`;
+
+  const [prompt, setPrompt] = useState(initialPrompt || defaultPrompt);
   
   useEffect(() => {
-    if (prompt && !value) {
-      setValue(prompt);
+    if (initialPrompt && initialPrompt !== prompt) {
+      setPrompt(initialPrompt);
     }
-  }, [prompt, value]);
+  }, [initialPrompt]);
 
   // Create debounced update function
   const debouncedUpdate = debounce((value) => onUpdate(value), 1000);
   
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    setValue(newValue);
+  const updatePrompt = (newValue: string) => {
+    setPrompt(newValue);
     debouncedUpdate(newValue);
   };
 
-  return (
-    <>
-      <div className="bg-muted/30 px-4 py-2 border-b flex justify-between items-center">
-        <span className="text-sm font-medium">Agent Prompt</span>
-        <span className="text-xs text-muted-foreground">{value.length} characters</span>
-      </div>
-      <Textarea
-        value={value}
-        onChange={handleChange}
-        className="min-h-[500px] font-mono text-sm border-0 rounded-none focus-visible:ring-0 resize-none"
-        placeholder={t('prompt_placeholder')}
-      />
-    </>
-  );
+  return {
+    prompt,
+    setPrompt,
+    updatePrompt
+  };
 };
-
-export default EditablePrompt;
