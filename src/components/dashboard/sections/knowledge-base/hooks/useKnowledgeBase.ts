@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
-import { KnowledgeBase, KnowledgeBaseSource } from '../types';
+import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../types';
 
 export const useKnowledgeBase = () => {
   const { fetchWithAuth } = useApiContext();
