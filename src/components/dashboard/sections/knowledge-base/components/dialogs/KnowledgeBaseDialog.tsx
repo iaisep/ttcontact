@@ -1,21 +1,16 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { 
   Dialog, 
   DialogContent, 
   DialogDescription, 
-  DialogFooter, 
   DialogHeader, 
   DialogTitle 
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
-import AddUrlSourceModal from '../AddUrlSourceModal';
-import AddFileSourceModal from '../AddFileSourceModal';
-import AddTextSourceModal from '../AddTextSourceModal';
-import SourceDeleteDialog from '../SourceDeleteDialog';
-import KnowledgeBaseFormContent from './KnowledgeBaseFormContent';
-import SourcesSection from './SourcesSection';
+import { KnowledgeBase, WebPage } from '../../types';
+import { useKnowledgeBaseDialog } from '../../hooks/useKnowledgeBaseDialog';
+import KnowledgeBaseDialogContent from './KnowledgeBaseDialogContent';
+import KnowledgeBaseSourceModals from './KnowledgeBaseSourceModals';
 
 interface KnowledgeBaseDialogProps {
   open: boolean;
@@ -29,7 +24,7 @@ interface KnowledgeBaseDialogProps {
     sourceData: any
   ) => Promise<KnowledgeBase>;
   onDeleteSource: (kbId: string, sourceId: string) => Promise<KnowledgeBase>;
-  onFetchSitemap: (url: string) => Promise<any[]>;
+  onFetchSitemap: (url: string) => Promise<WebPage[]>;
   isSaving: boolean;
 }
 
@@ -44,128 +39,45 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   onFetchSitemap,
   isSaving
 }) => {
-  const [currentSourceType, setCurrentSourceType] = useState<'url' | 'file' | 'text' | null>(null);
-  const [sourceToDelete, setSourceToDelete] = useState<KnowledgeBaseSource | null>(null);
-  const [deleteSourceDialogOpen, setDeleteSourceDialogOpen] = useState(false);
-  const [currentKb, setCurrentKb] = useState<KnowledgeBase | null>(knowledgeBase);
-  const [creationComplete, setCreationComplete] = useState(false);
-  const [addingSource, setAddingSource] = useState(false);
-
-  useEffect(() => {
-    if (knowledgeBase) {
-      setCurrentKb(knowledgeBase);
-      if (isCreating && knowledgeBase.id) {
-        setCreationComplete(true);
-      }
-    } else {
-      setCurrentKb(null);
-      setCreationComplete(false);
-    }
-  }, [knowledgeBase, isCreating]);
+  const {
+    currentSourceType,
+    sourceToDelete,
+    deleteSourceDialogOpen,
+    currentKb,
+    creationComplete,
+    addingSource,
+    setCurrentSourceType,
+    setSourceToDelete,
+    setDeleteSourceDialogOpen,
+    resetSourceModals,
+    handleAddSourceClick,
+    handleAddUrlSource,
+    handleAddFileSource,
+    handleAddTextSource,
+    handleDeleteSource,
+    handleAutoSyncChange,
+    handleKnowledgeBaseSave
+  } = useKnowledgeBaseDialog({
+    knowledgeBase,
+    isCreating,
+    onAddSource,
+    onDeleteSource
+  });
 
   // Reset source modals when main dialog closes
   useEffect(() => {
     if (!open) {
       // Use timeout to ensure state updates don't conflict
       const timeout = setTimeout(() => {
-        setCurrentSourceType(null);
-        setSourceToDelete(null);
-        setDeleteSourceDialogOpen(false);
-        setCreationComplete(false);
+        resetSourceModals();
       }, 100);
       
       return () => clearTimeout(timeout);
     }
   }, [open]);
 
-  const handleAddSourceClick = (type: 'url' | 'file' | 'text') => {
-    setCurrentSourceType(type);
-  };
-
-  const handleAddUrlSource = async (url: string, autoSync: boolean, selectedPages: WebPage[]) => {
-    if (!currentKb) return;
-
-    try {
-      setAddingSource(true);
-      console.log("Adding URL source with params:", { url, autoSync, selectedPages });
-      
-      const updatedKb = await onAddSource(currentKb.id, 'url', {
-        url,
-        autoSync,
-        webPages: selectedPages
-      });
-      
-      setCurrentKb(updatedKb);
-      setCurrentSourceType(null);
-    } catch (error) {
-      console.error('Failed to add URL source:', error);
-    } finally {
-      setAddingSource(false);
-    }
-  };
-
-  const handleAddFileSource = async (file: File) => {
-    if (!currentKb) return;
-
-    try {
-      setAddingSource(true);
-      console.log("Adding file source:", file.name);
-      
-      const updatedKb = await onAddSource(currentKb.id, 'file', { file });
-      setCurrentKb(updatedKb);
-      setCurrentSourceType(null);
-    } catch (error) {
-      console.error('Failed to add file source:', error);
-    } finally {
-      setAddingSource(false);
-    }
-  };
-
-  const handleAddTextSource = async (fileName: string, content: string) => {
-    if (!currentKb) return;
-
-    try {
-      setAddingSource(true);
-      console.log("Adding text source:", { fileName, contentLength: content.length });
-      
-      const updatedKb = await onAddSource(currentKb.id, 'text', { fileName, content });
-      setCurrentKb(updatedKb);
-      setCurrentSourceType(null);
-    } catch (error) {
-      console.error('Failed to add text source:', error);
-    } finally {
-      setAddingSource(false);
-    }
-  };
-
-  const handleDeleteSource = async () => {
-    if (!currentKb || !sourceToDelete) return;
-
-    try {
-      const updatedKb = await onDeleteSource(currentKb.id, sourceToDelete.id);
-      setCurrentKb(updatedKb);
-      // Don't set setDeleteSourceDialogOpen(false) here - let the component handle it
-    } catch (error) {
-      console.error('Failed to delete source:', error);
-    }
-  };
-
-  const handleAutoSyncChange = (checked: boolean) => {
-    if (!currentKb) return;
-    
-    const updatedKb = {...currentKb, auto_sync: checked};
-    setCurrentKb(updatedKb);
-  };
-
-  const handleKnowledgeBaseSave = async (data: { name: string }) => {
-    try {
-      await onSave(data);
-      if (isCreating) {
-        setCreationComplete(true);
-      }
-    } catch (error) {
-      console.error('Error saving knowledge base:', error);
-    }
+  const handleKnowledgeBaseSaveWithSave = async (data: { name: string }) => {
+    return handleKnowledgeBaseSave(data, onSave);
   };
 
   return (
@@ -189,85 +101,38 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
           
-          {isCreating && !creationComplete ? (
-            <KnowledgeBaseFormContent 
-              knowledgeBase={currentKb} 
-              onOpenChange={onOpenChange} 
-              isSaving={isSaving} 
-              onSave={handleKnowledgeBaseSave}
-            />
-          ) : (
-            <>
-              <KnowledgeBaseFormContent 
-                knowledgeBase={currentKb} 
-                onOpenChange={onOpenChange} 
-                isSaving={isSaving} 
-                onSave={handleKnowledgeBaseSave}
-              />
-              
-              {currentKb && (
-                <SourcesSection 
-                  knowledgeBase={currentKb}
-                  onAddSourceClick={handleAddSourceClick}
-                  onDeleteSourceClick={(source) => {
-                    setSourceToDelete(source);
-                    setDeleteSourceDialogOpen(true);
-                  }}
-                  onAutoSyncChange={handleAutoSyncChange}
-                />
-              )}
-            </>
-          )}
-          
-          <DialogFooter>
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSaving || addingSource}
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit"
-              form="knowledge-base-form"
-              disabled={isSaving || addingSource}
-            >
-              {isSaving ? "Saving..." : (isCreating && !creationComplete ? 'Create' : 'Update')}
-            </Button>
-          </DialogFooter>
+          <KnowledgeBaseDialogContent 
+            knowledgeBase={currentKb}
+            isCreating={isCreating}
+            isSaving={isSaving}
+            addingSource={addingSource}
+            creationComplete={creationComplete}
+            onOpenChange={onOpenChange}
+            onSave={onSave}
+            onAddSourceClick={handleAddSourceClick}
+            onDeleteSourceClick={(source) => {
+              setSourceToDelete(source);
+              setDeleteSourceDialogOpen(true);
+            }}
+            onAutoSyncChange={handleAutoSyncChange}
+            onKnowledgeBaseSave={handleKnowledgeBaseSaveWithSave}
+          />
         </DialogContent>
       </Dialog>
 
       {/* Child modals */}
-      <AddUrlSourceModal
-        open={currentSourceType === 'url'}
-        onOpenChange={(open) => !open && setCurrentSourceType(null)}
-        onSubmit={handleAddUrlSource}
+      <KnowledgeBaseSourceModals
+        currentSourceType={currentSourceType}
+        setCurrentSourceType={setCurrentSourceType}
+        sourceToDelete={sourceToDelete}
+        deleteSourceDialogOpen={deleteSourceDialogOpen}
+        setDeleteSourceDialogOpen={setDeleteSourceDialogOpen}
+        onAddUrlSource={handleAddUrlSource}
+        onAddFileSource={handleAddFileSource}
+        onAddTextSource={handleAddTextSource}
+        onDeleteSource={handleDeleteSource}
         onFetchSitemap={onFetchSitemap}
       />
-
-      <AddFileSourceModal
-        open={currentSourceType === 'file'}
-        onOpenChange={(open) => !open && setCurrentSourceType(null)}
-        onSubmit={handleAddFileSource}
-      />
-
-      <AddTextSourceModal
-        open={currentSourceType === 'text'}
-        onOpenChange={(open) => !open && setCurrentSourceType(null)}
-        onSubmit={handleAddTextSource}
-      />
-
-      {/* Delete source dialog */}
-      {deleteSourceDialogOpen && (
-        <SourceDeleteDialog
-          open={deleteSourceDialogOpen}
-          onOpenChange={setDeleteSourceDialogOpen}
-          source={sourceToDelete}
-          onConfirm={handleDeleteSource}
-        />
-      )}
     </>
   );
 };
