@@ -13,14 +13,19 @@ export const createFunctionFromTemplate = (type: string): AgentFunction => {
         type: 'custom',
         url: 'https://api.example.com/transfer',
         parameters: {
-          destination: {
-            type: 'string',
-            description: 'Phone number or agent ID to transfer to'
+          type: 'object',
+          description: 'Parameters for call transfer',
+          properties: {
+            destination: {
+              type: 'string',
+              description: 'Phone number or agent ID to transfer to'
+            },
+            reason: {
+              type: 'string',
+              description: 'Reason for transfer'
+            }
           },
-          reason: {
-            type: 'string',
-            description: 'Reason for transfer'
-          }
+          required: ['destination']
         },
         timeout_ms: 30000,
         speak_during_execution: true,
@@ -34,22 +39,27 @@ export const createFunctionFromTemplate = (type: string): AgentFunction => {
         type: 'custom',
         url: 'https://api.example.com/calendar/book',
         parameters: {
-          date: {
-            type: 'string',
-            description: 'Date for the appointment (YYYY-MM-DD)'
+          type: 'object',
+          description: 'Parameters for calendar booking',
+          properties: {
+            date: {
+              type: 'string',
+              description: 'Date for the appointment (YYYY-MM-DD)'
+            },
+            time: {
+              type: 'string',
+              description: 'Time for the appointment (HH:MM)'
+            },
+            duration: {
+              type: 'number',
+              description: 'Duration in minutes'
+            },
+            title: {
+              type: 'string',
+              description: 'Title of the appointment'
+            }
           },
-          time: {
-            type: 'string',
-            description: 'Time for the appointment (HH:MM)'
-          },
-          duration: {
-            type: 'number',
-            description: 'Duration in minutes'
-          },
-          title: {
-            type: 'string',
-            description: 'Title of the appointment'
-          }
+          required: ['date', 'time', 'title']
         },
         timeout_ms: 30000,
         speak_during_execution: true,
@@ -69,7 +79,10 @@ export const createFunctionFromTemplate = (type: string): AgentFunction => {
         description: '',
         type: 'custom',
         url: '',
-        parameters: {},
+        parameters: {
+          type: 'object',
+          description: 'Function parameters'
+        },
         timeout_ms: 30000,
         speak_during_execution: false,
         speak_after_execution: true
