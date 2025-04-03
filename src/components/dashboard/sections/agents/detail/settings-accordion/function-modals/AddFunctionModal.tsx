@@ -25,20 +25,21 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [url, setUrl] = useState('');
-  const [timeout, setTimeout] = useState('30000');
+  const [timeoutMs, setTimeoutMs] = useState('30000'); // Renamed from setTimeout to avoid shadowing
   const [parameters, setParameters] = useState('{}');
   const [speakDuring, setSpeakDuring] = useState(false);
   const [speakAfter, setSpeakAfter] = useState(true);
   const [type, setType] = useState('custom');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (functionData) {
+    if (isOpen && functionData) {
       setName(functionData.name || '');
       setDescription(functionData.description || '');
       setUrl(functionData.url || '');
       setType(functionData.type || 'custom');
-      setTimeout(functionData.timeout_ms?.toString() || '30000');
+      setTimeoutMs(functionData.timeout_ms?.toString() || '30000');
       setSpeakDuring(functionData.speak_during_execution || false);
       setSpeakAfter(functionData.speak_after_execution || true);
       
@@ -52,19 +53,22 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
       } else {
         setParameters('{}');
       }
-    } else {
+    } else if (isOpen) {
       // Reset form for new function
       setName('');
       setDescription('');
       setUrl('');
       setType('custom');
-      setTimeout('30000');
+      setTimeoutMs('30000');
       setSpeakDuring(false);
       setSpeakAfter(true);
       setParameters('{}');
     }
+    
     // Clear errors when modal opens/closes
     setErrors({});
+    // Reset submission state
+    setIsSubmitting(false);
   }, [functionData, isOpen]);
 
   const validate = (): boolean => {
@@ -95,6 +99,8 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
   };
 
   const handleSubmit = () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    
     if (!validate()) return;
     
     let parsedParameters;
@@ -105,6 +111,8 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
       return;
     }
     
+    setIsSubmitting(true);
+    
     const newFunction: AgentFunction = {
       name,
       description,
@@ -113,30 +121,38 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
     
     if (type === 'custom') {
       newFunction.url = url;
-      newFunction.timeout_ms = parseInt(timeout, 10);
+      newFunction.timeout_ms = parseInt(timeoutMs, 10);
       newFunction.parameters = parsedParameters;
       newFunction.speak_during_execution = speakDuring;
       newFunction.speak_after_execution = speakAfter;
-    } else if (type === 'end_call') {
-      // End call functions don't need additional properties
     }
     
     // First close the modal cleanly to prevent UI freezes
     onClose();
     
-    // Use setTimeout to ensure the UI updates before processing the add operation
-    // Fix: setTimeout expects a callback and delay, we had a naming conflict with our state setter
+    // Use a small delay to ensure the UI updates before processing the add operation
     window.setTimeout(() => {
       onAdd(newFunction);
+      setIsSubmitting(false);
     }, 100);
+  };
+
+  const handleCleanClose = () => {
+    // Prevent processing if already in closing state
+    if (isSubmitting) return;
+    
+    onClose();
   };
 
   const isCustomFunction = type === 'custom';
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open) onClose();
-    }}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        if (!open && !isSubmitting) handleCleanClose();
+      }}
+    >
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
@@ -186,12 +202,12 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
               </div>
               
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="timeout" className="text-right">Timeout (ms)</Label>
+                <Label htmlFor="timeoutMs" className="text-right">Timeout (ms)</Label>
                 <Input
-                  id="timeout"
+                  id="timeoutMs"
                   type="number"
-                  value={timeout}
-                  onChange={(e) => setTimeout(e.target.value)}
+                  value={timeoutMs}
+                  onChange={(e) => setTimeoutMs(e.target.value)}
                   className="col-span-3"
                 />
               </div>
@@ -239,13 +255,20 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
           <Button 
             variant="outline" 
             onClick={(e) => {
-              e.preventDefault(); 
-              onClose();
+              e.preventDefault();
+              e.stopPropagation();
+              handleCleanClose();
             }}
+            disabled={isSubmitting}
           >
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>Add Function</Button>
+          <Button 
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
+            Add Function
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

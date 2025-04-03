@@ -9,9 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Trash2 } from 'lucide-react';
 
 interface DeleteFunctionDialogProps {
   isOpen: boolean;
@@ -26,43 +24,34 @@ export const DeleteFunctionDialog: React.FC<DeleteFunctionDialogProps> = ({
   onConfirm,
   functionName,
 }) => {
-  // Handle confirmation properly to ensure UI stays responsive
-  const handleConfirm = () => {
-    // First close the dialog to avoid UI freeze
+  // Safely handle confirmation with clean modal closure
+  const handleConfirm = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Close first to ensure UI stays responsive
     onClose();
-    // Then perform the delete operation
-    setTimeout(() => {
+    
+    // Small delay to ensure UI has time to update
+    window.setTimeout(() => {
       onConfirm();
     }, 100);
   };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={(open) => {
-      // Only call onClose when dialog is being closed
-      if (!open) onClose();
-    }}>
+    <AlertDialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="flex items-center">
-            <Trash2 className="h-5 w-5 mr-2 text-red-500" />
-            Delete Function
-          </AlertDialogTitle>
+          <AlertDialogTitle>Delete Function</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete the function <span className="font-semibold">{functionName}</span>? 
-            This action cannot be undone.
+            Are you sure you want to delete the function "{functionName}"? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={(e) => {
-            e.preventDefault();
-            onClose();
-          }}>
+          <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={handleConfirm}
-            className="bg-red-500 hover:bg-red-600"
-          >
+          <AlertDialogAction onClick={handleConfirm}>
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>
