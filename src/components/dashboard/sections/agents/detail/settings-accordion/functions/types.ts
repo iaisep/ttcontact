@@ -25,3 +25,14 @@ export interface FunctionsContextProps {
   deleteFunction: (index: number) => void;
   getFunctionByName: (name: string) => AgentFunction | undefined;
 }
+
+// Add the missing interfaces
+export interface FunctionItemProps {
+  func: AgentFunction;
+  onEdit: (func: AgentFunction) => void;
+  onDelete: (func: AgentFunction) => void;
+}
+
+export interface FunctionsSectionProps {
+  agent: any; // Using 'any' for now, should be replaced with the proper type
+}

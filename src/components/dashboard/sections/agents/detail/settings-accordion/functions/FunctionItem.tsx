@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Edit, Trash2, Phone, Sparkles, Calendar, FileText } from 'lucide-react';
 import { AgentFunction, FunctionItemProps } from './types';
