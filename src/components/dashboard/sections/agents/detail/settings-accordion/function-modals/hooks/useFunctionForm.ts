@@ -20,7 +20,7 @@ export const useFunctionForm = (functionData: AgentFunction | null, isOpen?: boo
   
   // Reset form to default state or initialize with functionData
   const resetForm = useCallback(() => {
-    if (functionData) {
+    if (functionData && functionData.name) {
       setFormData({
         name: functionData.name || '',
         description: functionData.description || '',

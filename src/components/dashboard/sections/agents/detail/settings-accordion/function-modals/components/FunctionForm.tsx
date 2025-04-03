@@ -21,6 +21,7 @@ const FunctionForm: React.FC<FunctionFormProps> = ({
           value={formData.name}
           onChange={(e) => onChange('name', e.target.value)}
           className="col-span-3"
+          placeholder="function_name"
         />
         {errors.name && <p className="text-red-500 text-xs col-start-2 col-span-3">{errors.name}</p>}
       </div>
@@ -32,6 +33,7 @@ const FunctionForm: React.FC<FunctionFormProps> = ({
           value={formData.description}
           onChange={(e) => onChange('description', e.target.value)}
           className="col-span-3"
+          placeholder="Brief description of what this function does"
         />
         {errors.description && <p className="text-red-500 text-xs col-start-2 col-span-3">{errors.description}</p>}
       </div>
@@ -58,6 +60,7 @@ const FunctionForm: React.FC<FunctionFormProps> = ({
               value={formData.timeoutMs}
               onChange={(e) => onChange('timeoutMs', e.target.value)}
               className="col-span-3"
+              placeholder="30000"
             />
           </div>
           
@@ -69,6 +72,7 @@ const FunctionForm: React.FC<FunctionFormProps> = ({
               onChange={(e) => onChange('parameters', e.target.value)}
               className="col-span-3 font-mono text-xs"
               rows={8}
+              placeholder='{\n  "param1": "string",\n  "param2": "number"\n}'
             />
             {errors.parameters && <p className="text-red-500 text-xs col-start-2 col-span-3">{errors.parameters}</p>}
           </div>

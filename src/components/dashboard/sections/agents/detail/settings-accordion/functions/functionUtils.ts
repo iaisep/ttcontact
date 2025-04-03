@@ -1,118 +1,78 @@
 
-import { AgentFunction } from './types';
+import { AgentFunction } from "./types";
 
-// Create a new function from template
+/**
+ * Creates a function template based on the specified type
+ */
 export const createFunctionFromTemplate = (type: string): AgentFunction => {
   switch (type) {
+    case 'call_transfer':
+      return {
+        name: '',
+        description: 'Transfer call to another agent or phone number',
+        type: 'custom',
+        url: 'https://api.example.com/transfer',
+        parameters: {
+          destination: {
+            type: 'string',
+            description: 'Phone number or agent ID to transfer to'
+          },
+          reason: {
+            type: 'string',
+            description: 'Reason for transfer'
+          }
+        },
+        timeout_ms: 30000,
+        speak_during_execution: true,
+        speak_after_execution: false
+      };
+      
+    case 'calendar_booking':
+      return {
+        name: '',
+        description: 'Book an appointment on a calendar',
+        type: 'custom',
+        url: 'https://api.example.com/calendar/book',
+        parameters: {
+          date: {
+            type: 'string',
+            description: 'Date for the appointment (YYYY-MM-DD)'
+          },
+          time: {
+            type: 'string',
+            description: 'Time for the appointment (HH:MM)'
+          },
+          duration: {
+            type: 'number',
+            description: 'Duration in minutes'
+          },
+          title: {
+            type: 'string',
+            description: 'Title of the appointment'
+          }
+        },
+        timeout_ms: 30000,
+        speak_during_execution: true,
+        speak_after_execution: true
+      };
+      
     case 'end_call':
       return {
         name: 'end_call',
-        type: 'end_call',
-        description: 'End the call immediately'
+        description: 'End the current call',
+        type: 'end_call'
       };
-    case 'call_transfer':
-      return {
-        name: 'call_transfer',
-        type: 'custom',
-        description: 'Transfer call to another agent or human',
-        timeout_ms: 30000,
-        speak_during_execution: true,
-        speak_after_execution: false,
-        parameters: {
-          type: 'object',
-          description: 'Call transfer parameters',
-          properties: {
-            transfer_to: {
-              type: 'string',
-              description: 'ID or phone number to transfer to'
-            }
-          },
-          required: ['transfer_to']
-        },
-        url: ''
-      };
-    case 'calendar_check':
-      return {
-        name: 'check_availability',
-        type: 'custom',
-        description: 'Check calendar availability',
-        timeout_ms: 60000,
-        speak_during_execution: true,
-        speak_after_execution: true,
-        parameters: {
-          type: 'object',
-          description: 'Calendar parameters',
-          properties: {
-            date: {
-              type: 'string',
-              description: 'Date to check in ISO format'
-            }
-          },
-          required: ['date']
-        },
-        url: ''
-      };
-    case 'calendar_book':
-      return {
-        name: 'book_appointment',
-        type: 'custom',
-        description: 'Book an appointment on the calendar',
-        timeout_ms: 60000,
-        speak_during_execution: true,
-        speak_after_execution: true,
-        parameters: {
-          type: 'object',
-          description: 'Booking parameters',
-          properties: {
-            date: {
-              type: 'string',
-              description: 'Date and time in ISO format'
-            },
-            duration: {
-              type: 'number',
-              description: 'Duration in minutes'
-            }
-          },
-          required: ['date', 'duration']
-        },
-        url: ''
-      };
-    case 'ivr_digit':
-      return {
-        name: 'press_digit',
-        type: 'custom',
-        description: 'Press a digit for IVR navigation',
-        timeout_ms: 10000,
-        speak_during_execution: false,
-        speak_after_execution: true,
-        parameters: {
-          type: 'object',
-          description: 'IVR parameters',
-          properties: {
-            digit: {
-              type: 'string',
-              description: 'Digit to press (0-9, *, #)'
-            }
-          },
-          required: ['digit']
-        },
-        url: ''
-      };
+      
     default:
       return {
-        name: 'custom_function',
+        name: '',
+        description: '',
         type: 'custom',
-        description: 'Custom function',
+        url: '',
+        parameters: {},
         timeout_ms: 30000,
         speak_during_execution: false,
-        speak_after_execution: true,
-        parameters: {
-          type: 'object',
-          description: 'Function parameters',
-          properties: {},
-          required: []
-        },
-        url: ''
+        speak_after_execution: true
       };
   }
 };
