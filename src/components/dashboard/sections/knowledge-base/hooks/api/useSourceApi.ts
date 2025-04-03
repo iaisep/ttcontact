@@ -17,35 +17,55 @@ export const useSourceApi = () => {
       webPages?: WebPage[]
     }
   ) => {
-    // Create FormData for API request (allows file uploads)
-    const formData = new FormData();
-    formData.append('type', sourceType);
+    // Prepare request data based on source type
+    let requestData: any = {};
     
     if (sourceType === 'url' && sourceData.url) {
-      formData.append('url', sourceData.url);
-      if (sourceData.autoSync !== undefined) {
-        formData.append('auto_sync', String(sourceData.autoSync));
-      }
-      
-      // If webPages are included, add them as selected URLs
+      // Format URLs according to the API documentation
       if (sourceData.webPages && sourceData.webPages.length > 0) {
-        const selectedUrls = sourceData.webPages
+        // If specific webPages are selected
+        requestData.knowledge_base_urls = sourceData.webPages
           .filter(page => page.selected)
           .map(page => page.url);
-        formData.append('urls', JSON.stringify(selectedUrls));
+      } else {
+        // Single URL
+        requestData.knowledge_base_urls = [sourceData.url];
+      }
+      
+      if (sourceData.autoSync !== undefined) {
+        requestData.auto_sync = sourceData.autoSync;
       }
     } else if (sourceType === 'file' && sourceData.file) {
+      // Format file data
+      const formData = new FormData();
       formData.append('file', sourceData.file);
+      formData.append('knowledge_base_id', kbId);
+      
+      // Special case for file uploads - use FormData
+      const response = await fetchWithAuth(`/add-knowledge-base-sources`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      return response;
     } else if (sourceType === 'text') {
-      formData.append('title', sourceData.fileName || 'Untitled');
-      formData.append('content', sourceData.content || '');
+      // Format text content according to the API documentation
+      requestData.knowledge_base_texts = [{
+        title: sourceData.fileName || 'Untitled',
+        text: sourceData.content || '',
+      }];
     }
     
-    // Call the API endpoint
-    const response = await fetchWithAuth(`/add-knowledge-base-sources/${kbId}`, {
+    // Call the API endpoint with JSON for URL and text sources
+    const response = await fetchWithAuth(`/add-knowledge-base-sources`, {
       method: 'POST',
-      body: formData,
-      // Note: Don't set Content-Type header when using FormData
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        knowledge_base_id: kbId,
+        ...requestData
+      }),
     });
     
     return response;

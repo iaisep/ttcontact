@@ -49,6 +49,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   const [deleteSourceDialogOpen, setDeleteSourceDialogOpen] = useState(false);
   const [currentKb, setCurrentKb] = useState<KnowledgeBase | null>(knowledgeBase);
   const [creationComplete, setCreationComplete] = useState(false);
+  const [addingSource, setAddingSource] = useState(false);
 
   useEffect(() => {
     if (knowledgeBase) {
@@ -85,15 +86,21 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     if (!currentKb) return;
 
     try {
+      setAddingSource(true);
+      console.log("Adding URL source with params:", { url, autoSync, selectedPages });
+      
       const updatedKb = await onAddSource(currentKb.id, 'url', {
         url,
         autoSync,
         webPages: selectedPages
       });
+      
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
     } catch (error) {
       console.error('Failed to add URL source:', error);
+    } finally {
+      setAddingSource(false);
     }
   };
 
@@ -101,11 +108,16 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     if (!currentKb) return;
 
     try {
+      setAddingSource(true);
+      console.log("Adding file source:", file.name);
+      
       const updatedKb = await onAddSource(currentKb.id, 'file', { file });
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
     } catch (error) {
       console.error('Failed to add file source:', error);
+    } finally {
+      setAddingSource(false);
     }
   };
 
@@ -113,11 +125,16 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     if (!currentKb) return;
 
     try {
+      setAddingSource(true);
+      console.log("Adding text source:", { fileName, contentLength: content.length });
+      
       const updatedKb = await onAddSource(currentKb.id, 'text', { fileName, content });
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
     } catch (error) {
       console.error('Failed to add text source:', error);
+    } finally {
+      setAddingSource(false);
     }
   };
 
@@ -157,7 +174,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         open={open} 
         onOpenChange={(open) => {
           // Only allow closing if we're not in the middle of an operation
-          if (!isSaving) {
+          if (!isSaving && !addingSource) {
             onOpenChange(open);
           }
         }}
@@ -207,14 +224,14 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
               type="button" 
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isSaving}
+              disabled={isSaving || addingSource}
             >
               Cancel
             </Button>
             <Button 
               type="submit"
               form="knowledge-base-form"
-              disabled={isSaving}
+              disabled={isSaving || addingSource}
             >
               {isSaving ? "Saving..." : (isCreating && !creationComplete ? 'Create' : 'Update')}
             </Button>

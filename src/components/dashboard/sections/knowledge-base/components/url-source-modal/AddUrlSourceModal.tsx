@@ -50,6 +50,13 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   };
 
   const submitAndClose = async () => {
+    console.log("Submitting URL source:", {
+      sourceUrl,
+      autoSync,
+      webPagesCount: webPages.length,
+      selectedCount: webPages.filter(p => p.selected).length
+    });
+    
     const success = await handleSubmit();
     if (success) {
       onOpenChange(false);
