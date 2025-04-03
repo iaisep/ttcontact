@@ -26,7 +26,7 @@ const TestButtons: React.FC<TestButtonsProps> = ({
       <Button 
         variant="outline" 
         onClick={onAudioTest} 
-        className="w-full flex items-center justify-center text-[10px]" 
+        className="w-full flex items-center justify-center " 
         disabled={isLoading || isRecording}
       >
         <Phone className="mr-2 h-4 w-4" /> 
@@ -36,7 +36,7 @@ const TestButtons: React.FC<TestButtonsProps> = ({
       <Button 
         variant="outline" 
         onClick={onLlmTest} 
-        className="w-full flex items-center justify-center text-[10px]" 
+        className="w-full flex items-center justify-center " 
         disabled={isLoading || isRecording}
       >
         <TestTube className="mr-2 h-4 w-4" /> 
@@ -46,7 +46,7 @@ const TestButtons: React.FC<TestButtonsProps> = ({
       <Button 
         variant="outline" 
         onClick={onCodeTest} 
-        className="w-full flex items-center justify-center text-[10px]" 
+        className="w-full flex items-center justify-center " 
         disabled={isLoading || isRecording}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" className="mr-2 h-4 w-4">
