@@ -22,7 +22,7 @@ interface KnowledgeBaseDialogProps {
   onOpenChange: (open: boolean) => void;
   isCreating: boolean;
   knowledgeBase: KnowledgeBase | null;
-  onSave: (name: string, kb: KnowledgeBase | null) => Promise<KnowledgeBase>;
+  onSave: (data: { name: string }) => Promise<void>;
   onAddSource: (
     kbId: string,
     sourceType: 'url' | 'file' | 'text',
@@ -30,6 +30,7 @@ interface KnowledgeBaseDialogProps {
   ) => Promise<KnowledgeBase>;
   onDeleteSource: (kbId: string, sourceId: string) => Promise<KnowledgeBase>;
   onFetchSitemap: (url: string) => Promise<any[]>;
+  isSaving: boolean;
 }
 
 const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
@@ -40,13 +41,13 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   onSave,
   onAddSource,
   onDeleteSource,
-  onFetchSitemap
+  onFetchSitemap,
+  isSaving
 }) => {
   const [currentSourceType, setCurrentSourceType] = useState<'url' | 'file' | 'text' | null>(null);
   const [sourceToDelete, setSourceToDelete] = useState<KnowledgeBaseSource | null>(null);
   const [deleteSourceDialogOpen, setDeleteSourceDialogOpen] = useState(false);
   const [currentKb, setCurrentKb] = useState<KnowledgeBase | null>(knowledgeBase);
-  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (knowledgeBase) {
@@ -69,23 +70,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
       return () => clearTimeout(timeout);
     }
   }, [open]);
-
-  const handleSave = async (data: { name: string }) => {
-    if (isSaving) return;
-    
-    try {
-      setIsSaving(true);
-      const savedKb = await onSave(data.name, currentKb);
-      setCurrentKb(savedKb);
-      if (isCreating) {
-        onOpenChange(false);
-      }
-    } catch (error) {
-      console.error('Failed to save knowledge base:', error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const handleAddSourceClick = (type: 'url' | 'file' | 'text') => {
     setCurrentSourceType(type);
@@ -175,7 +159,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
             knowledgeBase={currentKb} 
             onOpenChange={onOpenChange} 
             isSaving={isSaving} 
-            onSave={handleSave}
+            onSave={onSave}
           />
           
           {!isCreating && currentKb && (
