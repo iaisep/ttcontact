@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -999,3 +1000,212 @@ const KnowledgeBaseSection = () => {
                 Cancel
               </Button>
               <Button
+                type="button"
+                onClick={handleAddSource}
+                disabled={!sourceFileName || !sourceContent}
+              >
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Add Source Dialog - URL */}
+      {currentSourceType === 'url' && !sitemapDialogOpen && (
+        <Dialog 
+          open={sourceDialogOpen} 
+          onOpenChange={(open) => {
+            setSourceDialogOpen(open);
+            if (!open) {
+              setSourceUrl('');
+              setAutoSync(false);
+            }
+          }}
+        >
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Add Web Pages</DialogTitle>
+              <DialogDescription>
+                Enter a website URL to extract content from its sitemap.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="url">Website URL</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="url"
+                    placeholder="https://example.com"
+                    value={sourceUrl}
+                    onChange={(e) => setSourceUrl(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button"
+                    onClick={handleFetchSitemap}
+                    disabled={!sourceUrl}
+                  >
+                    <Search className="h-4 w-4 mr-1" /> Scan
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Enter the root URL of the website to scan its sitemap.
+                </p>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="auto-sync" 
+                  checked={autoSync}
+                  onCheckedChange={(checked) => setAutoSync(checked === true)}
+                />
+                <Label htmlFor="auto-sync" className="text-sm cursor-pointer">
+                  Auto sync web pages every 24 hours
+                </Label>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={() => {
+                  setSourceDialogOpen(false);
+                  setSourceUrl('');
+                  setAutoSync(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="button"
+                onClick={handleAddSource}
+                disabled={!sourceUrl}
+              >
+                Add
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Sitemap Selection Dialog */}
+      {sitemapDialogOpen && (
+        <Dialog 
+          open={sitemapDialogOpen} 
+          onOpenChange={(open) => {
+            setSitemapDialogOpen(open);
+            if (!open && !sourceDialogOpen) {
+              setSourceUrl('');
+              setWebPages([]);
+              setAutoSync(false);
+            }
+          }}
+        >
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Select Web Pages</DialogTitle>
+              <DialogDescription>
+                Select which pages from {sourceUrl} you want to include in your knowledge base.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="border rounded-md divide-y max-h-[300px] overflow-y-auto">
+                {webPages.length === 0 ? (
+                  <div className="p-4 text-center text-sm text-muted-foreground">
+                    No pages found in the sitemap.
+                  </div>
+                ) : (
+                  webPages.map((page, index) => (
+                    <div 
+                      key={page.url}
+                      className="flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => toggleWebPageSelection(index)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Checkbox 
+                          checked={page.selected}
+                          onCheckedChange={() => toggleWebPageSelection(index)}
+                          id={`page-${index}`}
+                        />
+                        <Label 
+                          htmlFor={`page-${index}`}
+                          className="text-sm cursor-pointer"
+                        >
+                          {page.title || page.url}
+                        </Label>
+                      </div>
+                      <span className="text-xs text-muted-foreground truncate max-w-[200px]">
+                        {page.url}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="text-sm">
+                  {webPages.filter(p => p.selected).length} of {webPages.length} pages selected
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setWebPages(webPages.map(p => ({...p, selected: false})))}
+                  >
+                    Deselect All
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setWebPages(webPages.map(p => ({...p, selected: true})))}
+                  >
+                    Select All
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="sitemap-auto-sync" 
+                  checked={autoSync}
+                  onCheckedChange={(checked) => setAutoSync(checked === true)}
+                />
+                <Label htmlFor="sitemap-auto-sync" className="text-sm cursor-pointer">
+                  Auto sync web pages every 24 hours
+                </Label>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={() => {
+                  setSitemapDialogOpen(false);
+                  setSourceDialogOpen(true);
+                }}
+              >
+                Back
+              </Button>
+              <Button 
+                type="button"
+                onClick={handleAddSource}
+                disabled={webPages.filter(p => p.selected).length === 0}
+              >
+                Add Selected Pages
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </div>
+  );
+};
+
+export default KnowledgeBaseSection;
