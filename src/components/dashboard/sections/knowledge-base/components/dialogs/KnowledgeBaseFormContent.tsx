@@ -33,7 +33,7 @@ const KnowledgeBaseFormContent: React.FC<KnowledgeBaseFormContentProps> = ({
 
   React.useEffect(() => {
     if (knowledgeBase) {
-      form.setValue('name', knowledgeBase.name);
+      form.setValue('name', knowledgeBase.name || '');
     } else {
       form.setValue('name', '');
     }

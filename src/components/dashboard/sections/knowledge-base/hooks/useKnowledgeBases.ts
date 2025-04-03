@@ -185,8 +185,9 @@ export const useKnowledgeBases = () => {
     }
   };
 
+  // Fix to safely handle possibly undefined name properties
   const filteredKnowledgeBases = knowledgeBases.filter(kb =>
-    kb.name.toLowerCase().includes(searchQuery.toLowerCase())
+    kb.name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false
   );
 
   const paginatedKnowledgeBases = filteredKnowledgeBases.slice(
