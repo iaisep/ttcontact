@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { AgentFunction } from '../FunctionsSection';
+import { AgentFunction } from '../functions/types';
 import { Sparkles, Plus } from 'lucide-react';
 
 interface AddFunctionModalProps {
@@ -25,13 +25,30 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [url, setUrl] = useState('');
-  const [timeoutMs, setTimeoutMs] = useState('30000'); // Renamed from setTimeout to avoid shadowing
+  const [timeoutMs, setTimeoutMs] = useState('30000');
   const [parameters, setParameters] = useState('{}');
   const [speakDuring, setSpeakDuring] = useState(false);
   const [speakAfter, setSpeakAfter] = useState(true);
   const [type, setType] = useState('custom');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Add a ref to track if the component is mounted
+  const isMountedRef = useRef(true);
+
+  // Update the mounted ref on cleanup
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Use a memoized close handler to avoid recreating it on each render
+  const handleCleanClose = useCallback(() => {
+    if (isSubmitting) return;
+    onClose();
+  }, [isSubmitting, onClose]);
 
   useEffect(() => {
     if (isOpen && functionData) {
@@ -71,7 +88,7 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
     setIsSubmitting(false);
   }, [functionData, isOpen]);
 
-  const validate = (): boolean => {
+  const validate = useCallback((): boolean => {
     const newErrors: Record<string, string> = {};
     
     if (!name.trim()) {
@@ -96,9 +113,9 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [name, description, type, url, parameters]);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (isSubmitting) return; // Prevent multiple submissions
     
     if (!validate()) return;
@@ -107,7 +124,7 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
     try {
       parsedParameters = parameters ? JSON.parse(parameters) : undefined;
     } catch (e) {
-      setErrors({ ...errors, parameters: 'Invalid JSON format' });
+      setErrors(prev => ({ ...prev, parameters: 'Invalid JSON format' }));
       return;
     }
     
@@ -130,21 +147,30 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
     // First close the modal cleanly to prevent UI freezes
     onClose();
     
-    // Use a small delay to ensure the UI updates before processing the add operation
-    window.setTimeout(() => {
-      onAdd(newFunction);
-      setIsSubmitting(false);
+    // Use a small delay to ensure modal is unmounted before processing
+    // Don't use state for this as it could be part of the freezing issue
+    setTimeout(() => {
+      // Only proceed if component is still mounted
+      if (isMountedRef.current) {
+        onAdd(newFunction);
+      }
     }, 100);
-  };
-
-  const handleCleanClose = () => {
-    // Prevent processing if already in closing state
-    if (isSubmitting) return;
-    
-    onClose();
-  };
+  }, [
+    isSubmitting, validate, parameters, name, description, type, 
+    url, timeoutMs, speakDuring, speakAfter, onClose, onAdd
+  ]);
 
   const isCustomFunction = type === 'custom';
+
+  // Use useEffect for cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Cleanup any pending state or operations when modal is closed
+      setIsSubmitting(false);
+    };
+  }, []);
+
+  if (!isOpen) return null;
 
   return (
     <Dialog 

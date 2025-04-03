@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { useLanguage } from '@/context/LanguageContext';
@@ -19,7 +19,7 @@ export const useFunctions = (agent: RetellAgent) => {
   const llmId = agent?.response_engine?.llm_id;
 
   // Fetch functions data
-  const fetchFunctions = async () => {
+  const fetchFunctions = useCallback(async () => {
     if (!llmId) return;
     
     setIsLoading(true);
@@ -34,14 +34,14 @@ export const useFunctions = (agent: RetellAgent) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [llmId, fetchWithAuth, t]);
 
   useEffect(() => {
     fetchFunctions();
-  }, [llmId]);
+  }, [fetchFunctions]);
 
   // Function to update LLM with modified functions
-  const updateLLMFunctions = async (updatedFunctions: AgentFunction[]) => {
+  const updateLLMFunctions = useCallback(async (updatedFunctions: AgentFunction[]) => {
     if (!llmId) return false;
     
     setIsLoading(true);
@@ -61,55 +61,58 @@ export const useFunctions = (agent: RetellAgent) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [llmId, fetchWithAuth, t]);
+
+  // Reset all modals and selections
+  const resetState = useCallback(() => {
+    setSelectedFunction(null);
+    setEditModalOpen(false);
+    setAddModalOpen(false);
+    setDeleteDialogOpen(false);
+  }, []);
 
   // Handle function edit
-  const handleEditFunction = (func: AgentFunction) => {
+  const handleEditFunction = useCallback((func: AgentFunction) => {
     setSelectedFunction(func);
     setEditModalOpen(true);
-  };
+  }, []);
 
   // Handle function delete 
-  const handleDeleteFunction = (func: AgentFunction) => {
+  const handleDeleteFunction = useCallback((func: AgentFunction) => {
     setSelectedFunction(func);
     setDeleteDialogOpen(true);
-  };
+  }, []);
   
   // Perform function delete
-  const confirmDeleteFunction = async () => {
+  const confirmDeleteFunction = useCallback(async () => {
     if (!selectedFunction) return;
     
     const updatedFunctions = functions.filter(f => f.name !== selectedFunction.name);
-    const success = await updateLLMFunctions(updatedFunctions);
-    
-    if (success) {
-      setDeleteDialogOpen(false);
-      setSelectedFunction(null);
-    }
-  };
+    await updateLLMFunctions(updatedFunctions);
+  }, [selectedFunction, functions, updateLLMFunctions]);
 
   // Handle function update
-  const handleUpdateFunction = async (updatedFunction: AgentFunction) => {
+  const handleUpdateFunction = useCallback(async (updatedFunction: AgentFunction) => {
     const updatedFunctions = functions.map(f => 
       f.name === selectedFunction?.name ? updatedFunction : f
     );
     
-    const success = await updateLLMFunctions(updatedFunctions);
-    if (success) {
-      setEditModalOpen(false);
-      setSelectedFunction(null);
-    }
-  };
+    await updateLLMFunctions(updatedFunctions);
+  }, [functions, selectedFunction, updateLLMFunctions]);
 
   // Handle function add
-  const handleAddFunction = async (newFunction: AgentFunction) => {
-    const updatedFunctions = [...functions, newFunction];
-    const success = await updateLLMFunctions(updatedFunctions);
+  const handleAddFunction = useCallback(async (newFunction: AgentFunction) => {
+    // Check if a function with this name already exists
+    const existingFunction = functions.find(f => f.name === newFunction.name);
     
-    if (success) {
-      setAddModalOpen(false);
+    if (existingFunction) {
+      toast.error(t('function_name_already_exists'));
+      return;
     }
-  };
+    
+    const updatedFunctions = [...functions, newFunction];
+    await updateLLMFunctions(updatedFunctions);
+  }, [functions, updateLLMFunctions, t]);
 
   return {
     functions,
@@ -126,6 +129,7 @@ export const useFunctions = (agent: RetellAgent) => {
     handleDeleteFunction,
     handleUpdateFunction,
     handleAddFunction,
-    confirmDeleteFunction
+    confirmDeleteFunction,
+    resetState
   };
 };

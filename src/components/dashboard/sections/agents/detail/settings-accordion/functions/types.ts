@@ -21,6 +21,7 @@ export interface AgentFunction {
 
 export interface FunctionsSectionProps {
   agent: RetellAgent;
+  updateAgentField?: (fieldName: string, value: any) => void;
 }
 
 export interface FunctionItemProps {

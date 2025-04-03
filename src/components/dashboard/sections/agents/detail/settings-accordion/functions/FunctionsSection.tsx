@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { FileText } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -29,11 +29,31 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
     handleDeleteFunction,
     handleUpdateFunction,
     handleAddFunction,
-    confirmDeleteFunction
+    confirmDeleteFunction,
+    resetState
   } = useFunctions(agent);
 
+  // Handle safely closing modals
+  const handleCloseEditModal = useCallback(() => {
+    setEditModalOpen(false);
+    // Use a timeout to ensure state is updated after modal animation
+    setTimeout(() => setSelectedFunction(null), 150);
+  }, [setEditModalOpen, setSelectedFunction]);
+
+  const handleCloseAddModal = useCallback(() => {
+    setAddModalOpen(false);
+    // Use a timeout to ensure state is updated after modal animation
+    setTimeout(() => setSelectedFunction(null), 150);
+  }, [setAddModalOpen, setSelectedFunction]);
+
+  const handleCloseDeleteDialog = useCallback(() => {
+    setDeleteDialogOpen(false);
+    // Use a timeout to ensure state is updated after modal animation
+    setTimeout(() => setSelectedFunction(null), 150);
+  }, [setDeleteDialogOpen, setSelectedFunction]);
+
   // Handle adding a function from template
-  const handleAddFunctionTemplate = (type: string) => {
+  const handleAddFunctionTemplate = useCallback((type: string) => {
     if (type === 'custom') {
       // For custom function, open the add modal with empty template
       setSelectedFunction(createFunctionFromTemplate(type));
@@ -51,7 +71,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
         setAddModalOpen(true);
       }
     }
-  };
+  }, [setSelectedFunction, setAddModalOpen, handleAddFunction]);
 
   return (
     <AccordionItem value="functions" className="mt-4 border rounded-md overflow-hidden">
@@ -74,7 +94,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
             ) : (
               functions.map((func, index) => (
                 <FunctionItem 
-                  key={index}
+                  key={`${func.name}-${index}`}
                   func={func}
                   onEdit={handleEditFunction}
                   onDelete={handleDeleteFunction}
@@ -91,10 +111,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
         {/* Edit Function Modal */}
         <EditFunctionModal
           isOpen={editModalOpen}
-          onClose={() => {
-            setEditModalOpen(false);
-            setSelectedFunction(null);
-          }}
+          onClose={handleCloseEditModal}
           onUpdate={handleUpdateFunction}
           functionData={selectedFunction}
         />
@@ -102,10 +119,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
         {/* Add Function Modal */}
         <AddFunctionModal
           isOpen={addModalOpen}
-          onClose={() => {
-            setAddModalOpen(false);
-            setSelectedFunction(null);
-          }}
+          onClose={handleCloseAddModal}
           onAdd={handleAddFunction}
           functionData={selectedFunction}
         />
@@ -113,10 +127,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
         {/* Delete Function Dialog */}
         <DeleteFunctionDialog
           isOpen={deleteDialogOpen}
-          onClose={() => {
-            setDeleteDialogOpen(false);
-            setSelectedFunction(null);
-          }}
+          onClose={handleCloseDeleteDialog}
           onConfirm={confirmDeleteFunction}
           functionName={selectedFunction?.name || ''}
         />
