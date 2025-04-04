@@ -5,8 +5,7 @@ import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase } from '../../../types';
 
 export const useKnowledgeBaseCreateApi = () => {
-  const { fetchWithAuth } = useApiContext();
-  const { baseURL } = useApiContext();
+  const { fetchWithAuth, baseURL } = useApiContext();
   const [loading, setLoading] = useState(false);
 
   const createKnowledgeBase = async (nameOrData: string | { 
@@ -45,8 +44,11 @@ export const useKnowledgeBaseCreateApi = () => {
       formData.append('knowledge_base_urls', JSON.stringify(urls));
       formData.append('enable_auto_refresh', String(autoSync));
       
+      console.log('Request URL:', `${baseURL}/create-knowledge-base`);
+      console.log('Form data:', Object.fromEntries(formData.entries()));
+      
       // Make the request using fetch
-      const response = fetchWithAuth(`${baseURL}/create-knowledge-base`, {
+      const response = await fetchWithAuth('create-knowledge-base', {
         method: 'POST',
         headers: {
           'Accept': 'application/json, text/plain, */*',
@@ -57,15 +59,12 @@ export const useKnowledgeBaseCreateApi = () => {
         mode: 'cors'
       });
       
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
+      console.log('Knowledge base creation response:', response);
       
-      const responseData = await response.json();
-      console.log('Knowledge base creation response:', responseData);
+      const responseData = response;
       
       const createdKb: KnowledgeBase = {
-        id: responseData.knowledge_base_id,
+        id: responseData.knowledge_base_id || `kb_${Date.now()}`,
         name: responseData.knowledge_base_name || name,
         created_at: new Date(responseData.user_modified_timestamp || Date.now()).toISOString(),
         updated_at: new Date(responseData.user_modified_timestamp || Date.now()).toISOString(),

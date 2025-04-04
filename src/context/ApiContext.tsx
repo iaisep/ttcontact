@@ -36,7 +36,11 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
   // Define fetchWithAuth as a FetchWithAuthFunction
   const fetchWithAuth: FetchWithAuthFunction = async (endpoint: string, options?: RequestInit) => {
     try {
-      const url = `${baseURL}${endpoint}`;
+      // Ensure the endpoint starts with a slash if it doesn't already
+      const formattedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+      
+      // Make sure we don't duplicate the baseURL
+      const url = endpoint.includes('http') ? endpoint : `${baseURL}${formattedEndpoint}`;
       
       // Only set default headers if they're not already set in options
       // This allows custom handling of multipart/form-data
@@ -51,6 +55,8 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
           !options.headers?.['content-type']) {
         defaultHeaders['Content-Type'] = 'application/json';
       }
+      
+      console.log('Making API request to:', url);
       
       const response = await fetch(url, {
         ...options,
