@@ -74,13 +74,13 @@ const KnowledgeBaseSection: React.FC = () => {
           autoSync: false
         });
         
-        // Make sure we have a valid name, even if it's a default one
-        const kbName = data.name && data.name.trim() !== '' ? data.name : 'New Knowledge Base';
+        // Asegurarse de que el nombre no esté vacío pero priorizar el valor del usuario
+        const kbName = data.name.trim() !== '' ? data.name : 'New Knowledge Base';
         
-        // Using the updated createKnowledgeBase function that accepts a single parameter
+        // Usar la función createKnowledgeBase con el nombre correcto
         const newKb = await createKnowledgeBase(kbName);
         console.log('Created new knowledge base:', newKb);
-        // Don't close the dialog here to allow adding sources
+        // No cerrar el diálogo aún para permitir añadir fuentes
         setCurrentKb(newKb);
         toast.success('Knowledge base created successfully');
       } else if (currentKb) {

@@ -34,11 +34,12 @@ export const useKnowledgeBaseCreateApi = () => {
         autoSync
       });
       
-      // Create the form data using FormData
+      // Crear el FormData
       const formData = new FormData();
       
-      // Make sure the name is properly set in the request
-      if (!name || name.trim() === '') {
+      // Asegurarse de que el nombre se establezca correctamente, priorizando el valor del usuario
+      // Solo usar el valor por defecto si el nombre está completamente vacío
+      if (!name) {
         name = 'New Knowledge Base';
       }
       
@@ -50,8 +51,6 @@ export const useKnowledgeBaseCreateApi = () => {
       console.log('Request URL:', `${baseURL}/create-knowledge-base`);
       console.log('Form data:', Object.fromEntries(formData.entries()));
       
-      // Make the request using fetchWithAuth without directly setting Authorization header
-      // Let fetchWithAuth handle the Authorization header from the ApiContext
       const response = await fetchWithAuth('create-knowledge-base', {
         method: 'POST',
         headers: {
@@ -67,7 +66,7 @@ export const useKnowledgeBaseCreateApi = () => {
       
       const createdKb: KnowledgeBase = {
         id: responseData.knowledge_base_id || `kb_${Date.now()}`,
-        name: responseData.knowledge_base_name || name,
+        name: name, // Usar el nombre proporcionado por el usuario
         created_at: new Date(responseData.user_modified_timestamp || Date.now()).toISOString(),
         updated_at: new Date(responseData.user_modified_timestamp || Date.now()).toISOString(),
         source_count: urls.length,
@@ -87,10 +86,12 @@ export const useKnowledgeBaseCreateApi = () => {
       console.error('Failed to create knowledge base:', error);
       toast.error('Failed to create knowledge base');
       
-      // Fallback to return a mock knowledge base in case of error
+      // Fallback para devolver un knowledge base simulado en caso de error
+      const name = typeof nameOrData === 'string' ? nameOrData : (nameOrData.name || 'New Knowledge Base');
+      
       const newKb: KnowledgeBase = {
         id: `kb_${Date.now()}`,
-        name: typeof nameOrData === 'string' ? nameOrData : nameOrData.name,
+        name: name, // Usar el nombre proporcionado por el usuario
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         source_count: typeof nameOrData === 'string' ? 0 : (nameOrData.urls?.length || 0),
