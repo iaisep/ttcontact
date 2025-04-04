@@ -20,10 +20,7 @@ export const useKnowledgeBaseManageApi = () => {
       
       await fetchWithAuth(`/add-knowledge-base-sources/${kb.id}`, {
         method: 'POST',
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
-        },
+        // Don't set Content-Type header when using FormData
         body: formData,
       });
       

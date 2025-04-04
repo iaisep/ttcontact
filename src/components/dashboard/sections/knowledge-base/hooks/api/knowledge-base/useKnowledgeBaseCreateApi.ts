@@ -45,10 +45,7 @@ export const useKnowledgeBaseCreateApi = () => {
       
       const response = await fetchWithAuth('/create-knowledge-base', {
         method: 'POST',
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
-        },
+        // Don't set Content-Type header when using FormData
         body: formData,
       });
       

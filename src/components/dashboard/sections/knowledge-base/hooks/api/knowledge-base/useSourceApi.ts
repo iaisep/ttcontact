@@ -45,10 +45,8 @@ export const useSourceApi = () => {
         
         const response = await fetchWithAuth(apiEndpoint, {
           method: 'POST',
-          headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
-          },
+          // Don't set Content-Type header when using FormData
+          // The browser will automatically set the correct Content-Type with boundary
           body: formData,
         });
         
@@ -67,10 +65,7 @@ export const useSourceApi = () => {
         
         const response = await fetchWithAuth(apiEndpoint, {
           method: 'POST',
-          headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
-          },
+          // Don't set Content-Type header when using FormData
           body: formData,
         });
         
@@ -92,10 +87,7 @@ export const useSourceApi = () => {
         
         const response = await fetchWithAuth(apiEndpoint, {
           method: 'POST',
-          headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
-          },
+          // Don't set Content-Type header when using FormData
           body: formData,
         });
         

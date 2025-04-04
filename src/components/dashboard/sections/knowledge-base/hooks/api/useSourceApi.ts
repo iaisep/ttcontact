@@ -1,4 +1,3 @@
-
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -72,6 +71,7 @@ export const useSourceApi = () => {
       // Special case for file uploads - use FormData
       const response = await fetchWithAuth(`/kb/add-sources`, {
         method: 'POST',
+        // Don't set Content-Type header when using FormData
         body: formData,
       });
       
