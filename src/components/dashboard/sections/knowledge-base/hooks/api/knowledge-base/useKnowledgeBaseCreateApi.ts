@@ -44,10 +44,13 @@ export const useKnowledgeBaseCreateApi = () => {
       });
       
       const response = await fetchWithAuth('/create-knowledge-base', {
-        method: 'POST',
-        // Don't set Content-Type header when using FormData
-        body: formData,
-      });
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json, text/plain, */*'
+            // ⚠️ NO pongas Content-Type aquí
+          },
+          body: formData
+        });
       
       console.log('Knowledge base creation response:', response);
       
