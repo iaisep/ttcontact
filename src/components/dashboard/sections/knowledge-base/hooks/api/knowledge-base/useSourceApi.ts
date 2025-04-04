@@ -136,9 +136,49 @@ export const useSourceApi = () => {
     }
   };
 
+  const deleteSource = async (kbId: string, sourceId: string): Promise<KnowledgeBase> => {
+    try {
+      setLoading(true);
+      
+      // API endpoint for deleting a source
+      const endpoint = `/kb/${kbId}/sources/${sourceId}`;
+      
+      console.log(`Deleting source ${sourceId} from KB ${kbId}`);
+      
+      // Make the API call
+      await fetchWithAuth(endpoint, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // For now, return a mock response since we don't have the actual KB data
+      const mockResponse: KnowledgeBase = {
+        id: kbId,
+        name: "Knowledge Base",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        source_count: 0,
+        sources: [], // Removed the source
+        auto_sync: false
+      };
+      
+      return mockResponse;
+    } catch (error) {
+      console.error(`Failed to delete source:`, error);
+      toast.error(`Failed to delete source`);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     setLoading,
-    addSourceToKnowledgeBase
+    addSourceToKnowledgeBase,
+    deleteSource
   };
 };
