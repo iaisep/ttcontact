@@ -48,9 +48,10 @@ export const useSourceApi = () => {
         const response = await fetchWithAuth(`/add-knowledge-base-sources/${kbId}`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Accept': 'application/json, text/plain, */*',
           },
-          body: JSON.stringify(requestData),
+          body: formData,
+          mode: 'cors'
         });
         
         console.log('API response for URL source:', response);
