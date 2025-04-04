@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { 
   Dialog, 
@@ -84,10 +83,8 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     }
   });
 
-  // Reset source modals when main dialog closes
   useEffect(() => {
     if (!open) {
-      // Use timeout to ensure state updates don't conflict
       const timeout = setTimeout(() => {
         resetSourceModals();
         form.reset();
@@ -108,7 +105,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     }
   }, [knowledgeBase, form]);
 
-  // Track form value changes
   useEffect(() => {
     const subscription = form.watch((value) => {
       if (value.name !== undefined) {
@@ -122,13 +118,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     try {
       console.log('Saving knowledge base with name:', data.name);
       
-      // Ensure we have a name, even if empty - we'll handle validation on the API side
-      if (!data.name || data.name.trim() === '') {
-        data.name = 'New Knowledge Base';
-        form.setValue('name', data.name);
-        setKnowledgeBaseName(data.name);
-      }
-      
       const success = await handleKnowledgeBaseSave(data, onSave);
       if (success) {
         form.reset();
@@ -138,7 +127,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     }
   };
 
-  // Source menu options
   const sourceOptions = [
     {
       id: 'url',
@@ -165,7 +153,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
       <Dialog 
         open={open} 
         onOpenChange={(open) => {
-          // Only allow closing if we're not in the middle of an operation
           if (!isSaving && !addingSource) {
             onOpenChange(open);
           }
@@ -207,12 +194,10 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                     )}
                   />
                   
-                  {/* Documents Section */}
                   <div>
                     <h3 className="text-base font-medium mb-2">Documents</h3>
                     
                     <div className="relative">
-                      {/* Add Button */}
                       <Button
                         type="button"
                         variant="outline"
@@ -223,7 +208,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                         <Plus className="h-4 w-4 mr-1" /> Add
                       </Button>
                       
-                      {/* Source Selection Menu */}
                       {showSourceMenu && (
                         <div className="absolute top-full left-0 mt-1 bg-white border rounded-lg shadow-lg z-10 w-64">
                           {sourceOptions.map(option => (
@@ -248,7 +232,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                       )}
                     </div>
                     
-                    {/* List of added sources */}
                     {currentKb && currentKb.sources.length > 0 && (
                       <div className="mt-4 space-y-2">
                         {currentKb.sources.map(source => (
@@ -288,7 +271,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                       </div>
                     )}
                     
-                    {/* Auto-sync option (only show if there are URL sources) */}
                     {currentKb && currentKb.sources.some(s => s.type === 'url') && (
                       <div className="flex items-center space-x-2 mt-4">
                         <Checkbox 
@@ -303,7 +285,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                     )}
                   </div>
                   
-                  {/* Dialog Footer */}
                   <div className="flex justify-end gap-2 mt-6">
                     <Button 
                       type="button" 
@@ -330,7 +311,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Source modals */}
       <KnowledgeBaseSourceModals
         currentSourceType={currentSourceType}
         setCurrentSourceType={setCurrentSourceType}

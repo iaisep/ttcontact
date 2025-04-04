@@ -74,17 +74,16 @@ const KnowledgeBaseSection: React.FC = () => {
           autoSync: false
         });
         
-        // Asegurarse de que el nombre no esté vacío pero priorizar el valor del usuario
-        const kbName = data.name.trim() !== '' ? data.name : 'New Knowledge Base';
+        // Use the user-provided name directly
+        await createKnowledgeBase({
+          name: data.name, // Pass the name as is, validation happens in the API
+          urls: [],
+          autoSync: false
+        });
         
-        // Usar la función createKnowledgeBase con el nombre correcto
-        const newKb = await createKnowledgeBase(kbName);
-        console.log('Created new knowledge base:', newKb);
-        // No cerrar el diálogo aún para permitir añadir fuentes
-        setCurrentKb(newKb);
         toast.success('Knowledge base created successfully');
       } else if (currentKb) {
-        const updatedKb = { ...currentKb, name: data.name || 'New Knowledge Base' };
+        const updatedKb = { ...currentKb, name: data.name };
         await updateKnowledgeBase(updatedKb);
         setKbDialogOpen(false);
       }
@@ -134,12 +133,9 @@ const KnowledgeBaseSection: React.FC = () => {
         console.log('Adding url source to KB', kbId, ':', sourceData);
         
         if (isNewKnowledgeBase) {
-          // For a new knowledge base, we'll need to create it first
-          // with the URLs included in the creation request
-          const kbName = sourceData.knowledgeBaseName && sourceData.knowledgeBaseName.trim() !== '' 
-            ? sourceData.knowledgeBaseName 
-            : 'New Knowledge Base';
-            
+          // For a new knowledge base, create it first with the URLs
+          // Ensure we use the provided knowledge base name
+          const kbName = sourceData.knowledgeBaseName || 'New Knowledge Base';
           const urls = sourceData.webPages.map((page: any) => page.url) || [];
           const autoSync = sourceData.autoSync || false;
           
@@ -149,7 +145,6 @@ const KnowledgeBaseSection: React.FC = () => {
             autoSync
           });
           
-          // Use the create knowledge base API with the new simplified signature
           const newKb = await createKnowledgeBase({
             name: kbName,
             urls: urls,
