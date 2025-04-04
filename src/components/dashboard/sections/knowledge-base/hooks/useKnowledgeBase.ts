@@ -2,6 +2,7 @@
 import { useKnowledgeBases } from './useKnowledgeBases';
 import { useKnowledgeBaseSources } from './useKnowledgeBaseSources';
 import { useKnowledgeBaseSync } from './useKnowledgeBaseSync';
+import { usePaginationAndFiltering } from './usePaginationAndFiltering';
 
 export const useKnowledgeBase = () => {
   const {
