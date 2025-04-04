@@ -129,12 +129,13 @@ export const useKnowledgeBaseDialog = ({
     setCurrentKb(updatedKb);
   };
 
-  const handleKnowledgeBaseSave = async (data: { name: string }, onSave: (data: { name: string }) => Promise<void>) => {
+  const handleKnowledgeBaseSave = async (data: { name: string }, onSave: (data: { name: string }) => Promise<void>): Promise<boolean> => {
     try {
       await onSave(data);
       if (isCreating) {
         setCreationComplete(true);
       }
+      return true;
     } catch (error) {
       console.error('Error saving knowledge base:', error);
       throw error;

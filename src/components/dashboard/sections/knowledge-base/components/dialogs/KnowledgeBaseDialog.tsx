@@ -87,7 +87,13 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     
     console.log("Creating knowledge base with data:", formattedData);
     
-    return handleKnowledgeBaseSave(data, onSave);
+    try {
+      await handleKnowledgeBaseSave(data, onSave);
+      return true; // Return boolean value to match expected type
+    } catch (error) {
+      console.error("Error saving knowledge base:", error);
+      return false; // Return boolean value to match expected type
+    }
   };
 
   return (
