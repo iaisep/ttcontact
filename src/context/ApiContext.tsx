@@ -42,10 +42,14 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
       // Make sure we don't duplicate the baseURL
       const url = endpoint.includes('http') ? endpoint : `${baseURL}${formattedEndpoint}`;
       
+      // Get auth token from localStorage or use the apiKey as fallback
+      const authToken = localStorage.getItem('auth_token') || apiKey;
+      console.log('Using auth token:', authToken ? 'Token exists' : 'No token available');
+      
       // Only set default headers if they're not already set in options
       // This allows custom handling of multipart/form-data
       const defaultHeaders = {
-        'Authorization': `Bearer ${localStorage.getItem('auth_token') || apiKey}`,
+        'Authorization': `Bearer ${authToken}`,
       };
       
       // If Content-Type is not set in options and body is not FormData, set default Content-Type

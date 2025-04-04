@@ -34,9 +34,6 @@ export const useKnowledgeBaseCreateApi = () => {
         autoSync
       });
       
-      // Get the auth token for authorization header
-      const authToken = localStorage.getItem('auth_token');
-      
       // Create the form data using FormData
       const formData = new FormData();
       formData.append('knowledge_base_name', name);
@@ -47,16 +44,14 @@ export const useKnowledgeBaseCreateApi = () => {
       console.log('Request URL:', `${baseURL}/create-knowledge-base`);
       console.log('Form data:', Object.fromEntries(formData.entries()));
       
-      // Make the request using fetch - use mode: 'cors' but without 'include' credentials
+      // Make the request using fetchWithAuth without directly setting Authorization header
+      // Let fetchWithAuth handle the Authorization header from the ApiContext
       const response = await fetchWithAuth('create-knowledge-base', {
         method: 'POST',
         headers: {
           'Accept': 'application/json, text/plain, */*',
-          'Authorization': `Bearer ${authToken}`
         },
         body: formData,
-        // We're removing the credentials: 'include' option to avoid CORS issues
-        // The fetchWithAuth function will use 'same-origin' by default
         mode: 'cors'
       });
       
