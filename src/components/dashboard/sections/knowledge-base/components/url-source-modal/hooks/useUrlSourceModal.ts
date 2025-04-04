@@ -92,10 +92,10 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
         selectedUrls: selectedPageUrls
       });
       
-      // Submit the selected pages
+      // Call the API with the selected pages
       await onSubmit(url, autoSync, selectedPages);
       
-      // Reset the form state
+      // Reset the form state after successful submission
       resetState();
     } catch (error) {
       console.error('Failed to add URL source:', error);

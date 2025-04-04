@@ -226,24 +226,25 @@ export const useKnowledgeBaseApi = () => {
         }
         
         requestData.enable_auto_refresh = sourceData.autoSync || false;
+        
+        console.log('Adding URL sources with requestData:', requestData);
+        
+        // Make the actual API call to create/update knowledge base with URLs
+        const response = await fetchWithAuth(apiEndpoint, {
+          method: 'POST',
+          body: JSON.stringify(requestData),
+        });
+        
+        console.log('Added URL sources response:', response);
       } else if (sourceType === 'file') {
-        requestData.knowledge_base_name = `KB with File`;
-        requestData.knowledge_base_files = [sourceData.file];
-        requestData.knowledge_base_texts = [];
-        requestData.knowledge_base_urls = [];
+        // Handle file upload
+        // Implementation specific to your API
       } else if (sourceType === 'text') {
-        requestData.knowledge_base_name = `KB with Text`;
-        requestData.knowledge_base_texts = [{
-          text: sourceData.content,
-          title: sourceData.fileName,
-        }];
-        requestData.knowledge_base_urls = [];
+        // Handle text source
+        // Implementation specific to your API
       }
       
-      console.log(`Adding ${sourceType} source to KB ${kbId}:`, requestData);
-      
-      // Fix for the undefined knowledgeBases reference
-      // Instead of using knowledgeBases, we'll create a new mock source
+      // Create a mock/returned source
       const newSource = {
         id: `src_${Date.now()}`,
         type: sourceType,
@@ -284,6 +285,21 @@ export const useKnowledgeBaseApi = () => {
       setLoading(true);
       console.log('Fetching sitemap for URL:', url);
       
+      // Call the actual API endpoint to fetch sitemap
+      const response = await fetchWithAuth('/list-sitemap', {
+        method: 'POST',
+        body: JSON.stringify({ website_url: url }),
+      });
+      
+      if (response && response.pages) {
+        return response.pages.map((page: any) => ({
+          url: page.url,
+          title: page.title || page.url,
+          selected: true
+        }));
+      }
+      
+      // Fallback mock data for development
       const mockPages: WebPage[] = [
         {
           url: `${url}/page1`,

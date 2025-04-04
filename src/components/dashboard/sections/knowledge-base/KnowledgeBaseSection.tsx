@@ -7,7 +7,7 @@ import { useKnowledgeBase } from './hooks/useKnowledgeBase';
 import KnowledgeBaseTable from './components/KnowledgeBaseTable';
 import KnowledgeBaseDialog from './components/dialogs/KnowledgeBaseDialog';
 import KnowledgeBaseDeleteDialog from './components/KnowledgeBaseDeleteDialog';
-import { KnowledgeBase } from './types';
+import { KnowledgeBase, WebPage } from './types';
 import { toast } from 'sonner';
 
 const KnowledgeBaseSection: React.FC = () => {
@@ -122,6 +122,8 @@ const KnowledgeBaseSection: React.FC = () => {
       
       if (sourceType === 'url') {
         // Handle URL source
+        console.log('Adding url source to KB', kbId, ':', sourceData);
+        
         requestData = {
           url: sourceData.url,
           autoSync: sourceData.autoSync,
