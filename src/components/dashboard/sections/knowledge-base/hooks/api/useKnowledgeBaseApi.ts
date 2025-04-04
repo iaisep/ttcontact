@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
@@ -129,9 +128,13 @@ export const useKnowledgeBaseApi = () => {
       const formData = new FormData();
       formData.append('knowledge_base_name', name);
       
-      formData.append('knowledge_base_texts', JSON.stringify([]));
+      formData.append('knowledge_base_texts', '[]');
       
-      formData.append('knowledge_base_urls', JSON.stringify(urls));
+      if (urls.length > 0) {
+        formData.append('knowledge_base_urls', JSON.stringify(urls));
+      } else {
+        formData.append('knowledge_base_urls', '[]');
+      }
       
       formData.append('enable_auto_refresh', String(autoSync));
       
@@ -205,12 +208,13 @@ export const useKnowledgeBaseApi = () => {
       let sourceName = ""; // Default name for the source
 
       if (sourceType === 'url') {
-        // Extract the name from sourceData for URL sources
         const knowledgeBaseName = sourceData.knowledgeBaseName || `KB with URLs`;
+        sourceName = knowledgeBaseName; // Store for later use
         
         formData.append('knowledge_base_id', kbId);
         formData.append('knowledge_base_name', knowledgeBaseName);
-        formData.append('knowledge_base_texts', JSON.stringify([]));
+        
+        formData.append('knowledge_base_texts', '[]');
         
         const urls = sourceData.webPages && Array.isArray(sourceData.webPages) 
           ? sourceData.webPages.map((page: WebPage) => page.url) 
@@ -225,8 +229,6 @@ export const useKnowledgeBaseApi = () => {
           autoSync: sourceData.autoSync || false
         });
         
-        sourceName = knowledgeBaseName; // Store for later use
-        
         const response = await fetchWithAuth(apiEndpoint, {
           method: 'POST',
           body: formData,
@@ -234,13 +236,25 @@ export const useKnowledgeBaseApi = () => {
         
         console.log('Added URL sources response:', response);
       } else if (sourceType === 'file') {
-        // Handle file upload with FormData
-        // Implementation specific to your API
-        sourceName = sourceData.file?.name || "File Source";
+        formData.append('knowledge_base_id', kbId);
+        const fileName = sourceData.file?.name || "File Source";
+        sourceName = fileName;
+        
+        if (sourceData.file) {
+          formData.append('file', sourceData.file);
+        }
       } else if (sourceType === 'text') {
-        // Handle text source with FormData
-        // Implementation specific to your API
-        sourceName = sourceData.fileName || "Text Source";
+        formData.append('knowledge_base_id', kbId);
+        const fileName = sourceData.fileName || "Text Content";
+        sourceName = fileName;
+        
+        const textContent = [{
+          title: fileName,
+          text: sourceData.content || ''
+        }];
+        
+        formData.append('knowledge_base_texts', JSON.stringify(textContent));
+        formData.append('knowledge_base_urls', '[]');
       }
       
       const newSource = {
@@ -259,7 +273,7 @@ export const useKnowledgeBaseApi = () => {
       
       const updatedKb: KnowledgeBase = {
         id: kbId,
-        name: sourceName || "Knowledge Base", // Use the stored name here
+        name: sourceName || "Knowledge Base",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         source_count: 1,
