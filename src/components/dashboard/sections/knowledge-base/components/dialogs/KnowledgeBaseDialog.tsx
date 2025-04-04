@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { KnowledgeBase, WebPage } from '../../types';
-import { useKnowledgeBaseDialog } from '../../hooks/useKnowledgeBaseDialog';
+import { useKnowledgeBaseDialog } from '../../hooks/dialog';
 import KnowledgeBaseSourceModals from './KnowledgeBaseSourceModals';
 import { useForm } from 'react-hook-form';
 import {
