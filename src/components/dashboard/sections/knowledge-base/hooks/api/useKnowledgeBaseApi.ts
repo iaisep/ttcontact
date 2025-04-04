@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
@@ -112,7 +113,7 @@ export const useKnowledgeBaseApi = () => {
     try {
       setLoading(true);
       
-      // Format the request data according to the API screenshots
+      // Format the request data according to the API requirements
       const requestData = {
         knowledge_base_name: name,
         knowledge_base_texts: [],
@@ -134,8 +135,8 @@ export const useKnowledgeBaseApi = () => {
       const createdKb: KnowledgeBase = {
         id: response.knowledge_base_id,
         name: response.knowledge_base_name,
-        created_at: new Date(response.user_modified_timestamp).toISOString(),
-        updated_at: new Date(response.user_modified_timestamp).toISOString(),
+        created_at: new Date(response.user_modified_timestamp || Date.now()).toISOString(),
+        updated_at: new Date(response.user_modified_timestamp || Date.now()).toISOString(),
         source_count: 0,
         sources: [],
         auto_sync: response.enable_auto_refresh || false
@@ -212,6 +213,81 @@ export const useKnowledgeBaseApi = () => {
     }
   };
 
+  const addSourceToKnowledgeBase = async (
+    kbId: string,
+    sourceType: 'url' | 'file' | 'text',
+    sourceData: any
+  ) => {
+    try {
+      setLoading(true);
+      
+      let apiEndpoint = '';
+      let requestData = {};
+      
+      if (sourceType === 'url') {
+        apiEndpoint = '/add-url-source';
+        requestData = {
+          knowledge_base_id: kbId,
+          url: sourceData.url,
+          enable_auto_refresh: sourceData.autoSync,
+          selected_pages: sourceData.webPages || []
+        };
+      } else if (sourceType === 'file') {
+        apiEndpoint = '/add-file-source';
+        // Handle file upload
+        const formData = new FormData();
+        formData.append('file', sourceData.file);
+        formData.append('knowledge_base_id', kbId);
+        
+        // Custom handling for file upload would go here
+      } else if (sourceType === 'text') {
+        apiEndpoint = '/add-text-source';
+        requestData = {
+          knowledge_base_id: kbId,
+          filename: sourceData.fileName,
+          content: sourceData.content
+        };
+      }
+      
+      console.log(`Adding ${sourceType} source to KB ${kbId}:`, requestData);
+      
+      // In a real implementation, you would call the API here
+      // For now, we'll just return a mock response
+      
+      // Get the current KB
+      const kb = await fetchWithAuth(`/get-knowledge-base/${kbId}`);
+      
+      // Mock data for development
+      const newSource = {
+        id: `src_${Date.now()}`,
+        type: sourceType,
+        title: sourceType === 'url' 
+          ? sourceData.url 
+          : (sourceType === 'file' ? sourceData.file.name : sourceData.fileName),
+        url: sourceType === 'url' ? sourceData.url : undefined,
+        file_name: sourceType === 'file' ? sourceData.file.name : 
+                  (sourceType === 'text' ? sourceData.fileName : undefined),
+        content: sourceType === 'text' ? sourceData.content : undefined,
+        created_at: new Date().toISOString(),
+        auto_sync: sourceType === 'url' ? sourceData.autoSync : undefined
+      };
+      
+      const updatedKb = {
+        ...kb,
+        sources: [...(kb.sources || []), newSource],
+        source_count: (kb.sources?.length || 0) + 1
+      };
+      
+      return updatedKb;
+    } catch (error) {
+      console.error(`Failed to add ${sourceType} source:`, error);
+      toast.error(`Failed to add ${sourceType} source`);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     setLoading,
@@ -219,6 +295,7 @@ export const useKnowledgeBaseApi = () => {
     fetchAgents,
     createKnowledgeBase,
     updateKnowledgeBase,
-    deleteKnowledgeBase
+    deleteKnowledgeBase,
+    addSourceToKnowledgeBase
   };
 };

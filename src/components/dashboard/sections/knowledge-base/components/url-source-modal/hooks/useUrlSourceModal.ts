@@ -2,77 +2,114 @@
 import { useState } from 'react';
 import { WebPage } from '../../../types';
 
-export const useUrlSourceModal = (
-  onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<void>,
-  onFetchSitemap: (url: string) => Promise<WebPage[]>
-) => {
-  const [sourceUrl, setSourceUrl] = useState('');
+interface UseUrlSourceModalProps {
+  onFetchSitemap: (url: string) => Promise<WebPage[]>;
+  onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<void>;
+}
+
+export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModalProps) => {
+  const [url, setUrl] = useState('');
   const [autoSync, setAutoSync] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [view, setView] = useState<'url-input' | 'sitemap-selection'>('url-input');
   const [webPages, setWebPages] = useState<WebPage[]>([]);
-  const [sitemapDialogOpen, setSitemapDialogOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [selectedPageUrls, setSelectedPageUrls] = useState<string[]>([]);
 
-  const handleReset = () => {
-    setSourceUrl('');
+  const resetState = () => {
+    setUrl('');
     setAutoSync(false);
+    setIsLoading(false);
+    setView('url-input');
     setWebPages([]);
-    setSitemapDialogOpen(false);
+    setSelectedPageUrls([]);
   };
 
-  const handleFetchSitemap = async () => {
-    if (!sourceUrl) return;
-    
+  const handleUrlSubmit = async () => {
+    if (!url) return;
+
     try {
-      setLoading(true);
-      const pages = await onFetchSitemap(sourceUrl);
+      setIsLoading(true);
+      
+      // Format the URL if needed
+      let formattedUrl = url;
+      if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+        formattedUrl = `https://${formattedUrl}`;
+      }
+      
+      // Fetch sitemap from the URL
+      const pages = await onFetchSitemap(formattedUrl);
+      
+      // Update state with fetched pages
       setWebPages(pages);
-      setSitemapDialogOpen(true);
+      
+      // Pre-select all pages by default
+      setSelectedPageUrls(pages.map(page => page.url));
+      
+      // Switch to sitemap selection view
+      setView('sitemap-selection');
     } catch (error) {
-      console.error(error);
+      console.error('Failed to fetch sitemap:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSelectionToggle = (pageUrl: string) => {
+    setSelectedPageUrls(prevSelected => {
+      if (prevSelected.includes(pageUrl)) {
+        return prevSelected.filter(url => url !== pageUrl);
+      } else {
+        return [...prevSelected, pageUrl];
+      }
+    });
+  };
+
+  const handleToggleAll = () => {
+    if (selectedPageUrls.length === webPages.length) {
+      // Deselect all
+      setSelectedPageUrls([]);
+    } else {
+      // Select all
+      setSelectedPageUrls(webPages.map(page => page.url));
+    }
+  };
+
+  const handleConfirmSelection = async () => {
+    if (selectedPageUrls.length === 0) return;
+
     try {
-      await onSubmit(sourceUrl, autoSync, webPages.filter(p => p.selected));
-      handleReset();
-      return true;
+      setIsLoading(true);
+      
+      // Create selected pages array with full WebPage objects
+      const selectedPages = webPages.filter(page => 
+        selectedPageUrls.includes(page.url)
+      );
+      
+      // Submit the selected pages
+      await onSubmit(url, autoSync, selectedPages);
+      
+      // Reset the form state
+      resetState();
     } catch (error) {
-      console.error(error);
-      return false;
+      console.error('Failed to add URL source:', error);
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const toggleWebPageSelection = (index: number) => {
-    const updatedPages = [...webPages];
-    updatedPages[index].selected = !updatedPages[index].selected;
-    setWebPages(updatedPages);
-  };
-
-  const selectAllPages = () => {
-    setWebPages(webPages.map(p => ({...p, selected: true})));
-  };
-
-  const deselectAllPages = () => {
-    setWebPages(webPages.map(p => ({...p, selected: false})));
   };
 
   return {
-    sourceUrl,
-    setSourceUrl,
+    url,
+    setUrl,
     autoSync,
     setAutoSync,
+    isLoading,
+    view,
     webPages,
-    sitemapDialogOpen,
-    setSitemapDialogOpen,
-    loading,
-    handleReset,
-    handleFetchSitemap,
-    handleSubmit,
-    toggleWebPageSelection,
-    selectAllPages,
-    deselectAllPages
+    selectedPageUrls,
+    handleUrlSubmit,
+    handleSelectionToggle,
+    handleToggleAll,
+    handleConfirmSelection,
+    resetState
   };
 };
