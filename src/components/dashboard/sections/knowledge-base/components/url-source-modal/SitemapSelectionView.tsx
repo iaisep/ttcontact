@@ -7,23 +7,25 @@ import { WebPage } from '../../types';
 
 interface SitemapSelectionViewProps {
   webPages: WebPage[];
-  sourceUrl: string;
+  selectedPageUrls: string[];
+  onSelectionToggle: (pageUrl: string) => void;
+  onToggleAll: () => void;
+  isLoading: boolean;
   autoSync: boolean;
-  onAutoSyncChange: (checked: boolean) => void;
-  onTogglePageSelection: (index: number) => void;
-  onSelectAll: () => void;
-  onDeselectAll: () => void;
+  setAutoSync: (checked: boolean) => void;
 }
 
 const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   webPages,
-  sourceUrl,
+  selectedPageUrls,
+  onSelectionToggle,
+  onToggleAll,
+  isLoading,
   autoSync,
-  onAutoSyncChange,
-  onTogglePageSelection,
-  onSelectAll,
-  onDeselectAll
+  setAutoSync
 }) => {
+  const allSelected = webPages.length > 0 && selectedPageUrls.length === webPages.length;
+
   return (
     <div className="space-y-4">
       <div className="border rounded-md divide-y max-h-[300px] overflow-y-auto">
@@ -32,20 +34,20 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
             No pages found in the sitemap.
           </div>
         ) : (
-          webPages.map((page, index) => (
+          webPages.map((page) => (
             <div 
               key={page.url}
               className="flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer"
-              onClick={() => onTogglePageSelection(index)}
+              onClick={() => onSelectionToggle(page.url)}
             >
               <div className="flex items-center gap-2">
                 <Checkbox 
-                  checked={page.selected}
-                  onCheckedChange={() => onTogglePageSelection(index)}
-                  id={`page-${index}`}
+                  checked={selectedPageUrls.includes(page.url)}
+                  onCheckedChange={() => onSelectionToggle(page.url)}
+                  id={`page-${page.url}`}
                 />
                 <Label 
-                  htmlFor={`page-${index}`}
+                  htmlFor={`page-${page.url}`}
                   className="text-sm cursor-pointer"
                 >
                   {page.title || page.url}
@@ -61,24 +63,17 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
       
       <div className="flex items-center justify-between">
         <div className="text-sm">
-          {webPages.filter(p => p.selected).length} of {webPages.length} pages selected
+          {selectedPageUrls.length} of {webPages.length} pages selected
         </div>
         <div className="flex gap-2">
           <Button 
             type="button" 
             variant="outline" 
             size="sm"
-            onClick={onDeselectAll}
+            onClick={onToggleAll}
+            disabled={webPages.length === 0}
           >
-            Deselect All
-          </Button>
-          <Button 
-            type="button" 
-            variant="outline" 
-            size="sm"
-            onClick={onSelectAll}
-          >
-            Select All
+            {allSelected ? "Deselect All" : "Select All"}
           </Button>
         </div>
       </div>
@@ -87,7 +82,7 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
         <Checkbox 
           id="sitemap-auto-sync" 
           checked={autoSync}
-          onCheckedChange={(checked) => onAutoSyncChange(checked === true)}
+          onCheckedChange={(checked) => setAutoSync(checked === true)}
         />
         <Label htmlFor="sitemap-auto-sync" className="text-sm cursor-pointer">
           Auto sync web pages every 24 hours
