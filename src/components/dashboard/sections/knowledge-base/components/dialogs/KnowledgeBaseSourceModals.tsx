@@ -19,6 +19,8 @@ interface KnowledgeBaseSourceModalsProps {
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
   currentKnowledgeBase: KnowledgeBase | null;
   knowledgeBaseName?: string;
+  // Add an optional callback to close parent dialogs after successful submission
+  onSourceAddSuccess?: () => void;
 }
 
 const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
@@ -33,11 +35,27 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
   onDeleteSource,
   onFetchSitemap,
   currentKnowledgeBase,
-  knowledgeBaseName
+  knowledgeBaseName,
+  onSourceAddSuccess
 }) => {
   // Handler for closing all source modals
   const handleCloseModal = () => {
     setCurrentSourceType(null);
+  };
+
+  // Handler for successful URL source addition
+  const handleUrlSourceAddSuccess = async (kbId: string, sourceType: 'url' | 'file' | 'text', sourceData: any) => {
+    try {
+      const result = await onAddUrlSource(sourceData.url, sourceData.autoSync, sourceData.webPages);
+      // Close the parent dialog if callback is provided
+      if (onSourceAddSuccess) {
+        onSourceAddSuccess();
+      }
+      return result;
+    } catch (error) {
+      console.error('Error in URL source add:', error);
+      throw error;
+    }
   };
 
   return (
@@ -48,7 +66,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
         onClose={handleCloseModal}
         onAddSource={(kbId, sourceType, sourceData) => {
           if (sourceType === 'url') {
-            return onAddUrlSource(sourceData.url, sourceData.autoSync, sourceData.webPages);
+            return handleUrlSourceAddSuccess(kbId, sourceType, sourceData);
           }
           throw new Error('Invalid source type in URL modal');
         }}

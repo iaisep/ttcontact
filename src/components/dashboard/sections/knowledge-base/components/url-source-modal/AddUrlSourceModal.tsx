@@ -11,13 +11,13 @@ import { KnowledgeBase, WebPage } from '../../types';
 interface AddUrlSourceModalProps {
   open: boolean;
   onClose: () => void;
-  onOpenChange?: (open: boolean) => void; // Added this prop
+  onOpenChange?: (open: boolean) => void;
   onAddSource: (
     kbId: string,
     sourceType: 'url' | 'file' | 'text',
     sourceData: any
   ) => Promise<KnowledgeBase>;
-  onFetchSitemap: (url: string) => Promise<any[]>;
+  onFetchSitemap: (url: string) => Promise<WebPage[]>;
   currentKnowledgeBase?: KnowledgeBase | null;
   knowledgeBaseName?: string;
 }
@@ -55,30 +55,27 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   } = useUrlSourceModal({
     onFetchSitemap,
     onSubmit: async (url, autoSync, selectedPages) => {
-      // Pass the knowledge base name explicitly
-      const result = await handleUrlSourceSubmit(
-        url, 
-        autoSync, 
-        selectedPages, 
-        currentKnowledgeBase,
-        knowledgeBaseName
-      );
-      onClose();
-      resetState();
-      return result;
+      try {
+        // Pass the knowledge base name explicitly
+        const result = await handleUrlSourceSubmit(
+          url, 
+          autoSync, 
+          selectedPages, 
+          currentKnowledgeBase,
+          knowledgeBaseName
+        );
+        // Close the modal immediately after successful submission
+        onClose();
+        resetState();
+        return result;
+      } catch (error) {
+        console.error('Error submitting URL source:', error);
+        throw error;
+      }
     },
     currentKnowledgeBase,
     knowledgeBaseName
   });
-
-  // Log state for debugging
-  useEffect(() => {
-    console.log('AddUrlSourceModal - current URL:', url);
-    console.log('AddUrlSourceModal - view state:', view);
-    console.log('AddUrlSourceModal - selected pages count:', selectedPageUrls.length);
-    console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase);
-    console.log('AddUrlSourceModal - knowledge base name:', knowledgeBaseName);
-  }, [open, currentKnowledgeBase, knowledgeBaseName, url, view, selectedPageUrls]);
 
   // Clean up state when modal is closed
   useEffect(() => {
