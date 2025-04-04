@@ -86,7 +86,7 @@ export const useSourceApi = () => {
       console.log("Adding text content with title:", sourceData.fileName);
       
       // Call the API endpoint with JSON for text sources
-      const response = await fetchWithAuth(`/kb/add-sources`, {
+      const response = await fetchWithAuth(`/add-knowledge-base-sources/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
