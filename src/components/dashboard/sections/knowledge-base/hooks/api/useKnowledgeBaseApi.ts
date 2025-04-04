@@ -148,7 +148,7 @@ export const useKnowledgeBaseApi = () => {
         method: 'POST',
         headers: {
           'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'multipart/form-data; boundary=----'
+          'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
         },
         body: formData,
       });
@@ -238,7 +238,7 @@ export const useKnowledgeBaseApi = () => {
           method: 'POST',
           headers: {
             'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'multipart/form-data; boundary=----'
+            'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
           },
           body: formData,
         });
@@ -260,7 +260,7 @@ export const useKnowledgeBaseApi = () => {
           method: 'POST',
           headers: {
             'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'multipart/form-data; boundary=----'
+            'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
           },
           body: formData,
         });
@@ -285,7 +285,7 @@ export const useKnowledgeBaseApi = () => {
           method: 'POST',
           headers: {
             'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'multipart/form-data; boundary=----'
+            'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
           },
           body: formData,
         });
@@ -341,7 +341,7 @@ export const useKnowledgeBaseApi = () => {
         method: 'POST',
         headers: {
           'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'multipart/form-data; boundary=----'
+          'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
         },
         body: formData,
       });
@@ -387,7 +387,7 @@ export const useKnowledgeBaseApi = () => {
         method: 'POST',
         headers: {
           'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'multipart/form-data; boundary=----'
+          'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
         },
         body: formData,
       });
