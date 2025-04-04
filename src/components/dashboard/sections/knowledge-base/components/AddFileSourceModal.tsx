@@ -17,12 +17,14 @@ interface AddFileSourceModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (file: File) => Promise<KnowledgeBase>;
+  currentKnowledgeBase: KnowledgeBase | null;
 }
 
 const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
   open,
   onOpenChange,
-  onSubmit
+  onSubmit,
+  currentKnowledgeBase
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -65,6 +67,12 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
         </DialogHeader>
         
         <div className="space-y-4">
+          {currentKnowledgeBase && (
+            <div className="text-sm text-muted-foreground mb-2">
+              Adding file to: <span className="font-medium">{currentKnowledgeBase.name}</span>
+            </div>
+          )}
+          
           <div className="grid gap-2">
             <Label htmlFor="file">Select File</Label>
             <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-6">

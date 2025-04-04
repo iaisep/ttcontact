@@ -18,12 +18,14 @@ interface AddTextSourceModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (fileName: string, content: string) => Promise<KnowledgeBase>;
+  currentKnowledgeBase: KnowledgeBase | null;
 }
 
 const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
   open,
   onOpenChange,
-  onSubmit
+  onSubmit,
+  currentKnowledgeBase
 }) => {
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
@@ -62,6 +64,12 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
         </DialogHeader>
         
         <div className="space-y-4">
+          {currentKnowledgeBase && (
+            <div className="text-sm text-muted-foreground mb-2">
+              Adding text to: <span className="font-medium">{currentKnowledgeBase.name}</span>
+            </div>
+          )}
+          
           <div className="grid gap-2">
             <Label htmlFor="fileName">File Name</Label>
             <Input
