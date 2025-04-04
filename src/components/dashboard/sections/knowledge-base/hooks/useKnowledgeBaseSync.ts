@@ -26,6 +26,9 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
           // Use the correct API endpoint format and payload structure
           await fetchWithAuth(`/kb/${kb.id}/refresh`, {
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ 
               website_url: source.url 
             }),
@@ -53,9 +56,13 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
         formattedUrl = `https://${formattedUrl}`;
       }
       
-      // Call the actual API endpoint (corrected endpoint)
+      // Call the actual API endpoint with the correct format
       const response = await fetchWithAuth('/list-sitemap', {
         method: 'POST',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ website_url: formattedUrl }),
       });
       

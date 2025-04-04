@@ -13,19 +13,25 @@ export const useSitemapApi = () => {
       setLoading(true);
       console.log('Fetching sitemap for URL:', url);
       
-      const formData = new FormData();
-      formData.append('website_url', url);
+      // Format the URL if needed
+      let formattedUrl = url.trim();
+      if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+        formattedUrl = `https://${formattedUrl}`;
+      }
       
+      // Make the API call with the correct format
       const response = await fetchWithAuth('/list-sitemap', {
         method: 'POST',
         headers: {
           'Accept': 'application/json, text/plain, */*',
           'Content-Type': 'application/json'
         },
-        body: formData,
+        body: JSON.stringify({ website_url: formattedUrl }),
       });
       
-      if (response && response.pages) {
+      console.log('Sitemap API response:', response);
+      
+      if (response && response.pages && Array.isArray(response.pages)) {
         return response.pages.map((page: any) => ({
           url: page.url,
           title: page.title || page.url,
@@ -33,19 +39,20 @@ export const useSitemapApi = () => {
         }));
       }
       
+      // Fallback to mock data if response is invalid
       const mockPages: WebPage[] = [
         {
-          url: `${url}/page1`,
+          url: `${formattedUrl}/page1`,
           title: 'Page 1',
           selected: true
         },
         {
-          url: `${url}/page2`,
+          url: `${formattedUrl}/page2`,
           title: 'Page 2',
           selected: true
         },
         {
-          url: `${url}/page3`,
+          url: `${formattedUrl}/page3`,
           title: 'Page 3',
           selected: true
         }
