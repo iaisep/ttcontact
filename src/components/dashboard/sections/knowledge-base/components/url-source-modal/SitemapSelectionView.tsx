@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { WebPage, KnowledgeBase } from '../../types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Info } from 'lucide-react';
 
 interface SitemapSelectionViewProps {
   webPages: WebPage[];
@@ -17,6 +17,7 @@ interface SitemapSelectionViewProps {
   onCancel: () => void;
   onConfirm: () => Promise<void>;
   currentKnowledgeBase?: KnowledgeBase | null;
+  knowledgeBaseName?: string;
 }
 
 const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
@@ -29,7 +30,8 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   setAutoSync,
   onCancel,
   onConfirm,
-  currentKnowledgeBase
+  currentKnowledgeBase,
+  knowledgeBaseName
 }) => {
   // Check if all pages are selected
   const allSelected = webPages.length > 0 && selectedPageUrls.length === webPages.length;
@@ -45,6 +47,7 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
 
   // Debug logging for improved visibility
   console.log('Sitemap selection view - current knowledge base:', currentKnowledgeBase);
+  console.log('Sitemap selection view - knowledge base name:', knowledgeBaseName);
   console.log('Sitemap selection view - selected URLs count:', selectedPageUrls.length);
 
   // Check if we have a valid knowledge base
@@ -53,6 +56,13 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
 
   return (
     <div className="space-y-4">
+      {knowledgeBaseName && (
+        <div className="flex items-center gap-2 p-2 bg-blue-50 text-blue-700 rounded-md mb-2">
+          <Info className="h-4 w-4" />
+          <span className="text-sm">Adding to knowledge base: <strong>{knowledgeBaseName}</strong></span>
+        </div>
+      )}
+      
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <Checkbox 
@@ -118,11 +128,7 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
         </label>
       </div>
 
-      {currentKnowledgeBase ? (
-        <div className="text-sm text-gray-500">
-          Adding to knowledge base: <span className="font-medium">{currentKnowledgeBase.name}</span>
-        </div>
-      ) : (
+      {!knowledgeBaseSelected && !knowledgeBaseName && (
         <div className="flex items-center text-sm text-amber-600 bg-amber-50 p-2 rounded-md">
           <AlertCircle className="h-4 w-4 mr-2" />
           No knowledge base selected
@@ -142,6 +148,7 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
           onClick={() => {
             console.log('Save button clicked with selected pages:', selectedPageUrls);
             console.log('Current knowledge base:', currentKnowledgeBase);
+            console.log('Knowledge base name:', knowledgeBaseName);
             if (!currentKnowledgeBase) {
               console.error('No knowledge base selected, cannot proceed');
               return;

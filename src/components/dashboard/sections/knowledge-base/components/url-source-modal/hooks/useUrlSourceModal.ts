@@ -7,9 +7,15 @@ interface UseUrlSourceModalProps {
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
   onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<KnowledgeBase>;
   currentKnowledgeBase?: KnowledgeBase | null;
+  knowledgeBaseName?: string;
 }
 
-export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBase }: UseUrlSourceModalProps) => {
+export const useUrlSourceModal = ({ 
+  onFetchSitemap, 
+  onSubmit, 
+  currentKnowledgeBase,
+  knowledgeBaseName
+}: UseUrlSourceModalProps) => {
   const [url, setUrl] = useState('');
   const [autoSync, setAutoSync] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,6 +57,7 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBa
       const formattedUrl = formatUrl(url);
       
       console.log('Fetching sitemap for URL:', formattedUrl);
+      console.log('Using knowledge base:', currentKnowledgeBase?.id, knowledgeBaseName);
       
       // Fetch sitemap from the URL
       const pages = await onFetchSitemap(formattedUrl);
@@ -129,10 +136,11 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBa
         autoSync,
         selectedPages,
         selectedUrls: selectedPageUrls,
-        knowledgeBase: currentKnowledgeBase
+        knowledgeBase: currentKnowledgeBase,
+        knowledgeBaseName
       });
       
-      // Call the API with the selected pages
+      // Call the API with the selected pages and knowledge base info
       await onSubmit(url, autoSync, selectedPages);
       
       toast.success('URL source added successfully');

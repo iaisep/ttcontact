@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
-import AddUrlSourceModal from '../url-source-modal/AddUrlSourceModal';
+import AddUrlSourceModal from '../AddUrlSourceModal';
 import AddFileSourceModal from '../AddFileSourceModal';
 import AddTextSourceModal from '../AddTextSourceModal';
 import SourceDeleteDialog from '../SourceDeleteDialog';
@@ -18,6 +18,7 @@ interface KnowledgeBaseSourceModalsProps {
   onDeleteSource: () => Promise<KnowledgeBase>;
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
   currentKnowledgeBase: KnowledgeBase | null;
+  knowledgeBaseName?: string;
 }
 
 const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
@@ -31,48 +32,55 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
   onAddTextSource,
   onDeleteSource,
   onFetchSitemap,
-  currentKnowledgeBase
+  currentKnowledgeBase,
+  knowledgeBaseName
 }) => {
-  console.log('KnowledgeBaseSourceModals - current KB:', currentKnowledgeBase);
-  
+  // Handler for closing all source modals
+  const handleCloseModal = () => {
+    setCurrentSourceType(null);
+  };
+
   return (
     <>
+      {/* URL Source Modal */}
       <AddUrlSourceModal
         open={currentSourceType === 'url'}
-        onOpenChange={(open) => !open && setCurrentSourceType(null)}
-        onSubmit={async (url, autoSync, selectedPages) => {
-          return await onAddUrlSource(url, autoSync, selectedPages);
+        onOpenChange={(open) => {
+          if (!open) handleCloseModal();
         }}
+        onSubmit={onAddUrlSource}
         onFetchSitemap={onFetchSitemap}
+        currentKnowledgeBase={currentKnowledgeBase}
+        knowledgeBaseName={knowledgeBaseName}
+      />
+
+      {/* File Source Modal */}
+      <AddFileSourceModal
+        open={currentSourceType === 'file'}
+        onOpenChange={(open) => {
+          if (!open) handleCloseModal();
+        }}
+        onSubmit={onAddFileSource}
         currentKnowledgeBase={currentKnowledgeBase}
       />
 
-      <AddFileSourceModal
-        open={currentSourceType === 'file'}
-        onOpenChange={(open) => !open && setCurrentSourceType(null)}
-        onSubmit={async (file) => {
-          return await onAddFileSource(file);
-        }}
-      />
-
+      {/* Text Source Modal */}
       <AddTextSourceModal
         open={currentSourceType === 'text'}
-        onOpenChange={(open) => !open && setCurrentSourceType(null)}
-        onSubmit={async (fileName, content) => {
-          return await onAddTextSource(fileName, content);
+        onOpenChange={(open) => {
+          if (!open) handleCloseModal();
         }}
+        onSubmit={onAddTextSource}
+        currentKnowledgeBase={currentKnowledgeBase}
       />
 
-      {deleteSourceDialogOpen && (
-        <SourceDeleteDialog
-          open={deleteSourceDialogOpen}
-          onOpenChange={setDeleteSourceDialogOpen}
-          source={sourceToDelete}
-          onConfirm={async () => {
-            return await onDeleteSource();
-          }}
-        />
-      )}
+      {/* Delete Source Dialog */}
+      <SourceDeleteDialog
+        open={deleteSourceDialogOpen}
+        onOpenChange={setDeleteSourceDialogOpen}
+        source={sourceToDelete}
+        onConfirm={onDeleteSource}
+      />
     </>
   );
 };

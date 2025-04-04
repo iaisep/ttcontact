@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../types';
 import { toast } from 'sonner';
@@ -57,7 +58,7 @@ export const useKnowledgeBaseDialog = ({
 
     try {
       setAddingSource(true);
-      console.log("Adding URL source with params:", { url, autoSync, selectedPages, kbId: currentKb.id });
+      console.log("Adding URL source with params:", { url, autoSync, selectedPages, kbId: currentKb.id, kbName: currentKb.name });
       
       // Format the data according to the API requirements
       const sourceData = {
@@ -66,7 +67,8 @@ export const useKnowledgeBaseDialog = ({
         webPages: selectedPages.map(page => ({
           url: page.url,
           title: page.title
-        }))
+        })),
+        knowledgeBaseName: currentKb.name // Pass the knowledge base name
       };
       
       console.log("Sending data to API:", sourceData);
@@ -103,7 +105,10 @@ export const useKnowledgeBaseDialog = ({
       setAddingSource(true);
       console.log("Adding file source:", file.name);
       
-      const updatedKb = await onAddSource(currentKb.id, 'file', { file });
+      const updatedKb = await onAddSource(currentKb.id, 'file', { 
+        file,
+        knowledgeBaseName: currentKb.name 
+      });
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
       toast.success('File source added successfully');
@@ -127,7 +132,11 @@ export const useKnowledgeBaseDialog = ({
       setAddingSource(true);
       console.log("Adding text source:", { fileName, contentLength: content.length });
       
-      const updatedKb = await onAddSource(currentKb.id, 'text', { fileName, content });
+      const updatedKb = await onAddSource(currentKb.id, 'text', { 
+        fileName, 
+        content,
+        knowledgeBaseName: currentKb.name
+      });
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
       toast.success('Text source added successfully');

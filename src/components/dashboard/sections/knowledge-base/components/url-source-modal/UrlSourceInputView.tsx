@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Link, AlertCircle } from 'lucide-react';
+import { Link, AlertCircle, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface UrlSourceInputViewProps {
@@ -12,6 +12,7 @@ interface UrlSourceInputViewProps {
   error: string | null;
   onSubmit: () => Promise<void>;
   onCancel: () => void;
+  knowledgeBaseName?: string;
 }
 
 const UrlSourceInputView: React.FC<UrlSourceInputViewProps> = ({
@@ -20,10 +21,18 @@ const UrlSourceInputView: React.FC<UrlSourceInputViewProps> = ({
   isLoading,
   error,
   onSubmit,
-  onCancel
+  onCancel,
+  knowledgeBaseName
 }) => {
   return (
     <div className="space-y-4">
+      {knowledgeBaseName && (
+        <div className="flex items-center gap-2 p-2 bg-blue-50 text-blue-700 rounded-md mb-2">
+          <Info className="h-4 w-4" />
+          <span className="text-sm">Adding to knowledge base: <strong>{knowledgeBaseName}</strong></span>
+        </div>
+      )}
+      
       <div>
         <h3 className="text-base font-medium mb-2">URL Address</h3>
         <div className="flex gap-2 items-center">

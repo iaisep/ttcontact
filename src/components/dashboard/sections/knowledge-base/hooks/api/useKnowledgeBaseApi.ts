@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
@@ -216,7 +215,8 @@ export const useKnowledgeBaseApi = () => {
       };
       
       if (sourceType === 'url') {
-        requestData.knowledge_base_name = `KB with URLs`;
+        const knowledgeBaseName = sourceData.knowledgeBaseName || `KB with URLs`;
+        requestData.knowledge_base_name = knowledgeBaseName;
         requestData.knowledge_base_texts = [];
         
         if (sourceData.webPages && Array.isArray(sourceData.webPages)) {
@@ -229,7 +229,6 @@ export const useKnowledgeBaseApi = () => {
         
         console.log('Adding URL sources with requestData:', requestData);
         
-        // Make the actual API call to create/update knowledge base with URLs
         const response = await fetchWithAuth(apiEndpoint, {
           method: 'POST',
           body: JSON.stringify(requestData),
@@ -244,7 +243,6 @@ export const useKnowledgeBaseApi = () => {
         // Implementation specific to your API
       }
       
-      // Create a mock/returned source
       const newSource = {
         id: `src_${Date.now()}`,
         type: sourceType,
@@ -259,7 +257,6 @@ export const useKnowledgeBaseApi = () => {
         auto_sync: sourceType === 'url' ? sourceData.autoSync : undefined
       };
       
-      // Create a mock updated knowledge base object
       const updatedKb: KnowledgeBase = {
         id: kbId,
         name: requestData.knowledge_base_name || "Knowledge Base",
@@ -285,7 +282,6 @@ export const useKnowledgeBaseApi = () => {
       setLoading(true);
       console.log('Fetching sitemap for URL:', url);
       
-      // Call the actual API endpoint (corrected endpoint)
       const response = await fetchWithAuth('/list-sitemap', {
         method: 'POST',
         body: JSON.stringify({ website_url: url }),
@@ -299,7 +295,6 @@ export const useKnowledgeBaseApi = () => {
         }));
       }
       
-      // Fallback mock data for development
       const mockPages: WebPage[] = [
         {
           url: `${url}/page1`,

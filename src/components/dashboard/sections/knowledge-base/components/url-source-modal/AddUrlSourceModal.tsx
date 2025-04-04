@@ -18,6 +18,7 @@ interface AddUrlSourceModalProps {
   onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<KnowledgeBase>;
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
   currentKnowledgeBase?: KnowledgeBase | null;
+  knowledgeBaseName?: string;
 }
 
 const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
@@ -25,7 +26,8 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   onOpenChange,
   onSubmit,
   onFetchSitemap,
-  currentKnowledgeBase
+  currentKnowledgeBase,
+  knowledgeBaseName
 }) => {
   const {
     url,
@@ -45,7 +47,8 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   } = useUrlSourceModal({
     onFetchSitemap,
     onSubmit,
-    currentKnowledgeBase
+    currentKnowledgeBase,
+    knowledgeBaseName
   });
 
   const handleCloseModal = () => {
@@ -60,6 +63,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   console.log('AddUrlSourceModal - view state:', view);
   console.log('AddUrlSourceModal - selected pages count:', selectedPageUrls.length);
   console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase?.id);
+  console.log('AddUrlSourceModal - knowledge base name:', knowledgeBaseName);
 
   return (
     <Dialog 
@@ -94,6 +98,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
               error={error}
               onSubmit={handleUrlSubmit}
               onCancel={handleCloseModal}
+              knowledgeBaseName={knowledgeBaseName}
             />
           ) : (
             <SitemapSelectionView 
@@ -107,6 +112,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
               onCancel={handleCloseModal}
               onConfirm={handleConfirmSelection}
               currentKnowledgeBase={currentKnowledgeBase}
+              knowledgeBaseName={knowledgeBaseName}
             />
           )}
         </div>

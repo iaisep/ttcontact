@@ -76,6 +76,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   });
 
   const [showSourceMenu, setShowSourceMenu] = useState(false);
+  const [knowledgeBaseName, setKnowledgeBaseName] = useState('');
 
   const form = useForm({
     defaultValues: {
@@ -100,10 +101,22 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   useEffect(() => {
     if (knowledgeBase) {
       form.setValue('name', knowledgeBase.name || '');
+      setKnowledgeBaseName(knowledgeBase.name || '');
     } else {
       form.setValue('name', '');
+      setKnowledgeBaseName('');
     }
   }, [knowledgeBase, form]);
+
+  // Track form value changes
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (value.name !== undefined) {
+        setKnowledgeBaseName(value.name);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   const handleSubmit = async (data: { name: string }) => {
     try {
@@ -322,6 +335,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         onDeleteSource={handleDeleteSource}
         onFetchSitemap={onFetchSitemap}
         currentKnowledgeBase={currentKb}
+        knowledgeBaseName={knowledgeBaseName}
       />
     </>
   );
