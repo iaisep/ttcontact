@@ -10,7 +10,11 @@ export const useKnowledgeBaseApi = () => {
   const fetchKnowledgeBases = async () => {
     setLoading(true);
     try {
-      const response = await fetchWithAuth('/list-knowledge-bases');
+      const response = await fetchWithAuth('/list-knowledge-bases', {
+        headers: {
+          'Accept': 'application/json, text/plain, */*'
+        }
+      });
       console.log('Knowledge base response:', response);
       
       const transformedData = response.map((kb: any) => ({
@@ -142,6 +146,9 @@ export const useKnowledgeBaseApi = () => {
       
       const response = await fetchWithAuth('/create-knowledge-base', {
         method: 'POST',
+        headers: {
+          'Accept': 'application/json, text/plain, */*'
+        },
         body: formData,
       });
       
@@ -228,6 +235,9 @@ export const useKnowledgeBaseApi = () => {
         
         const response = await fetchWithAuth(apiEndpoint, {
           method: 'POST',
+          headers: {
+            'Accept': 'application/json, text/plain, */*'
+          },
           body: formData,
         });
         
