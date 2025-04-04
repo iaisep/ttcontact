@@ -28,7 +28,7 @@ const AddUrlSourceModal = ({
   onSourceAddSuccess
 }: AddUrlSourceModalProps) => {
   // Use our custom hook for source operations
-  const { handleUrlSourceSubmit } = useSourceOperations({
+  const { handleAddUrlSource } = useSourceOperations({
     onAddSource
   });
 
@@ -53,7 +53,7 @@ const AddUrlSourceModal = ({
     onSubmit: async (url, autoSync, selectedPages) => {
       try {
         // Pass the knowledge base name explicitly
-        const result = await handleUrlSourceSubmit(
+        const result = await handleAddUrlSource(
           url, 
           autoSync, 
           selectedPages, 

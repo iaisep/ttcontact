@@ -35,6 +35,15 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
   const sources = knowledgeBase?.sources || [];
   const autoSync = knowledgeBase?.auto_sync || false;
 
+  const getSourceTitle = (source: KnowledgeBaseSource) => {
+    if (source.type === 'url') {
+      return source.url || 'URL Source';
+    } else {
+      // Use file_name instead of filename
+      return source.file_name || 'File Source';
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -76,7 +85,7 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                     <span className="font-medium truncate max-w-[200px]">
-                      {source.type === 'url' ? source.url : source.filename}
+                      {getSourceTitle(source)}
                     </span>
                   </div>
                   <div className="flex items-center space-x-1">
