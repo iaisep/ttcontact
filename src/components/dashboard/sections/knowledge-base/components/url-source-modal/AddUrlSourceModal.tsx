@@ -5,10 +5,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogFooter
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 import { WebPage } from '../../types';
 import { useUrlSourceModal } from './hooks/useUrlSourceModal';
 import UrlSourceInputView from './UrlSourceInputView';
@@ -56,58 +54,40 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
         }
       }}
     >
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Add Web Pages</DialogTitle>
-          <DialogDescription>
-            Import content from web pages to enhance your knowledge base.
-          </DialogDescription>
+      <DialogContent className="sm:max-w-[600px] p-0">
+        <DialogHeader className="p-4 border-b">
+          <DialogTitle className="text-xl font-medium">
+            {view === 'url-input' ? 'Add Web Pages' : 'Select Site Maps'}
+          </DialogTitle>
+          <button
+            onClick={() => onOpenChange(false)}
+            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none"
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </button>
         </DialogHeader>
         
-        {view === 'url-input' ? (
-          <UrlSourceInputView 
-            url={url}
-            setUrl={setUrl}
-            isLoading={isLoading}
-            onSubmit={handleUrlSubmit}
-          />
-        ) : (
-          <SitemapSelectionView 
-            webPages={webPages}
-            selectedPageUrls={selectedPageUrls}
-            onSelectionToggle={handleSelectionToggle}
-            onToggleAll={handleToggleAll}
-            isLoading={isLoading}
-            autoSync={autoSync}
-            setAutoSync={setAutoSync}
-          />
-        )}
-        
-        <DialogFooter>
-          <Button 
-            type="button" 
-            variant="outline"
-            onClick={() => {
-              if (view === 'sitemap-selection') {
-                resetState();
-              } else {
-                onOpenChange(false);
-              }
-            }}
-            disabled={isLoading}
-          >
-            {view === 'sitemap-selection' ? 'Back' : 'Cancel'}
-          </Button>
-          {view === 'sitemap-selection' && (
-            <Button
-              type="button"
-              onClick={handleConfirmSelection}
-              disabled={isLoading || selectedPageUrls.length === 0}
-            >
-              {isLoading ? 'Adding...' : 'Add Selected'}
-            </Button>
+        <div className="p-6">
+          {view === 'url-input' ? (
+            <UrlSourceInputView 
+              url={url}
+              setUrl={setUrl}
+              isLoading={isLoading}
+              onSubmit={handleUrlSubmit}
+            />
+          ) : (
+            <SitemapSelectionView 
+              webPages={webPages}
+              selectedPageUrls={selectedPageUrls}
+              onSelectionToggle={handleSelectionToggle}
+              onToggleAll={handleToggleAll}
+              isLoading={isLoading}
+              autoSync={autoSync}
+              setAutoSync={setAutoSync}
+            />
           )}
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -2,9 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Search } from 'lucide-react';
+import { Link } from 'lucide-react';
 
 interface UrlSourceInputViewProps {
   url: string;
@@ -21,27 +19,34 @@ const UrlSourceInputView: React.FC<UrlSourceInputViewProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <div className="grid gap-2">
-        <Label htmlFor="url">Website URL</Label>
+      <div>
+        <h3 className="text-base font-medium mb-2">URL Address</h3>
         <div className="flex gap-2">
           <Input
-            id="url"
-            placeholder="https://example.com"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://example.com"
             className="flex-1"
           />
-          <Button 
-            type="button"
-            onClick={onSubmit}
-            disabled={!url || isLoading}
-          >
-            <Search className="h-4 w-4 mr-1" /> Scan
-          </Button>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Enter the root URL of the website to scan its sitemap.
-        </p>
+      </div>
+      
+      <div className="flex justify-end gap-2 mt-4">
+        <Button 
+          variant="outline" 
+          onClick={() => onSubmit()} 
+          disabled={isLoading || !url}
+          className="w-20"
+        >
+          Cancel
+        </Button>
+        <Button 
+          onClick={() => onSubmit()} 
+          disabled={isLoading || !url}
+          className="w-20 bg-black text-white hover:bg-black/80"
+        >
+          Save
+        </Button>
       </div>
     </div>
   );
