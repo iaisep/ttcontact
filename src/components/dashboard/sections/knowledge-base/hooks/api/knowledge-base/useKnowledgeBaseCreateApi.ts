@@ -5,7 +5,7 @@ import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase } from '../../../types';
 
 export const useKnowledgeBaseCreateApi = () => {
-  const { fetchWithAuth } = useApiContext();
+  const { fetchWithAuth, baseURL } = useApiContext();
   const [loading, setLoading] = useState(false);
 
   const createKnowledgeBase = async (nameOrData: string | { 
@@ -72,7 +72,7 @@ export const useKnowledgeBaseCreateApi = () => {
       };
       
       // Make the request using fetch directly to ensure exact format
-      const response = await fetch(`${fetchWithAuth.baseURL || 'https://api.retellai.com'}/create-knowledge-base`, {
+      const response = await fetch(`${baseURL}/create-knowledge-base`, {
         method: 'POST',
         headers,
         body: formDataString,

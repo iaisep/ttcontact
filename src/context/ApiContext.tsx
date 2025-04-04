@@ -2,12 +2,18 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { toast } from 'sonner';
 
+// Extend the function type to include baseURL property
+interface FetchWithAuthFunction extends Function {
+  (endpoint: string, options?: RequestInit): Promise<any>;
+  baseURL?: string;
+}
+
 interface ApiContextType {
   apiKey: string;
   baseURL: string;
   setApiKey: (key: string) => void;
   setBaseURL: (url: string) => void;
-  fetchWithAuth: (endpoint: string, options?: RequestInit) => Promise<any>;
+  fetchWithAuth: FetchWithAuthFunction;
   login: (email: string, password: string) => Promise<boolean>;
   register: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
@@ -27,7 +33,8 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
     localStorage.getItem('auth_token') !== null
   );
 
-  const fetchWithAuth = async (endpoint: string, options?: RequestInit) => {
+  // Define fetchWithAuth as a FetchWithAuthFunction
+  const fetchWithAuth: FetchWithAuthFunction = async (endpoint: string, options?: RequestInit) => {
     try {
       const url = `${baseURL}${endpoint}`;
       
@@ -65,7 +72,7 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
     }
   };
   
-  // Add baseURL property to fetchWithAuth to make it accessible in other functions
+  // Add baseURL property to fetchWithAuth
   fetchWithAuth.baseURL = baseURL;
 
   const login = async (email: string, password: string): Promise<boolean> => {
