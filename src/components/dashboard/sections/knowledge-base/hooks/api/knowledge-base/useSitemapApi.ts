@@ -20,7 +20,7 @@ export const useSitemapApi = () => {
         method: 'POST',
         headers: {
           'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary6LtSoBCD0u4vEY2L'
+          'Content-Type': 'application/json'
         },
         body: formData,
       });
