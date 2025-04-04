@@ -1,4 +1,3 @@
-
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -17,45 +16,49 @@ export const useSourceApi = () => {
       webPages?: WebPage[]
     }
   ) => {
+    console.log(`API call: Adding ${sourceType} source to KB ${kbId}:`, sourceData);
+    
     // Prepare request data based on source type
     let requestData: any = {
       knowledge_base_id: kbId
     };
     
     if (sourceType === 'url') {
-      console.log("Processing URL source data:", sourceData);
-      
       // Format URLs according to the API documentation
+      const urls = [];
+      
+      // Extract URLs from the webPages array if available
       if (sourceData.webPages && sourceData.webPages.length > 0) {
-        // If specific webPages are selected
-        const selectedUrls = sourceData.webPages
-          .filter(page => page.selected)
-          .map(page => page.url);
-          
-        console.log("Selected URLs:", selectedUrls);
-        
-        if (selectedUrls.length > 0) {
-          requestData.knowledge_base_urls = selectedUrls;
-          requestData.enable_auto_refresh = !!sourceData.autoSync;
-        }
+        urls.push(...sourceData.webPages.map(page => page.url));
       } else if (sourceData.url) {
-        // Single URL
-        requestData.knowledge_base_urls = [sourceData.url];
+        // Otherwise use the main URL
+        urls.push(sourceData.url);
+      }
+      
+      // Add URLs to the request
+      if (urls.length > 0) {
+        requestData.knowledge_base_urls = urls;
         requestData.enable_auto_refresh = !!sourceData.autoSync;
       }
       
-      console.log("Final URL request data:", requestData);
+      console.log('API call data for URL source:', requestData);
       
-      // Call the API endpoint with JSON for URL sources
-      const response = await fetchWithAuth(`/add-knowledge-base-sources`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
-      
-      return response;
+      try {
+        // Call the API endpoint for URL sources
+        const response = await fetchWithAuth(`/kb/add-sources`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData),
+        });
+        
+        console.log('API response for URL source:', response);
+        return response;
+      } catch (error) {
+        console.error('API error adding URL source:', error);
+        throw error;
+      }
       
     } else if (sourceType === 'file' && sourceData.file) {
       // Format file data - using FormData
@@ -66,7 +69,7 @@ export const useSourceApi = () => {
       console.log("Uploading file:", sourceData.file.name, "to KB:", kbId);
       
       // Special case for file uploads - use FormData
-      const response = await fetchWithAuth(`/add-knowledge-base-sources`, {
+      const response = await fetchWithAuth(`/kb/add-sources`, {
         method: 'POST',
         body: formData,
       });
@@ -82,7 +85,7 @@ export const useSourceApi = () => {
       console.log("Adding text content with title:", sourceData.fileName);
       
       // Call the API endpoint with JSON for text sources
-      const response = await fetchWithAuth(`/add-knowledge-base-sources`, {
+      const response = await fetchWithAuth(`/kb/add-sources`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +102,7 @@ export const useSourceApi = () => {
   const deleteSourceApi = async (kbId: string, sourceId: string) => {
     console.log(`Deleting source ${sourceId} from KB ${kbId}`);
     
-    return await fetchWithAuth(`/delete-knowledge-base-source/${kbId}/source/${sourceId}`, {
+    return await fetchWithAuth(`/kb/${kbId}/sources/${sourceId}`, {
       method: 'DELETE',
     });
   };
@@ -117,27 +120,24 @@ export const useSourceApi = () => {
     }
   ): KnowledgeBaseSource | null => {
     if (sourceType === 'url') {
-      // If we have selected web pages, use them to create multiple sources
+      // If we have web pages, use them to create mock sources
       if (sourceData.webPages && sourceData.webPages.length > 0) {
-        const selectedPages = sourceData.webPages.filter(p => p.selected);
-        if (selectedPages.length > 0) {
-          // Return the first selected page as a source
-          return {
-            id: `src_url_${Date.now()}`,
-            type: 'url',
-            title: selectedPages[0].title || selectedPages[0].url,
-            url: selectedPages[0].url,
-            created_at: new Date().toISOString(),
-            auto_sync: sourceData.autoSync
-          };
-        }
+        // Return the first page as a source
+        return {
+          id: `src_url_${Date.now()}`,
+          type: 'url',
+          title: sourceData.webPages[0].title || 'Website',
+          url: sourceData.webPages[0].url,
+          created_at: new Date().toISOString(),
+          auto_sync: sourceData.autoSync
+        };
       }
       
       // Fallback to single URL
       return {
         id: `src_url_${Date.now()}`,
         type: 'url',
-        title: sourceData.url || 'Website',
+        title: 'Website',
         url: sourceData.url,
         created_at: new Date().toISOString(),
         auto_sync: sourceData.autoSync

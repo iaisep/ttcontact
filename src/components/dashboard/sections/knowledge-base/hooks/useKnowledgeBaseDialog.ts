@@ -50,7 +50,10 @@ export const useKnowledgeBaseDialog = ({
   };
 
   const handleAddUrlSource = async (url: string, autoSync: boolean, selectedPages: WebPage[]) => {
-    if (!currentKb) return;
+    if (!currentKb) {
+      console.error('No current knowledge base');
+      return;
+    }
 
     try {
       setAddingSource(true);
@@ -66,9 +69,17 @@ export const useKnowledgeBaseDialog = ({
         }))
       };
       
+      // Call the API to add the source to the knowledge base
       const updatedKb = await onAddSource(currentKb.id, 'url', sourceData);
+      
+      console.log("URL source added, updated KB:", updatedKb);
+      
+      // Update the current knowledge base state with the response
       setCurrentKb(updatedKb);
+      
+      // Close the URL source modal
       setCurrentSourceType(null);
+      
       toast.success('URL source added successfully');
     } catch (error) {
       console.error('Failed to add URL source:', error);
@@ -144,6 +155,8 @@ export const useKnowledgeBaseDialog = ({
 
   const handleKnowledgeBaseSave = async (data: { name: string }, onSave: (data: { name: string }) => Promise<void>): Promise<boolean> => {
     try {
+      console.log("Saving knowledge base with data:", data);
+      
       // Call the API with the provided data
       await onSave(data);
       

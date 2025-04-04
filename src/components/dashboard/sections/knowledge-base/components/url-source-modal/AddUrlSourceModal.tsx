@@ -51,6 +51,11 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
     }
   };
 
+  // Ensure the URL is properly passed from the input view to the selection view
+  console.log('AddUrlSourceModal - current URL:', url);
+  console.log('AddUrlSourceModal - view state:', view);
+  console.log('AddUrlSourceModal - selected pages:', selectedPageUrls);
+
   return (
     <Dialog 
       open={open} 

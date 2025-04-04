@@ -107,6 +107,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
 
   const handleSubmit = async (data: { name: string }) => {
     try {
+      console.log('Saving knowledge base with name:', data.name);
       const success = await handleKnowledgeBaseSave(data, onSave);
       if (success) {
         form.reset();

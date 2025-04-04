@@ -36,14 +36,21 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
         formattedUrl = `https://${formattedUrl}`;
       }
       
+      console.log('Fetching sitemap for URL:', formattedUrl);
+      
       // Fetch sitemap from the URL
       const pages = await onFetchSitemap(formattedUrl);
+      
+      console.log('Fetched pages:', pages);
       
       // Update state with fetched pages
       setWebPages(pages);
       
       // Pre-select all pages by default
       setSelectedPageUrls(pages.map(page => page.url));
+      
+      // Update the URL state with the formatted URL
+      setUrl(formattedUrl);
       
       // Switch to sitemap selection view
       setView('sitemap-selection');
@@ -75,7 +82,10 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
   };
 
   const handleConfirmSelection = async () => {
-    if (selectedPageUrls.length === 0) return;
+    if (selectedPageUrls.length === 0) {
+      console.warn('No pages selected, cannot proceed');
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -85,6 +95,7 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
         selectedPageUrls.includes(page.url)
       );
       
+      console.log('Confirming selection for URL:', url);
       console.log('Submitting selected pages:', {
         url,
         autoSync,

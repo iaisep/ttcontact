@@ -37,8 +37,12 @@ export const useSourceManagement = (
       setIsProcessing(true);
       setLoading(true);
       
+      console.log(`Adding ${sourceType} source to KB ${kbId}:`, sourceData);
+      
       // Call the API endpoint
       const response = await addSourceToKnowledgeBaseApi(kbId, sourceType, sourceData);
+      
+      console.log(`API response for adding ${sourceType} source:`, response);
       
       // Find and update the KB in the local state
       const kb = knowledgeBases.find(kb => kb.id === kbId);
