@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { File, X } from 'lucide-react';
 import { KnowledgeBase } from '../types';
+import { toast } from 'sonner';
 
 interface AddFileSourceModalProps {
   open: boolean;
@@ -27,10 +28,19 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
   currentKnowledgeBase
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleReset = () => {
     setSelectedFile(null);
+    setIsSubmitting(false);
   };
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (!open) {
+      handleReset();
+    }
+  }, [open]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -42,11 +52,16 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
     if (!selectedFile) return;
     
     try {
+      setIsSubmitting(true);
       await onSubmit(selectedFile);
       handleReset();
+      toast.success('File source added successfully');
       onOpenChange(false);
     } catch (error) {
-      console.error(error);
+      console.error('Failed to add file source:', error);
+      toast.error('Failed to add file source');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -54,8 +69,10 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
     <Dialog 
       open={open} 
       onOpenChange={(open) => {
-        onOpenChange(open);
-        if (!open) handleReset();
+        if (!isSubmitting) {
+          onOpenChange(open);
+          if (!open) handleReset();
+        }
       }}
     >
       <DialogContent className="sm:max-w-[500px]">
@@ -91,6 +108,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
                     variant="ghost" 
                     size="icon"
                     onClick={() => setSelectedFile(null)}
+                    disabled={isSubmitting}
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -106,6 +124,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
                     variant="outline" 
                     size="sm"
                     onClick={() => document.getElementById('file')?.click()}
+                    disabled={isSubmitting}
                   >
                     Select File
                   </Button>
@@ -126,15 +145,16 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
               handleReset();
               onOpenChange(false);
             }}
+            disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button 
             type="button"
             onClick={handleSubmit}
-            disabled={!selectedFile}
+            disabled={!selectedFile || isSubmitting}
           >
-            Upload
+            {isSubmitting ? 'Uploading...' : 'Upload'}
           </Button>
         </DialogFooter>
       </DialogContent>

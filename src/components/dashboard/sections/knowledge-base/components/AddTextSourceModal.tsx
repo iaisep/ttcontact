@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { KnowledgeBase } from '../types';
+import { toast } from 'sonner';
 
 interface AddTextSourceModalProps {
   open: boolean;
@@ -29,21 +30,35 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
 }) => {
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleReset = () => {
     setFileName('');
     setContent('');
+    setIsSubmitting(false);
   };
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (!open) {
+      handleReset();
+    }
+  }, [open]);
 
   const handleSubmit = async () => {
     if (!fileName || !content) return;
     
     try {
+      setIsSubmitting(true);
       await onSubmit(fileName, content);
       handleReset();
+      toast.success('Text source added successfully');
       onOpenChange(false);
     } catch (error) {
-      console.error(error);
+      console.error('Failed to add text source:', error);
+      toast.error('Failed to add text source');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -51,8 +66,10 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
     <Dialog 
       open={open} 
       onOpenChange={(open) => {
-        onOpenChange(open);
-        if (!open) handleReset();
+        if (!isSubmitting) { 
+          onOpenChange(open);
+          if (!open) handleReset();
+        }
       }}
     >
       <DialogContent className="sm:max-w-[600px]">
@@ -100,15 +117,16 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
               handleReset();
               onOpenChange(false);
             }}
+            disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button
             type="button"
             onClick={handleSubmit}
-            disabled={!fileName || !content}
+            disabled={!fileName || !content || isSubmitting}
           >
-            Save
+            {isSubmitting ? 'Saving...' : 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>
