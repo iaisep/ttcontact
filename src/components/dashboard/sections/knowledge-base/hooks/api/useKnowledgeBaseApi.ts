@@ -185,50 +185,6 @@ export const useKnowledgeBaseApi = () => {
     }
   };
 
-  const updateKnowledgeBase = async (kb: KnowledgeBase) => {
-    try {
-      setLoading(true);
-      
-      const updateData = {
-        knowledge_base_id: kb.id,
-        knowledge_base_name: kb.name,
-        enable_auto_refresh: kb.auto_sync
-      };
-      
-      await fetchWithAuth(`/add-knowledge-base-sources/${kb.id}`, {
-        method: 'POST',
-        body: JSON.stringify(updateData),
-      });
-      
-      toast.success('Knowledge base updated');
-      return kb;
-    } catch (error) {
-      console.error('Failed to update knowledge base:', error);
-      toast.error('Failed to update knowledge base');
-      
-      return kb;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteKnowledgeBase = async (kbId: string) => {
-    try {
-      setLoading(true);
-      
-      await fetchWithAuth(`/delete-knowledge-base/${kbId}`, {
-        method: 'DELETE',
-      });
-      
-      toast.success('Knowledge base deleted');
-    } catch (error) {
-      console.error('Failed to delete knowledge base:', error);
-      toast.error('Failed to delete knowledge base');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const addSourceToKnowledgeBase = async (
     kbId: string,
     sourceType: 'url' | 'file' | 'text',
@@ -238,22 +194,20 @@ export const useKnowledgeBaseApi = () => {
       setLoading(true);
       
       let apiEndpoint = '/create-knowledge-base';
-      let requestData: any = {
-        knowledge_base_id: kbId,
-      };
+      let requestData: any = {};
       
       if (sourceType === 'url') {
         const knowledgeBaseName = sourceData.knowledgeBaseName || `KB with URLs`;
-        requestData.knowledge_base_name = knowledgeBaseName;
-        requestData.knowledge_base_texts = [];
         
-        if (sourceData.webPages && Array.isArray(sourceData.webPages)) {
-          requestData.knowledge_base_urls = sourceData.webPages.map((page: WebPage) => page.url);
-        } else {
-          requestData.knowledge_base_urls = [sourceData.url];
-        }
-        
-        requestData.enable_auto_refresh = sourceData.autoSync || false;
+        requestData = {
+          knowledge_base_id: kbId,
+          knowledge_base_name: knowledgeBaseName,
+          knowledge_base_texts: [],
+          knowledge_base_urls: sourceData.webPages && Array.isArray(sourceData.webPages) 
+            ? sourceData.webPages.map((page: WebPage) => page.url) 
+            : [sourceData.url],
+          enable_auto_refresh: sourceData.autoSync || false
+        };
         
         console.log('Adding URL sources with requestData:', requestData);
         
@@ -300,6 +254,50 @@ export const useKnowledgeBaseApi = () => {
       console.error(`Failed to add ${sourceType} source:`, error);
       toast.error(`Failed to add ${sourceType} source`);
       throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateKnowledgeBase = async (kb: KnowledgeBase) => {
+    try {
+      setLoading(true);
+      
+      const updateData = {
+        knowledge_base_id: kb.id,
+        knowledge_base_name: kb.name,
+        enable_auto_refresh: kb.auto_sync
+      };
+      
+      await fetchWithAuth(`/add-knowledge-base-sources/${kb.id}`, {
+        method: 'POST',
+        body: JSON.stringify(updateData),
+      });
+      
+      toast.success('Knowledge base updated');
+      return kb;
+    } catch (error) {
+      console.error('Failed to update knowledge base:', error);
+      toast.error('Failed to update knowledge base');
+      
+      return kb;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteKnowledgeBase = async (kbId: string) => {
+    try {
+      setLoading(true);
+      
+      await fetchWithAuth(`/delete-knowledge-base/${kbId}`, {
+        method: 'DELETE',
+      });
+      
+      toast.success('Knowledge base deleted');
+    } catch (error) {
+      console.error('Failed to delete knowledge base:', error);
+      toast.error('Failed to delete knowledge base');
     } finally {
       setLoading(false);
     }
