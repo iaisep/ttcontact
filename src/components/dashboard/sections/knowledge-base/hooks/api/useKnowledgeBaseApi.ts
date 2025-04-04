@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
-import { KnowledgeBase } from '../../types';
+import { KnowledgeBase, WebPage } from '../../types';
 
 export const useKnowledgeBaseApi = () => {
   const { fetchWithAuth } = useApiContext();
@@ -11,11 +10,9 @@ export const useKnowledgeBaseApi = () => {
   const fetchKnowledgeBases = async () => {
     setLoading(true);
     try {
-      // Use the real API endpoint
       const response = await fetchWithAuth('/list-knowledge-bases');
       console.log('Knowledge base response:', response);
       
-      // Transform API response to match our KnowledgeBase type if needed
       const transformedData = response.map((kb: any) => ({
         id: kb.knowledge_base_id || kb.id,
         name: kb.knowledge_base_name || kb.name,
@@ -39,7 +36,6 @@ export const useKnowledgeBaseApi = () => {
       console.error('Failed to fetch knowledge bases:', error);
       toast.error('Failed to fetch knowledge bases');
       
-      // Return mock data for development fallback
       return getMockKnowledgeBases();
     } finally {
       setLoading(false);
@@ -113,7 +109,6 @@ export const useKnowledgeBaseApi = () => {
     try {
       setLoading(true);
       
-      // Format the request data according to the API requirements
       const requestData = {
         knowledge_base_name: name,
         knowledge_base_texts: [],
@@ -123,7 +118,6 @@ export const useKnowledgeBaseApi = () => {
       
       console.log('Creating knowledge base with data:', requestData);
       
-      // Call the actual API endpoint
       const response = await fetchWithAuth('/create-knowledge-base', {
         method: 'POST',
         body: JSON.stringify(requestData),
@@ -131,7 +125,6 @@ export const useKnowledgeBaseApi = () => {
       
       console.log('Knowledge base creation response:', response);
       
-      // Map the response to our KnowledgeBase type
       const createdKb: KnowledgeBase = {
         id: response.knowledge_base_id,
         name: response.knowledge_base_name,
@@ -148,7 +141,6 @@ export const useKnowledgeBaseApi = () => {
       console.error('Failed to create knowledge base:', error);
       toast.error('Failed to create knowledge base');
       
-      // Fallback for development - create mock KB
       const newKb: KnowledgeBase = {
         id: `kb_${Date.now()}`,
         name,
@@ -169,14 +161,12 @@ export const useKnowledgeBaseApi = () => {
     try {
       setLoading(true);
       
-      // Format the data for the API
       const updateData = {
         knowledge_base_id: kb.id,
         knowledge_base_name: kb.name,
         enable_auto_refresh: kb.auto_sync
       };
       
-      // Call the actual API endpoint (when available)
       await fetchWithAuth(`/update-knowledge-base/${kb.id}`, {
         method: 'PUT',
         body: JSON.stringify(updateData),
@@ -188,7 +178,6 @@ export const useKnowledgeBaseApi = () => {
       console.error('Failed to update knowledge base:', error);
       toast.error('Failed to update knowledge base');
       
-      // Fallback for development
       return kb;
     } finally {
       setLoading(false);
@@ -199,7 +188,6 @@ export const useKnowledgeBaseApi = () => {
     try {
       setLoading(true);
       
-      // Call the actual API endpoint
       await fetchWithAuth(`/delete-knowledge-base/${kbId}`, {
         method: 'DELETE',
       });
@@ -221,50 +209,51 @@ export const useKnowledgeBaseApi = () => {
     try {
       setLoading(true);
       
-      let apiEndpoint = '';
-      let requestData = {};
+      let apiEndpoint = '/create-knowledge-base';
+      let requestData: any = {
+        knowledge_base_id: kbId,
+      };
       
       if (sourceType === 'url') {
-        apiEndpoint = '/add-url-source';
-        requestData = {
-          knowledge_base_id: kbId,
-          url: sourceData.url,
-          enable_auto_refresh: sourceData.autoSync,
-          selected_pages: sourceData.webPages || []
-        };
-      } else if (sourceType === 'file') {
-        apiEndpoint = '/add-file-source';
-        // Handle file upload
-        const formData = new FormData();
-        formData.append('file', sourceData.file);
-        formData.append('knowledge_base_id', kbId);
+        requestData.knowledge_base_name = `KB with URLs`;
+        requestData.knowledge_base_texts = [];
         
-        // Custom handling for file upload would go here
+        if (sourceData.webPages && Array.isArray(sourceData.webPages)) {
+          requestData.knowledge_base_urls = sourceData.webPages.map((page: WebPage) => page.url);
+        } else {
+          requestData.knowledge_base_urls = [sourceData.url];
+        }
+        
+        requestData.enable_auto_refresh = sourceData.autoSync || false;
+      } else if (sourceType === 'file') {
+        requestData.knowledge_base_name = `KB with File`;
+        requestData.knowledge_base_files = [sourceData.file];
+        requestData.knowledge_base_texts = [];
+        requestData.knowledge_base_urls = [];
       } else if (sourceType === 'text') {
-        apiEndpoint = '/add-text-source';
-        requestData = {
-          knowledge_base_id: kbId,
-          filename: sourceData.fileName,
-          content: sourceData.content
-        };
+        requestData.knowledge_base_name = `KB with Text`;
+        requestData.knowledge_base_texts = [{
+          text: sourceData.content,
+          title: sourceData.fileName,
+        }];
+        requestData.knowledge_base_urls = [];
       }
       
       console.log(`Adding ${sourceType} source to KB ${kbId}:`, requestData);
       
-      // In a real implementation, you would call the API here
-      // For now, we'll just return a mock response
+      const kb = knowledgeBases.find(k => k.id === kbId);
       
-      // Get the current KB
-      const kb = await fetchWithAuth(`/get-knowledge-base/${kbId}`);
+      if (!kb) {
+        throw new Error(`Knowledge base with ID ${kbId} not found`);
+      }
       
-      // Mock data for development
       const newSource = {
         id: `src_${Date.now()}`,
         type: sourceType,
         title: sourceType === 'url' 
-          ? sourceData.url 
+          ? (sourceData.webPages && sourceData.webPages.length > 0 ? sourceData.webPages[0].title : sourceData.url) 
           : (sourceType === 'file' ? sourceData.file.name : sourceData.fileName),
-        url: sourceType === 'url' ? sourceData.url : undefined,
+        url: sourceType === 'url' ? (sourceData.webPages && sourceData.webPages.length > 0 ? sourceData.webPages[0].url : sourceData.url) : undefined,
         file_name: sourceType === 'file' ? sourceData.file.name : 
                   (sourceType === 'text' ? sourceData.fileName : undefined),
         content: sourceType === 'text' ? sourceData.content : undefined,
@@ -288,6 +277,39 @@ export const useKnowledgeBaseApi = () => {
     }
   };
 
+  const fetchSitemap = async (url: string): Promise<WebPage[]> => {
+    try {
+      setLoading(true);
+      console.log('Fetching sitemap for URL:', url);
+      
+      const mockPages: WebPage[] = [
+        {
+          url: `${url}/page1`,
+          title: 'Page 1',
+          selected: true
+        },
+        {
+          url: `${url}/page2`,
+          title: 'Page 2',
+          selected: true
+        },
+        {
+          url: `${url}/page3`,
+          title: 'Page 3',
+          selected: true
+        }
+      ];
+      
+      return mockPages;
+    } catch (error) {
+      console.error('Failed to fetch sitemap:', error);
+      toast.error('Failed to fetch sitemap');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     setLoading,
@@ -296,6 +318,7 @@ export const useKnowledgeBaseApi = () => {
     createKnowledgeBase,
     updateKnowledgeBase,
     deleteKnowledgeBase,
-    addSourceToKnowledgeBase
+    addSourceToKnowledgeBase,
+    fetchSitemap
   };
 };

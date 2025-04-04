@@ -62,6 +62,16 @@ const KnowledgeBaseSection: React.FC = () => {
       console.log('Saving knowledge base with name:', data.name);
       
       if (isCreating) {
+        // Format the request data according to the API requirements
+        const requestData = {
+          knowledge_base_name: data.name,
+          knowledge_base_texts: [],
+          knowledge_base_urls: [],
+          enable_auto_refresh: false
+        };
+        
+        console.log('Creating knowledge base with data:', requestData);
+        
         const newKb = await createKnowledgeBase(data.name);
         console.log('Created new knowledge base:', newKb);
         // No cerramos el diálogo aquí para permitir añadir fuentes
@@ -105,7 +115,32 @@ const KnowledgeBaseSection: React.FC = () => {
     sourceData: any
   ) => {
     try {
-      const updatedKb = await addSourceToKnowledgeBase(kbId, sourceType, sourceData);
+      console.log(`Adding ${sourceType} source to KB ${kbId}:`, sourceData);
+      
+      // Prepare the request data based on the source type
+      let requestData: any = {};
+      
+      if (sourceType === 'url') {
+        // Handle URL source
+        requestData = {
+          url: sourceData.url,
+          autoSync: sourceData.autoSync,
+          webPages: sourceData.selectedPages || []
+        };
+      } else if (sourceType === 'file') {
+        // Handle file source
+        requestData = {
+          file: sourceData
+        };
+      } else if (sourceType === 'text') {
+        // Handle text source
+        requestData = {
+          fileName: sourceData.fileName,
+          content: sourceData.content
+        };
+      }
+      
+      const updatedKb = await addSourceToKnowledgeBase(kbId, sourceType, requestData);
       toast.success(`${sourceType} source added successfully`);
       return updatedKb;
     } catch (error) {

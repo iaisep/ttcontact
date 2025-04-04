@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
-import { KnowledgeBase, WebPage } from '../types';
-import { useKnowledgeBaseApi } from './api/useKnowledgeBaseApi';
+import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../types';
 import { toast } from 'sonner';
 
 export const useKnowledgeBaseSources = (
@@ -9,77 +8,129 @@ export const useKnowledgeBaseSources = (
   setKnowledgeBases: React.Dispatch<React.SetStateAction<KnowledgeBase[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const { addSourceToKnowledgeBase } = useKnowledgeBaseApi();
-
-  const addSource = async (
+  // Add a URL source to a knowledge base
+  const addSourceToKnowledgeBase = async (
     kbId: string,
     sourceType: 'url' | 'file' | 'text',
     sourceData: any
-  ) => {
+  ): Promise<KnowledgeBase> => {
     try {
-      setIsProcessing(true);
       setLoading(true);
-
-      // Call the API function to add the source
-      const updatedKb = await addSourceToKnowledgeBase(kbId, sourceType, sourceData);
+      console.log(`Adding ${sourceType} source to KB ${kbId}:`, sourceData);
       
-      // Update the knowledge bases list with the updated knowledge base
-      setKnowledgeBases(prevKbs => 
-        prevKbs.map(kb => kb.id === kbId ? updatedKb : kb)
-      );
+      // Find the knowledge base to update
+      const kb = knowledgeBases.find(kb => kb.id === kbId);
+      if (!kb) {
+        throw new Error(`Knowledge base with ID ${kbId} not found`);
+      }
       
+      // Create the new sources based on the source type
+      let newSources: KnowledgeBaseSource[] = [];
+      
+      if (sourceType === 'url') {
+        if (sourceData.webPages && Array.isArray(sourceData.webPages)) {
+          // Create a source for each web page
+          newSources = sourceData.webPages.map((page: WebPage) => ({
+            id: `src_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            type: 'url',
+            title: page.title || page.url,
+            url: page.url,
+            created_at: new Date().toISOString(),
+            auto_sync: sourceData.autoSync
+          }));
+        } else {
+          // Create a single source for the URL
+          newSources = [{
+            id: `src_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            type: 'url',
+            title: new URL(sourceData.url).hostname,
+            url: sourceData.url,
+            created_at: new Date().toISOString(),
+            auto_sync: sourceData.autoSync
+          }];
+        }
+      } else if (sourceType === 'file') {
+        newSources = [{
+          id: `src_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          type: 'file',
+          title: sourceData.file.name,
+          file_name: sourceData.file.name,
+          created_at: new Date().toISOString()
+        }];
+      } else if (sourceType === 'text') {
+        newSources = [{
+          id: `src_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          type: 'text',
+          title: sourceData.fileName,
+          content: sourceData.content,
+          created_at: new Date().toISOString()
+        }];
+      }
+      
+      // Update the knowledge base with the new sources
+      const updatedKb = {
+        ...kb,
+        sources: [...kb.sources, ...newSources],
+        source_count: kb.source_count + newSources.length,
+        auto_sync: sourceType === 'url' ? sourceData.autoSync : kb.auto_sync
+      };
+      
+      // Update the knowledgeBases state
+      setKnowledgeBases(knowledgeBases.map(item => 
+        item.id === kbId ? updatedKb : item
+      ));
+      
+      console.log(`Added ${newSources.length} ${sourceType} sources to KB ${kbId}`, updatedKb);
       return updatedKb;
     } catch (error) {
-      console.error(`Failed to add ${sourceType} source:`, error);
+      console.error(`Error adding ${sourceType} source:`, error);
       toast.error(`Failed to add ${sourceType} source`);
       throw error;
     } finally {
-      setIsProcessing(false);
       setLoading(false);
     }
   };
 
-  const deleteSource = async (kbId: string, sourceId: string) => {
+  // Delete a source from a knowledge base
+  const deleteSource = async (kbId: string, sourceId: string): Promise<KnowledgeBase> => {
     try {
-      setIsProcessing(true);
       setLoading(true);
       
-      // Find the knowledge base
+      // Find the knowledge base and remove the source
       const kb = knowledgeBases.find(kb => kb.id === kbId);
       if (!kb) {
-        throw new Error('Knowledge base not found');
+        throw new Error(`Knowledge base with ID ${kbId} not found`);
       }
       
-      // Remove the source from the knowledge base
       const updatedSources = kb.sources.filter(source => source.id !== sourceId);
       
-      // Create the updated knowledge base
+      // Check if any URL sources remain for auto_sync
+      const hasUrlSources = updatedSources.some(source => source.type === 'url');
+      
       const updatedKb = {
         ...kb,
         sources: updatedSources,
-        source_count: updatedSources.length
+        source_count: updatedSources.length,
+        auto_sync: hasUrlSources ? kb.auto_sync : false
       };
       
-      // Update the knowledge bases list
-      setKnowledgeBases(prevKbs => 
-        prevKbs.map(kb => kb.id === kbId ? updatedKb : kb)
-      );
+      // Update the knowledgeBases state
+      setKnowledgeBases(knowledgeBases.map(item => 
+        item.id === kbId ? updatedKb : item
+      ));
       
       return updatedKb;
     } catch (error) {
-      console.error('Failed to delete source:', error);
+      console.error('Error deleting source:', error);
       toast.error('Failed to delete source');
       throw error;
     } finally {
-      setIsProcessing(false);
       setLoading(false);
     }
   };
 
   return {
-    addSourceToKnowledgeBase: addSource,
-    deleteSource,
-    isProcessing
+    addSourceToKnowledgeBase,
+    deleteSource
   };
 };

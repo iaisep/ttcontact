@@ -85,6 +85,13 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
         selectedPageUrls.includes(page.url)
       );
       
+      console.log('Submitting selected pages:', {
+        url,
+        autoSync,
+        selectedPages,
+        selectedUrls: selectedPageUrls
+      });
+      
       // Submit the selected pages
       await onSubmit(url, autoSync, selectedPages);
       

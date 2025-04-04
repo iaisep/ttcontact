@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { WebPage } from '../../types';
+import { Globe, Check } from 'lucide-react';
 
 interface SitemapSelectionViewProps {
   webPages: WebPage[];
@@ -29,110 +30,90 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
 }) => {
   const groupedPages = webPages.reduce((acc, page) => {
     const domain = new URL(page.url).hostname;
-    
     if (!acc[domain]) {
       acc[domain] = [];
     }
-    
     acc[domain].push(page);
     return acc;
   }, {} as Record<string, WebPage[]>);
 
-  const domains = Object.keys(groupedPages);
-  const totalPagesCount = webPages.length;
+  const allSelected = selectedPageUrls.length === webPages.length;
+  const someSelected = selectedPageUrls.length > 0 && selectedPageUrls.length < webPages.length;
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-medium">Select Site Maps</h2>
-      
-      <div className="flex items-center justify-between mb-2">
+      {/* Header with select all checkbox */}
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Checkbox 
             id="select-all" 
-            checked={selectedPageUrls.length === totalPagesCount && totalPagesCount > 0}
+            checked={allSelected}
+            indeterminate={someSelected && !allSelected}
             onCheckedChange={() => onToggleAll()}
           />
-          <label htmlFor="select-all" className="text-sm font-medium">
-            Select All ({totalPagesCount})
+          <label 
+            htmlFor="select-all" 
+            className="text-sm font-medium cursor-pointer"
+          >
+            {allSelected ? 'Deselect All' : 'Select All'} ({webPages.length} pages)
           </label>
         </div>
-        <div className="text-blue-600 text-sm">
-          Selected({selectedPageUrls.length})
+        <div className="text-sm text-gray-500">
+          {selectedPageUrls.length} selected
         </div>
       </div>
       
-      <div className="border rounded-md max-h-[300px] overflow-y-auto">
-        {domains.length === 0 ? (
-          <div className="p-4 text-center text-sm text-muted-foreground">
-            No pages found in the sitemap.
-          </div>
-        ) : (
-          <div className="divide-y">
-            {domains.map(domain => (
-              <div key={domain} className="py-2 px-3">
-                <div className="flex items-center mb-2">
-                  <button 
-                    className="flex items-center gap-1 text-sm font-medium"
-                    onClick={() => {/* Toggle domain expand/collapse */}}
+      {/* List of domains and their pages */}
+      <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+        {Object.entries(groupedPages).map(([domain, pages]) => (
+          <div key={domain} className="space-y-2">
+            <h3 className="text-sm font-medium">{domain}</h3>
+            <div className="space-y-1">
+              {pages.map((page) => (
+                <div 
+                  key={page.url} 
+                  className={`
+                    flex items-center p-2 rounded-md 
+                    ${selectedPageUrls.includes(page.url) ? 'bg-gray-100' : 'hover:bg-gray-50'}
+                  `}
+                >
+                  <Checkbox 
+                    id={`page-${page.url}`}
+                    checked={selectedPageUrls.includes(page.url)}
+                    onCheckedChange={() => onSelectionToggle(page.url)}
+                    className="mr-2"
+                  />
+                  <label 
+                    htmlFor={`page-${page.url}`}
+                    className="flex flex-1 cursor-pointer items-center"
                   >
-                    <span>▾</span> {/* This is the expand/collapse icon */}
-                    <Checkbox 
-                      checked={groupedPages[domain].every(page => 
-                        selectedPageUrls.includes(page.url)
-                      )}
-                      onCheckedChange={() => {
-                        // Select/deselect all pages in this domain
-                        const allSelected = groupedPages[domain].every(
-                          page => selectedPageUrls.includes(page.url)
-                        );
-                        
-                        if (allSelected) {
-                          // Deselect all in this domain
-                          groupedPages[domain].forEach(page => {
-                            if (selectedPageUrls.includes(page.url)) {
-                              onSelectionToggle(page.url);
-                            }
-                          });
-                        } else {
-                          // Select all in this domain
-                          groupedPages[domain].forEach(page => {
-                            if (!selectedPageUrls.includes(page.url)) {
-                              onSelectionToggle(page.url);
-                            }
-                          });
-                        }
-                      }}
-                    />
-                    <span className="ml-2">{domain} ({groupedPages[domain].length})</span>
-                  </button>
-                </div>
-                
-                <div className="ml-6 space-y-1">
-                  {groupedPages[domain].map(page => (
-                    <div 
-                      key={page.url}
-                      className="flex items-center py-1"
-                    >
-                      <Checkbox 
-                        checked={selectedPageUrls.includes(page.url)}
-                        onCheckedChange={() => onSelectionToggle(page.url)}
-                        id={`page-${page.url}`}
-                      />
-                      <label 
-                        htmlFor={`page-${page.url}`}
-                        className="ml-2 text-sm cursor-pointer truncate"
-                      >
-                        {page.url}
-                      </label>
+                    <div className="flex items-center">
+                      <Globe className="h-4 w-4 mr-2 text-gray-400" />
+                      <div className="text-sm truncate max-w-[380px]" title={page.url}>
+                        {page.title || page.url}
+                      </div>
                     </div>
-                  ))}
+                  </label>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        )}
+        ))}
       </div>
       
+      {/* Auto-sync option */}
+      <div className="flex items-center space-x-2 pt-3 border-t">
+        <Checkbox 
+          id="auto-sync"
+          checked={autoSync}
+          onCheckedChange={(checked) => setAutoSync(checked === true)}
+        />
+        <label htmlFor="auto-sync" className="text-sm cursor-pointer">
+          Auto sync web pages every 24 hours
+        </label>
+      </div>
+      
+      {/* Footer buttons */}
       <div className="flex justify-end gap-2 mt-4">
         <Button 
           variant="outline" 
