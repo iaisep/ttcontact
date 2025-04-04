@@ -50,8 +50,12 @@ export const useKnowledgeBases = () => {
   const createKnowledgeBase = async (name: string, urls: string[] = [], autoSync: boolean = false) => {
     try {
       setLoading(true);
-      // Using the updated API function with a single object parameter
-      const newKb = await apiCreateKnowledgeBase(name, urls, autoSync);
+      // Pass parameters correctly to match API function signature
+      const newKb = await apiCreateKnowledgeBase({
+        name,
+        urls,
+        autoSync
+      });
       
       setKnowledgeBases((prev) => [...prev, newKb]);
       return newKb;
