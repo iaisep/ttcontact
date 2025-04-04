@@ -70,7 +70,7 @@ export const useSourceApi = () => {
       console.log("Uploading file:", sourceData.file.name, "to KB:", kbId);
       
       // Special case for file uploads - use FormData
-      const response = await fetchWithAuth(`/add-knowledge-base-sources`, {
+      const response = await fetchWithAuth(`/kb/add-sources`, {
         method: 'POST',
         body: formData,
       });
@@ -86,7 +86,7 @@ export const useSourceApi = () => {
       console.log("Adding text content with title:", sourceData.fileName);
       
       // Call the API endpoint with JSON for text sources
-      const response = await fetchWithAuth(`/add-knowledge-base-sources/`, {
+      const response = await fetchWithAuth(`/kb/add-sources`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

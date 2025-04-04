@@ -168,8 +168,8 @@ export const useKnowledgeBaseApi = () => {
         enable_auto_refresh: kb.auto_sync
       };
       
-      await fetchWithAuth(`/add-knowledge-base-sources/${kb.id}`, {
-        method: 'POST',
+      await fetchWithAuth(`/update-knowledge-base/${kb.id}`, {
+        method: 'PUT',
         body: JSON.stringify(updateData),
       });
       
