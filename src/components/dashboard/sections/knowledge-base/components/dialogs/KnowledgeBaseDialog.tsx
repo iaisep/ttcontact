@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Link, Upload, FileText, Plus, Trash } from 'lucide-react';
 import { X } from 'lucide-react';
+import SourcesSection from './SourcesSection';
 
 interface KnowledgeBaseDialogProps {
   open: boolean;
@@ -108,10 +109,9 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   const handleSubmit = async (data: { name: string }) => {
     try {
       console.log('Saving knowledge base with name:', data.name);
-      const success = await handleKnowledgeBaseSave(data, onSave);
-      if (success) {
-        form.reset();
-      }
+      // Modify this to handle void return type from onSave
+      await handleKnowledgeBaseSave(data, onSave);
+      form.reset();
     } catch (error) {
       console.error('Error saving knowledge base:', error);
     }
@@ -186,101 +186,15 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                     )}
                   />
                   
-                  {/* Documents Section */}
-                  <div>
-                    <h3 className="text-base font-medium mb-2">Documents</h3>
-                    
-                    <div className="relative">
-                      {/* Add Button */}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowSourceMenu(!showSourceMenu)}
-                        className="relative border border-gray-300"
-                      >
-                        <Plus className="h-4 w-4 mr-1" /> Add
-                      </Button>
-                      
-                      {/* Source Selection Menu */}
-                      {showSourceMenu && (
-                        <div className="absolute top-full left-0 mt-1 bg-white border rounded-lg shadow-lg z-10 w-64">
-                          {sourceOptions.map(option => (
-                            <div 
-                              key={option.id}
-                              className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer"
-                              onClick={() => {
-                                handleAddSourceClick(option.id as 'url' | 'file' | 'text');
-                                setShowSourceMenu(false);
-                              }}
-                            >
-                              <div className="flex-shrink-0 p-2 bg-white border rounded-full">
-                                {option.icon}
-                              </div>
-                              <div>
-                                <h4 className="font-medium">{option.title}</h4>
-                                <p className="text-xs text-gray-500">{option.description}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* List of added sources */}
-                    {currentKb && currentKb.sources.length > 0 && (
-                      <div className="mt-4 space-y-2">
-                        {currentKb.sources.map(source => (
-                          <div 
-                            key={source.id}
-                            className="flex items-center justify-between border rounded-md p-3"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="flex-shrink-0 p-1 bg-yellow-100 rounded-md">
-                                {source.type === 'url' ? (
-                                  <Link className="h-5 w-5 text-yellow-600" />
-                                ) : source.type === 'file' ? (
-                                  <FileText className="h-5 w-5 text-yellow-600" />
-                                ) : (
-                                  <FileText className="h-5 w-5 text-yellow-600" />
-                                )}
-                              </div>
-                              <div>
-                                <h4 className="text-sm font-medium">{source.title || source.url || source.file_name}</h4>
-                                <p className="text-xs text-gray-500">
-                                  {source.type === 'url' ? '1 Page' : ''}
-                                </p>
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSourceToDelete(source);
-                                setDeleteSourceDialogOpen(true);
-                              }}
-                              className="text-gray-500 hover:text-red-500"
-                            >
-                              <Trash className="h-4 w-4" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {/* Auto-sync option (only show if there are URL sources) */}
-                    {currentKb && currentKb.sources.some(s => s.type === 'url') && (
-                      <div className="flex items-center space-x-2 mt-4">
-                        <Checkbox 
-                          id="auto-sync"
-                          checked={currentKb.auto_sync}
-                          onCheckedChange={(checked) => handleAutoSyncChange(checked === true)}
-                        />
-                        <label htmlFor="auto-sync" className="text-sm cursor-pointer">
-                          Auto sync web pages every 24 hours
-                        </label>
-                      </div>
-                    )}
-                  </div>
+                  {/* Using SourcesSection component instead of inline UI */}
+                  {currentKb && (
+                    <SourcesSection 
+                      knowledgeBase={currentKb}
+                      onAddSourceClick={handleAddSourceClick}
+                      onDeleteSourceClick={setSourceToDelete}
+                      onAutoSyncChange={handleAutoSyncChange}
+                    />
+                  )}
                   
                   {/* Dialog Footer */}
                   <div className="flex justify-end gap-2 mt-6">

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../types';
 import { toast } from 'sonner';
@@ -168,7 +169,8 @@ export const useKnowledgeBaseDialog = ({
     setCurrentKb(updatedKb);
   };
 
-  const handleKnowledgeBaseSave = async (data: { name: string }, onSave: (data: { name: string }) => Promise<void>): Promise<boolean> => {
+  // Modified to return Promise<void> instead of Promise<boolean>
+  const handleKnowledgeBaseSave = async (data: { name: string }, onSave: (data: { name: string }) => Promise<void>): Promise<void> => {
     try {
       console.log("Saving knowledge base with data:", data);
       
@@ -181,12 +183,10 @@ export const useKnowledgeBaseDialog = ({
       } else {
         toast.success('Knowledge base updated successfully');
       }
-      
-      return true;
     } catch (error) {
       console.error('Error saving knowledge base:', error);
       toast.error('Failed to save knowledge base');
-      return false;
+      throw error;
     }
   };
 
