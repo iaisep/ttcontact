@@ -128,13 +128,9 @@ export const useKnowledgeBaseApi = () => {
       const formData = new FormData();
       formData.append('knowledge_base_name', name);
       
-      formData.append('knowledge_base_texts', '[]');
+      formData.append('knowledge_base_texts', JSON.stringify([]));
       
-      if (urls.length > 0) {
-        formData.append('knowledge_base_urls', JSON.stringify(urls));
-      } else {
-        formData.append('knowledge_base_urls', '[]');
-      }
+      formData.append('knowledge_base_urls', JSON.stringify(urls));
       
       formData.append('enable_auto_refresh', String(autoSync));
       
@@ -214,13 +210,14 @@ export const useKnowledgeBaseApi = () => {
         formData.append('knowledge_base_id', kbId);
         formData.append('knowledge_base_name', knowledgeBaseName);
         
-        formData.append('knowledge_base_texts', '[]');
+        formData.append('knowledge_base_texts', JSON.stringify([]));
         
         const urls = sourceData.webPages && Array.isArray(sourceData.webPages) 
           ? sourceData.webPages.map((page: WebPage) => page.url) 
           : [sourceData.url];
         
         formData.append('knowledge_base_urls', JSON.stringify(urls));
+        
         formData.append('enable_auto_refresh', String(sourceData.autoSync || false));
         
         console.log('Adding URL sources with FormData:', {
@@ -243,6 +240,16 @@ export const useKnowledgeBaseApi = () => {
         if (sourceData.file) {
           formData.append('file', sourceData.file);
         }
+        
+        formData.append('knowledge_base_texts', JSON.stringify([]));
+        formData.append('knowledge_base_urls', JSON.stringify([]));
+        
+        const response = await fetchWithAuth(apiEndpoint, {
+          method: 'POST',
+          body: formData,
+        });
+        
+        console.log('Added file source response:', response);
       } else if (sourceType === 'text') {
         formData.append('knowledge_base_id', kbId);
         const fileName = sourceData.fileName || "Text Content";
@@ -254,7 +261,16 @@ export const useKnowledgeBaseApi = () => {
         }];
         
         formData.append('knowledge_base_texts', JSON.stringify(textContent));
-        formData.append('knowledge_base_urls', '[]');
+        formData.append('knowledge_base_urls', JSON.stringify([]));
+        
+        formData.append('enable_auto_refresh', 'false');
+        
+        const response = await fetchWithAuth(apiEndpoint, {
+          method: 'POST',
+          body: formData,
+        });
+        
+        console.log('Added text source response:', response);
       }
       
       const newSource = {
@@ -298,6 +314,7 @@ export const useKnowledgeBaseApi = () => {
       const formData = new FormData();
       formData.append('knowledge_base_id', kb.id);
       formData.append('knowledge_base_name', kb.name);
+      
       formData.append('enable_auto_refresh', String(kb.auto_sync));
       
       await fetchWithAuth(`/add-knowledge-base-sources/${kb.id}`, {
