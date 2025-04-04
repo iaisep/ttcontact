@@ -74,7 +74,7 @@ const KnowledgeBaseSection: React.FC = () => {
         
         const newKb = await createKnowledgeBase(data.name);
         console.log('Created new knowledge base:', newKb);
-        // No cerramos el diálogo aquí para permitir añadir fuentes
+        // Don't close the dialog here to allow adding sources
         setCurrentKb(newKb);
         toast.success('Knowledge base created successfully');
       } else if (currentKb) {
@@ -127,12 +127,12 @@ const KnowledgeBaseSection: React.FC = () => {
         requestData = {
           url: sourceData.url,
           autoSync: sourceData.autoSync,
-          webPages: sourceData.selectedPages || []
+          webPages: sourceData.webPages || []
         };
       } else if (sourceType === 'file') {
         // Handle file source
         requestData = {
-          file: sourceData
+          file: sourceData.file
         };
       } else if (sourceType === 'text') {
         // Handle text source

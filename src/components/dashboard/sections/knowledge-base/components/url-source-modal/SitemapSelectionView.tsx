@@ -121,13 +121,13 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
         </Button>
         <Button 
           onClick={() => {
-            console.log('Confirm button clicked with selected pages:', selectedPageUrls);
+            console.log('Save button clicked with selected pages:', selectedPageUrls);
             onConfirm();
           }} 
           disabled={isLoading || selectedPageUrls.length === 0}
           className="w-20 bg-black text-white hover:bg-black/80"
         >
-          Save
+          {isLoading ? 'Saving...' : 'Save'}
         </Button>
       </div>
     </div>

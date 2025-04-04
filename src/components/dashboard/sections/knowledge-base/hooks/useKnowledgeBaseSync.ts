@@ -44,6 +44,7 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
   const fetchSitemap = async (url: string) => {
     try {
       setLoading(true);
+      console.log('Fetching sitemap for URL:', url);
       
       // Call the actual API endpoint
       const response = await fetchWithAuth('/list-sitemap', {
@@ -51,8 +52,10 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
         body: JSON.stringify({ website_url: url }),
       });
       
+      console.log('Sitemap API response:', response);
+      
       if (response && response.pages) {
-        // Return the API response
+        // Transform the API response to our WebPage format
         return response.pages.map((page: any) => ({
           url: page.url,
           title: page.title || page.url,
@@ -61,6 +64,7 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
       }
       
       // Fallback mock data for development
+      console.log('Using fallback mock data for sitemap');
       const mockPages = [
         { url: `${url}/about`, title: 'About Us', selected: false },
         { url: `${url}/products`, title: 'Products', selected: false },

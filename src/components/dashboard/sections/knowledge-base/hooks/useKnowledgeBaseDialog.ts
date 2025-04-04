@@ -69,6 +69,8 @@ export const useKnowledgeBaseDialog = ({
         }))
       };
       
+      console.log("Sending data to API:", sourceData);
+      
       // Call the API to add the source to the knowledge base
       const updatedKb = await onAddSource(currentKb.id, 'url', sourceData);
       
