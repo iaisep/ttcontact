@@ -28,8 +28,8 @@ export const useKnowledgeBaseCreateApi = () => {
         autoSync = nameOrData.autoSync || false;
       }
       
-      // Make sure we have a name, but only use default if completely empty
-      const kbName = name && name.trim() !== '' ? name : 'New Knowledge Base';
+      // Make sure we have a valid name, never use default unless empty string
+      const kbName = name && name.trim() !== '' ? name.trim() : 'New Knowledge Base';
       
       console.log('Creating knowledge base with form data:', {
         name: kbName,
@@ -40,7 +40,7 @@ export const useKnowledgeBaseCreateApi = () => {
       // Create FormData object
       const formData = new FormData();
       
-      // Use the provided name or default if empty
+      // Use the provided name - this is the critical part
       formData.append('knowledge_base_name', kbName);
       formData.append('knowledge_base_texts', '[]');
       formData.append('knowledge_base_urls', JSON.stringify(urls));
@@ -62,7 +62,7 @@ export const useKnowledgeBaseCreateApi = () => {
       
       const responseData = response;
       
-      // Use the provided name for consistency, not the one returned from API
+      // Always use the provided name for consistency
       const createdKb: KnowledgeBase = {
         id: responseData.knowledge_base_id || `kb_${Date.now()}`,
         name: kbName,

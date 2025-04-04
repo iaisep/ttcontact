@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 
 interface UseUrlSourceModalProps {
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
-  onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<KnowledgeBase>;
+  onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[], knowledgeBaseName?: string) => Promise<KnowledgeBase>;
   currentKnowledgeBase?: KnowledgeBase | null;
   knowledgeBaseName?: string;
 }
@@ -143,7 +143,8 @@ export const useUrlSourceModal = ({
       });
       
       // Call the API with the selected pages and knowledge base info
-      await onSubmit(url, autoSync, selectedPages);
+      // Pass the knowledgeBaseName explicitly to ensure it gets used
+      await onSubmit(url, autoSync, selectedPages, knowledgeBaseName);
       
       toast.success('URL source added successfully');
       

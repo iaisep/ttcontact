@@ -1,34 +1,49 @@
 
-import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import React, { useEffect } from 'react';
+import { Dialog, DialogContent, DialogTitle, DialogHeader } from '@/components/ui/dialog';
 import { X } from 'lucide-react';
-import { WebPage, KnowledgeBase } from '../../types';
 import { useUrlSourceModal } from './hooks/useUrlSourceModal';
-import UrlSourceInputView from './UrlSourceInputView';
+import { useSourceOperations } from '../../hooks/useSourceOperations';
+import { KnowledgeBase } from '../../types';
+import UrlInputView from './UrlInputView';
 import SitemapSelectionView from './SitemapSelectionView';
 
 interface AddUrlSourceModalProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<KnowledgeBase>;
-  onFetchSitemap: (url: string) => Promise<WebPage[]>;
+  onClose: () => void;
+  onAddSource: (
+    kbId: string,
+    sourceType: 'url' | 'file' | 'text',
+    sourceData: any
+  ) => Promise<KnowledgeBase>;
+  onFetchSitemap: (url: string) => Promise<any[]>;
   currentKnowledgeBase?: KnowledgeBase | null;
   knowledgeBaseName?: string;
 }
 
 const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   open,
-  onOpenChange,
-  onSubmit,
+  onClose,
+  onAddSource,
   onFetchSitemap,
   currentKnowledgeBase,
   knowledgeBaseName
 }) => {
+  // Log state for debugging
+  useEffect(() => {
+    console.log('AddUrlSourceModal - current URL:', url);
+    console.log('AddUrlSourceModal - view state:', view);
+    console.log('AddUrlSourceModal - selected pages count:', selectedPageUrls.length);
+    console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase);
+    console.log('AddUrlSourceModal - knowledge base name:', knowledgeBaseName);
+  }, [open, currentKnowledgeBase, knowledgeBaseName]);
+
+  // Use our custom hook for source operations
+  const { handleUrlSourceSubmit } = useSourceOperations({
+    onAddSource,
+  });
+
+  // Use the URL source modal hook for state management and operations
   const {
     url,
     setUrl,
@@ -46,76 +61,68 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
     resetState
   } = useUrlSourceModal({
     onFetchSitemap,
-    onSubmit,
+    onSubmit: async (url, autoSync, selectedPages) => {
+      // Pass the knowledge base name explicitly
+      const result = await handleUrlSourceSubmit(
+        url, 
+        autoSync, 
+        selectedPages, 
+        currentKnowledgeBase,
+        knowledgeBaseName
+      );
+      onClose();
+      resetState();
+      return result;
+    },
     currentKnowledgeBase,
     knowledgeBaseName
   });
 
-  const handleCloseModal = () => {
-    if (!isLoading) {
-      onOpenChange(false);
-      setTimeout(() => resetState(), 300);
+  // Clean up state when modal is closed
+  useEffect(() => {
+    if (!open) {
+      resetState();
     }
-  };
-
-  // Debug logging for component state
-  console.log('AddUrlSourceModal - current URL:', url);
-  console.log('AddUrlSourceModal - view state:', view);
-  console.log('AddUrlSourceModal - selected pages count:', selectedPageUrls.length);
-  console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase?.id);
-  console.log('AddUrlSourceModal - knowledge base name:', knowledgeBaseName);
+  }, [open, resetState]);
 
   return (
-    <Dialog 
-      open={open} 
-      onOpenChange={(value) => {
-        if (!value && !isLoading) {
-          handleCloseModal();
-        }
-      }}
-    >
-      <DialogContent className="sm:max-w-[600px] p-0">
-        <DialogHeader className="p-4 border-b">
-          <DialogTitle className="text-xl font-medium">
-            {view === 'url-input' ? 'Add Web Pages' : 'Select Site Pages'}
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center justify-between">
+            <span>Add URL Source</span>
+            <X 
+              className="h-4 w-4 cursor-pointer" 
+              onClick={onClose} 
+            />
           </DialogTitle>
-          <button
-            onClick={handleCloseModal}
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none"
-            disabled={isLoading}
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </button>
         </DialogHeader>
-        
-        <div className="p-6">
-          {view === 'url-input' ? (
-            <UrlSourceInputView 
-              url={url}
-              setUrl={setUrl}
-              isLoading={isLoading}
-              error={error}
-              onSubmit={handleUrlSubmit}
-              onCancel={handleCloseModal}
-              knowledgeBaseName={knowledgeBaseName}
-            />
-          ) : (
-            <SitemapSelectionView 
-              webPages={webPages}
-              selectedPageUrls={selectedPageUrls}
-              onSelectionToggle={handleSelectionToggle}
-              onToggleAll={handleToggleAll}
-              isLoading={isLoading}
-              autoSync={autoSync}
-              setAutoSync={setAutoSync}
-              onCancel={handleCloseModal}
-              onConfirm={handleConfirmSelection}
-              currentKnowledgeBase={currentKnowledgeBase}
-              knowledgeBaseName={knowledgeBaseName}
-            />
-          )}
-        </div>
+
+        {view === 'url-input' ? (
+          <UrlInputView 
+            url={url} 
+            setUrl={setUrl} 
+            error={error} 
+            isLoading={isLoading} 
+            onSubmit={handleUrlSubmit} 
+            onCancel={onClose}
+          />
+        ) : (
+          <SitemapSelectionView 
+            url={url}
+            autoSync={autoSync}
+            setAutoSync={setAutoSync}
+            webPages={webPages}
+            selectedPageUrls={selectedPageUrls}
+            onSelectionToggle={handleSelectionToggle}
+            onToggleAll={handleToggleAll}
+            onConfirm={handleConfirmSelection}
+            onBack={() => resetState()}
+            isLoading={isLoading}
+            currentKnowledgeBase={currentKnowledgeBase}
+            knowledgeBaseName={knowledgeBaseName}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

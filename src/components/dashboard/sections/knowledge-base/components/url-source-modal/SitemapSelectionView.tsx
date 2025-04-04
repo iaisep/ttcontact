@@ -1,61 +1,49 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { WebPage, KnowledgeBase } from '../../types';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Switch } from '@/components/ui/switch';
-import { AlertCircle, Info } from 'lucide-react';
+import { Info, RefreshCw } from 'lucide-react';
+import { WebPage, KnowledgeBase } from '../../../types';
 
 interface SitemapSelectionViewProps {
+  url: string;
+  autoSync: boolean;
+  setAutoSync: (value: boolean) => void;
   webPages: WebPage[];
   selectedPageUrls: string[];
   onSelectionToggle: (pageUrl: string) => void;
   onToggleAll: () => void;
+  onConfirm: () => void;
+  onBack: () => void;
   isLoading: boolean;
-  autoSync: boolean;
-  setAutoSync: (sync: boolean) => void;
-  onCancel: () => void;
-  onConfirm: () => Promise<void>;
-  currentKnowledgeBase?: KnowledgeBase | null;
+  currentKnowledgeBase: KnowledgeBase | null;
   knowledgeBaseName?: string;
 }
 
 const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
+  url,
+  autoSync,
+  setAutoSync,
   webPages,
   selectedPageUrls,
   onSelectionToggle,
   onToggleAll,
-  isLoading,
-  autoSync,
-  setAutoSync,
-  onCancel,
   onConfirm,
+  onBack,
+  isLoading,
   currentKnowledgeBase,
   knowledgeBaseName
 }) => {
-  // Check if all pages are selected
-  const allSelected = webPages.length > 0 && selectedPageUrls.length === webPages.length;
+  useEffect(() => {
+    console.log('Sitemap selection view - current knowledge base:', currentKnowledgeBase);
+    console.log('Sitemap selection view - knowledge base name:', knowledgeBaseName);
+    console.log('Sitemap selection view - selected URLs count:', selectedPageUrls.length);
+  }, [currentKnowledgeBase, knowledgeBaseName, selectedPageUrls]);
   
-  // Check if some pages are selected (but not all)
-  const someSelected = selectedPageUrls.length > 0 && selectedPageUrls.length < webPages.length;
-
-  // Add the selected status to each web page for easier handling
-  const pagesWithSelectionStatus = webPages.map(page => ({
-    ...page,
-    selected: selectedPageUrls.includes(page.url)
-  }));
-
-  // Debug logging for improved visibility
-  console.log('Sitemap selection view - current knowledge base:', currentKnowledgeBase);
-  console.log('Sitemap selection view - knowledge base name:', knowledgeBaseName);
-  console.log('Sitemap selection view - selected URLs count:', selectedPageUrls.length);
-
-  // Determine if we can proceed with the save operation
-  // We need at least one selected page AND either a knowledge base object OR a knowledge base name
   const hasSelectedPages = selectedPageUrls.length > 0;
   const hasKnowledgeBase = !!currentKnowledgeBase?.id || !!knowledgeBaseName;
   const canProceed = hasSelectedPages && hasKnowledgeBase;
-
+  
   const displayName = knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name);
 
   return (
@@ -67,99 +55,67 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
         </div>
       )}
       
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="select-all" 
-            checked={allSelected}
-            onCheckedChange={onToggleAll}
+      <div className="flex flex-col">
+        <h3 className="font-medium text-sm mb-2">Found {webPages.length} URLs at {url}</h3>
+        
+        <div className="flex items-center mb-4">
+          <Checkbox
+            id="auto-sync"
+            checked={autoSync}
+            onCheckedChange={(checked) => setAutoSync(checked as boolean)}
           />
-          <label htmlFor="select-all" className="text-sm font-medium">
-            {allSelected ? 'Deselect All' : 'Select All'} ({selectedPageUrls.length}/{webPages.length})
+          <label htmlFor="auto-sync" className="ml-2 text-sm flex items-center gap-1">
+            <RefreshCw className="h-3.5 w-3.5" />
+            Automatically refresh content (daily)
           </label>
         </div>
-      </div>
-      
-      <div className="border rounded-md overflow-hidden">
-        <div className="max-h-60 overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Select
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  URL
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {pagesWithSelectionStatus.map((page) => (
-                <tr key={page.url} className={page.selected ? "bg-blue-50" : ""}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Checkbox 
-                      id={`page-${page.url}`} 
-                      checked={page.selected}
-                      onCheckedChange={() => onSelectionToggle(page.url)}
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="font-medium">{page.title || 'Untitled'}</div>
-                    <div className="text-gray-500 text-xs truncate max-w-xs">{page.url}</div>
-                  </td>
-                </tr>
-              ))}
-              {webPages.length === 0 && (
-                <tr>
-                  <td colSpan={2} className="px-6 py-4 text-center text-sm text-gray-500">
-                    No pages found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm font-medium">Select pages to include:</div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleAll}
+            className="text-xs"
+          >
+            {selectedPageUrls.length === webPages.length ? 'Deselect all' : 'Select all'}
+          </Button>
         </div>
-      </div>
-      
-      <div className="flex items-center space-x-2">
-        <Switch 
-          id="auto-sync"
-          checked={autoSync}
-          onCheckedChange={setAutoSync}
-        />
-        <label htmlFor="auto-sync" className="text-sm">
-          Auto sync every 24 hours
-        </label>
-      </div>
+        
+        <div className="border rounded-md max-h-60 overflow-y-auto">
+          {webPages.map((page) => (
+            <div 
+              key={page.url}
+              className="flex items-center px-3 py-2 hover:bg-gray-50 border-b last:border-b-0"
+            >
+              <Checkbox
+                id={`page-${page.url}`}
+                checked={selectedPageUrls.includes(page.url)}
+                onCheckedChange={() => onSelectionToggle(page.url)}
+              />
+              <label htmlFor={`page-${page.url}`} className="ml-2 text-sm truncate flex-grow cursor-pointer">
+                {page.title || page.url}
+              </label>
+            </div>
+          ))}
+        </div>
 
-      {!hasKnowledgeBase && (
-        <div className="flex items-center text-sm text-amber-600 bg-amber-50 p-2 rounded-md">
-          <AlertCircle className="h-4 w-4 mr-2" />
-          No knowledge base selected
+        <div className="flex justify-between mt-4 pt-4 border-t">
+          <Button
+            variant="outline"
+            onClick={onBack}
+            disabled={isLoading}
+          >
+            Back
+          </Button>
+          <Button
+            onClick={onConfirm}
+            disabled={!canProceed || isLoading}
+            className={isLoading ? 'opacity-70 cursor-not-allowed' : ''}
+          >
+            {isLoading ? 'Adding...' : 'Add to Knowledge Base'}
+          </Button>
         </div>
-      )}
-      
-      <div className="flex justify-end gap-2 mt-4">
-        <Button 
-          variant="outline" 
-          onClick={onCancel} 
-          disabled={isLoading}
-          className="w-20"
-        >
-          Cancel
-        </Button>
-        <Button 
-          onClick={() => {
-            console.log('Save button clicked with selected pages:', selectedPageUrls);
-            console.log('Current knowledge base:', currentKnowledgeBase);
-            console.log('Knowledge base name:', knowledgeBaseName);
-            onConfirm();
-          }} 
-          disabled={isLoading || !canProceed}
-          className="w-20 bg-black text-white hover:bg-black/80"
-        >
-          {isLoading ? 'Saving...' : 'Save'}
-        </Button>
       </div>
     </div>
   );
