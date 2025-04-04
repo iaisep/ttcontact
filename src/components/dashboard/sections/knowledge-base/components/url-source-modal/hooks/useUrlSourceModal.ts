@@ -116,7 +116,10 @@ export const useUrlSourceModal = ({
     }
 
     // Validate that we have a knowledge base before proceeding
-    if (!currentKnowledgeBase || !currentKnowledgeBase.id) {
+    // We now accept either currentKnowledgeBase or knowledgeBaseName
+    const hasKnowledgeBase = (!!currentKnowledgeBase && !!currentKnowledgeBase.id) || !!knowledgeBaseName;
+    
+    if (!hasKnowledgeBase) {
       console.error('No knowledge base selected');
       toast.error('No knowledge base selected');
       return;
@@ -145,7 +148,7 @@ export const useUrlSourceModal = ({
       
       toast.success('URL source added successfully');
       
-      // Don't reset state here - the parent component will handle closing the modal after successful API call
+      // Reset state here - the parent component will handle closing the modal after successful API call
     } catch (error) {
       console.error('Failed to add URL source:', error);
       toast.error('Failed to add URL source');

@@ -50,16 +50,18 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   console.log('Sitemap selection view - knowledge base name:', knowledgeBaseName);
   console.log('Sitemap selection view - selected URLs count:', selectedPageUrls.length);
 
-  // Check if we have a valid knowledge base
-  const knowledgeBaseSelected = !!currentKnowledgeBase && !!currentKnowledgeBase.id;
-  const canProceed = selectedPageUrls.length > 0 && knowledgeBaseSelected;
+  // Determine if we can proceed with the save operation
+  // We need at least one selected page AND either a knowledge base object OR a knowledge base name
+  const hasSelectedPages = selectedPageUrls.length > 0;
+  const hasKnowledgeBase = !!currentKnowledgeBase?.id || !!knowledgeBaseName;
+  const canProceed = hasSelectedPages && hasKnowledgeBase;
 
   return (
     <div className="space-y-4">
-      {knowledgeBaseName && (
+      {(knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name)) && (
         <div className="flex items-center gap-2 p-2 bg-blue-50 text-blue-700 rounded-md mb-2">
           <Info className="h-4 w-4" />
-          <span className="text-sm">Adding to knowledge base: <strong>{knowledgeBaseName}</strong></span>
+          <span className="text-sm">Adding to knowledge base: <strong>{knowledgeBaseName || currentKnowledgeBase?.name}</strong></span>
         </div>
       )}
       
@@ -128,7 +130,7 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
         </label>
       </div>
 
-      {!knowledgeBaseSelected && !knowledgeBaseName && (
+      {!hasKnowledgeBase && (
         <div className="flex items-center text-sm text-amber-600 bg-amber-50 p-2 rounded-md">
           <AlertCircle className="h-4 w-4 mr-2" />
           No knowledge base selected
@@ -149,10 +151,6 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
             console.log('Save button clicked with selected pages:', selectedPageUrls);
             console.log('Current knowledge base:', currentKnowledgeBase);
             console.log('Knowledge base name:', knowledgeBaseName);
-            if (!currentKnowledgeBase) {
-              console.error('No knowledge base selected, cannot proceed');
-              return;
-            }
             onConfirm();
           }} 
           disabled={isLoading || !canProceed}
