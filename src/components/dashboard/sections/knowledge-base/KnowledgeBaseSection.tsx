@@ -28,6 +28,7 @@ const KnowledgeBaseSection: React.FC = () => {
     addSourceToKnowledgeBase,
     deleteSource,
     resyncKnowledgeBase,
+    fetchKnowledgeBases,
     fetchSitemap,
     hasUrlSources
   } = useKnowledgeBase();
@@ -43,6 +44,11 @@ const KnowledgeBaseSection: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, pageSize]);
+
+  // Fetch knowledge bases when component mounts
+  useEffect(() => {
+    fetchKnowledgeBases();
+  }, []);
 
   const handleCreateClick = () => {
     setCurrentKb(null);
