@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
@@ -126,17 +125,13 @@ export const useKnowledgeBaseApi = () => {
         autoSync = nameOrData.autoSync || false;
       }
       
-      // Create FormData object
       const formData = new FormData();
       formData.append('knowledge_base_name', name);
       
-      // Add empty knowledge_base_texts array
       formData.append('knowledge_base_texts', JSON.stringify([]));
       
-      // Add knowledge_base_urls array
       formData.append('knowledge_base_urls', JSON.stringify(urls));
       
-      // Add enable_auto_refresh flag
       formData.append('enable_auto_refresh', String(autoSync));
       
       console.log('Creating knowledge base with FormData:', {
@@ -145,7 +140,6 @@ export const useKnowledgeBaseApi = () => {
         autoSync
       });
       
-      // Use FormData instead of JSON
       const response = await fetchWithAuth('/create-knowledge-base', {
         method: 'POST',
         body: formData,
@@ -211,12 +205,10 @@ export const useKnowledgeBaseApi = () => {
       if (sourceType === 'url') {
         const knowledgeBaseName = sourceData.knowledgeBaseName || `KB with URLs`;
         
-        // Create FormData for URL source
         formData.append('knowledge_base_id', kbId);
         formData.append('knowledge_base_name', knowledgeBaseName);
         formData.append('knowledge_base_texts', JSON.stringify([]));
         
-        // Handle URL sources
         const urls = sourceData.webPages && Array.isArray(sourceData.webPages) 
           ? sourceData.webPages.map((page: WebPage) => page.url) 
           : [sourceData.url];
@@ -260,7 +252,7 @@ export const useKnowledgeBaseApi = () => {
       
       const updatedKb: KnowledgeBase = {
         id: kbId,
-        name: requestData.knowledge_base_name || "Knowledge Base",
+        name: knowledgeBaseName || "Knowledge Base",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         source_count: 1,
@@ -282,7 +274,6 @@ export const useKnowledgeBaseApi = () => {
     try {
       setLoading(true);
       
-      // Create FormData for update
       const formData = new FormData();
       formData.append('knowledge_base_id', kb.id);
       formData.append('knowledge_base_name', kb.name);
@@ -327,7 +318,6 @@ export const useKnowledgeBaseApi = () => {
       setLoading(true);
       console.log('Fetching sitemap for URL:', url);
       
-      // Create FormData for sitemap request
       const formData = new FormData();
       formData.append('website_url', url);
       
