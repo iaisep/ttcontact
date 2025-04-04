@@ -285,7 +285,7 @@ export const useKnowledgeBaseApi = () => {
       setLoading(true);
       console.log('Fetching sitemap for URL:', url);
       
-      // Call the actual API endpoint to fetch sitemap
+      // Call the actual API endpoint (corrected endpoint)
       const response = await fetchWithAuth('/list-sitemap', {
         method: 'POST',
         body: JSON.stringify({ website_url: url }),

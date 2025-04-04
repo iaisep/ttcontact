@@ -52,8 +52,8 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
         formattedUrl = `https://${formattedUrl}`;
       }
       
-      // Call the actual API endpoint
-      const response = await fetchWithAuth('/kb/sitemap', {
+      // Call the actual API endpoint (corrected endpoint)
+      const response = await fetchWithAuth('/list-sitemap', {
         method: 'POST',
         body: JSON.stringify({ website_url: formattedUrl }),
       });
