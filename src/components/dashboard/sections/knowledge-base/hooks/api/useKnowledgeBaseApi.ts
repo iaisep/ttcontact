@@ -1,9 +1,10 @@
+
 import { useState } from 'react';
 import { useKnowledgeBaseListApi } from './knowledge-base';
 import { useKnowledgeBaseManageApi } from './knowledge-base';
 import { useKnowledgeBaseCreateApi } from './knowledge-base';
 import { useSitemapApi } from './knowledge-base';
-import { useSourceApi } from './knowledge-base';
+import { useSourceApi } from './api/useSourceApi';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
 export const useKnowledgeBaseApi = () => {
@@ -67,6 +68,7 @@ export const useKnowledgeBaseApi = () => {
     deleteKnowledgeBase: deleteKnowledgeBaseWrapper,
     addSourceToKnowledgeBase,
     deleteSource,
-    fetchSitemap: fetchSitemapWrapper
+    fetchSitemap: fetchSitemapWrapper,
+    createMockSource
   };
 };

@@ -1,11 +1,15 @@
+
 import { useState, useEffect } from 'react';
 import { useKnowledgeBaseApi } from './api/useKnowledgeBaseApi';
-import { KnowledgeBase } from '../types';
+import { KnowledgeBase, WebPage } from '../types';
+import { useKnowledgeBases } from './useKnowledgeBases';
 
 export const useKnowledgeBase = () => {
   const {
     knowledgeBases,
+    setKnowledgeBases,
     loading,
+    setLoading,
     currentPage,
     pageSize,
     searchQuery,
@@ -20,6 +24,12 @@ export const useKnowledgeBase = () => {
     updateKnowledgeBase,
     deleteKnowledgeBase
   } = useKnowledgeBases();
+
+  const { 
+    addSourceToKnowledgeBase: apiAddSourceToKnowledgeBase, 
+    deleteSource: apiDeleteSource, 
+    fetchSitemap: apiFetchSitemap 
+  } = useKnowledgeBaseApi();
 
   // Function to add a source to a knowledge base
   const addSourceToKnowledgeBase = async (kbId, sourceType, sourceData) => {
@@ -50,7 +60,7 @@ export const useKnowledgeBase = () => {
   };
 
   // Function to resync a knowledge base
-  const resyncKnowledgeBase = async (kbId) => {
+  const resyncKnowledgeBase = async (kb) => {
     try {
       setLoading(true);
       // Assuming there's a specific API endpoint for resyncing a knowledge base
@@ -103,6 +113,3 @@ export const useKnowledgeBase = () => {
     hasUrlSources
   };
 };
-
-// Import this at the top of the file
-import { useKnowledgeBases } from './useKnowledgeBases';
