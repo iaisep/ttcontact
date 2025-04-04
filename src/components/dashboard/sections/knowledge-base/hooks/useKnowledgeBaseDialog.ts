@@ -138,7 +138,7 @@ export const useKnowledgeBaseDialog = ({
       return true;
     } catch (error) {
       console.error('Error saving knowledge base:', error);
-      throw error;
+      return false;
     }
   };
 

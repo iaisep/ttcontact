@@ -8,6 +8,7 @@ import KnowledgeBaseTable from './components/KnowledgeBaseTable';
 import KnowledgeBaseDialog from './components/dialogs/KnowledgeBaseDialog';
 import KnowledgeBaseDeleteDialog from './components/KnowledgeBaseDeleteDialog';
 import { KnowledgeBase } from './types';
+import { toast } from 'sonner';
 
 const KnowledgeBaseSection: React.FC = () => {
   const {
@@ -58,15 +59,22 @@ const KnowledgeBaseSection: React.FC = () => {
   const handleSaveKnowledgeBase = async (data: { name: string }) => {
     setIsSaving(true);
     try {
+      console.log('Saving knowledge base with name:', data.name);
+      
       if (isCreating) {
-        await createKnowledgeBase(data.name);
+        const newKb = await createKnowledgeBase(data.name);
+        console.log('Created new knowledge base:', newKb);
+        // No cerramos el diálogo aquí para permitir añadir fuentes
+        setCurrentKb(newKb);
+        toast.success('Knowledge base created successfully');
       } else if (currentKb) {
         const updatedKb = { ...currentKb, name: data.name };
         await updateKnowledgeBase(updatedKb);
+        setKbDialogOpen(false);
       }
-      setKbDialogOpen(false);
     } catch (error) {
       console.error('Error saving knowledge base:', error);
+      toast.error('Failed to save knowledge base');
     } finally {
       setIsSaving(false);
     }
@@ -83,8 +91,10 @@ const KnowledgeBaseSection: React.FC = () => {
         await deleteKnowledgeBase(kbToDelete.id);
         setDeleteDialogOpen(false);
         setKbToDelete(null);
+        toast.success('Knowledge base deleted successfully');
       } catch (error) {
         console.error('Error deleting knowledge base:', error);
+        toast.error('Failed to delete knowledge base');
       }
     }
   };
@@ -94,14 +104,28 @@ const KnowledgeBaseSection: React.FC = () => {
     sourceType: 'url' | 'file' | 'text',
     sourceData: any
   ) => {
-    return await addSourceToKnowledgeBase(kbId, sourceType, sourceData);
+    try {
+      const updatedKb = await addSourceToKnowledgeBase(kbId, sourceType, sourceData);
+      toast.success(`${sourceType} source added successfully`);
+      return updatedKb;
+    } catch (error) {
+      console.error(`Error adding ${sourceType} source:`, error);
+      toast.error(`Failed to add ${sourceType} source`);
+      throw error;
+    }
   };
 
   const handleDeleteSource = async (kbId: string, sourceId: string) => {
-    return await deleteSource(kbId, sourceId);
+    try {
+      const updatedKb = await deleteSource(kbId, sourceId);
+      toast.success('Source deleted successfully');
+      return updatedKb;
+    } catch (error) {
+      console.error('Error deleting source:', error);
+      toast.error('Failed to delete source');
+      throw error;
+    }
   };
-
-  console.log('Rendering with knowledge bases:', paginatedKnowledgeBases);
 
   return (
     <div className="space-y-6">

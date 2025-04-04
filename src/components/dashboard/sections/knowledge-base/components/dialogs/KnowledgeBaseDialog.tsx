@@ -89,10 +89,10 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     
     try {
       await handleKnowledgeBaseSave(data, onSave);
-      return true; // Return boolean value to match expected type
+      return true;
     } catch (error) {
       console.error("Error saving knowledge base:", error);
-      return false; // Return boolean value to match expected type
+      return false;
     }
   };
 
