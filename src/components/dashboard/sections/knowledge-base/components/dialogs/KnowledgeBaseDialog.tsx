@@ -321,6 +321,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         onAddTextSource={handleAddTextSource}
         onDeleteSource={handleDeleteSource}
         onFetchSitemap={onFetchSitemap}
+        currentKnowledgeBase={currentKb}
       />
     </>
   );

@@ -12,11 +12,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { KnowledgeBase } from '../types';
 
 interface AddTextSourceModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (fileName: string, content: string) => Promise<void>;
+  onSubmit: (fileName: string, content: string) => Promise<KnowledgeBase>;
 }
 
 const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({

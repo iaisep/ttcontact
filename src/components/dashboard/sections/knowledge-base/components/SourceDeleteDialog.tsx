@@ -10,13 +10,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { KnowledgeBaseSource } from '../types';
+import { KnowledgeBaseSource, KnowledgeBase } from '../types';
 
 interface SourceDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   source: KnowledgeBaseSource | null;
-  onConfirm: () => Promise<void>;
+  onConfirm: () => Promise<KnowledgeBase>;
 }
 
 const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({

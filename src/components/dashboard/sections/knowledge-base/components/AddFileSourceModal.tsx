@@ -11,11 +11,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { File, X } from 'lucide-react';
+import { KnowledgeBase } from '../types';
 
 interface AddFileSourceModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (file: File) => Promise<void>;
+  onSubmit: (file: File) => Promise<KnowledgeBase>;
 }
 
 const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
