@@ -105,15 +105,15 @@ export const useKnowledgeBaseApi = () => {
     ];
   };
 
-  const createKnowledgeBase = async (name: string) => {
+  const createKnowledgeBase = async (name: string, urls: string[] = [], autoSync: boolean = false) => {
     try {
       setLoading(true);
       
       const requestData = {
         knowledge_base_name: name,
         knowledge_base_texts: [],
-        knowledge_base_urls: [],
-        enable_auto_refresh: false
+        knowledge_base_urls: urls,
+        enable_auto_refresh: autoSync
       };
       
       console.log('Creating knowledge base with data:', requestData);
@@ -130,9 +130,15 @@ export const useKnowledgeBaseApi = () => {
         name: response.knowledge_base_name,
         created_at: new Date(response.user_modified_timestamp || Date.now()).toISOString(),
         updated_at: new Date(response.user_modified_timestamp || Date.now()).toISOString(),
-        source_count: 0,
-        sources: [],
-        auto_sync: response.enable_auto_refresh || false
+        source_count: urls.length,
+        sources: urls.map(url => ({
+          id: `src_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          type: 'url',
+          title: url,
+          url: url,
+          created_at: new Date().toISOString(),
+        })),
+        auto_sync: response.enable_auto_refresh || autoSync
       };
       
       toast.success('Knowledge base created');
@@ -146,9 +152,15 @@ export const useKnowledgeBaseApi = () => {
         name,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        source_count: 0,
-        sources: [],
-        auto_sync: false
+        source_count: urls.length,
+        sources: urls.map(url => ({
+          id: `src_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          type: 'url',
+          title: url,
+          url: url,
+          created_at: new Date().toISOString(),
+        })),
+        auto_sync: autoSync
       };
       
       return newKb;

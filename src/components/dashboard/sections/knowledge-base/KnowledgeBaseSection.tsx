@@ -117,6 +117,9 @@ const KnowledgeBaseSection: React.FC = () => {
     try {
       console.log(`Adding ${sourceType} source to KB ${kbId}:`, sourceData);
       
+      // Check if this is for a new knowledge base (with a temporary ID)
+      const isNewKnowledgeBase = kbId.startsWith('temp_');
+      
       // Prepare the request data based on the source type
       let requestData: any = {};
       
@@ -124,11 +127,29 @@ const KnowledgeBaseSection: React.FC = () => {
         // Handle URL source
         console.log('Adding url source to KB', kbId, ':', sourceData);
         
-        requestData = {
-          url: sourceData.url,
-          autoSync: sourceData.autoSync,
-          webPages: sourceData.webPages || []
-        };
+        if (isNewKnowledgeBase) {
+          // For a new knowledge base, we'll need to create it first
+          // with the URLs included in the creation request
+          requestData = {
+            knowledge_base_name: sourceData.knowledgeBaseName,
+            knowledge_base_urls: sourceData.webPages.map((page: any) => page.url) || [],
+            enable_auto_refresh: sourceData.autoSync || false
+          };
+          
+          console.log('Creating new knowledge base with URLs:', requestData);
+          
+          // Use the create knowledge base API instead of add source
+          const newKb = await createKnowledgeBase(sourceData.knowledgeBaseName, requestData.knowledge_base_urls, requestData.enable_auto_refresh);
+          toast.success(`Created knowledge base with ${requestData.knowledge_base_urls.length} URLs`);
+          return newKb;
+        } else {
+          // For existing knowledge base, add URLs as sources
+          requestData = {
+            url: sourceData.url,
+            autoSync: sourceData.autoSync,
+            webPages: sourceData.webPages || []
+          };
+        }
       } else if (sourceType === 'file') {
         // Handle file source
         requestData = {

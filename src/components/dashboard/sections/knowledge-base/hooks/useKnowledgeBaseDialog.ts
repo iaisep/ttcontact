@@ -50,15 +50,20 @@ export const useKnowledgeBaseDialog = ({
   };
 
   const handleAddUrlSource = async (url: string, autoSync: boolean, selectedPages: WebPage[]) => {
-    if (!currentKb) {
-      console.error('No current knowledge base');
-      toast.error('No knowledge base selected');
-      throw new Error('No current knowledge base');
-    }
-
     try {
       setAddingSource(true);
-      console.log("Adding URL source with params:", { url, autoSync, selectedPages, kbId: currentKb.id, kbName: currentKb.name });
+      
+      // Check if we have either a knowledge base ID or a name
+      const hasKbId = currentKb && currentKb.id;
+      const kbName = currentKb?.name || '';
+      
+      console.log("Adding URL source with params:", { 
+        url, 
+        autoSync, 
+        selectedPages, 
+        kbId: hasKbId ? currentKb?.id : 'creating new KB', 
+        kbName 
+      });
       
       // Format the data according to the API requirements
       const sourceData = {
@@ -68,13 +73,25 @@ export const useKnowledgeBaseDialog = ({
           url: page.url,
           title: page.title
         })),
-        knowledgeBaseName: currentKb.name // Pass the knowledge base name
+        knowledgeBaseName: kbName // Pass the knowledge base name
       };
       
       console.log("Sending data to API:", sourceData);
       
-      // Call the API to add the source to the knowledge base
-      const updatedKb = await onAddSource(currentKb.id, 'url', sourceData);
+      // We need to handle both cases: 
+      // 1. Adding to existing KB (have kbId)
+      // 2. Creating a new KB with URLs (only have kbName)
+      let updatedKb: KnowledgeBase;
+      
+      if (hasKbId && currentKb) {
+        // Call the API to add the source to the existing knowledge base
+        updatedKb = await onAddSource(currentKb.id, 'url', sourceData);
+      } else {
+        // For creating a new KB with URLs, we need to create a temporary ID
+        // The API will handle the actual creation
+        const tempId = `temp_${Date.now()}`;
+        updatedKb = await onAddSource(tempId, 'url', sourceData);
+      }
       
       console.log("URL source added, updated KB:", updatedKb);
       
