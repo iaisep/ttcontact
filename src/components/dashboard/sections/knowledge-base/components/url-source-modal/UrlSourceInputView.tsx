@@ -9,13 +9,15 @@ interface UrlSourceInputViewProps {
   setUrl: (url: string) => void;
   isLoading: boolean;
   onSubmit: () => Promise<void>;
+  onCancel: () => void;
 }
 
 const UrlSourceInputView: React.FC<UrlSourceInputViewProps> = ({
   url,
   setUrl,
   isLoading,
-  onSubmit
+  onSubmit,
+  onCancel
 }) => {
   return (
     <div className="space-y-4">
@@ -34,8 +36,8 @@ const UrlSourceInputView: React.FC<UrlSourceInputViewProps> = ({
       <div className="flex justify-end gap-2 mt-4">
         <Button 
           variant="outline" 
-          onClick={() => onSubmit()} 
-          disabled={isLoading || !url}
+          onClick={onCancel} 
+          disabled={isLoading}
           className="w-20"
         >
           Cancel
@@ -45,7 +47,7 @@ const UrlSourceInputView: React.FC<UrlSourceInputViewProps> = ({
           disabled={isLoading || !url}
           className="w-20 bg-black text-white hover:bg-black/80"
         >
-          Save
+          Next
         </Button>
       </div>
     </div>

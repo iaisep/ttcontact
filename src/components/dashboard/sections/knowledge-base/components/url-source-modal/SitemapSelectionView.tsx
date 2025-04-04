@@ -12,6 +12,8 @@ interface SitemapSelectionViewProps {
   isLoading: boolean;
   autoSync: boolean;
   setAutoSync: (checked: boolean) => void;
+  onCancel: () => void;
+  onConfirm: () => void;
 }
 
 const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
@@ -21,7 +23,9 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   onToggleAll,
   isLoading,
   autoSync,
-  setAutoSync
+  setAutoSync,
+  onCancel,
+  onConfirm
 }) => {
   const groupedPages = webPages.reduce((acc, page) => {
     const domain = new URL(page.url).hostname;
@@ -132,14 +136,14 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
       <div className="flex justify-end gap-2 mt-4">
         <Button 
           variant="outline" 
-          onClick={() => {/* Cancel button handler */}}
+          onClick={onCancel}
           disabled={isLoading}
           className="w-20"
         >
           Cancel
         </Button>
         <Button 
-          onClick={() => {/* Save button handler */}}
+          onClick={onConfirm}
           disabled={isLoading || selectedPageUrls.length === 0}
           className="w-20 bg-black text-white hover:bg-black/80"
         >

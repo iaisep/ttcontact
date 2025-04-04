@@ -75,6 +75,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
               setUrl={setUrl}
               isLoading={isLoading}
               onSubmit={handleUrlSubmit}
+              onCancel={() => onOpenChange(false)}
             />
           ) : (
             <SitemapSelectionView 
@@ -85,6 +86,8 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
               isLoading={isLoading}
               autoSync={autoSync}
               setAutoSync={setAutoSync}
+              onCancel={() => onOpenChange(false)}
+              onConfirm={handleConfirmSelection}
             />
           )}
         </div>
