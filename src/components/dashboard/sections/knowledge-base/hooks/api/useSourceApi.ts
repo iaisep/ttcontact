@@ -70,7 +70,7 @@ export const useSourceApi = () => {
       console.log("Uploading file:", sourceData.file.name, "to KB:", kbId);
       
       // Special case for file uploads - use FormData
-      const response = await fetchWithAuth(`/kb/add-sources`, {
+      const response = await fetchWithAuth(`/add-knowledge-base-sources`, {
         method: 'POST',
         body: formData,
       });
