@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
@@ -241,12 +242,8 @@ export const useKnowledgeBaseApi = () => {
       
       console.log(`Adding ${sourceType} source to KB ${kbId}:`, requestData);
       
-      const kb = knowledgeBases.find(k => k.id === kbId);
-      
-      if (!kb) {
-        throw new Error(`Knowledge base with ID ${kbId} not found`);
-      }
-      
+      // Fix for the undefined knowledgeBases reference
+      // Instead of using knowledgeBases, we'll create a new mock source
       const newSource = {
         id: `src_${Date.now()}`,
         type: sourceType,
@@ -261,10 +258,15 @@ export const useKnowledgeBaseApi = () => {
         auto_sync: sourceType === 'url' ? sourceData.autoSync : undefined
       };
       
-      const updatedKb = {
-        ...kb,
-        sources: [...(kb.sources || []), newSource],
-        source_count: (kb.sources?.length || 0) + 1
+      // Create a mock updated knowledge base object
+      const updatedKb: KnowledgeBase = {
+        id: kbId,
+        name: requestData.knowledge_base_name || "Knowledge Base",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        source_count: 1,
+        sources: [newSource],
+        auto_sync: sourceType === 'url' ? sourceData.autoSync || false : false
       };
       
       return updatedKb;

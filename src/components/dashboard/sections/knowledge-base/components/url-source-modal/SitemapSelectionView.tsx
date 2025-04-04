@@ -47,8 +47,7 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
         <div className="flex items-center gap-2">
           <Checkbox 
             id="select-all" 
-            checked={allSelected}
-            indeterminate={someSelected && !allSelected}
+            checked={allSelected || someSelected}
             onCheckedChange={() => onToggleAll()}
           />
           <label 
