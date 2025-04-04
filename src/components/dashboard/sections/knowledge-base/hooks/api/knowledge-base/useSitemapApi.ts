@@ -41,15 +41,13 @@ export const useSitemapApi = () => {
         pages = response.results.map((page: any) => ({
           url: page.url || '',
           title: page.title || 'Untitled Page',
-          description: page.description || '',
-          lastModified: page.last_modified || new Date().toISOString()
+          selected: false
         }));
       } else if (response.website_pages && Array.isArray(response.website_pages)) {
         pages = response.website_pages.map((page: any) => ({
           url: page.url || '',
           title: page.title || 'Untitled Page',
-          description: page.description || '',
-          lastModified: page.last_modified || new Date().toISOString()
+          selected: false
         }));
       }
       
@@ -60,8 +58,7 @@ export const useSitemapApi = () => {
           {
             url: formattedUrl,
             title: 'Main Page',
-            description: 'Main page of the website',
-            lastModified: new Date().toISOString()
+            selected: false
           }
         ];
       }
@@ -77,8 +74,7 @@ export const useSitemapApi = () => {
         {
           url: url,
           title: 'Website Page',
-          description: 'Could not fetch details for this page',
-          lastModified: new Date().toISOString()
+          selected: false
         }
       ];
     } finally {
