@@ -45,7 +45,7 @@ export const useKnowledgeBaseCreateApi = () => {
       formData.append('enable_auto_refresh', String(autoSync));
       
       // Make the request using fetch
-      const response = await fetchWithAuth(`${baseURL}/create-knowledge-base`, {
+      const response = fetchWithAuth(`${baseURL}/create-knowledge-base`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json, text/plain, */*',
