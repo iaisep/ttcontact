@@ -5,6 +5,7 @@ import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase } from '../../../types';
 
 export const useKnowledgeBaseCreateApi = () => {
+  const { fetchWithAuth } = useApiContext();
   const { baseURL } = useApiContext();
   const [loading, setLoading] = useState(false);
 
