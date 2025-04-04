@@ -17,7 +17,14 @@ export const useSourceApi = () => {
     }
   ) => {
     console.log(`API call: Adding ${sourceType} source to KB ${kbId}:`, sourceData);
-    
+      // Create FormData object
+      const formData = new FormData();
+      
+      // Use the provided name - this is the critical part
+      formData.append('knowledge_base_name', kbName);
+      formData.append('knowledge_base_texts', '[]');
+      formData.append('knowledge_base_urls', JSON.stringify(urls));
+      formData.append('enable_auto_refresh', String(autoSync));
     // Prepare request data based on source type
     let requestData: any = {
       knowledge_base_id: kbId
