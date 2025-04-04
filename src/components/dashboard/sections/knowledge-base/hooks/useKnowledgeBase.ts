@@ -78,7 +78,10 @@ export const useKnowledgeBase = () => {
 
   // Function to check if a knowledge base has URL sources
   const hasUrlSources = (kb) => {
-    return kb ? kb.sources.some(source => source.type === 'url') : false;
+    if (!kb || !kb.sources || !Array.isArray(kb.sources)) {
+      return false;
+    }
+    return kb.sources.some(source => source.type === 'url');
   };
 
   // Function to fetch the sitemap for a URL

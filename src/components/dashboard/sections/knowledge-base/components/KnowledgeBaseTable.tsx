@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
@@ -68,41 +69,57 @@ const KnowledgeBaseTable: React.FC<KnowledgeBaseTableProps> = ({
     {
       key: 'actions',
       header: <div className="text-right">Actions</div>,
-      cell: (kb: KnowledgeBase) => (
-        <div className="flex justify-end gap-2">
-          {hasUrlSources(kb) && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => {
-                      console.log('Refresh clicked for KB:', kb.id);
-                      onResync(kb);
-                    }}
-                  >
-                    <RefreshCw className="h-4 w-4 text-blue-500" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Refresh knowledge base</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          <Button variant="ghost" size="icon" onClick={() => onEdit(kb)}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => onDelete(kb)}
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-        </div>
-      ),
+      cell: (kb: KnowledgeBase) => {
+        // Add null check for kb to prevent errors
+        if (!kb) return null;
+        
+        return (
+          <div className="flex justify-end gap-2">
+            {hasUrlSources(kb) && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click
+                        console.log('Refresh clicked for KB:', kb.id);
+                        onResync(kb);
+                      }}
+                    >
+                      <RefreshCw className="h-4 w-4 text-blue-500" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Refresh knowledge base</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent row click
+                onEdit(kb);
+              }}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent row click
+                onDelete(kb);
+              }}
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          </div>
+        );
+      },
       className: 'text-right'
     }
   ];
@@ -119,7 +136,7 @@ const KnowledgeBaseTable: React.FC<KnowledgeBaseTableProps> = ({
 
   return (
     <TableWithPagination
-      data={knowledgeBases}
+      data={knowledgeBases || []}
       columns={columns}
       initialPageSize={pageSize}
       pageSizeOptions={[10, 25, 50]}
