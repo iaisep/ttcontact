@@ -5,7 +5,7 @@ import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase } from '../../../types';
 
 export const useKnowledgeBaseCreateApi = () => {
-  const { fetchWithAuth, baseURL } = useApiContext();
+  const { baseURL } = useApiContext();
   const [loading, setLoading] = useState(false);
 
   const createKnowledgeBase = async (nameOrData: string | { 
@@ -28,54 +28,30 @@ export const useKnowledgeBaseCreateApi = () => {
         autoSync = nameOrData.autoSync || false;
       }
       
-      // Create the correct multipart form data boundary
-      const boundary = `----WebKitFormBoundary${Math.random().toString(36).substring(2)}`;
-      
-      // Build the multipart form data manually as per the example
-      let formDataString = '';
-      
-      // Add knowledge_base_name
-      formDataString += `------${boundary}\r\n`;
-      formDataString += `Content-Disposition: form-data; name="knowledge_base_name"\r\n\r\n`;
-      formDataString += `${name}\r\n`;
-      
-      // Add knowledge_base_texts (empty array)
-      formDataString += `------${boundary}\r\n`;
-      formDataString += `Content-Disposition: form-data; name="knowledge_base_texts"\r\n\r\n`;
-      formDataString += `[]\r\n`;
-      
-      // Add knowledge_base_urls
-      formDataString += `------${boundary}\r\n`;
-      formDataString += `Content-Disposition: form-data; name="knowledge_base_urls"\r\n\r\n`;
-      formDataString += `${JSON.stringify(urls)}\r\n`;
-      
-      // Add enable_auto_refresh
-      formDataString += `------${boundary}\r\n`;
-      formDataString += `Content-Disposition: form-data; name="enable_auto_refresh"\r\n\r\n`;
-      formDataString += `${String(autoSync)}\r\n`;
-      
-      // Close the form data
-      formDataString += `------${boundary}--\r\n`;
-      
       console.log('Creating knowledge base with form data:', {
         name,
         urls,
         autoSync
       });
       
-      // Get the headers from the fetchWithAuth function and extend them
+      // Get the auth token for authorization header
       const authToken = localStorage.getItem('auth_token');
-      const headers = {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': `multipart/form-data; boundary=${boundary}`,
-        'Authorization': `Bearer ${authToken}`
-      };
       
-      // Make the request using fetch directly to ensure exact format
+      // Create the form data using FormData
+      const formData = new FormData();
+      formData.append('knowledge_base_name', name);
+      formData.append('knowledge_base_texts', '[]');
+      formData.append('knowledge_base_urls', JSON.stringify(urls));
+      formData.append('enable_auto_refresh', String(autoSync));
+      
+      // Make the request using fetch
       const response = await fetch(`${baseURL}/create-knowledge-base`, {
         method: 'POST',
-        headers,
-        body: formDataString,
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: formData,
         credentials: 'include',
         mode: 'cors'
       });
