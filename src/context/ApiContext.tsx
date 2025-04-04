@@ -58,13 +58,25 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
       
       console.log('Making API request to:', url);
       
-      const response = await fetch(url, {
+      // Create fetch options without credentials mode by default
+      const fetchOptions = {
         ...options,
         headers: {
           ...defaultHeaders,
           ...options?.headers,
         },
-      });
+        // Don't include credentials mode by default
+      };
+      
+      // For this demo app, let's use 'same-origin' instead of 'include' to avoid CORS issues
+      // In a real-world app, the backend would need to be properly configured for CORS
+      if (!fetchOptions.credentials) {
+        fetchOptions.credentials = 'same-origin';
+      }
+      
+      console.log('Fetch options:', fetchOptions);
+      
+      const response = await fetch(url, fetchOptions);
 
       if (!response.ok) {
         const error = await response.text();

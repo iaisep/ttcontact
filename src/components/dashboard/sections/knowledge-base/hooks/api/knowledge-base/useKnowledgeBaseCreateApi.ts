@@ -47,7 +47,7 @@ export const useKnowledgeBaseCreateApi = () => {
       console.log('Request URL:', `${baseURL}/create-knowledge-base`);
       console.log('Form data:', Object.fromEntries(formData.entries()));
       
-      // Make the request using fetch
+      // Make the request using fetch - use mode: 'cors' but without 'include' credentials
       const response = await fetchWithAuth('create-knowledge-base', {
         method: 'POST',
         headers: {
@@ -55,7 +55,8 @@ export const useKnowledgeBaseCreateApi = () => {
           'Authorization': `Bearer ${authToken}`
         },
         body: formData,
-        credentials: 'include',
+        // We're removing the credentials: 'include' option to avoid CORS issues
+        // The fetchWithAuth function will use 'same-origin' by default
         mode: 'cors'
       });
       
