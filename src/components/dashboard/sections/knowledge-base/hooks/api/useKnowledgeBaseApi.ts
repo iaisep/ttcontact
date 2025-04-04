@@ -4,7 +4,7 @@ import { useKnowledgeBaseListApi } from './knowledge-base';
 import { useKnowledgeBaseManageApi } from './knowledge-base';
 import { useKnowledgeBaseCreateApi } from './knowledge-base';
 import { useSitemapApi } from './knowledge-base';
-import { useSourceApi } from './api/useSourceApi';
+import { useSourceApi } from './useSourceApi';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
 export const useKnowledgeBaseApi = () => {
