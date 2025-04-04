@@ -116,7 +116,6 @@ export const useUrlSourceModal = ({
     }
 
     // Validate that we have a knowledge base before proceeding
-    // We now accept either currentKnowledgeBase or knowledgeBaseName
     const hasKnowledgeBase = (!!currentKnowledgeBase && !!currentKnowledgeBase.id) || !!knowledgeBaseName;
     
     if (!hasKnowledgeBase) {

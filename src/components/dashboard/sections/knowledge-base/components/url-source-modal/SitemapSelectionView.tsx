@@ -56,12 +56,14 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   const hasKnowledgeBase = !!currentKnowledgeBase?.id || !!knowledgeBaseName;
   const canProceed = hasSelectedPages && hasKnowledgeBase;
 
+  const displayName = knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name);
+
   return (
     <div className="space-y-4">
-      {(knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name)) && (
+      {displayName && (
         <div className="flex items-center gap-2 p-2 bg-blue-50 text-blue-700 rounded-md mb-2">
           <Info className="h-4 w-4" />
-          <span className="text-sm">Adding to knowledge base: <strong>{knowledgeBaseName || currentKnowledgeBase?.name}</strong></span>
+          <span className="text-sm">Adding to knowledge base: <strong>{displayName}</strong></span>
         </div>
       )}
       
