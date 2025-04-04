@@ -28,37 +28,70 @@ export const useKnowledgeBaseCreateApi = () => {
         autoSync = nameOrData.autoSync || false;
       }
       
-      const formData = new FormData();
-      formData.append('knowledge_base_name', name);
+      // Create the correct multipart form data boundary
+      const boundary = `----WebKitFormBoundary${Math.random().toString(36).substring(2)}`;
       
-      formData.append('knowledge_base_texts', JSON.stringify([]));
+      // Build the multipart form data manually as per the example
+      let formDataString = '';
       
-      formData.append('knowledge_base_urls', JSON.stringify(urls));
+      // Add knowledge_base_name
+      formDataString += `------${boundary}\r\n`;
+      formDataString += `Content-Disposition: form-data; name="knowledge_base_name"\r\n\r\n`;
+      formDataString += `${name}\r\n`;
       
-      formData.append('enable_auto_refresh', String(autoSync));
+      // Add knowledge_base_texts (empty array)
+      formDataString += `------${boundary}\r\n`;
+      formDataString += `Content-Disposition: form-data; name="knowledge_base_texts"\r\n\r\n`;
+      formDataString += `[]\r\n`;
       
-      console.log('Creating knowledge base with FormData:', {
+      // Add knowledge_base_urls
+      formDataString += `------${boundary}\r\n`;
+      formDataString += `Content-Disposition: form-data; name="knowledge_base_urls"\r\n\r\n`;
+      formDataString += `${JSON.stringify(urls)}\r\n`;
+      
+      // Add enable_auto_refresh
+      formDataString += `------${boundary}\r\n`;
+      formDataString += `Content-Disposition: form-data; name="enable_auto_refresh"\r\n\r\n`;
+      formDataString += `${String(autoSync)}\r\n`;
+      
+      // Close the form data
+      formDataString += `------${boundary}--\r\n`;
+      
+      console.log('Creating knowledge base with form data:', {
         name,
         urls,
         autoSync
       });
       
-      const response = await fetchWithAuth('/create-knowledge-base', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json, text/plain, */*'
-            // ⚠️ NO pongas Content-Type aquí
-          },
-          body: formData
-        });
+      // Get the headers from the fetchWithAuth function and extend them
+      const authToken = localStorage.getItem('auth_token');
+      const headers = {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        'Authorization': `Bearer ${authToken}`
+      };
       
-      console.log('Knowledge base creation response:', response);
+      // Make the request using fetch directly to ensure exact format
+      const response = await fetch(`${fetchWithAuth.baseURL || 'https://api.retellai.com'}/create-knowledge-base`, {
+        method: 'POST',
+        headers,
+        body: formDataString,
+        credentials: 'include',
+        mode: 'cors'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+      
+      const responseData = await response.json();
+      console.log('Knowledge base creation response:', responseData);
       
       const createdKb: KnowledgeBase = {
-        id: response.knowledge_base_id,
-        name: response.knowledge_base_name || name,
-        created_at: new Date(response.user_modified_timestamp || Date.now()).toISOString(),
-        updated_at: new Date(response.user_modified_timestamp || Date.now()).toISOString(),
+        id: responseData.knowledge_base_id,
+        name: responseData.knowledge_base_name || name,
+        created_at: new Date(responseData.user_modified_timestamp || Date.now()).toISOString(),
+        updated_at: new Date(responseData.user_modified_timestamp || Date.now()).toISOString(),
         source_count: urls.length,
         sources: urls.map(url => ({
           id: `src_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -67,7 +100,7 @@ export const useKnowledgeBaseCreateApi = () => {
           url: url,
           created_at: new Date().toISOString(),
         })),
-        auto_sync: response.enable_auto_refresh || autoSync
+        auto_sync: responseData.enable_auto_refresh || autoSync
       };
       
       toast.success('Knowledge base created');
@@ -76,6 +109,7 @@ export const useKnowledgeBaseCreateApi = () => {
       console.error('Failed to create knowledge base:', error);
       toast.error('Failed to create knowledge base');
       
+      // Fallback to return a mock knowledge base in case of error
       const newKb: KnowledgeBase = {
         id: `kb_${Date.now()}`,
         name: typeof nameOrData === 'string' ? nameOrData : nameOrData.name,

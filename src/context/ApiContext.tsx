@@ -30,20 +30,26 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
   const fetchWithAuth = async (endpoint: string, options?: RequestInit) => {
     try {
       const url = `${baseURL}${endpoint}`;
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+      
+      // Only set default headers if they're not already set in options
+      // This allows custom handling of multipart/form-data
+      const defaultHeaders = {
+        'Authorization': `Bearer ${localStorage.getItem('auth_token') || apiKey}`,
       };
-
-      if (localStorage.getItem('auth_token')) {
-        headers['Authorization'] = `Bearer ${localStorage.getItem('auth_token')}`;
+      
+      // If Content-Type is not set in options and body is not FormData, set default Content-Type
+      if (options?.body && 
+          !(options.body instanceof FormData) && 
+          !options.headers?.['Content-Type'] &&
+          !options.headers?.['content-type']) {
+        defaultHeaders['Content-Type'] = 'application/json';
       }
-
+      
       const response = await fetch(url, {
         ...options,
         headers: {
+          ...defaultHeaders,
           ...options?.headers,
-          ...headers,
         },
       });
 
@@ -58,6 +64,9 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
       throw error;
     }
   };
+  
+  // Add baseURL property to fetchWithAuth to make it accessible in other functions
+  fetchWithAuth.baseURL = baseURL;
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
