@@ -45,10 +45,13 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       {/* URL Source Modal */}
       <AddUrlSourceModal
         open={currentSourceType === 'url'}
-        onOpenChange={(open) => {
-          if (!open) handleCloseModal();
+        onClose={handleCloseModal}
+        onAddSource={(kbId, sourceType, sourceData) => {
+          if (sourceType === 'url') {
+            return onAddUrlSource(sourceData.url, sourceData.autoSync, sourceData.webPages);
+          }
+          throw new Error('Invalid source type in URL modal');
         }}
-        onSubmit={onAddUrlSource}
         onFetchSitemap={onFetchSitemap}
         currentKnowledgeBase={currentKnowledgeBase}
         knowledgeBaseName={knowledgeBaseName}

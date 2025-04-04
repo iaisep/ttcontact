@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Info, RefreshCw } from 'lucide-react';
-import { WebPage, KnowledgeBase } from '../../../types';
+import { WebPage, KnowledgeBase } from '../../types';
 
 interface SitemapSelectionViewProps {
   url: string;

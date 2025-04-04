@@ -4,13 +4,14 @@ import { Dialog, DialogContent, DialogTitle, DialogHeader } from '@/components/u
 import { X } from 'lucide-react';
 import { useUrlSourceModal } from './hooks/useUrlSourceModal';
 import { useSourceOperations } from '../../hooks/useSourceOperations';
-import { KnowledgeBase } from '../../types';
 import UrlInputView from './UrlInputView';
 import SitemapSelectionView from './SitemapSelectionView';
+import { KnowledgeBase, WebPage } from '../../types';
 
 interface AddUrlSourceModalProps {
   open: boolean;
   onClose: () => void;
+  onOpenChange?: (open: boolean) => void; // Added this prop
   onAddSource: (
     kbId: string,
     sourceType: 'url' | 'file' | 'text',
@@ -24,20 +25,12 @@ interface AddUrlSourceModalProps {
 const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   open,
   onClose,
+  onOpenChange,
   onAddSource,
   onFetchSitemap,
   currentKnowledgeBase,
   knowledgeBaseName
 }) => {
-  // Log state for debugging
-  useEffect(() => {
-    console.log('AddUrlSourceModal - current URL:', url);
-    console.log('AddUrlSourceModal - view state:', view);
-    console.log('AddUrlSourceModal - selected pages count:', selectedPageUrls.length);
-    console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase);
-    console.log('AddUrlSourceModal - knowledge base name:', knowledgeBaseName);
-  }, [open, currentKnowledgeBase, knowledgeBaseName]);
-
   // Use our custom hook for source operations
   const { handleUrlSourceSubmit } = useSourceOperations({
     onAddSource,
@@ -78,6 +71,15 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
     knowledgeBaseName
   });
 
+  // Log state for debugging
+  useEffect(() => {
+    console.log('AddUrlSourceModal - current URL:', url);
+    console.log('AddUrlSourceModal - view state:', view);
+    console.log('AddUrlSourceModal - selected pages count:', selectedPageUrls.length);
+    console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase);
+    console.log('AddUrlSourceModal - knowledge base name:', knowledgeBaseName);
+  }, [open, currentKnowledgeBase, knowledgeBaseName, url, view, selectedPageUrls]);
+
   // Clean up state when modal is closed
   useEffect(() => {
     if (!open) {
@@ -85,8 +87,18 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
     }
   }, [open, resetState]);
 
+  // Handle dialog open state changes
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      onClose();
+    }
+    if (onOpenChange) {
+      onOpenChange(isOpen);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
@@ -106,6 +118,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
             isLoading={isLoading} 
             onSubmit={handleUrlSubmit} 
             onCancel={onClose}
+            knowledgeBaseName={knowledgeBaseName}
           />
         ) : (
           <SitemapSelectionView 
