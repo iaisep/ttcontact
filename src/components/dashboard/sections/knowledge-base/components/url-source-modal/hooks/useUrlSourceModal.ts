@@ -108,13 +108,6 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBa
       return;
     }
 
-    // Validate that we have a knowledge base before proceeding
-    if (!currentKnowledgeBase || !currentKnowledgeBase.id) {
-      console.error('No knowledge base selected');
-      toast.error('No knowledge base selected');
-      return;
-    }
-
     try {
       setIsLoading(true);
       
