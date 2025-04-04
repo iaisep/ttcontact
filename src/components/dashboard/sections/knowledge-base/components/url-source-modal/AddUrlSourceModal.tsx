@@ -103,10 +103,10 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Add URL Source</span>
-            <X 
+            {/*<X 
               className="h-4 w-4 cursor-pointer" 
               onClick={onClose} 
-            />
+            />*/}
           </DialogTitle>
         </DialogHeader>
 
