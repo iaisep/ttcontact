@@ -1,104 +1,28 @@
-
 import { useState, useEffect } from 'react';
 import { useKnowledgeBaseApi } from './api/useKnowledgeBaseApi';
-import { KnowledgeBase, WebPage } from '../types';
+import { KnowledgeBase } from '../types';
 
 export const useKnowledgeBase = () => {
   const {
-    loading: apiLoading,
-    fetchKnowledgeBases: apiFetchKnowledgeBases,
-    fetchAgents: apiFetchAgents,
-    createKnowledgeBase: apiCreateKnowledgeBase,
-    updateKnowledgeBase: apiUpdateKnowledgeBase,
-    deleteKnowledgeBase: apiDeleteKnowledgeBase,
-    addSourceToKnowledgeBase: apiAddSourceToKnowledgeBase,
-    deleteSource: apiDeleteSource,
-    fetchSitemap: apiFetchSitemap,
-    setLoading: apiSetLoading,
-  } = useKnowledgeBaseApi();
+    knowledgeBases,
+    loading,
+    currentPage,
+    pageSize,
+    searchQuery,
+    agents,
+    filteredKnowledgeBases,
+    paginatedKnowledgeBases,
+    setCurrentPage,
+    setPageSize,
+    setSearchQuery,
+    fetchKnowledgeBases,
+    createKnowledgeBase,
+    updateKnowledgeBase,
+    deleteKnowledgeBase
+  } = useKnowledgeBases();
 
-  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([]);
-  const [loading, setLoading] = useState(apiLoading);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [agents, setAgents] = useState([]);
-
-  // Update loading state when the API loading state changes
-  useEffect(() => {
-    setLoading(apiLoading);
-  }, [apiLoading]);
-
-  // Filtered knowledge bases based on search query
-  const filteredKnowledgeBases = knowledgeBases.filter(kb => 
-    searchQuery ? kb.name.toLowerCase().includes(searchQuery.toLowerCase()) : true
-  );
-
-  // Paginated knowledge bases
-  const paginatedKnowledgeBases = filteredKnowledgeBases.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-
-  const fetchKnowledgeBases = async () => {
-    try {
-      setLoading(true);
-      const data = await apiFetchKnowledgeBases();
-      setKnowledgeBases(data);
-      return data;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchSitemap = async (url: string): Promise<WebPage[]> => {
-    try {
-      setLoading(true);
-      return await apiFetchSitemap(url);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createKnowledgeBase = async (name: string, urls: string[] = [], autoSync: boolean = false) => {
-    try {
-      setLoading(true);
-      const newKb = await apiCreateKnowledgeBase({ name, urls, autoSync });
-      setKnowledgeBases((prev) => [...prev, newKb]);
-      return newKb;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateKnowledgeBase = async (updatedKb: KnowledgeBase) => {
-    try {
-      setLoading(true);
-      const result = await apiUpdateKnowledgeBase(updatedKb);
-      setKnowledgeBases((prev) =>
-        prev.map((kb) => (kb.id === updatedKb.id ? result : kb))
-      );
-      return result;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteKnowledgeBase = async (kbId: string) => {
-    try {
-      setLoading(true);
-      await apiDeleteKnowledgeBase(kbId);
-      setKnowledgeBases((prev) => prev.filter((kb) => kb.id !== kbId));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const addSourceToKnowledgeBase = async (
-    kbId: string,
-    sourceType: 'url' | 'file' | 'text',
-    sourceData: any
-  ) => {
+  // Function to add a source to a knowledge base
+  const addSourceToKnowledgeBase = async (kbId, sourceType, sourceData) => {
     try {
       setLoading(true);
       const updatedKb = await apiAddSourceToKnowledgeBase(kbId, sourceType, sourceData);
@@ -111,7 +35,8 @@ export const useKnowledgeBase = () => {
     }
   };
 
-  const deleteSource = async (kbId: string, sourceId: string) => {
+  // Function to delete a source from a knowledge base
+  const deleteSource = async (kbId, sourceId) => {
     try {
       setLoading(true);
       const updatedKb = await apiDeleteSource(kbId, sourceId);
@@ -124,11 +49,12 @@ export const useKnowledgeBase = () => {
     }
   };
 
-  const resyncKnowledgeBase = async (kb: KnowledgeBase) => {
+  // Function to resync a knowledge base
+  const resyncKnowledgeBase = async (kbId) => {
     try {
       setLoading(true);
       // Assuming there's a specific API endpoint for resyncing a knowledge base
-      // const updatedKb = await apiResyncKnowledgeBase(kb.id); 
+      // const updatedKb = await apiResyncKnowledgeBase(kbId); 
       // setKnowledgeBases((prev) =>
       //   prev.map((item) => (item.id === kb.id ? updatedKb : item))
       // );
@@ -140,32 +66,43 @@ export const useKnowledgeBase = () => {
     }
   };
 
-  const hasUrlSources = (kb: KnowledgeBase): boolean => {
+  // Function to check if a knowledge base has URL sources
+  const hasUrlSources = (kb) => {
     return kb ? kb.sources.some(source => source.type === 'url') : false;
+  };
+
+  // Function to fetch the sitemap for a URL
+  const fetchSitemap = async (url) => {
+    try {
+      setLoading(true);
+      return await apiFetchSitemap(url);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return {
     knowledgeBases,
-    setKnowledgeBases,
     loading,
-    setLoading,
     currentPage,
     pageSize,
     searchQuery,
-    agents,
-    filteredKnowledgeBases,
     paginatedKnowledgeBases,
+    filteredKnowledgeBases,
     setCurrentPage,
     setPageSize,
     setSearchQuery,
-    fetchKnowledgeBases,
-    fetchSitemap,
     createKnowledgeBase,
     updateKnowledgeBase,
     deleteKnowledgeBase,
     addSourceToKnowledgeBase,
     deleteSource,
     resyncKnowledgeBase,
+    fetchKnowledgeBases,
+    fetchSitemap,
     hasUrlSources
   };
 };
+
+// Import this at the top of the file
+import { useKnowledgeBases } from './useKnowledgeBases';

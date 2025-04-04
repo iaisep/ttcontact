@@ -47,15 +47,15 @@ export const useKnowledgeBases = () => {
     }
   };
 
-  const createKnowledgeBase = async (name: string, urls: string[] = [], autoSync: boolean = false) => {
+  // Update the createKnowledgeBase function to accept either a string or an object parameter
+  const createKnowledgeBase = async (
+    nameOrData: string | { name: string; urls?: string[]; autoSync?: boolean }
+  ) => {
     try {
       setLoading(true);
+      
       // Pass parameters in the format that apiCreateKnowledgeBase expects
-      const newKb = await apiCreateKnowledgeBase({
-        name,
-        urls,
-        autoSync
-      });
+      const newKb = await apiCreateKnowledgeBase(nameOrData);
       
       setKnowledgeBases((prev) => [...prev, newKb]);
       return newKb;
