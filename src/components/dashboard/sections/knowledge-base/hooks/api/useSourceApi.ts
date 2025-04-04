@@ -17,93 +17,69 @@ export const useSourceApi = () => {
     }
   ) => {
     console.log(`API call: Adding ${sourceType} source to KB ${kbId}:`, sourceData);
-      // Create FormData object
-      const formData = new FormData();
-      
-      // Use the provided name - this is the critical part
-      formData.append('knowledge_base_texts', '[]');
-      formData.append('knowledge_base_urls', JSON.stringify([sourceData.url]));
-    // Prepare request data based on source type
-    let requestData: any = {
-      knowledge_base_id: kbId
-    };
+    
+    // Create FormData object for all types
+    const formData = new FormData();
+    formData.append('knowledge_base_id', kbId);
     
     if (sourceType === 'url') {
       // Format URLs according to the API documentation
-      const urls = [];
+      // Empty arrays for file and text content
+      formData.append('knowledge_base_texts', '[]');
       
-      // Extract URLs from the webPages array if available
-      if (sourceData.webPages && sourceData.webPages.length > 0) {
-        urls.push(...sourceData.webPages.map(page => page.url));
-      } else if (sourceData.url) {
-        // Otherwise use the main URL
-        urls.push(sourceData.url);
-      }
+      // Add URL data
+      const urls = sourceData.webPages && Array.isArray(sourceData.webPages) 
+        ? sourceData.webPages.map(page => page.url) 
+        : [sourceData.url];
       
-      // Add URLs to the request
-      if (urls.length > 0) {
-        requestData.knowledge_base_urls = urls;
-        requestData.enable_auto_refresh = !!sourceData.autoSync;
-      }
+      formData.append('knowledge_base_urls', JSON.stringify(urls));
+      formData.append('enable_auto_refresh', String(sourceData.autoSync || false));
       
-      console.log('API call data for URL source:', requestData);
+      console.log('API call data for URL source:', {
+        urls,
+        autoSync: sourceData.autoSync || false
+      });
+    } 
+    else if (sourceType === 'file' && sourceData.file) {
+      // For file upload, include the file in formData
+      formData.append('knowledge_base_files', sourceData.file);
       
-      try {
-        // Call the API endpoint for URL sources
-        const response = await fetchWithAuth(`/add-knowledge-base-sources/${kbId}`, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json, text/plain, */*',
-          },
-          body: formData,
-          mode: 'cors'
-        });
-        
-        console.log('API response for URL source:', response);
-        return response;
-      } catch (error) {
-        console.error('API error adding URL source:', error);
-        throw error;
-      }
-      
-    } else if (sourceType === 'file' && sourceData.file) {
-      // Format file data - using FormData
-      const formData = new FormData();
-      formData.append('file', sourceData.file);
-      formData.append('knowledge_base_id', kbId);
+      // Empty arrays for text and URL content
+      formData.append('knowledge_base_texts', '[]');
+      formData.append('knowledge_base_urls', '[]');
       
       console.log("Uploading file:", sourceData.file.name, "to KB:", kbId);
+    } 
+    else if (sourceType === 'text') {
+      // Format text content according to the API documentation
+      const textContent = [{
+        title: sourceData.fileName || 'Untitled',
+        text: sourceData.content || '',
+        uuid: 'm' + Math.random().toString(36).substring(2, 15)
+      }];
       
-      // Special case for file uploads - use FormData
+      formData.append('knowledge_base_texts', JSON.stringify(textContent));
+      formData.append('knowledge_base_urls', '[]');
+      
+      console.log("Adding text content with title:", sourceData.fileName);
+    }
+    
+    try {
+      // Call the API endpoint with FormData for all source types
       const response = await fetchWithAuth(`/add-knowledge-base-sources/${kbId}`, {
         method: 'POST',
         // Don't set Content-Type header when using FormData
+        // The browser will automatically set the correct Content-Type with boundary
         body: formData,
+        mode: 'cors'
       });
       
+      console.log(`Added ${sourceType} source response:`, response);
       return response;
-    } else if (sourceType === 'text') {
-      // Format text content according to the API documentation
-      requestData.knowledge_base_texts = [{
-        title: sourceData.fileName || 'Untitled',
-        text: sourceData.content || '',
-      }];
-      
-      console.log("Adding text content with title:", sourceData.fileName);
-      
-      // Call the API endpoint with JSON for text sources
-      const response = await fetchWithAuth(`/add-knowledge-base-sources/${kbId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
-      
-      return response;
+    } catch (error) {
+      console.error(`API error adding ${sourceType} source:`, error);
+      throw error;
     }
-    
-    throw new Error(`Unsupported source type: ${sourceType}`);
   };
 
   const deleteSourceApi = async (kbId: string, sourceId: string) => {
