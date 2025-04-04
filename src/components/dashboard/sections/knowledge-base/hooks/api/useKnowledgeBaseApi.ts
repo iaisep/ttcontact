@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
@@ -125,18 +126,29 @@ export const useKnowledgeBaseApi = () => {
         autoSync = nameOrData.autoSync || false;
       }
       
-      const requestData = {
-        knowledge_base_name: name,
-        knowledge_base_texts: [],
-        knowledge_base_urls: urls,
-        enable_auto_refresh: autoSync
-      };
+      // Create FormData object
+      const formData = new FormData();
+      formData.append('knowledge_base_name', name);
       
-      console.log('Creating knowledge base with data:', requestData);
+      // Add empty knowledge_base_texts array
+      formData.append('knowledge_base_texts', JSON.stringify([]));
       
+      // Add knowledge_base_urls array
+      formData.append('knowledge_base_urls', JSON.stringify(urls));
+      
+      // Add enable_auto_refresh flag
+      formData.append('enable_auto_refresh', String(autoSync));
+      
+      console.log('Creating knowledge base with FormData:', {
+        name,
+        urls,
+        autoSync
+      });
+      
+      // Use FormData instead of JSON
       const response = await fetchWithAuth('/create-knowledge-base', {
         method: 'POST',
-        body: JSON.stringify(requestData),
+        body: formData,
       });
       
       console.log('Knowledge base creation response:', response);
@@ -194,34 +206,41 @@ export const useKnowledgeBaseApi = () => {
       setLoading(true);
       
       let apiEndpoint = '/create-knowledge-base';
-      let requestData: any = {};
+      let formData = new FormData();
       
       if (sourceType === 'url') {
         const knowledgeBaseName = sourceData.knowledgeBaseName || `KB with URLs`;
         
-        requestData = {
-          knowledge_base_id: kbId,
-          knowledge_base_name: knowledgeBaseName,
-          knowledge_base_texts: [],
-          knowledge_base_urls: sourceData.webPages && Array.isArray(sourceData.webPages) 
-            ? sourceData.webPages.map((page: WebPage) => page.url) 
-            : [sourceData.url],
-          enable_auto_refresh: sourceData.autoSync || false
-        };
+        // Create FormData for URL source
+        formData.append('knowledge_base_id', kbId);
+        formData.append('knowledge_base_name', knowledgeBaseName);
+        formData.append('knowledge_base_texts', JSON.stringify([]));
         
-        console.log('Adding URL sources with requestData:', requestData);
+        // Handle URL sources
+        const urls = sourceData.webPages && Array.isArray(sourceData.webPages) 
+          ? sourceData.webPages.map((page: WebPage) => page.url) 
+          : [sourceData.url];
+        
+        formData.append('knowledge_base_urls', JSON.stringify(urls));
+        formData.append('enable_auto_refresh', String(sourceData.autoSync || false));
+        
+        console.log('Adding URL sources with FormData:', {
+          knowledgeBaseName,
+          urls,
+          autoSync: sourceData.autoSync || false
+        });
         
         const response = await fetchWithAuth(apiEndpoint, {
           method: 'POST',
-          body: JSON.stringify(requestData),
+          body: formData,
         });
         
         console.log('Added URL sources response:', response);
       } else if (sourceType === 'file') {
-        // Handle file upload
+        // Handle file upload with FormData
         // Implementation specific to your API
       } else if (sourceType === 'text') {
-        // Handle text source
+        // Handle text source with FormData
         // Implementation specific to your API
       }
       
@@ -263,15 +282,15 @@ export const useKnowledgeBaseApi = () => {
     try {
       setLoading(true);
       
-      const updateData = {
-        knowledge_base_id: kb.id,
-        knowledge_base_name: kb.name,
-        enable_auto_refresh: kb.auto_sync
-      };
+      // Create FormData for update
+      const formData = new FormData();
+      formData.append('knowledge_base_id', kb.id);
+      formData.append('knowledge_base_name', kb.name);
+      formData.append('enable_auto_refresh', String(kb.auto_sync));
       
       await fetchWithAuth(`/add-knowledge-base-sources/${kb.id}`, {
         method: 'POST',
-        body: JSON.stringify(updateData),
+        body: formData,
       });
       
       toast.success('Knowledge base updated');
@@ -308,9 +327,13 @@ export const useKnowledgeBaseApi = () => {
       setLoading(true);
       console.log('Fetching sitemap for URL:', url);
       
+      // Create FormData for sitemap request
+      const formData = new FormData();
+      formData.append('website_url', url);
+      
       const response = await fetchWithAuth('/list-sitemap', {
         method: 'POST',
-        body: JSON.stringify({ website_url: url }),
+        body: formData,
       });
       
       if (response && response.pages) {
