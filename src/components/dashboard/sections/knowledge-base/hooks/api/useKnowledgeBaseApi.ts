@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
@@ -113,14 +112,37 @@ export const useKnowledgeBaseApi = () => {
     try {
       setLoading(true);
       
+      // Format the request data according to the API screenshots
+      const requestData = {
+        knowledge_base_name: name,
+        knowledge_base_texts: [],
+        knowledge_base_urls: [],
+        enable_auto_refresh: false
+      };
+      
+      console.log('Creating knowledge base with data:', requestData);
+      
       // Call the actual API endpoint
       const response = await fetchWithAuth('/create-knowledge-base', {
         method: 'POST',
-        body: JSON.stringify({ name }),
+        body: JSON.stringify(requestData),
       });
       
+      console.log('Knowledge base creation response:', response);
+      
+      // Map the response to our KnowledgeBase type
+      const createdKb: KnowledgeBase = {
+        id: response.knowledge_base_id,
+        name: response.knowledge_base_name,
+        created_at: new Date(response.user_modified_timestamp).toISOString(),
+        updated_at: new Date(response.user_modified_timestamp).toISOString(),
+        source_count: 0,
+        sources: [],
+        auto_sync: response.enable_auto_refresh || false
+      };
+      
       toast.success('Knowledge base created');
-      return response;
+      return createdKb;
     } catch (error) {
       console.error('Failed to create knowledge base:', error);
       toast.error('Failed to create knowledge base');
@@ -146,10 +168,17 @@ export const useKnowledgeBaseApi = () => {
     try {
       setLoading(true);
       
+      // Format the data for the API
+      const updateData = {
+        knowledge_base_id: kb.id,
+        knowledge_base_name: kb.name,
+        enable_auto_refresh: kb.auto_sync
+      };
+      
       // Call the actual API endpoint (when available)
       await fetchWithAuth(`/update-knowledge-base/${kb.id}`, {
         method: 'PUT',
-        body: JSON.stringify(kb),
+        body: JSON.stringify(updateData),
       });
       
       toast.success('Knowledge base updated');

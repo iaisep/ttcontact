@@ -77,6 +77,16 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   }, [open]);
 
   const handleKnowledgeBaseSaveWithSave = async (data: { name: string }) => {
+    // Include API parameters matching the format in the screenshots
+    const formattedData = {
+      knowledge_base_name: data.name,
+      knowledge_base_urls: [],
+      knowledge_base_texts: [],
+      enable_auto_refresh: false
+    };
+    
+    console.log("Creating knowledge base with data:", formattedData);
+    
     return handleKnowledgeBaseSave(data, onSave);
   };
 

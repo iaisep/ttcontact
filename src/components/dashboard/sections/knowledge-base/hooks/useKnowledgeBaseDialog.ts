@@ -64,11 +64,10 @@ export const useKnowledgeBaseDialog = ({
       
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
-      return true;
     } catch (error) {
       console.error('Failed to add URL source:', error);
       toast.error('Failed to add URL source');
-      return false;
+      throw error;
     } finally {
       setAddingSource(false);
     }
@@ -84,11 +83,10 @@ export const useKnowledgeBaseDialog = ({
       const updatedKb = await onAddSource(currentKb.id, 'file', { file });
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
-      return true;
     } catch (error) {
       console.error('Failed to add file source:', error);
       toast.error('Failed to add file source');
-      return false;
+      throw error;
     } finally {
       setAddingSource(false);
     }
@@ -104,11 +102,10 @@ export const useKnowledgeBaseDialog = ({
       const updatedKb = await onAddSource(currentKb.id, 'text', { fileName, content });
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
-      return true;
     } catch (error) {
       console.error('Failed to add text source:', error);
       toast.error('Failed to add text source');
-      return false;
+      throw error;
     } finally {
       setAddingSource(false);
     }
@@ -119,10 +116,9 @@ export const useKnowledgeBaseDialog = ({
 
     try {
       await onDeleteSource(currentKb.id, sourceToDelete.id);
-      return true;
     } catch (error) {
       console.error('Failed to delete source:', error);
-      return false;
+      throw error;
     }
   };
 
@@ -139,10 +135,9 @@ export const useKnowledgeBaseDialog = ({
       if (isCreating) {
         setCreationComplete(true);
       }
-      return true;
     } catch (error) {
       console.error('Error saving knowledge base:', error);
-      return false;
+      throw error;
     }
   };
 

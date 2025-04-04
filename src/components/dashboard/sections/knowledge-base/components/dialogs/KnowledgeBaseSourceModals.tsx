@@ -12,10 +12,10 @@ interface KnowledgeBaseSourceModalsProps {
   sourceToDelete: KnowledgeBaseSource | null;
   deleteSourceDialogOpen: boolean;
   setDeleteSourceDialogOpen: (open: boolean) => void;
-  onAddUrlSource: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<boolean | void>;
-  onAddFileSource: (file: File) => Promise<boolean | void>;
-  onAddTextSource: (fileName: string, content: string) => Promise<boolean | void>;
-  onDeleteSource: () => Promise<boolean | void>;
+  onAddUrlSource: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<void>;
+  onAddFileSource: (file: File) => Promise<void>;
+  onAddTextSource: (fileName: string, content: string) => Promise<void>;
+  onDeleteSource: () => Promise<void>;
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
 }
 
@@ -36,20 +36,26 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       <AddUrlSourceModal
         open={currentSourceType === 'url'}
         onOpenChange={(open) => !open && setCurrentSourceType(null)}
-        onSubmit={onAddUrlSource}
+        onSubmit={async (url, autoSync, selectedPages) => {
+          await onAddUrlSource(url, autoSync, selectedPages);
+        }}
         onFetchSitemap={onFetchSitemap}
       />
 
       <AddFileSourceModal
         open={currentSourceType === 'file'}
         onOpenChange={(open) => !open && setCurrentSourceType(null)}
-        onSubmit={onAddFileSource}
+        onSubmit={async (file) => {
+          await onAddFileSource(file);
+        }}
       />
 
       <AddTextSourceModal
         open={currentSourceType === 'text'}
         onOpenChange={(open) => !open && setCurrentSourceType(null)}
-        onSubmit={onAddTextSource}
+        onSubmit={async (fileName, content) => {
+          await onAddTextSource(fileName, content);
+        }}
       />
 
       {deleteSourceDialogOpen && (
@@ -57,7 +63,9 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           open={deleteSourceDialogOpen}
           onOpenChange={setDeleteSourceDialogOpen}
           source={sourceToDelete}
-          onConfirm={onDeleteSource}
+          onConfirm={async () => {
+            await onDeleteSource();
+          }}
         />
       )}
     </>
