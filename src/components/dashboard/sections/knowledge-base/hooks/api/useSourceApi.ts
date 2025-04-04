@@ -22,7 +22,7 @@ export const useSourceApi = () => {
       
       // Use the provided name - this is the critical part
       formData.append('knowledge_base_texts', '[]');
-      formData.append('knowledge_base_urls', JSON.stringify(sourceData.url));
+      formData.append('knowledge_base_urls', JSON.stringify([sourceData.url]));
     // Prepare request data based on source type
     let requestData: any = {
       knowledge_base_id: kbId
