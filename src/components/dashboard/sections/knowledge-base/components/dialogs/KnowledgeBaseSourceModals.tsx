@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { KnowledgeBaseSource, WebPage } from '../../types';
+import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 import AddUrlSourceModal from '../url-source-modal/AddUrlSourceModal';
 import AddFileSourceModal from '../AddFileSourceModal';
 import AddTextSourceModal from '../AddTextSourceModal';
@@ -12,10 +12,10 @@ interface KnowledgeBaseSourceModalsProps {
   sourceToDelete: KnowledgeBaseSource | null;
   deleteSourceDialogOpen: boolean;
   setDeleteSourceDialogOpen: (open: boolean) => void;
-  onAddUrlSource: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<void>;
-  onAddFileSource: (file: File) => Promise<void>;
-  onAddTextSource: (fileName: string, content: string) => Promise<void>;
-  onDeleteSource: () => Promise<void>;
+  onAddUrlSource: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<KnowledgeBase>;
+  onAddFileSource: (file: File) => Promise<KnowledgeBase>;
+  onAddTextSource: (fileName: string, content: string) => Promise<KnowledgeBase>;
+  onDeleteSource: () => Promise<KnowledgeBase>;
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
 }
 
