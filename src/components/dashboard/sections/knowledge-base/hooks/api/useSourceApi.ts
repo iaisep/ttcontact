@@ -45,7 +45,7 @@ export const useSourceApi = () => {
       
       try {
         // Call the API endpoint for URL sources
-        const response = await fetchWithAuth(`/kb/add-sources`, {
+        const response = await fetchWithAuth(`/add-knowledge-base-sources/${sourceId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export const useSourceApi = () => {
       console.log("Uploading file:", sourceData.file.name, "to KB:", kbId);
       
       // Special case for file uploads - use FormData
-      const response = await fetchWithAuth(`/kb/add-sources`, {
+      const response = await fetchWithAuth(`/add-knowledge-base-sources/${sourceId}`, {
         method: 'POST',
         // Don't set Content-Type header when using FormData
         body: formData,
@@ -86,7 +86,7 @@ export const useSourceApi = () => {
       console.log("Adding text content with title:", sourceData.fileName);
       
       // Call the API endpoint with JSON for text sources
-      const response = await fetchWithAuth(`/kb/add-sources`, {
+      const response = await fetchWithAuth(`/add-knowledge-base-sources/${sourceId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
