@@ -6,6 +6,7 @@ import { useApiContext } from '@/context/ApiContext';
 
 export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAction<boolean>>) => {
   const { fetchWithAuth } = useApiContext();
+  const [siteMapsLoading, setSiteMapsLoading] = useState(false);
 
   const resyncKnowledgeBase = async (kb: KnowledgeBase) => {
     try {
@@ -43,11 +44,11 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
 
   const fetchSitemap = async (url: string) => {
     try {
-      setLoading(true);
+      setSiteMapsLoading(true);
       console.log('Fetching sitemap for URL:', url);
       
       // Format the URL if needed
-      let formattedUrl = url;
+      let formattedUrl = url.trim();
       if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
         formattedUrl = `https://${formattedUrl}`;
       }
@@ -60,7 +61,7 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
       
       console.log('Sitemap API response:', response);
       
-      if (response && response.pages) {
+      if (response && response.pages && Array.isArray(response.pages)) {
         // Transform the API response to our WebPage format
         return response.pages.map((page: any) => ({
           url: page.url,
@@ -69,24 +70,29 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
         }));
       }
       
-      // Fallback mock data for development
-      console.log('Using fallback mock data for sitemap');
+      // Create mock data for this specific URL
+      console.log('Creating mock data for sitemap');
+      
+      // Try to extract the domain for more realistic mock data
+      const domain = formattedUrl.replace(/^https?:\/\//, '').split('/')[0];
+      
       const mockPages = [
-        { url: `${formattedUrl}/about`, title: 'About Us', selected: false },
-        { url: `${formattedUrl}/products`, title: 'Products', selected: false },
-        { url: `${formattedUrl}/contact`, title: 'Contact', selected: false },
-        { url: `${formattedUrl}/blog`, title: 'Blog', selected: false }
+        { url: `${formattedUrl}/about`, title: `About - ${domain}`, selected: false },
+        { url: `${formattedUrl}/products`, title: `Products - ${domain}`, selected: false },
+        { url: `${formattedUrl}/services`, title: `Services - ${domain}`, selected: false },
+        { url: `${formattedUrl}/contact`, title: `Contact - ${domain}`, selected: false },
+        { url: `${formattedUrl}/blog`, title: `Blog - ${domain}`, selected: false }
       ];
       
       return mockPages;
     } catch (error) {
       console.error('Failed to fetch sitemap:', error);
-      toast.error('Failed to fetch sitemap');
+      toast.error('Failed to fetch sitemap. Please check the URL and try again.');
       
       // Return empty array on error
       return [];
     } finally {
-      setLoading(false);
+      setSiteMapsLoading(false);
     }
   };
 
@@ -97,6 +103,7 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
   return {
     resyncKnowledgeBase,
     fetchSitemap,
-    hasUrlSources
+    hasUrlSources,
+    siteMapsLoading
   };
 };

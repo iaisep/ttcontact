@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { WebPage, KnowledgeBase } from '../../../types';
 import { toast } from 'sonner';
 
@@ -16,27 +16,39 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBa
   const [view, setView] = useState<'url-input' | 'sitemap-selection'>('url-input');
   const [webPages, setWebPages] = useState<WebPage[]>([]);
   const [selectedPageUrls, setSelectedPageUrls] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const resetState = () => {
+  const resetState = useCallback(() => {
     setUrl('');
     setAutoSync(false);
     setIsLoading(false);
     setView('url-input');
     setWebPages([]);
     setSelectedPageUrls([]);
-  };
+    setError(null);
+  }, []);
+
+  const formatUrl = useCallback((inputUrl: string): string => {
+    let formattedUrl = inputUrl.trim();
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = `https://${formattedUrl}`;
+    }
+    return formattedUrl;
+  }, []);
 
   const handleUrlSubmit = async () => {
-    if (!url) return;
+    if (!url) {
+      setError('Please enter a URL');
+      return;
+    }
 
+    setError(null);
+    
     try {
       setIsLoading(true);
       
       // Format the URL if needed
-      let formattedUrl = url;
-      if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
-        formattedUrl = `https://${formattedUrl}`;
-      }
+      const formattedUrl = formatUrl(url);
       
       console.log('Fetching sitemap for URL:', formattedUrl);
       
@@ -44,6 +56,10 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBa
       const pages = await onFetchSitemap(formattedUrl);
       
       console.log('Fetched pages:', pages);
+      
+      if (pages.length === 0) {
+        toast.warning('No pages found for this URL');
+      }
       
       // Update state with fetched pages
       setWebPages(pages);
@@ -58,7 +74,8 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBa
       setView('sitemap-selection');
     } catch (error) {
       console.error('Failed to fetch sitemap:', error);
-      toast.error('Failed to fetch sitemap');
+      toast.error('Failed to fetch sitemap from URL');
+      setError('Could not retrieve sitemap from this URL');
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +109,7 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBa
     }
 
     // Validate that we have a knowledge base before proceeding
-    if (!currentKnowledgeBase) {
+    if (!currentKnowledgeBase || !currentKnowledgeBase.id) {
       console.error('No knowledge base selected');
       toast.error('No knowledge base selected');
       return;
@@ -118,8 +135,9 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBa
       // Call the API with the selected pages
       await onSubmit(url, autoSync, selectedPages);
       
+      toast.success('URL source added successfully');
+      
       // Don't reset state here - the parent component will handle closing the modal after successful API call
-      // This ensures we don't get flashes of the URL input screen before the modal closes
     } catch (error) {
       console.error('Failed to add URL source:', error);
       toast.error('Failed to add URL source');
@@ -138,6 +156,7 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBa
     view,
     webPages,
     selectedPageUrls,
+    error,
     handleUrlSubmit,
     handleSelectionToggle,
     handleToggleAll,

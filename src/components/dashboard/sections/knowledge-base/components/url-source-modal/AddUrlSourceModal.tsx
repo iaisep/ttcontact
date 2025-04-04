@@ -36,6 +36,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
     view,
     webPages,
     selectedPageUrls,
+    error,
     handleUrlSubmit,
     handleSelectionToggle,
     handleToggleAll,
@@ -43,28 +44,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
     resetState
   } = useUrlSourceModal({
     onFetchSitemap,
-    onSubmit: async (url, autoSync, selectedPages) => {
-      try {
-        // Log the current knowledge base for debugging
-        console.log('Current knowledge base in modal:', currentKnowledgeBase);
-        
-        // This will be called when the Save button is clicked
-        const result = await onSubmit(url, autoSync, selectedPages);
-        
-        // Close the modal after successful submission
-        onOpenChange(false);
-        
-        // Reset state after the modal is closed
-        setTimeout(() => resetState(), 300);
-        
-        return result;
-      } catch (error) {
-        // Error handling is done in handleConfirmSelection
-        console.error('Error in modal submission:', error);
-        // Don't close the modal on error
-        throw error;
-      }
-    },
+    onSubmit,
     currentKnowledgeBase
   });
 
@@ -78,8 +58,8 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   // Debug logging for component state
   console.log('AddUrlSourceModal - current URL:', url);
   console.log('AddUrlSourceModal - view state:', view);
-  console.log('AddUrlSourceModal - selected pages:', selectedPageUrls);
-  console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase);
+  console.log('AddUrlSourceModal - selected pages count:', selectedPageUrls.length);
+  console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase?.id);
 
   return (
     <Dialog 
@@ -93,7 +73,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
       <DialogContent className="sm:max-w-[600px] p-0">
         <DialogHeader className="p-4 border-b">
           <DialogTitle className="text-xl font-medium">
-            {view === 'url-input' ? 'Add Web Pages' : 'Select Site Maps'}
+            {view === 'url-input' ? 'Add Web Pages' : 'Select Site Pages'}
           </DialogTitle>
           <button
             onClick={handleCloseModal}
@@ -111,6 +91,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
               url={url}
               setUrl={setUrl}
               isLoading={isLoading}
+              error={error}
               onSubmit={handleUrlSubmit}
               onCancel={handleCloseModal}
             />

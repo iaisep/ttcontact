@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { WebPage, KnowledgeBase } from '../../types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
+import { AlertCircle } from 'lucide-react';
 
 interface SitemapSelectionViewProps {
   webPages: WebPage[];
@@ -42,9 +43,13 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
     selected: selectedPageUrls.includes(page.url)
   }));
 
-  console.log('Sitemap selection view - pages:', pagesWithSelectionStatus);
-  console.log('Sitemap selection view - selected URLs:', selectedPageUrls);
-  console.log('Sitemap selection view - knowledge base:', currentKnowledgeBase);
+  // Debug logging for improved visibility
+  console.log('Sitemap selection view - current knowledge base:', currentKnowledgeBase);
+  console.log('Sitemap selection view - selected URLs count:', selectedPageUrls.length);
+
+  // Check if we have a valid knowledge base
+  const knowledgeBaseSelected = !!currentKnowledgeBase && !!currentKnowledgeBase.id;
+  const canProceed = selectedPageUrls.length > 0 && knowledgeBaseSelected;
 
   return (
     <div className="space-y-4">
@@ -113,9 +118,14 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
         </label>
       </div>
 
-      {currentKnowledgeBase && (
+      {currentKnowledgeBase ? (
         <div className="text-sm text-gray-500">
           Adding to knowledge base: <span className="font-medium">{currentKnowledgeBase.name}</span>
+        </div>
+      ) : (
+        <div className="flex items-center text-sm text-amber-600 bg-amber-50 p-2 rounded-md">
+          <AlertCircle className="h-4 w-4 mr-2" />
+          No knowledge base selected
         </div>
       )}
       
@@ -132,9 +142,13 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
           onClick={() => {
             console.log('Save button clicked with selected pages:', selectedPageUrls);
             console.log('Current knowledge base:', currentKnowledgeBase);
+            if (!currentKnowledgeBase) {
+              console.error('No knowledge base selected, cannot proceed');
+              return;
+            }
             onConfirm();
           }} 
-          disabled={isLoading || selectedPageUrls.length === 0}
+          disabled={isLoading || !canProceed}
           className="w-20 bg-black text-white hover:bg-black/80"
         >
           {isLoading ? 'Saving...' : 'Save'}
