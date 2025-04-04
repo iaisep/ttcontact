@@ -2,10 +2,6 @@
 import { KnowledgeBase } from '../../types';
 
 export const useDialogSourceTypes = () => {
-  const handleAddSourceClick = (type: 'url' | 'file' | 'text') => {
-    return type;
-  };
-
   const handleAutoSyncChange = (
     checked: boolean, 
     currentKb: KnowledgeBase | null,
@@ -19,7 +15,6 @@ export const useDialogSourceTypes = () => {
   };
 
   return {
-    handleAddSourceClick,
     handleAutoSyncChange
   };
 };

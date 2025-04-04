@@ -40,7 +40,7 @@ export const useKnowledgeBaseDialog = ({
   } = useDialogState(knowledgeBase, isCreating);
 
   // Import source type management hook
-  const { handleAddSourceClick, handleAutoSyncChange } = useDialogSourceTypes();
+  const { handleAutoSyncChange } = useDialogSourceTypes();
 
   // Import source operations hook
   const { 

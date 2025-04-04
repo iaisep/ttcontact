@@ -24,7 +24,8 @@ export const useKnowledgeBaseApi = () => {
   } = useKnowledgeBaseManageApi();
   
   const {
-    addSourceToKnowledgeBase
+    addSourceToKnowledgeBase,
+    deleteSource
   } = useSourceApi();
   
   const {
@@ -40,6 +41,7 @@ export const useKnowledgeBaseApi = () => {
     updateKnowledgeBase,
     deleteKnowledgeBase,
     addSourceToKnowledgeBase,
+    deleteSource,
     fetchSitemap
   };
 };

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useKnowledgeBaseApi } from './api/useKnowledgeBaseApi';
 import { KnowledgeBase, WebPage } from '../types';
@@ -123,29 +124,23 @@ export const useKnowledgeBase = () => {
     }
   };
 
-  const resyncKnowledgeBase = async (kbId: string) => {
+  const resyncKnowledgeBase = async (kb: KnowledgeBase) => {
     try {
       setLoading(true);
       // Assuming there's a specific API endpoint for resyncing a knowledge base
-      // You might need to adjust the endpoint and method accordingly
-      // const updatedKb = await apiResyncKnowledgeBase(kbId); 
+      // const updatedKb = await apiResyncKnowledgeBase(kb.id); 
       // setKnowledgeBases((prev) =>
-      //   prev.map((kb) => (kb.id === kbId ? updatedKb : kb))
+      //   prev.map((item) => (item.id === kb.id ? updatedKb : item))
       // );
-      // return updatedKb;
-      console.log(`Resyncing knowledge base with ID: ${kbId}`);
+      console.log(`Resyncing knowledge base: ${kb.name} (${kb.id})`);
       await new Promise(resolve => setTimeout(resolve, 2000));
+      return kb;
+    } finally {
       setLoading(false);
-      return knowledgeBases.find(kb => kb.id === kbId);
-    } catch (error) {
-      console.error('Error resyncing knowledge base:', error);
-      setLoading(false);
-      throw error;
     }
   };
 
-  const hasUrlSources = (kbId: string): boolean => {
-    const kb = knowledgeBases.find(kb => kb.id === kbId);
+  const hasUrlSources = (kb: KnowledgeBase): boolean => {
     return kb ? kb.sources.some(source => source.type === 'url') : false;
   };
 
