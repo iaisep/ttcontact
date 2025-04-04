@@ -21,10 +21,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { KnowledgeBase, KnowledgeBaseSource } from '../../types';
 
 interface SourcesSectionProps {
-  knowledgeBase: KnowledgeBase;
+  knowledgeBase: KnowledgeBase | null;
   onAddSourceClick: (type: 'url' | 'file' | 'text') => void;
   onDeleteSourceClick: (source: KnowledgeBaseSource) => void;
   onAutoSyncChange: (checked: boolean) => void;
+  isCreating?: boolean;
+  creationComplete?: boolean;
+  isSaving?: boolean;
 }
 
 const SourcesSection: React.FC<SourcesSectionProps> = ({
@@ -32,14 +35,38 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
   onAddSourceClick,
   onDeleteSourceClick,
   onAutoSyncChange,
+  isCreating = false,
+  creationComplete = false,
+  isSaving = false
 }) => {
+  // Early return if knowledgeBase is null with a placeholder
+  if (!knowledgeBase) {
+    return (
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <h3 className="text-sm font-medium">Sources</h3>
+          <Button variant="outline" size="sm" disabled={isSaving}>
+            <Plus className="mr-1 h-3 w-3" /> Add
+          </Button>
+        </div>
+        <div className="border rounded-md p-4 text-center text-sm text-muted-foreground">
+          Save the knowledge base first to add sources
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-medium">Sources</h3>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              disabled={isSaving || (isCreating && !creationComplete)}
+            >
               <Plus className="mr-1 h-3 w-3" /> Add
             </Button>
           </DropdownMenuTrigger>
@@ -102,6 +129,7 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
                 variant="ghost" 
                 size="icon"
                 onClick={() => onDeleteSourceClick(source)}
+                disabled={isSaving}
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
@@ -116,6 +144,7 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
             id="kb-auto-sync"
             checked={knowledgeBase.auto_sync || false}
             onCheckedChange={onAutoSyncChange}
+            disabled={isSaving}
           />
           <Label htmlFor="kb-auto-sync" className="text-sm cursor-pointer">
             Auto sync web pages every 24 hours

@@ -104,11 +104,11 @@ const KnowledgeBaseFormContent: React.FC<KnowledgeBaseFormContentProps> = ({
           {/* Sources section */}
           <SourcesSection 
             knowledgeBase={currentKb}
-            isCreating={isCreating}
-            creationComplete={creationComplete}
             onAddSourceClick={onAddSourceClick}
             onDeleteSourceClick={onDeleteSourceClick}
             onAutoSyncChange={onAutoSyncChange}
+            isCreating={isCreating}
+            creationComplete={creationComplete}
             isSaving={isSaving}
           />
         </div>

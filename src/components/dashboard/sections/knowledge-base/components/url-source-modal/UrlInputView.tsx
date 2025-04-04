@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Link, AlertCircle, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-interface UrlInputViewProps {
+interface UrlSourceInputViewProps {
   url: string;
   setUrl: (url: string) => void;
   isLoading: boolean;
@@ -15,7 +15,7 @@ interface UrlInputViewProps {
   knowledgeBaseName?: string;
 }
 
-const UrlInputView: React.FC<UrlInputViewProps> = ({
+const UrlInputView: React.FC<UrlSourceInputViewProps> = ({
   url,
   setUrl,
   isLoading,

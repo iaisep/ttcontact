@@ -89,7 +89,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
 
   // Handle when a source is successfully added
   const handleSourceAddSuccess = () => {
-    // Only close the entire dialog if we're creating a new knowledge base
+    // Close the entire dialog if we're creating a new knowledge base
     if (isCreating) {
       setShouldCloseAfterSave(true);
       setTimeout(() => {
