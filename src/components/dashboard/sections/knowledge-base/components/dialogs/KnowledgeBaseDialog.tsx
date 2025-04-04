@@ -121,6 +121,14 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   const handleSubmit = async (data: { name: string }) => {
     try {
       console.log('Saving knowledge base with name:', data.name);
+      
+      // Ensure we have a name, even if empty - we'll handle validation on the API side
+      if (!data.name || data.name.trim() === '') {
+        data.name = 'New Knowledge Base';
+        form.setValue('name', data.name);
+        setKnowledgeBaseName(data.name);
+      }
+      
       const success = await handleKnowledgeBaseSave(data, onSave);
       if (success) {
         form.reset();
@@ -309,7 +317,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                     <Button 
                       type="submit"
                       form="knowledge-base-form"
-                      disabled={isSaving || addingSource || !form.getValues().name}
+                      disabled={isSaving || addingSource}
                       className="w-20 bg-black text-white hover:bg-black/80"
                     >
                       Save

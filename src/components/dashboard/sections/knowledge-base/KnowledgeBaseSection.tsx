@@ -74,14 +74,17 @@ const KnowledgeBaseSection: React.FC = () => {
           autoSync: false
         });
         
+        // Make sure we have a valid name, even if it's a default one
+        const kbName = data.name && data.name.trim() !== '' ? data.name : 'New Knowledge Base';
+        
         // Using the updated createKnowledgeBase function that accepts a single parameter
-        const newKb = await createKnowledgeBase(data.name);
+        const newKb = await createKnowledgeBase(kbName);
         console.log('Created new knowledge base:', newKb);
         // Don't close the dialog here to allow adding sources
         setCurrentKb(newKb);
         toast.success('Knowledge base created successfully');
       } else if (currentKb) {
-        const updatedKb = { ...currentKb, name: data.name };
+        const updatedKb = { ...currentKb, name: data.name || 'New Knowledge Base' };
         await updateKnowledgeBase(updatedKb);
         setKbDialogOpen(false);
       }
@@ -133,7 +136,10 @@ const KnowledgeBaseSection: React.FC = () => {
         if (isNewKnowledgeBase) {
           // For a new knowledge base, we'll need to create it first
           // with the URLs included in the creation request
-          const kbName = sourceData.knowledgeBaseName || 'New Knowledge Base';
+          const kbName = sourceData.knowledgeBaseName && sourceData.knowledgeBaseName.trim() !== '' 
+            ? sourceData.knowledgeBaseName 
+            : 'New Knowledge Base';
+            
           const urls = sourceData.webPages.map((page: any) => page.url) || [];
           const autoSync = sourceData.autoSync || false;
           
@@ -144,7 +150,11 @@ const KnowledgeBaseSection: React.FC = () => {
           });
           
           // Use the create knowledge base API with the new simplified signature
-          const newKb = await createKnowledgeBase(kbName, urls, autoSync);
+          const newKb = await createKnowledgeBase({
+            name: kbName,
+            urls: urls,
+            autoSync: autoSync
+          });
           
           toast.success(`Created knowledge base with ${urls.length} URLs`);
           return newKb;

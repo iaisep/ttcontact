@@ -36,6 +36,12 @@ export const useKnowledgeBaseCreateApi = () => {
       
       // Create the form data using FormData
       const formData = new FormData();
+      
+      // Make sure the name is properly set in the request
+      if (!name || name.trim() === '') {
+        name = 'New Knowledge Base';
+      }
+      
       formData.append('knowledge_base_name', name);
       formData.append('knowledge_base_texts', '[]');
       formData.append('knowledge_base_urls', JSON.stringify(urls));
