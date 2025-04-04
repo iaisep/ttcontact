@@ -105,9 +105,25 @@ export const useKnowledgeBaseApi = () => {
     ];
   };
 
-  const createKnowledgeBase = async (name: string, urls: string[] = [], autoSync: boolean = false) => {
+  const createKnowledgeBase = async (nameOrData: string | { 
+    name: string; 
+    urls?: string[]; 
+    autoSync?: boolean 
+  }) => {
     try {
       setLoading(true);
+      
+      let name: string;
+      let urls: string[] = [];
+      let autoSync: boolean = false;
+      
+      if (typeof nameOrData === 'string') {
+        name = nameOrData;
+      } else {
+        name = nameOrData.name;
+        urls = nameOrData.urls || [];
+        autoSync = nameOrData.autoSync || false;
+      }
       
       const requestData = {
         knowledge_base_name: name,
@@ -127,7 +143,7 @@ export const useKnowledgeBaseApi = () => {
       
       const createdKb: KnowledgeBase = {
         id: response.knowledge_base_id,
-        name: response.knowledge_base_name,
+        name: response.knowledge_base_name || name,
         created_at: new Date(response.user_modified_timestamp || Date.now()).toISOString(),
         updated_at: new Date(response.user_modified_timestamp || Date.now()).toISOString(),
         source_count: urls.length,
@@ -149,18 +165,18 @@ export const useKnowledgeBaseApi = () => {
       
       const newKb: KnowledgeBase = {
         id: `kb_${Date.now()}`,
-        name,
+        name: typeof nameOrData === 'string' ? nameOrData : nameOrData.name,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        source_count: urls.length,
-        sources: urls.map(url => ({
+        source_count: typeof nameOrData === 'string' ? 0 : (nameOrData.urls?.length || 0),
+        sources: typeof nameOrData === 'string' ? [] : (nameOrData.urls || []).map(url => ({
           id: `src_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           type: 'url',
           title: url,
           url: url,
           created_at: new Date().toISOString(),
         })),
-        auto_sync: autoSync
+        auto_sync: typeof nameOrData === 'string' ? false : (nameOrData.autoSync || false)
       };
       
       return newKb;

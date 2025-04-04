@@ -62,16 +62,13 @@ const KnowledgeBaseSection: React.FC = () => {
       console.log('Saving knowledge base with name:', data.name);
       
       if (isCreating) {
-        // Format the request data according to the API requirements
-        const requestData = {
-          knowledge_base_name: data.name,
-          knowledge_base_texts: [],
-          knowledge_base_urls: [],
-          enable_auto_refresh: false
-        };
+        console.log('Creating knowledge base with data:', {
+          name: data.name,
+          urls: [],
+          autoSync: false
+        });
         
-        console.log('Creating knowledge base with data:', requestData);
-        
+        // Using the updated createKnowledgeBase function that accepts a single parameter
         const newKb = await createKnowledgeBase(data.name);
         console.log('Created new knowledge base:', newKb);
         // Don't close the dialog here to allow adding sources
@@ -130,17 +127,20 @@ const KnowledgeBaseSection: React.FC = () => {
         if (isNewKnowledgeBase) {
           // For a new knowledge base, we'll need to create it first
           // with the URLs included in the creation request
-          requestData = {
-            knowledge_base_name: sourceData.knowledgeBaseName,
-            knowledge_base_urls: sourceData.webPages.map((page: any) => page.url) || [],
-            enable_auto_refresh: sourceData.autoSync || false
-          };
+          const kbName = sourceData.knowledgeBaseName || 'New Knowledge Base';
+          const urls = sourceData.webPages.map((page: any) => page.url) || [];
+          const autoSync = sourceData.autoSync || false;
           
-          console.log('Creating new knowledge base with URLs:', requestData);
+          console.log('Creating new knowledge base with URLs:', {
+            name: kbName,
+            urls,
+            autoSync
+          });
           
-          // Use the create knowledge base API instead of add source
-          const newKb = await createKnowledgeBase(sourceData.knowledgeBaseName, requestData.knowledge_base_urls, requestData.enable_auto_refresh);
-          toast.success(`Created knowledge base with ${requestData.knowledge_base_urls.length} URLs`);
+          // Use the create knowledge base API with the new simplified signature
+          const newKb = await createKnowledgeBase(kbName, urls, autoSync);
+          
+          toast.success(`Created knowledge base with ${urls.length} URLs`);
           return newKb;
         } else {
           // For existing knowledge base, add URLs as sources
