@@ -147,7 +147,8 @@ export const useKnowledgeBaseApi = () => {
       const response = await fetchWithAuth('/create-knowledge-base', {
         method: 'POST',
         headers: {
-          'Accept': 'application/json, text/plain, */*'
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'multipart/form-data; boundary=----'
         },
         body: formData,
       });
@@ -236,7 +237,8 @@ export const useKnowledgeBaseApi = () => {
         const response = await fetchWithAuth(apiEndpoint, {
           method: 'POST',
           headers: {
-            'Accept': 'application/json, text/plain, */*'
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'multipart/form-data; boundary=----'
           },
           body: formData,
         });
@@ -256,6 +258,10 @@ export const useKnowledgeBaseApi = () => {
         
         const response = await fetchWithAuth(apiEndpoint, {
           method: 'POST',
+          headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'multipart/form-data; boundary=----'
+          },
           body: formData,
         });
         
@@ -277,6 +283,10 @@ export const useKnowledgeBaseApi = () => {
         
         const response = await fetchWithAuth(apiEndpoint, {
           method: 'POST',
+          headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'multipart/form-data; boundary=----'
+          },
           body: formData,
         });
         
@@ -329,6 +339,10 @@ export const useKnowledgeBaseApi = () => {
       
       await fetchWithAuth(`/add-knowledge-base-sources/${kb.id}`, {
         method: 'POST',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'multipart/form-data; boundary=----'
+        },
         body: formData,
       });
       
@@ -371,6 +385,10 @@ export const useKnowledgeBaseApi = () => {
       
       const response = await fetchWithAuth('/list-sitemap', {
         method: 'POST',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'multipart/form-data; boundary=----'
+        },
         body: formData,
       });
       
