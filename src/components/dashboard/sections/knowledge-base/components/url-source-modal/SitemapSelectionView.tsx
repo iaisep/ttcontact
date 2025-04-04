@@ -47,9 +47,9 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   console.log('Sitemap selection view - current knowledge base:', currentKnowledgeBase);
   console.log('Sitemap selection view - selected URLs count:', selectedPageUrls.length);
 
-  // Assume knowledge base is valid if it exists and has pages selected
-  // Remove the validation that was blocking progress
-  const canProceed = selectedPageUrls.length > 0;
+  // Check if we have a valid knowledge base
+  const knowledgeBaseSelected = !!currentKnowledgeBase && !!currentKnowledgeBase.id;
+  const canProceed = selectedPageUrls.length > 0 && knowledgeBaseSelected;
 
   return (
     <div className="space-y-4">
@@ -142,6 +142,10 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
           onClick={() => {
             console.log('Save button clicked with selected pages:', selectedPageUrls);
             console.log('Current knowledge base:', currentKnowledgeBase);
+            if (!currentKnowledgeBase) {
+              console.error('No knowledge base selected, cannot proceed');
+              return;
+            }
             onConfirm();
           }} 
           disabled={isLoading || !canProceed}
