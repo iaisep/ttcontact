@@ -17,6 +17,7 @@ interface KnowledgeBaseSourceModalsProps {
   onAddTextSource: (fileName: string, content: string) => Promise<KnowledgeBase>;
   onDeleteSource: () => Promise<KnowledgeBase>;
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
+  currentKnowledgeBase: KnowledgeBase | null;
 }
 
 const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
@@ -29,24 +30,28 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
   onAddFileSource,
   onAddTextSource,
   onDeleteSource,
-  onFetchSitemap
+  onFetchSitemap,
+  currentKnowledgeBase
 }) => {
+  console.log('KnowledgeBaseSourceModals - current KB:', currentKnowledgeBase);
+  
   return (
     <>
       <AddUrlSourceModal
         open={currentSourceType === 'url'}
         onOpenChange={(open) => !open && setCurrentSourceType(null)}
         onSubmit={async (url, autoSync, selectedPages) => {
-          await onAddUrlSource(url, autoSync, selectedPages);
+          return await onAddUrlSource(url, autoSync, selectedPages);
         }}
         onFetchSitemap={onFetchSitemap}
+        currentKnowledgeBase={currentKnowledgeBase}
       />
 
       <AddFileSourceModal
         open={currentSourceType === 'file'}
         onOpenChange={(open) => !open && setCurrentSourceType(null)}
         onSubmit={async (file) => {
-          await onAddFileSource(file);
+          return await onAddFileSource(file);
         }}
       />
 
@@ -54,7 +59,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
         open={currentSourceType === 'text'}
         onOpenChange={(open) => !open && setCurrentSourceType(null)}
         onSubmit={async (fileName, content) => {
-          await onAddTextSource(fileName, content);
+          return await onAddTextSource(fileName, content);
         }}
       />
 
@@ -64,7 +69,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           onOpenChange={setDeleteSourceDialogOpen}
           source={sourceToDelete}
           onConfirm={async () => {
-            await onDeleteSource();
+            return await onDeleteSource();
           }}
         />
       )}

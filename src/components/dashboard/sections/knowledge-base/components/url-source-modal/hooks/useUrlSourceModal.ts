@@ -1,14 +1,15 @@
 
 import { useState } from 'react';
-import { WebPage } from '../../../types';
+import { WebPage, KnowledgeBase } from '../../../types';
 import { toast } from 'sonner';
 
 interface UseUrlSourceModalProps {
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
-  onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<void>;
+  onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<KnowledgeBase>;
+  currentKnowledgeBase?: KnowledgeBase | null;
 }
 
-export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModalProps) => {
+export const useUrlSourceModal = ({ onFetchSitemap, onSubmit, currentKnowledgeBase }: UseUrlSourceModalProps) => {
   const [url, setUrl] = useState('');
   const [autoSync, setAutoSync] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -90,6 +91,13 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
       return;
     }
 
+    // Validate that we have a knowledge base before proceeding
+    if (!currentKnowledgeBase) {
+      console.error('No knowledge base selected');
+      toast.error('No knowledge base selected');
+      return;
+    }
+
     try {
       setIsLoading(true);
       
@@ -103,7 +111,8 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
         url,
         autoSync,
         selectedPages,
-        selectedUrls: selectedPageUrls
+        selectedUrls: selectedPageUrls,
+        knowledgeBase: currentKnowledgeBase
       });
       
       // Call the API with the selected pages
@@ -114,6 +123,7 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
     } catch (error) {
       console.error('Failed to add URL source:', error);
       toast.error('Failed to add URL source');
+      throw error;
     } finally {
       setIsLoading(false);
     }

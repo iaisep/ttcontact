@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { X } from 'lucide-react';
-import { WebPage } from '../../types';
+import { WebPage, KnowledgeBase } from '../../types';
 import { useUrlSourceModal } from './hooks/useUrlSourceModal';
 import UrlSourceInputView from './UrlSourceInputView';
 import SitemapSelectionView from './SitemapSelectionView';
@@ -15,15 +15,17 @@ import SitemapSelectionView from './SitemapSelectionView';
 interface AddUrlSourceModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<void>;
+  onSubmit: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<KnowledgeBase>;
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
+  currentKnowledgeBase?: KnowledgeBase | null;
 }
 
 const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   open,
   onOpenChange,
   onSubmit,
-  onFetchSitemap
+  onFetchSitemap,
+  currentKnowledgeBase
 }) => {
   const {
     url,
@@ -43,20 +45,27 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
     onFetchSitemap,
     onSubmit: async (url, autoSync, selectedPages) => {
       try {
+        // Log the current knowledge base for debugging
+        console.log('Current knowledge base in modal:', currentKnowledgeBase);
+        
         // This will be called when the Save button is clicked
-        await onSubmit(url, autoSync, selectedPages);
+        const result = await onSubmit(url, autoSync, selectedPages);
         
         // Close the modal after successful submission
         onOpenChange(false);
         
         // Reset state after the modal is closed
         setTimeout(() => resetState(), 300);
+        
+        return result;
       } catch (error) {
         // Error handling is done in handleConfirmSelection
         console.error('Error in modal submission:', error);
         // Don't close the modal on error
+        throw error;
       }
-    }
+    },
+    currentKnowledgeBase
   });
 
   const handleCloseModal = () => {
@@ -70,6 +79,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   console.log('AddUrlSourceModal - current URL:', url);
   console.log('AddUrlSourceModal - view state:', view);
   console.log('AddUrlSourceModal - selected pages:', selectedPageUrls);
+  console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase);
 
   return (
     <Dialog 
@@ -115,6 +125,7 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
               setAutoSync={setAutoSync}
               onCancel={handleCloseModal}
               onConfirm={handleConfirmSelection}
+              currentKnowledgeBase={currentKnowledgeBase}
             />
           )}
         </div>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { WebPage } from '../../types';
+import { WebPage, KnowledgeBase } from '../../types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 
@@ -15,6 +15,7 @@ interface SitemapSelectionViewProps {
   setAutoSync: (sync: boolean) => void;
   onCancel: () => void;
   onConfirm: () => Promise<void>;
+  currentKnowledgeBase?: KnowledgeBase | null;
 }
 
 const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
@@ -26,7 +27,8 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   autoSync,
   setAutoSync,
   onCancel,
-  onConfirm
+  onConfirm,
+  currentKnowledgeBase
 }) => {
   // Check if all pages are selected
   const allSelected = webPages.length > 0 && selectedPageUrls.length === webPages.length;
@@ -42,6 +44,7 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
 
   console.log('Sitemap selection view - pages:', pagesWithSelectionStatus);
   console.log('Sitemap selection view - selected URLs:', selectedPageUrls);
+  console.log('Sitemap selection view - knowledge base:', currentKnowledgeBase);
 
   return (
     <div className="space-y-4">
@@ -109,6 +112,12 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
           Auto sync every 24 hours
         </label>
       </div>
+
+      {currentKnowledgeBase && (
+        <div className="text-sm text-gray-500">
+          Adding to knowledge base: <span className="font-medium">{currentKnowledgeBase.name}</span>
+        </div>
+      )}
       
       <div className="flex justify-end gap-2 mt-4">
         <Button 
@@ -122,6 +131,7 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
         <Button 
           onClick={() => {
             console.log('Save button clicked with selected pages:', selectedPageUrls);
+            console.log('Current knowledge base:', currentKnowledgeBase);
             onConfirm();
           }} 
           disabled={isLoading || selectedPageUrls.length === 0}

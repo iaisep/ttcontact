@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../types';
 import { toast } from 'sonner';
@@ -58,7 +57,7 @@ export const useKnowledgeBaseDialog = ({
 
     try {
       setAddingSource(true);
-      console.log("Adding URL source with params:", { url, autoSync, selectedPages });
+      console.log("Adding URL source with params:", { url, autoSync, selectedPages, kbId: currentKb.id });
       
       // Format the data according to the API requirements
       const sourceData = {
@@ -145,7 +144,7 @@ export const useKnowledgeBaseDialog = ({
   const handleDeleteSource = async () => {
     if (!currentKb || !sourceToDelete) {
       toast.error('Missing knowledge base or source');
-      return;
+      return Promise.reject(new Error('Missing knowledge base or source'));
     }
 
     try {
