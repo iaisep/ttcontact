@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogTitle, DialogHeader } from '@/components/u
 import { X } from 'lucide-react';
 import { useUrlSourceModal } from './hooks/useUrlSourceModal';
 import { useSourceOperations } from '../../hooks/useSourceOperations';
-import UrlInputView from '../url-source-modal/UrlInputView';
+import UrlInputView from './UrlInputView';
 import SitemapSelectionView from './SitemapSelectionView';
 import { KnowledgeBase, WebPage } from '../../types';
 
@@ -15,6 +15,7 @@ interface AddUrlSourceModalProps {
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
   currentKnowledgeBase: KnowledgeBase | null;
   knowledgeBaseName?: string;
+  onSourceAddSuccess?: () => void;
 }
 
 const AddUrlSourceModal = ({
@@ -23,7 +24,8 @@ const AddUrlSourceModal = ({
   onAddSource,
   onFetchSitemap,
   currentKnowledgeBase,
-  knowledgeBaseName
+  knowledgeBaseName,
+  onSourceAddSuccess
 }: AddUrlSourceModalProps) => {
   // Use our custom hook for source operations
   const { handleUrlSourceSubmit } = useSourceOperations({
@@ -49,30 +51,35 @@ const AddUrlSourceModal = ({
   } = useUrlSourceModal({
     onFetchSitemap,
     onSubmit: async (url, autoSync, selectedPages) => {
-      // Pass the knowledge base name explicitly
-      const result = await handleUrlSourceSubmit(
-        url, 
-        autoSync, 
-        selectedPages, 
-        currentKnowledgeBase, 
-        knowledgeBaseName
-      );
-      onClose();
-      resetState();
-      return result;
+      try {
+        // Pass the knowledge base name explicitly
+        const result = await handleUrlSourceSubmit(
+          url, 
+          autoSync, 
+          selectedPages, 
+          currentKnowledgeBase, 
+          knowledgeBaseName
+        );
+        
+        // Notify parent of successful addition
+        if (onSourceAddSuccess) {
+          onSourceAddSuccess();
+        }
+        
+        // Close the modal
+        onClose();
+        
+        // Reset state after successful submission
+        resetState();
+        return result;
+      } catch (error) {
+        // Let the error bubble up
+        throw error;
+      }
     },
     currentKnowledgeBase,
     knowledgeBaseName
   });
-
-  // Log state for debugging
-  useEffect(() => {
-    console.log('AddUrlSourceModal - current URL:', url);
-    console.log('AddUrlSourceModal - view state:', view);
-    console.log('AddUrlSourceModal - selected pages count:', selectedPageUrls.length);
-    console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase);
-    console.log('AddUrlSourceModal - knowledge base name:', knowledgeBaseName);
-  }, [open, currentKnowledgeBase, knowledgeBaseName, url, view, selectedPageUrls]);
 
   // Clean up state when modal is closed
   useEffect(() => {
@@ -84,7 +91,11 @@ const AddUrlSourceModal = ({
   return (
     <Dialog 
       open={open} 
-      onOpenChange={(isOpen) => !isOpen && onClose()}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          onClose();
+        }
+      }}
     >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

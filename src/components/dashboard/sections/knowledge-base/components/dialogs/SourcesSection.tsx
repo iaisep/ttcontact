@@ -1,33 +1,25 @@
 
 import React from 'react';
-import { 
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import { Plus, Trash2, RefreshCcw } from 'lucide-react';
+import { KnowledgeBase, KnowledgeBaseSource } from '../../types';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { 
-  Plus, 
-  Trash2, 
-  Globe, 
-  File, 
-  FileText,
-  RefreshCcw 
-} from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { KnowledgeBase, KnowledgeBaseSource } from '../../types';
 
 interface SourcesSectionProps {
   knowledgeBase: KnowledgeBase | null;
   onAddSourceClick: (type: 'url' | 'file' | 'text') => void;
   onDeleteSourceClick: (source: KnowledgeBaseSource) => void;
   onAutoSyncChange: (checked: boolean) => void;
-  isCreating?: boolean;
-  creationComplete?: boolean;
-  isSaving?: boolean;
+  isCreating: boolean;
+  creationComplete: boolean;
+  isSaving: boolean;
 }
 
 const SourcesSection: React.FC<SourcesSectionProps> = ({
@@ -35,120 +27,110 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
   onAddSourceClick,
   onDeleteSourceClick,
   onAutoSyncChange,
-  isCreating = false,
-  creationComplete = false,
-  isSaving = false
+  isCreating,
+  creationComplete,
+  isSaving
 }) => {
-  // Early return if knowledgeBase is null with a placeholder
-  if (!knowledgeBase) {
-    return (
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <h3 className="text-sm font-medium">Sources</h3>
-          <Button variant="outline" size="sm" disabled={isSaving}>
-            <Plus className="mr-1 h-3 w-3" /> Add
-          </Button>
-        </div>
-        <div className="border rounded-md p-4 text-center text-sm text-muted-foreground">
-          Save the knowledge base first to add sources
-        </div>
-      </div>
-    );
-  }
+  // Handle the case when knowledgeBase is null
+  const sources = knowledgeBase?.sources || [];
+  const autoSync = knowledgeBase?.auto_sync || false;
 
   return (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium">Sources</h3>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              disabled={isSaving || (isCreating && !creationComplete)}
-            >
-              <Plus className="mr-1 h-3 w-3" /> Add
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onAddSourceClick('url')}>
-              <Globe className="mr-2 h-4 w-4" />
-              Add Web Pages
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onAddSourceClick('file')}>
-              <File className="mr-2 h-4 w-4" />
-              Upload Files
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onAddSourceClick('text')}>
-              <FileText className="mr-2 h-4 w-4" />
-              Add Text
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      
-      <div className="border rounded-md divide-y">
-        {knowledgeBase.sources.length === 0 ? (
-          <div className="p-4 text-center text-sm text-muted-foreground">
-            No sources added yet. Click "Add" to add your first source.
-          </div>
-        ) : (
-          knowledgeBase.sources.map((source) => (
-            <div key={source.id} className="flex items-center justify-between p-3">
-              <div className="flex items-center">
-                {source.type === 'url' && (
-                  <div className="flex items-center">
-                    <Globe className="h-4 w-4 mr-2 text-blue-500" />
-                    <span className="text-sm" title={source.url}>{source.title || source.url}</span>
-                    {source.auto_sync && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="ml-2">
-                              <RefreshCcw className="h-3 w-3 text-blue-500" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Auto-sync enabled</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-                  </div>
-                )}
-                {source.type === 'file' && <div className="flex items-center">
-                  <File className="h-4 w-4 mr-2 text-amber-500" />
-                  <span className="text-sm">{source.title}</span>
-                </div>}
-                {source.type === 'text' && <div className="flex items-center">
-                  <FileText className="h-4 w-4 mr-2 text-green-500" />
-                  <span className="text-sm">{source.title}</span>
-                </div>}
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => onDeleteSourceClick(source)}
-                disabled={isSaving}
-              >
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            </div>
-          ))
-        )}
-      </div>
-      
-      {knowledgeBase.sources.some(source => source.type === 'url') && (
-        <div className="flex items-center space-x-2 mt-4">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Label className="text-base font-medium">Sources</Label>
+        <div className="flex items-center space-x-2">
           <Switch
-            id="kb-auto-sync"
-            checked={knowledgeBase.auto_sync || false}
+            id="auto-sync"
+            checked={autoSync}
             onCheckedChange={onAutoSyncChange}
             disabled={isSaving}
           />
-          <Label htmlFor="kb-auto-sync" className="text-sm cursor-pointer">
-            Auto sync web pages every 24 hours
+          <Label htmlFor="auto-sync" className="text-sm">
+            Auto-sync
           </Label>
+        </div>
+      </div>
+      
+      {isCreating && !creationComplete ? (
+        <div className="text-center py-6">
+          <p className="text-sm text-muted-foreground">
+            Please save the knowledge base first before adding sources.
+          </p>
+        </div>
+      ) : (
+        <div>
+          <div className="space-y-2 mb-4">
+            {sources.length === 0 ? (
+              <div className="text-center py-6 border border-dashed rounded-md border-gray-300">
+                <p className="text-sm text-muted-foreground">
+                  No sources added yet. Add a source to populate your knowledge base.
+                </p>
+              </div>
+            ) : (
+              sources.map((source) => (
+                <div
+                  key={source.id}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+                >
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <span className="font-medium truncate max-w-[200px]">
+                      {source.type === 'url' ? source.url : source.filename}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    {source.type === 'url' && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-gray-500"
+                        disabled={isSaving}
+                      >
+                        <RefreshCcw className="h-4 w-4" />
+                        <span className="sr-only">Sync</span>
+                      </Button>
+                    )}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                      onClick={() => onDeleteSourceClick(source)}
+                      disabled={isSaving}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full flex items-center justify-center gap-1"
+                disabled={isSaving}
+              >
+                <Plus className="h-4 w-4" />
+                Add Source
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="w-56">
+              <DropdownMenuItem onClick={() => onAddSourceClick('url')}>
+                URL / Website
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onAddSourceClick('file')}>
+                File Upload
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onAddSourceClick('text')}>
+                Text Input
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
     </div>

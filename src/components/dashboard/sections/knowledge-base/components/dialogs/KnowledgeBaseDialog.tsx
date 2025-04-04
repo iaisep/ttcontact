@@ -33,11 +33,13 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   isSaving = false
 }) => {
   const [shouldCloseAfterSave, setShouldCloseAfterSave] = useState(false);
+  const [shouldCloseAfterSourceAdd, setShouldCloseAfterSourceAdd] = useState(false);
   
   // Reset the state when the dialog opens/closes
   useEffect(() => {
     if (!open) {
       setShouldCloseAfterSave(false);
+      setShouldCloseAfterSourceAdd(false);
     }
   }, [open]);
 
@@ -89,12 +91,18 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
 
   // Handle when a source is successfully added
   const handleSourceAddSuccess = () => {
-    // Close the entire dialog if we're creating a new knowledge base
-    if (isCreating) {
-      setShouldCloseAfterSave(true);
+    // If we're in a flow where we want to close after adding a source
+    if (shouldCloseAfterSourceAdd) {
       setTimeout(() => {
+        // Close source type modals first
+        setCurrentSourceType(null);
+        
+        // Then close the entire dialog
         onOpenChange(false);
       }, 500);
+    } else if (isCreating) {
+      // On creating new knowledge base, close after adding first source
+      setShouldCloseAfterSourceAdd(true);
     }
   };
 
