@@ -11,29 +11,33 @@ import { KnowledgeBase, WebPage } from '../../types';
 interface AddUrlSourceModalProps {
   open: boolean;
   onClose: () => void;
-  onAddSource: (kbId: string, sourceType: 'url' | 'file' | 'text', sourceData: any) => Promise<KnowledgeBase>;
-  onFetchSitemap: (url: string) => Promise<WebPage[]>;
-  currentKnowledgeBase: KnowledgeBase | null;
+  onOpenChange?: (open: boolean) => void; // Added this prop
+  onAddSource: (
+    kbId: string,
+    sourceType: 'url' | 'file' | 'text',
+    sourceData: any
+  ) => Promise<KnowledgeBase>;
+  onFetchSitemap: (url: string) => Promise<any[]>;
+  currentKnowledgeBase?: KnowledgeBase | null;
   knowledgeBaseName?: string;
-  onSourceAddSuccess?: () => void;
 }
 
-const AddUrlSourceModal = ({
+const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   open,
   onClose,
+  onOpenChange,
   onAddSource,
   onFetchSitemap,
   currentKnowledgeBase,
-  knowledgeBaseName,
-  onSourceAddSuccess
-}: AddUrlSourceModalProps) => {
+  knowledgeBaseName
+}) => {
   // Use our custom hook for source operations
-  const { handleAddUrlSource } = useSourceOperations({
-    onAddSource
+  const { handleUrlSourceSubmit } = useSourceOperations({
+    onAddSource,
   });
 
   // Use the URL source modal hook for state management and operations
-  const { 
+  const {
     url,
     setUrl,
     autoSync,
@@ -51,35 +55,30 @@ const AddUrlSourceModal = ({
   } = useUrlSourceModal({
     onFetchSitemap,
     onSubmit: async (url, autoSync, selectedPages) => {
-      try {
-        // Pass the knowledge base name explicitly
-        const result = await handleAddUrlSource(
-          url, 
-          autoSync, 
-          selectedPages, 
-          currentKnowledgeBase, 
-          knowledgeBaseName
-        );
-        
-        // Notify parent of successful addition
-        if (onSourceAddSuccess) {
-          onSourceAddSuccess();
-        }
-        
-        // Close the modal
-        onClose();
-        
-        // Reset state after successful submission
-        resetState();
-        return result;
-      } catch (error) {
-        // Let the error bubble up
-        throw error;
-      }
+      // Pass the knowledge base name explicitly
+      const result = await handleUrlSourceSubmit(
+        url, 
+        autoSync, 
+        selectedPages, 
+        currentKnowledgeBase,
+        knowledgeBaseName
+      );
+      onClose();
+      resetState();
+      return result;
     },
     currentKnowledgeBase,
     knowledgeBaseName
   });
+
+  // Log state for debugging
+  useEffect(() => {
+    console.log('AddUrlSourceModal - current URL:', url);
+    console.log('AddUrlSourceModal - view state:', view);
+    console.log('AddUrlSourceModal - selected pages count:', selectedPageUrls.length);
+    console.log('AddUrlSourceModal - knowledge base:', currentKnowledgeBase);
+    console.log('AddUrlSourceModal - knowledge base name:', knowledgeBaseName);
+  }, [open, currentKnowledgeBase, knowledgeBaseName, url, view, selectedPageUrls]);
 
   // Clean up state when modal is closed
   useEffect(() => {
@@ -88,35 +87,41 @@ const AddUrlSourceModal = ({
     }
   }, [open, resetState]);
 
+  // Handle dialog open state changes
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      onClose();
+    }
+    if (onOpenChange) {
+      onOpenChange(isOpen);
+    }
+  };
+
   return (
-    <Dialog 
-      open={open} 
-      onOpenChange={(isOpen) => {
-        if (!isOpen) {
-          onClose();
-        }
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Add URL Source</span>
-            <X className="h-4 w-4 cursor-pointer" onClick={onClose} />
+            <X 
+              className="h-4 w-4 cursor-pointer" 
+              onClick={onClose} 
+            />
           </DialogTitle>
         </DialogHeader>
 
         {view === 'url-input' ? (
-          <UrlInputView
-            url={url}
-            setUrl={setUrl}
-            error={error}
-            isLoading={isLoading}
-            onSubmit={handleUrlSubmit}
+          <UrlInputView 
+            url={url} 
+            setUrl={setUrl} 
+            error={error} 
+            isLoading={isLoading} 
+            onSubmit={handleUrlSubmit} 
             onCancel={onClose}
             knowledgeBaseName={knowledgeBaseName}
           />
         ) : (
-          <SitemapSelectionView
+          <SitemapSelectionView 
             url={url}
             autoSync={autoSync}
             setAutoSync={setAutoSync}

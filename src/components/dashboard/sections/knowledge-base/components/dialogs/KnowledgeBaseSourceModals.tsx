@@ -1,7 +1,9 @@
 
 import React from 'react';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
-import AddUrlSourceModal from '../url-source-modal/AddUrlSourceModal';
+import AddUrlSourceModal from '../AddUrlSourceModal';
+import AddFileSourceModal from '../AddFileSourceModal';
+import AddTextSourceModal from '../AddTextSourceModal';
 import SourceDeleteDialog from '../SourceDeleteDialog';
 
 interface KnowledgeBaseSourceModalsProps {
@@ -17,7 +19,6 @@ interface KnowledgeBaseSourceModalsProps {
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
   currentKnowledgeBase: KnowledgeBase | null;
   knowledgeBaseName?: string;
-  onSourceAddSuccess?: () => void;
 }
 
 const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
@@ -32,61 +33,49 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
   onDeleteSource,
   onFetchSitemap,
   currentKnowledgeBase,
-  knowledgeBaseName,
-  onSourceAddSuccess
+  knowledgeBaseName
 }) => {
+  // Handler for closing all source modals
+  const handleCloseModal = () => {
+    setCurrentSourceType(null);
+  };
+
   return (
     <>
       {/* URL Source Modal */}
       <AddUrlSourceModal
         open={currentSourceType === 'url'}
-        onClose={() => setCurrentSourceType(null)}
-        onAddSource={async (kbId, sourceType, sourceData) => {
-          // This is a mock implementation - in reality, AddUrlSourceModal calls handleUrlSourceSubmit
-          // which ultimately calls onAddUrlSource
-          return {} as KnowledgeBase;
+        onClose={handleCloseModal}
+        onAddSource={(kbId, sourceType, sourceData) => {
+          if (sourceType === 'url') {
+            return onAddUrlSource(sourceData.url, sourceData.autoSync, sourceData.webPages);
+          }
+          throw new Error('Invalid source type in URL modal');
         }}
         onFetchSitemap={onFetchSitemap}
         currentKnowledgeBase={currentKnowledgeBase}
         knowledgeBaseName={knowledgeBaseName}
-        onSourceAddSuccess={onSourceAddSuccess}
       />
 
-      {/* File Source Modal - Using existing component */}
-      {currentSourceType === 'file' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-xl font-semibold mb-4">File Upload Feature</h2>
-            <p className="mb-4">File upload functionality is temporarily disabled.</p>
-            <div className="flex justify-end">
-              <button 
-                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
-                onClick={() => setCurrentSourceType(null)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* File Source Modal */}
+      <AddFileSourceModal
+        open={currentSourceType === 'file'}
+        onOpenChange={(open) => {
+          if (!open) handleCloseModal();
+        }}
+        onSubmit={onAddFileSource}
+        currentKnowledgeBase={currentKnowledgeBase}
+      />
 
-      {/* Text Source Modal - Using existing component */}
-      {currentSourceType === 'text' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-xl font-semibold mb-4">Text Input Feature</h2>
-            <p className="mb-4">Text input functionality is temporarily disabled.</p>
-            <div className="flex justify-end">
-              <button 
-                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
-                onClick={() => setCurrentSourceType(null)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Text Source Modal */}
+      <AddTextSourceModal
+        open={currentSourceType === 'text'}
+        onOpenChange={(open) => {
+          if (!open) handleCloseModal();
+        }}
+        onSubmit={onAddTextSource}
+        currentKnowledgeBase={currentKnowledgeBase}
+      />
 
       {/* Delete Source Dialog */}
       <SourceDeleteDialog
