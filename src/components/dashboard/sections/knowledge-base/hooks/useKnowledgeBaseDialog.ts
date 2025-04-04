@@ -52,7 +52,8 @@ export const useKnowledgeBaseDialog = ({
   const handleAddUrlSource = async (url: string, autoSync: boolean, selectedPages: WebPage[]) => {
     if (!currentKb) {
       console.error('No current knowledge base');
-      return;
+      toast.error('No knowledge base selected');
+      throw new Error('No current knowledge base');
     }
 
     try {
@@ -83,6 +84,7 @@ export const useKnowledgeBaseDialog = ({
       setCurrentSourceType(null);
       
       toast.success('URL source added successfully');
+      return updatedKb;
     } catch (error) {
       console.error('Failed to add URL source:', error);
       toast.error('Failed to add URL source');
@@ -93,7 +95,10 @@ export const useKnowledgeBaseDialog = ({
   };
 
   const handleAddFileSource = async (file: File) => {
-    if (!currentKb) return;
+    if (!currentKb) {
+      toast.error('No knowledge base selected');
+      throw new Error('No current knowledge base');
+    }
 
     try {
       setAddingSource(true);
@@ -103,6 +108,7 @@ export const useKnowledgeBaseDialog = ({
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
       toast.success('File source added successfully');
+      return updatedKb;
     } catch (error) {
       console.error('Failed to add file source:', error);
       toast.error('Failed to add file source');
@@ -113,7 +119,10 @@ export const useKnowledgeBaseDialog = ({
   };
 
   const handleAddTextSource = async (fileName: string, content: string) => {
-    if (!currentKb) return;
+    if (!currentKb) {
+      toast.error('No knowledge base selected');
+      throw new Error('No current knowledge base');
+    }
 
     try {
       setAddingSource(true);
@@ -123,6 +132,7 @@ export const useKnowledgeBaseDialog = ({
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
       toast.success('Text source added successfully');
+      return updatedKb;
     } catch (error) {
       console.error('Failed to add text source:', error);
       toast.error('Failed to add text source');
@@ -133,7 +143,10 @@ export const useKnowledgeBaseDialog = ({
   };
 
   const handleDeleteSource = async () => {
-    if (!currentKb || !sourceToDelete) return;
+    if (!currentKb || !sourceToDelete) {
+      toast.error('Missing knowledge base or source');
+      return;
+    }
 
     try {
       const updatedKb = await onDeleteSource(currentKb.id, sourceToDelete.id);
@@ -141,6 +154,7 @@ export const useKnowledgeBaseDialog = ({
       setDeleteSourceDialogOpen(false);
       setSourceToDelete(null);
       toast.success('Source deleted successfully');
+      return updatedKb;
     } catch (error) {
       console.error('Failed to delete source:', error);
       toast.error('Failed to delete source');

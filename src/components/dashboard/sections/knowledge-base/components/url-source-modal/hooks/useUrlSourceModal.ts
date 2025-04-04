@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { WebPage } from '../../../types';
+import { toast } from 'sonner';
 
 interface UseUrlSourceModalProps {
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
@@ -56,6 +57,7 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
       setView('sitemap-selection');
     } catch (error) {
       console.error('Failed to fetch sitemap:', error);
+      toast.error('Failed to fetch sitemap');
     } finally {
       setIsLoading(false);
     }
@@ -84,6 +86,7 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
   const handleConfirmSelection = async () => {
     if (selectedPageUrls.length === 0) {
       console.warn('No pages selected, cannot proceed');
+      toast.error('Please select at least one page');
       return;
     }
 
@@ -106,10 +109,11 @@ export const useUrlSourceModal = ({ onFetchSitemap, onSubmit }: UseUrlSourceModa
       // Call the API with the selected pages
       await onSubmit(url, autoSync, selectedPages);
       
-      // Reset the form state after successful submission
-      resetState();
+      // Don't reset state here - the parent component will handle closing the modal after successful API call
+      // This ensures we don't get flashes of the URL input screen before the modal closes
     } catch (error) {
       console.error('Failed to add URL source:', error);
+      toast.error('Failed to add URL source');
     } finally {
       setIsLoading(false);
     }

@@ -41,17 +41,32 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
     resetState
   } = useUrlSourceModal({
     onFetchSitemap,
-    onSubmit
+    onSubmit: async (url, autoSync, selectedPages) => {
+      try {
+        // This will be called when the Save button is clicked
+        await onSubmit(url, autoSync, selectedPages);
+        
+        // Close the modal after successful submission
+        onOpenChange(false);
+        
+        // Reset state after the modal is closed
+        setTimeout(() => resetState(), 300);
+      } catch (error) {
+        // Error handling is done in handleConfirmSelection
+        console.error('Error in modal submission:', error);
+        // Don't close the modal on error
+      }
+    }
   });
 
   const handleCloseModal = () => {
     if (!isLoading) {
       onOpenChange(false);
-      setTimeout(() => resetState(), 100);
+      setTimeout(() => resetState(), 300);
     }
   };
 
-  // Ensure the URL is properly passed from the input view to the selection view
+  // Debug logging for component state
   console.log('AddUrlSourceModal - current URL:', url);
   console.log('AddUrlSourceModal - view state:', view);
   console.log('AddUrlSourceModal - selected pages:', selectedPageUrls);

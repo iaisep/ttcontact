@@ -23,7 +23,7 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
           console.log(`Resyncing KB ${kb.id} with URL: ${source.url}`);
           
           // Use the correct API endpoint format and payload structure
-          await fetchWithAuth(`/refresh-knowledge-base/${kb.id}`, {
+          await fetchWithAuth(`/kb/${kb.id}/refresh`, {
             method: 'POST',
             body: JSON.stringify({ 
               website_url: source.url 
@@ -46,10 +46,16 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
       setLoading(true);
       console.log('Fetching sitemap for URL:', url);
       
+      // Format the URL if needed
+      let formattedUrl = url;
+      if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+        formattedUrl = `https://${formattedUrl}`;
+      }
+      
       // Call the actual API endpoint
-      const response = await fetchWithAuth('/list-sitemap', {
+      const response = await fetchWithAuth('/kb/sitemap', {
         method: 'POST',
-        body: JSON.stringify({ website_url: url }),
+        body: JSON.stringify({ website_url: formattedUrl }),
       });
       
       console.log('Sitemap API response:', response);
@@ -66,10 +72,10 @@ export const useKnowledgeBaseSync = (setLoading: React.Dispatch<React.SetStateAc
       // Fallback mock data for development
       console.log('Using fallback mock data for sitemap');
       const mockPages = [
-        { url: `${url}/about`, title: 'About Us', selected: false },
-        { url: `${url}/products`, title: 'Products', selected: false },
-        { url: `${url}/contact`, title: 'Contact', selected: false },
-        { url: `${url}/blog`, title: 'Blog', selected: false }
+        { url: `${formattedUrl}/about`, title: 'About Us', selected: false },
+        { url: `${formattedUrl}/products`, title: 'Products', selected: false },
+        { url: `${formattedUrl}/contact`, title: 'Contact', selected: false },
+        { url: `${formattedUrl}/blog`, title: 'Blog', selected: false }
       ];
       
       return mockPages;

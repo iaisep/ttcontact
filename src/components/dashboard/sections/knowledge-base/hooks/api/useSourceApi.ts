@@ -1,3 +1,4 @@
+
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -122,12 +123,13 @@ export const useSourceApi = () => {
     if (sourceType === 'url') {
       // If we have web pages, use them to create mock sources
       if (sourceData.webPages && sourceData.webPages.length > 0) {
-        // Return the first page as a source
+        // Create a source for each web page for better visibility
+        const firstPage = sourceData.webPages[0];
         return {
           id: `src_url_${Date.now()}`,
           type: 'url',
-          title: sourceData.webPages[0].title || 'Website',
-          url: sourceData.webPages[0].url,
+          title: firstPage.title || 'Website',
+          url: firstPage.url,
           created_at: new Date().toISOString(),
           auto_sync: sourceData.autoSync
         };
