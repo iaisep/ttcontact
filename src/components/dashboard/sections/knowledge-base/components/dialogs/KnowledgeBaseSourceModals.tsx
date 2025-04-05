@@ -60,6 +60,9 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       <AddUrlSourceModal
         open={currentSourceType === 'url'}
         onClose={handleCloseModal}
+        onOpenChange={(open: boolean) => {
+          if (!open) handleCloseModal();
+        }}
         onAddSource={(url, autoSync, selectedPages) => {
           return onAddUrlSource(url, autoSync, selectedPages).then(result => {
             handleSourceAdded();
