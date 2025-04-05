@@ -46,6 +46,14 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   
   const displayName = knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name);
 
+  const handleConfirm = () => {
+    if (canProceed && !isLoading) {
+      onConfirm();
+      // No es necesario agregar más código aquí, ya que las funciones de cierre 
+      // se manejarán en los componentes padre
+    }
+  };
+
   return (
     <div className="space-y-4">
       {displayName && (
@@ -109,7 +117,7 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
             Back
           </Button>
           <Button
-            onClick={onConfirm}
+            onClick={handleConfirm}
             disabled={!canProceed || isLoading}
             className={isLoading ? 'opacity-70 cursor-not-allowed' : ''}
           >

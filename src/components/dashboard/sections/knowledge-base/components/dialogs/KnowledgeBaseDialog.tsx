@@ -76,6 +76,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
 
   const [showSourceMenu, setShowSourceMenu] = useState(false);
   const [knowledgeBaseName, setKnowledgeBaseName] = useState('');
+  const [needsRefresh, setNeedsRefresh] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -114,6 +115,12 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     return () => subscription.unsubscribe();
   }, [form]);
 
+  useEffect(() => {
+    if (needsRefresh) {
+      setNeedsRefresh(false);
+    }
+  }, [needsRefresh]);
+
   const handleSubmit = async (data: { name: string }) => {
     try {
       console.log('Saving knowledge base with name:', data.name);
@@ -125,6 +132,14 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     } catch (error) {
       console.error('Error saving knowledge base:', error);
     }
+  };
+
+  const handleSourceAdded = () => {
+    setNeedsRefresh(true);
+  };
+
+  const handleCloseMainDialog = () => {
+    onOpenChange(false);
   };
 
   const sourceOptions = [
@@ -163,13 +178,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
             <DialogTitle className="text-xl font-medium">
               Add Knowledge Base
             </DialogTitle>
-            {/* <button
-              onClick={() => onOpenChange(false)}
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </button> */}
           </DialogHeader>
           
           <div className="p-6 pt-2">
@@ -324,6 +332,8 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         onFetchSitemap={onFetchSitemap}
         currentKnowledgeBase={currentKb}
         knowledgeBaseName={knowledgeBaseName}
+        onSourceAdded={handleSourceAdded}
+        onCloseMainDialog={handleCloseMainDialog}
       />
     </>
   );
