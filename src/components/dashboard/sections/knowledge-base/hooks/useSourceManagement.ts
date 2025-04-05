@@ -39,42 +39,68 @@ export const useSourceManagement = (
       
       console.log(`Adding ${sourceType} source to KB ${kbId}:`, sourceData);
       
+      // Check if we're creating a new KB or adding to an existing one
+      const isNewKB = kbId === 'create_new' || kbId.startsWith('temp_');
+      
+      // If creating a new KB, add a knowledge base name to the data
+      if (isNewKB && sourceData.fileName && sourceType === 'text') {
+        sourceData.knowledgeBaseName = sourceData.fileName;
+      } else if (isNewKB && sourceData.file && sourceType === 'file') {
+        sourceData.knowledgeBaseName = sourceData.file.name.split('.')[0]; // Use filename without extension
+      }
+      
       // Call the API endpoint
       const response = await addSourceToKnowledgeBaseApi(kbId, sourceType, sourceData);
       
       console.log(`API response for adding ${sourceType} source:`, response);
       
-      // Find and update the KB in the local state
-      const kb = knowledgeBases.find(kb => kb.id === kbId);
-      if (!kb) throw new Error('Knowledge base not found');
-      
       // For development, create a mock source when API is not available
       let newSource: KnowledgeBaseSource | null = null;
+      let updatedKb: KnowledgeBase;
       
       if (response && response.source) {
         // Use the actual API response
         newSource = response.source;
+        updatedKb = response;
       } else {
         // Fallback mock data for development
         newSource = createMockSource(sourceType, sourceData);
-      }
-      
-      if (newSource) {
-        const updatedKb = {...kb};
-        updatedKb.sources = [...updatedKb.sources, newSource];
-        updatedKb.source_count = updatedKb.sources.length;
         
-        if (sourceType === 'url' && sourceData.autoSync) {
-          updatedKb.auto_sync = true;
+        // Find and update the KB in the local state for existing KBs
+        if (!isNewKB) {
+          const kb = knowledgeBases.find(kb => kb.id === kbId);
+          if (!kb) throw new Error('Knowledge base not found');
+          
+          updatedKb = {...kb};
+          if (newSource) {
+            updatedKb.sources = [...updatedKb.sources, newSource];
+            updatedKb.source_count = updatedKb.sources.length;
+          }
+          
+          if (sourceType === 'url' && sourceData.autoSync) {
+            updatedKb.auto_sync = true;
+          }
+        } else {
+          // For new KB, create a mock KB
+          updatedKb = {
+            id: kbId.startsWith('temp_') ? kbId : `kb_${Date.now()}`,
+            name: sourceData.knowledgeBaseName || "New Knowledge Base",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            source_count: newSource ? 1 : 0,
+            sources: newSource ? [newSource] : [],
+            auto_sync: sourceType === 'url' ? sourceData.autoSync || false : false
+          };
         }
-        
-        updateKnowledgeBaseInState(updatedKb);
-        
-        toast.success('Source added to knowledge base');
-        return updatedKb;
       }
       
-      throw new Error('Failed to add source');
+      if (!isNewKB) {
+        // Only update the local state for existing KBs
+        updateKnowledgeBaseInState(updatedKb);
+      }
+      
+      toast.success('Source added to knowledge base');
+      return updatedKb;
     } catch (error) {
       console.error('Failed to add source to knowledge base:', error);
       toast.error('Failed to add source to knowledge base');

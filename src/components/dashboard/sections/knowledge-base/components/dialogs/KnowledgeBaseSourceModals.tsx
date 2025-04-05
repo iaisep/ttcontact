@@ -1,6 +1,6 @@
 
 import React from 'react';
-import AddUrlSourceModal from '../AddUrlSourceModal';
+import AddUrlSourceModal from '../url-source-modal';
 import AddFileSourceModal from '../AddFileSourceModal';
 import AddTextSourceModal from '../AddTextSourceModal';
 import SourceDeleteDialog from '../SourceDeleteDialog';
@@ -85,6 +85,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       {/* File Source Modal */}
       <AddFileSourceModal
         open={currentSourceType === 'file'}
+        onOpenChange={handleCloseSourceModal}
         onClose={() => {
           handleCloseSourceModal();
           handleSourceAdded();
@@ -96,6 +97,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       {/* Text Source Modal */}
       <AddTextSourceModal
         open={currentSourceType === 'text'}
+        onOpenChange={handleCloseSourceModal}
         onClose={() => {
           handleCloseSourceModal();
           handleSourceAdded();

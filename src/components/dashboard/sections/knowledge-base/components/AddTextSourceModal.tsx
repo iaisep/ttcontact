@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 interface AddTextSourceModalProps {
   open: boolean;
   onOpenChange?: (open: boolean) => void;
-  onClose?: () => void; // Added onClose prop
+  onClose?: () => void;
   onSubmit: (fileName: string, content: string) => Promise<KnowledgeBase>;
   currentKnowledgeBase: KnowledgeBase | null;
 }
@@ -52,6 +52,7 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
     
     try {
       setIsSubmitting(true);
+      console.log("Submitting text content:", { fileName, contentLength: content.length });
       await onSubmit(fileName, content);
       handleReset();
       toast.success('Text source added successfully');

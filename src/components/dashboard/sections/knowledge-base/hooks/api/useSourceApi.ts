@@ -43,7 +43,7 @@ export const useSourceApi = () => {
     } 
     else if (sourceType === 'file' && sourceData.file) {
       // For file upload, include the file in formData
-      formData.append('knowledge_base_files', sourceData.file);
+      formData.append('file', sourceData.file);
       
       // Empty arrays for text and URL content
       formData.append('knowledge_base_texts', '[]');
@@ -66,8 +66,14 @@ export const useSourceApi = () => {
     }
     
     try {
+      const endpoint = kbId.startsWith('temp_') 
+        ? '/create-knowledge-base'
+        : `/add-knowledge-base-sources/${kbId}`;
+      
+      console.log(`Using endpoint ${endpoint} for ${sourceType} source`);
+      
       // Call the API endpoint with FormData for all source types
-      const response = await fetchWithAuth(`/add-knowledge-base-sources/${kbId}`, {
+      const response = await fetchWithAuth(endpoint, {
         method: 'POST',
         // Don't set Content-Type header when using FormData
         // The browser will automatically set the correct Content-Type with boundary

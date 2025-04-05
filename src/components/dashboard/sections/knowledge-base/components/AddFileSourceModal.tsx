@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 interface AddFileSourceModalProps {
   open: boolean;
   onOpenChange?: (open: boolean) => void;
-  onClose?: () => void; // Added onClose prop
+  onClose?: () => void;
   onSubmit: (file: File) => Promise<KnowledgeBase>;
   currentKnowledgeBase: KnowledgeBase | null;
 }
@@ -55,6 +55,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
     
     try {
       setIsSubmitting(true);
+      console.log("Submitting file:", selectedFile.name);
       await onSubmit(selectedFile);
       handleReset();
       toast.success('File source added successfully');
