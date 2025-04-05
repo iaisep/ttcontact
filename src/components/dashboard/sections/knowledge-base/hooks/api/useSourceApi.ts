@@ -1,4 +1,3 @@
-
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -24,7 +23,7 @@ export const useSourceApi = () => {
     const formData = new FormData();
     
     // Determine if we are creating a new knowledge base or adding to an existing one
-    const isCreatingNew = !kbId || kbId.startsWith('temp_');
+    const isCreatingNew = !kbId || kbId === 'create_new' || kbId.startsWith('temp_');
     
     // If we're creating a new KB, don't include KB ID in FormData
     if (!isCreatingNew) {
@@ -81,11 +80,11 @@ export const useSourceApi = () => {
     }
     
     try {
-      // Seleccionar el endpoint correcto basado en si estamos creando una nueva KB
-      // o añadiendo a una existente
+      // Select the correct endpoint based on whether we're creating a new KB
+      // or adding to an existing one
       const endpoint = isCreatingNew
-        ? '/create-knowledge-base'
-        : `/add-knowledge-base-sources/${kbId}`;
+        ? '/create-knowledge-base'  // For new KB, use the create endpoint
+        : `/add-knowledge-base-sources/${kbId}`; // For existing KB, use the add sources endpoint
       
       console.log(`Using endpoint ${endpoint} for ${sourceType} source. Creating new KB: ${isCreatingNew}`);
       

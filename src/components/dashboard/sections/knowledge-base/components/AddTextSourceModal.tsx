@@ -62,8 +62,8 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
         kb: currentKnowledgeBase 
       });
       
-      // La lógica para crear o añadir a KB existente se maneja en el hook
-      // useSourceOperations a través de onSubmit
+      // The logic for creating or adding to existing KB is handled in the hook
+      // useSourceOperations through onSubmit
       await onSubmit(fileName, content);
       handleReset();
       toast.success('Text source added successfully');
