@@ -47,7 +47,9 @@ export const useSourceManagement = (
       if (isNewKB && sourceData.fileName && sourceType === 'text') {
         sourceData.knowledgeBaseName = sourceData.fileName;
       } else if (isNewKB && sourceData.file && sourceType === 'file') {
-        sourceData.knowledgeBaseName = sourceData.file.name.split('.')[0]; // Use filename without extension
+        const fileName = sourceData.file.name;
+        const fileExtension = fileName.lastIndexOf('.') > -1 ? fileName.slice(fileName.lastIndexOf('.')) : '';
+        sourceData.knowledgeBaseName = fileName.replace(fileExtension, ''); // Use filename without extension
       }
       
       // Call the API endpoint

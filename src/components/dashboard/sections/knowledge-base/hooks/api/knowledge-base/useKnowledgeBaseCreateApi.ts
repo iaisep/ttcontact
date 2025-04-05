@@ -37,7 +37,7 @@ export const useKnowledgeBaseCreateApi = () => {
         autoSync
       });
       
-      // Create FormData object
+      // Create FormData object according to the API requirements shown in the images
       const formData = new FormData();
       
       // Use the provided name - this is the critical part

@@ -37,7 +37,7 @@ export const useSourceOperations = ({
       
       // Determine if this is a new KB or existing one
       const isNewKB = !currentKb.id || currentKb.id.startsWith('temp_');
-      const kbId = isNewKB ? 'temp_' + Date.now() : currentKb.id;
+      const kbId = isNewKB ? 'create_new' : currentKb.id;
       const kbName = currentKb.name || '';
       
       console.log("Adding URL source with params:", { 
@@ -90,14 +90,15 @@ export const useSourceOperations = ({
       
       // If creating a new KB, generate a temporary ID
       const kbId = isNewKB 
-        ? 'temp_' + Date.now() 
+        ? 'create_new' 
         : (currentKb?.id || '');
       
       // For new KB, use the file name as the KB name
       // Extract name without extension for KB name
       const fileName = file.name;
+      const fileExtension = fileName.lastIndexOf('.') > -1 ? fileName.slice(fileName.lastIndexOf('.')) : '';
       const kbName = isNewKB 
-        ? fileName.split('.')[0] || "New Knowledge Base"
+        ? fileName.replace(fileExtension, '') || "New Knowledge Base"
         : (currentKb?.name || "Unknown Knowledge Base");
       
       console.log("Adding file source:", { 
@@ -135,7 +136,7 @@ export const useSourceOperations = ({
       
       // If creating a new KB, generate a temporary ID
       const kbId = isNewKB 
-        ? 'temp_' + Date.now() 
+        ? 'create_new' 
         : (currentKb?.id || '');
       
       // For new KB, use the text file name as the KB name
