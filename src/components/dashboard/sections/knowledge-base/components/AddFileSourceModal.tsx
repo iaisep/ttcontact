@@ -59,11 +59,13 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
       console.log("Current knowledge base:", currentKnowledgeBase);
       
       if (!currentKnowledgeBase) {
+        toast.error('No knowledge base selected');
         throw new Error('No knowledge base selected');
       }
       
-      // Make sure we have a valid knowledge base ID before proceeding
+      // Validate that we have a knowledge base with at least an ID
       if (!currentKnowledgeBase.id) {
+        toast.error('Knowledge base has no ID');
         throw new Error('Knowledge base has no ID');
       }
       

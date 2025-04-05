@@ -75,6 +75,8 @@ export const useKnowledgeBaseDialog = ({
       toast.error('No knowledge base selected');
       return Promise.reject(new Error('No knowledge base selected'));
     }
+    
+    // Ensure we actually pass the currentKb to the sourceAddFileSource function
     return sourceAddFileSource(file, currentKb);
   };
 
