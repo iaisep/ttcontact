@@ -18,20 +18,18 @@ import {
   RefreshCcw 
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { KnowledgeBase, KnowledgeBaseSource } from '../../types';
+import { KnowledgeBaseSource } from '../../types';
 
 interface SourcesSectionProps {
-  knowledgeBase: KnowledgeBase;
+  sources: KnowledgeBaseSource[];
   onAddSourceClick: (type: 'url' | 'file' | 'text') => void;
-  onDeleteSourceClick: (source: KnowledgeBaseSource) => void;
-  onAutoSyncChange: (checked: boolean) => void;
+  onDeleteSource: (source: KnowledgeBaseSource) => void;
 }
 
 const SourcesSection: React.FC<SourcesSectionProps> = ({
-  knowledgeBase,
+  sources,
   onAddSourceClick,
-  onDeleteSourceClick,
-  onAutoSyncChange,
+  onDeleteSource,
 }) => {
   return (
     <div className="space-y-2">
@@ -61,12 +59,12 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
       </div>
       
       <div className="border rounded-md divide-y">
-        {knowledgeBase.sources.length === 0 ? (
+        {sources.length === 0 ? (
           <div className="p-4 text-center text-sm text-muted-foreground">
             No sources added yet. Click "Add" to add your first source.
           </div>
         ) : (
-          knowledgeBase.sources.map((source) => (
+          sources.map((source) => (
             <div key={source.id} className="flex items-center justify-between p-3">
               <div className="flex items-center">
                 {source.type === 'url' && (
@@ -101,7 +99,7 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => onDeleteSourceClick(source)}
+                onClick={() => onDeleteSource(source)}
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
@@ -110,12 +108,12 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
         )}
       </div>
       
-      {knowledgeBase.sources.some(source => source.type === 'url') && (
+      {sources.some(source => source.type === 'url') && (
         <div className="flex items-center space-x-2 mt-4">
           <Switch
             id="kb-auto-sync"
-            checked={knowledgeBase.auto_sync || false}
-            onCheckedChange={onAutoSyncChange}
+            checked={false}
+            onCheckedChange={() => {}}
           />
           <Label htmlFor="kb-auto-sync" className="text-sm cursor-pointer">
             Auto sync web pages every 24 hours

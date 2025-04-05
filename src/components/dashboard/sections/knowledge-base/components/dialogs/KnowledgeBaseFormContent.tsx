@@ -13,44 +13,30 @@ import { Input } from '@/components/ui/input';
 import { KnowledgeBase } from '../../types';
 
 interface KnowledgeBaseFormContentProps {
-  knowledgeBase: KnowledgeBase | null;
-  onOpenChange: (open: boolean) => void;
-  isSaving: boolean;
-  onSave: (data: { name: string }) => Promise<void>;
+  name: string;
+  setName: (name: string) => void;
+  currentKb: KnowledgeBase | null;
+  handleAutoSyncChange: (checked: boolean) => void;
 }
 
 const KnowledgeBaseFormContent: React.FC<KnowledgeBaseFormContentProps> = ({
-  knowledgeBase,
-  onOpenChange,
-  isSaving,
-  onSave,
+  name,
+  setName,
+  currentKb,
 }) => {
   const form = useForm({
     defaultValues: {
-      name: knowledgeBase?.name || '',
+      name: name || '',
     }
   });
 
   React.useEffect(() => {
-    if (knowledgeBase) {
-      form.setValue('name', knowledgeBase.name || '');
-    } else {
-      form.setValue('name', '');
-    }
-  }, [knowledgeBase, form]);
-
-  const handleSubmit = async (data: { name: string }) => {
-    try {
-      await onSave(data);
-      form.reset();
-    } catch (error) {
-      console.error('Error saving knowledge base:', error);
-    }
-  };
+    form.setValue('name', name || '');
+  }, [name, form]);
 
   return (
     <Form {...form}>
-      <form id="knowledge-base-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form id="knowledge-base-form" className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -61,7 +47,11 @@ const KnowledgeBaseFormContent: React.FC<KnowledgeBaseFormContentProps> = ({
                 <Input 
                   placeholder="Enter a name" 
                   {...field} 
-                  disabled={isSaving}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    setName(e.target.value);
+                  }}
+                  value={name}
                 />
               </FormControl>
               <FormMessage />

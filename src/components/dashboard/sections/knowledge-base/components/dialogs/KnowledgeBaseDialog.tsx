@@ -13,8 +13,8 @@ import { toast } from 'sonner';
 import { KnowledgeBase } from '../../types';
 import KnowledgeBaseFormContent from './KnowledgeBaseFormContent';
 import KnowledgeBaseSourceModals from './KnowledgeBaseSourceModals';
-import { useKnowledgeBaseDialog } from '../../hooks/dialog/useKnowledgeBaseDialog';
 import SourcesSection from './SourcesSection';
+import { useKnowledgeBaseDialog } from '../../hooks/dialog/useKnowledgeBaseDialog';
 
 interface KnowledgeBaseDialogProps {
   open: boolean;
