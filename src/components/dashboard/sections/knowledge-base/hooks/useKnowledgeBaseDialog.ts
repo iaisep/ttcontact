@@ -53,52 +53,48 @@ export const useKnowledgeBaseDialog = ({
     try {
       setAddingSource(true);
       
-      // Check if we have either a knowledge base ID or a name
-      const hasKbId = currentKb && currentKb.id;
-      const kbName = currentKb?.name || '';
+      // Generar una KB temporal si estamos creando una nueva
+      let kbToUse = currentKb;
+      
+      if (!kbToUse && isCreating) {
+        // Crear una KB temporal para el proceso de creación
+        kbToUse = {
+          id: `temp_${Date.now()}`,
+          name: "New Knowledge Base from URL",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          source_count: 0,
+          sources: [],
+          auto_sync: autoSync
+        };
+        setCurrentKb(kbToUse);
+      }
+      
+      if (!kbToUse) {
+        toast.error('No knowledge base selected');
+        throw new Error('No knowledge base selected');
+      }
       
       console.log("Adding URL source with params:", { 
         url, 
         autoSync, 
         selectedPages, 
-        kbId: hasKbId ? currentKb?.id : 'creating new KB', 
-        kbName 
+        kbId: kbToUse.id,
+        isTemp: kbToUse.id.startsWith('temp_')
       });
       
       // Format the data according to the API requirements
       const sourceData = {
         url,
         autoSync,
-        webPages: selectedPages.map(page => ({
-          url: page.url,
-          title: page.title
-        })),
-        knowledgeBaseName: kbName // Pass the knowledge base name
+        webPages: selectedPages,
+        knowledgeBaseName: kbToUse.name
       };
       
-      console.log("Sending data to API:", sourceData);
+      // La API decidirá qué endpoint usar basado en el ID
+      const updatedKb = await onAddSource(kbToUse.id, 'url', sourceData);
       
-      // We need to handle both cases: 
-      // 1. Adding to existing KB (have kbId)
-      // 2. Creating a new KB with URLs (only have kbName)
-      let updatedKb: KnowledgeBase;
-      
-      if (hasKbId && currentKb) {
-        // Call the API to add the source to the existing knowledge base
-        updatedKb = await onAddSource(currentKb.id, 'url', sourceData);
-      } else {
-        // For creating a new KB with URLs, we need to create a temporary ID
-        // The API will handle the actual creation
-        const tempId = `temp_${Date.now()}`;
-        updatedKb = await onAddSource(tempId, 'url', sourceData);
-      }
-      
-      console.log("URL source added, updated KB:", updatedKb);
-      
-      // Update the current knowledge base state with the response
       setCurrentKb(updatedKb);
-      
-      // Close the URL source modal
       setCurrentSourceType(null);
       
       toast.success('URL source added successfully');
@@ -113,19 +109,41 @@ export const useKnowledgeBaseDialog = ({
   };
 
   const handleAddFileSource = async (file: File) => {
-    if (!currentKb) {
-      toast.error('No knowledge base selected');
-      throw new Error('No current knowledge base');
-    }
-
     try {
       setAddingSource(true);
-      console.log("Adding file source:", file.name);
       
-      const updatedKb = await onAddSource(currentKb.id, 'file', { 
-        file,
-        knowledgeBaseName: currentKb.name 
+      // Determinar si estamos creando una KB nueva
+      let kbToUse = currentKb;
+      const isNewKb = !kbToUse || isCreating;
+      
+      if (isNewKb) {
+        // Crear una KB temporal con nombre basado en archivo
+        const fileName = file.name.split('.')[0] || "New Knowledge Base";
+        kbToUse = {
+          id: `temp_${Date.now()}`,
+          name: fileName,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          source_count: 0,
+          sources: [],
+          auto_sync: false
+        };
+        setCurrentKb(kbToUse);
+      }
+      
+      console.log("Adding file source:", { 
+        fileName: file.name,
+        kbId: kbToUse.id,
+        kbName: kbToUse.name,
+        isNewKb
       });
+      
+      // Add the source to the KB - will use create or add endpoint based on ID
+      const updatedKb = await onAddSource(kbToUse.id, 'file', { 
+        file,
+        knowledgeBaseName: kbToUse.name 
+      });
+      
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
       toast.success('File source added successfully');
@@ -140,20 +158,42 @@ export const useKnowledgeBaseDialog = ({
   };
 
   const handleAddTextSource = async (fileName: string, content: string) => {
-    if (!currentKb) {
-      toast.error('No knowledge base selected');
-      throw new Error('No current knowledge base');
-    }
-
     try {
       setAddingSource(true);
-      console.log("Adding text source:", { fileName, contentLength: content.length });
       
-      const updatedKb = await onAddSource(currentKb.id, 'text', { 
+      // Determinar si estamos creando una KB nueva
+      let kbToUse = currentKb;
+      const isNewKb = !kbToUse || isCreating;
+      
+      if (isNewKb) {
+        // Crear una KB temporal con nombre basado en archivo de texto
+        kbToUse = {
+          id: `temp_${Date.now()}`,
+          name: fileName || "New Knowledge Base",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          source_count: 0,
+          sources: [],
+          auto_sync: false
+        };
+        setCurrentKb(kbToUse);
+      }
+      
+      console.log("Adding text source:", { 
+        fileName, 
+        contentLength: content.length,
+        kbId: kbToUse.id,
+        kbName: kbToUse.name,
+        isNewKb
+      });
+      
+      // Add the source to the KB - will use create or add endpoint based on ID
+      const updatedKb = await onAddSource(kbToUse.id, 'text', { 
         fileName, 
         content,
-        knowledgeBaseName: currentKb.name
+        knowledgeBaseName: kbToUse.name
       });
+      
       setCurrentKb(updatedKb);
       setCurrentSourceType(null);
       toast.success('Text source added successfully');

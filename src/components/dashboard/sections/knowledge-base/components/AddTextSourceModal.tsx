@@ -33,6 +33,7 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   const handleReset = () => {
     setFileName('');
@@ -45,17 +46,24 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
     if (!open) {
       handleReset();
     }
-  }, [open]);
+    // Determine if we're creating a new KB or adding to existing one
+    setIsCreating(!currentKnowledgeBase || currentKnowledgeBase.id.startsWith('temp_'));
+  }, [open, currentKnowledgeBase]);
 
   const handleSubmit = async () => {
     if (!fileName || !content) return;
     
     try {
       setIsSubmitting(true);
-      console.log("Submitting text content:", { fileName, contentLength: content.length });
+      console.log("Submitting text content:", { 
+        fileName, 
+        contentLength: content.length,
+        isCreatingNew: isCreating, 
+        kb: currentKnowledgeBase 
+      });
       
-      // Solo validamos que exista una KB si no estamos en el proceso de creación
-      // La creación de KB temporal se maneja en useKnowledgeBaseDialog
+      // La lógica para crear o añadir a KB existente se maneja en el hook
+      // useSourceOperations a través de onSubmit
       await onSubmit(fileName, content);
       handleReset();
       toast.success('Text source added successfully');
@@ -100,9 +108,14 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
         </DialogHeader>
         
         <div className="space-y-4">
-          {currentKnowledgeBase && (
+          {currentKnowledgeBase && !currentKnowledgeBase.id.startsWith('temp_') && (
             <div className="text-sm text-muted-foreground mb-2">
               Adding text to: <span className="font-medium">{currentKnowledgeBase.name}</span>
+            </div>
+          )}
+          {isCreating && (
+            <div className="text-sm text-muted-foreground mb-2">
+              Creating a new knowledge base with this text
             </div>
           )}
           

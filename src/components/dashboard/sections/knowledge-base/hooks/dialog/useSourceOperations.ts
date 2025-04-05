@@ -29,27 +29,24 @@ export const useSourceOperations = ({
     try {
       setAddingSource(true);
       
-      // Validar si tenemos un KB - si no, este es un caso de error
+      // Para URL, necesitamos un KB (real o temporal)
       if (!currentKb) {
         console.error("No knowledge base provided for URL source");
         throw new Error('No knowledge base provided');
       }
       
-      // Check if we have either a knowledge base ID or a name
-      const hasKbId = currentKb.id;
+      // Determinamos si es una KB nueva o existente
+      const isNewKB = !currentKb.id || currentKb.id.startsWith('temp_');
+      const kbId = isNewKB ? 'temp_' + Date.now() : currentKb.id;
       const kbName = currentKb.name || '';
-      
-      if (!hasKbId) {
-        toast.error('Knowledge base ID is required');
-        throw new Error('Knowledge base ID is required');
-      }
       
       console.log("Adding URL source with params:", { 
         url, 
         autoSync, 
         selectedPages, 
-        kbId: currentKb.id, 
-        kbName 
+        kbId, 
+        kbName,
+        isNewKB
       });
       
       // Format the data according to the API requirements
@@ -60,13 +57,13 @@ export const useSourceOperations = ({
           url: page.url,
           title: page.title
         })),
-        knowledgeBaseName: kbName // Pass the knowledge base name
+        knowledgeBaseName: kbName
       };
       
       console.log("Sending data to API:", sourceData);
       
-      // Call API with the data
-      const updatedKb = await onAddSource(currentKb.id, 'url', sourceData);
+      // Call API with the data using the appropriate ID
+      const updatedKb = await onAddSource(kbId, 'url', sourceData);
       
       console.log("URL source added, updated KB:", updatedKb);
       
@@ -88,24 +85,30 @@ export const useSourceOperations = ({
     try {
       setAddingSource(true);
       
-      // Validar si tenemos un KB - si no, este es un caso de error
-      if (!currentKb) {
-        console.error("No knowledge base provided for file source");
-        throw new Error('No knowledge base provided');
-      }
+      // Para archivos, podemos crear una KB nueva si no hay una
+      const isNewKB = !currentKb || !currentKb.id || currentKb.id.startsWith('temp_');
       
-      console.log("Adding file source:", file.name, "to KB:", currentKb);
+      // Si estamos creando una KB nueva, generamos un ID temporal
+      const kbId = isNewKB 
+        ? 'temp_' + Date.now() 
+        : (currentKb?.id || '');
       
-      // Validar que el KB tenga un ID
-      if (!currentKb.id) {
-        console.error("Knowledge base has no ID");
-        throw new Error('Knowledge base ID is required');
-      }
+      // Para KB nueva, usamos el nombre del archivo como nombre de la KB
+      const kbName = isNewKB 
+        ? file.name.split('.')[0] || "New Knowledge Base"
+        : (currentKb?.name || "Unknown Knowledge Base");
       
-      // Add the source to the KB
-      const updatedKb = await onAddSource(currentKb.id, 'file', { 
+      console.log("Adding file source:", { 
+        fileName: file.name,
+        kbId,
+        kbName,
+        isNewKB
+      });
+      
+      // Add the source to the KB using the determined ID
+      const updatedKb = await onAddSource(kbId, 'file', { 
         file,
-        knowledgeBaseName: currentKb.name 
+        knowledgeBaseName: kbName 
       });
       
       setCurrentSourceType(null);
@@ -124,25 +127,32 @@ export const useSourceOperations = ({
     try {
       setAddingSource(true);
       
-      // Validar si tenemos un KB - si no, este es un caso de error
-      if (!currentKb) {
-        console.error("No knowledge base provided for text source");
-        throw new Error('No knowledge base provided');
-      }
+      // Para texto, podemos crear una KB nueva si no hay una
+      const isNewKB = !currentKb || !currentKb.id || currentKb.id.startsWith('temp_');
       
-      console.log("Adding text source:", { fileName, contentLength: content.length, currentKb });
+      // Si estamos creando una KB nueva, generamos un ID temporal
+      const kbId = isNewKB 
+        ? 'temp_' + Date.now() 
+        : (currentKb?.id || '');
       
-      // Validar que el KB tenga un ID
-      if (!currentKb.id) {
-        console.error("Knowledge base has no ID");
-        throw new Error('Knowledge base ID is required');
-      }
+      // Para KB nueva, usamos el nombre del archivo de texto como nombre de la KB
+      const kbName = isNewKB 
+        ? fileName || "New Knowledge Base"
+        : (currentKb?.name || "Unknown Knowledge Base");
       
-      // Add the source to the KB
-      const updatedKb = await onAddSource(currentKb.id, 'text', { 
+      console.log("Adding text source:", { 
+        fileName, 
+        contentLength: content.length,
+        kbId,
+        kbName,
+        isNewKB
+      });
+      
+      // Add the source to the KB using the determined ID
+      const updatedKb = await onAddSource(kbId, 'text', { 
         fileName, 
         content,
-        knowledgeBaseName: currentKb.name
+        knowledgeBaseName: kbName
       });
       
       setCurrentSourceType(null);

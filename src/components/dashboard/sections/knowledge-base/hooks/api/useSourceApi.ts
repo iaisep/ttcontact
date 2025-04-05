@@ -15,14 +15,21 @@ export const useSourceApi = () => {
       content?: string,
       autoSync?: boolean,
       webPages?: WebPage[],
-      knowledgeBaseName?: string // Added this property to fix TypeScript errors
+      knowledgeBaseName?: string
     }
   ) => {
     console.log(`API call: Adding ${sourceType} source to KB ${kbId}:`, sourceData);
     
     // Create FormData object for all types
     const formData = new FormData();
-    formData.append('knowledge_base_id', kbId);
+    
+    // Determine if we are creating a new knowledge base or adding to an existing one
+    const isCreatingNew = !kbId || kbId.startsWith('temp_');
+    
+    // If we're creating a new KB, don't include KB ID in FormData
+    if (!isCreatingNew) {
+      formData.append('knowledge_base_id', kbId);
+    }
     
     // Add knowledge base name if it exists
     if (sourceData.knowledgeBaseName) {
@@ -45,7 +52,8 @@ export const useSourceApi = () => {
       console.log('API call data for URL source:', {
         urls,
         autoSync: sourceData.autoSync || false,
-        knowledgeBaseName: sourceData.knowledgeBaseName
+        knowledgeBaseName: sourceData.knowledgeBaseName,
+        isCreatingNew
       });
     } 
     else if (sourceType === 'file' && sourceData.file) {
@@ -56,7 +64,7 @@ export const useSourceApi = () => {
       formData.append('knowledge_base_texts', '[]');
       formData.append('knowledge_base_urls', '[]');
       
-      console.log("Uploading file:", sourceData.file.name, "to KB:", kbId);
+      console.log("Uploading file:", sourceData.file.name, "to KB:", isCreatingNew ? "New KB" : kbId);
     } 
     else if (sourceType === 'text') {
       // Format text content according to the API documentation
@@ -73,11 +81,13 @@ export const useSourceApi = () => {
     }
     
     try {
-      const endpoint = kbId.startsWith('temp_') 
+      // Seleccionar el endpoint correcto basado en si estamos creando una nueva KB
+      // o añadiendo a una existente
+      const endpoint = isCreatingNew
         ? '/create-knowledge-base'
         : `/add-knowledge-base-sources/${kbId}`;
       
-      console.log(`Using endpoint ${endpoint} for ${sourceType} source`);
+      console.log(`Using endpoint ${endpoint} for ${sourceType} source. Creating new KB: ${isCreatingNew}`);
       
       // Call the API endpoint with FormData for all source types
       const response = await fetchWithAuth(endpoint, {
