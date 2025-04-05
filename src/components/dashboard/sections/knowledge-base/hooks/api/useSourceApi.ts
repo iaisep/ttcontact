@@ -19,6 +19,7 @@ export const useSourceApi = () => {
     }
   ) => {
     console.log(`API call: Adding ${sourceType} source to KB ${kbId}:`, sourceData);
+    console.log(`Knowledge Base Name: ${sourceData.knowledgeBaseName}`);
     
     // Create FormData object for all types
     const formData = new FormData();
@@ -33,10 +34,12 @@ export const useSourceApi = () => {
       : `/add-knowledge-base-sources/${kbId}`; // For existing KB, use the add sources endpoint
     
     console.log(`Using endpoint ${endpoint} for ${sourceType} source. Creating new KB: ${isCreatingNew}`);
+    console.log(`Knowledge Base Name for ${isCreatingNew ? 'new' : 'existing'} KB: ${sourceData.knowledgeBaseName}`);
     
     // If creating a new KB, we need to provide a name
     if (isCreatingNew && sourceData.knowledgeBaseName) {
       formData.append('knowledge_base_name', sourceData.knowledgeBaseName);
+      console.log('Adding knowledge_base_name to FormData:', sourceData.knowledgeBaseName);
     } else if (!isCreatingNew) {
       // If adding to existing KB, include KB ID for the add-sources endpoint
       formData.append('knowledge_base_id', kbId);
@@ -66,7 +69,15 @@ export const useSourceApi = () => {
     else if (sourceType === 'file' && sourceData.file) {
       // For file upload, include the file in formData as shown in the first image
       formData.append('knowledge_base_files', sourceData.file);
-      formData.append('knowledge_base_name', sourceData.knowledgeBaseName);
+      
+      // Make sure we have a knowledge base name
+      if (isCreatingNew && !formData.has('knowledge_base_name')) {
+        const kbName = sourceData.knowledgeBaseName || 
+                      (sourceData.file.name.split('.')[0]) || 
+                      "New Knowledge Base";
+        formData.append('knowledge_base_name', kbName);
+        console.log('Adding derived knowledge_base_name to FormData:', kbName);
+      }
       
       console.log("Uploading file:", sourceData.file.name, "to KB:", isCreatingNew ? "New KB" : kbId);
     } 
@@ -79,6 +90,15 @@ export const useSourceApi = () => {
       }];
       
       formData.set('knowledge_base_texts', JSON.stringify(textContent));
+      
+      // Make sure we have a knowledge base name
+      if (isCreatingNew && !formData.has('knowledge_base_name')) {
+        const kbName = sourceData.knowledgeBaseName || 
+                      sourceData.fileName || 
+                      "New Knowledge Base";
+        formData.append('knowledge_base_name', kbName);
+        console.log('Adding derived knowledge_base_name to FormData for text:', kbName);
+      }
       
       console.log("Adding text content with title:", sourceData.fileName);
     }

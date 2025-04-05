@@ -40,6 +40,13 @@ const KnowledgeBaseFormContent: React.FC<KnowledgeBaseFormContentProps> = ({
     }
   }, [name, currentKb, form]);
 
+  // Expose the current name value through a ref that can be accessed
+  // This ensures the name is always available to other components
+  const handleNameChange = (newName: string) => {
+    setName(newName);
+    console.log("KB Name updated:", newName);
+  };
+
   return (
     <Form {...form}>
       <form id="knowledge-base-form" className="space-y-4">
@@ -55,9 +62,10 @@ const KnowledgeBaseFormContent: React.FC<KnowledgeBaseFormContentProps> = ({
                   {...field} 
                   onChange={(e) => {
                     field.onChange(e);
-                    setName(e.target.value);
+                    handleNameChange(e.target.value);
                   }}
                   value={name}
+                  data-kb-name-field="true"
                 />
               </FormControl>
               <FormMessage />

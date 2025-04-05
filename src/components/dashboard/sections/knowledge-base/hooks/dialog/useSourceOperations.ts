@@ -24,7 +24,8 @@ export const useSourceOperations = ({
     url: string, 
     autoSync: boolean, 
     selectedPages: WebPage[],
-    currentKb: KnowledgeBase | null
+    currentKb: KnowledgeBase | null,
+    knowledgeBaseName?: string
   ) => {
     try {
       setAddingSource(true);
@@ -38,7 +39,8 @@ export const useSourceOperations = ({
       // Determine if this is a new KB or existing one
       const isNewKB = !currentKb.id || currentKb.id.startsWith('temp_');
       const kbId = isNewKB ? 'create_new' : currentKb.id;
-      const kbName = currentKb.name || '';
+      // Use the provided knowledgeBaseName or fall back to the KB name
+      const kbName = knowledgeBaseName || currentKb.name || '';
       
       console.log("Adding URL source with params:", { 
         url, 
@@ -81,7 +83,11 @@ export const useSourceOperations = ({
     }
   };
 
-  const handleAddFileSource = async (file: File, currentKb: KnowledgeBase | null) => {
+  const handleAddFileSource = async (
+    file: File, 
+    currentKb: KnowledgeBase | null,
+    knowledgeBaseName?: string
+  ) => {
     try {
       setAddingSource(true);
       
@@ -93,25 +99,31 @@ export const useSourceOperations = ({
         ? 'create_new' 
         : (currentKb?.id || '');
       
-      // For new KB, use the file name as the KB name
-      // Extract name without extension for KB name
+      // For new KB, use the provided name, file name, or default
       const fileName = file.name;
       const fileExtension = fileName.lastIndexOf('.') > -1 ? fileName.slice(fileName.lastIndexOf('.')) : '';
-      const kbName = isNewKB 
-        ? fileName.replace(fileExtension, '') || "New Knowledge Base"
-        : (currentKb?.name || "Unknown Knowledge Base");
+      const fileNameWithoutExt = fileName.replace(fileExtension, '');
+      
+      // Priority: 1) Explicit knowledgeBaseName, 2) currentKb name, 3) file name without extension, 4) default
+      const kbName = knowledgeBaseName || 
+                     (currentKb?.name) || 
+                     fileNameWithoutExt || 
+                     "New Knowledge Base";
       
       console.log("Adding file source:", { 
         fileName: file.name,
+        fileNameWithoutExt,
         kbId,
         kbName,
-        isNewKB
+        isNewKB,
+        knowledgeBaseName
       });
       
       // Add the source to the KB using the determined ID
       // Make sure to include the knowledgeBaseName for new KBs
       const updatedKb = await onAddSource(kbId, 'file', { 
         file,
+        fileName,
         knowledgeBaseName: kbName // This is required as shown in the image
       });
       
@@ -127,7 +139,12 @@ export const useSourceOperations = ({
     }
   };
 
-  const handleAddTextSource = async (fileName: string, content: string, currentKb: KnowledgeBase | null) => {
+  const handleAddTextSource = async (
+    fileName: string, 
+    content: string, 
+    currentKb: KnowledgeBase | null,
+    knowledgeBaseName?: string
+  ) => {
     try {
       setAddingSource(true);
       
@@ -139,17 +156,19 @@ export const useSourceOperations = ({
         ? 'create_new' 
         : (currentKb?.id || '');
       
-      // For new KB, use the text file name as the KB name
-      const kbName = isNewKB 
-        ? fileName || "New Knowledge Base"
-        : (currentKb?.name || "Unknown Knowledge Base");
+      // Priority: 1) Explicit knowledgeBaseName, 2) currentKb name, 3) fileName, 4) default
+      const kbName = knowledgeBaseName || 
+                     (currentKb?.name) || 
+                     fileName || 
+                     "New Knowledge Base";
       
       console.log("Adding text source:", { 
         fileName, 
         contentLength: content.length,
         kbId,
         kbName,
-        isNewKB
+        isNewKB,
+        knowledgeBaseName
       });
       
       // Add the source to the KB using the determined ID

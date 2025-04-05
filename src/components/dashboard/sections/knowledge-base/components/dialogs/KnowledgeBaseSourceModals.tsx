@@ -61,6 +61,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
   };
 
   console.log("KnowledgeBaseSourceModals - currentKnowledgeBase:", currentKnowledgeBase);
+  console.log("KnowledgeBaseSourceModals - knowledgeBaseName:", knowledgeBaseName);
 
   // Create a temporary knowledge base if we don't have one but have a name
   const effectiveKnowledgeBase = currentKnowledgeBase || 
@@ -86,7 +87,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           handleSourceAdded();
         }}
         onAddSource={(kbId, sourceType, sourceData) => {
-          // This is called from the URL source modal's hooks
+          // Make sure knowledgeBaseName is passed through in sourceData
           return onAddUrlSource(
             sourceData.url,
             sourceData.autoSync,
@@ -106,8 +107,12 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           handleCloseSourceModal();
           handleSourceAdded();
         }}
-        onSubmit={(file) => onAddFileSource(file)}
+        onSubmit={(file) => {
+          console.log("Submitting file with KB name:", knowledgeBaseName);
+          return onAddFileSource(file);
+        }}
         currentKnowledgeBase={effectiveKnowledgeBase}
+        knowledgeBaseName={knowledgeBaseName}
       />
 
       {/* Text Source Modal */}
@@ -118,8 +123,12 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           handleCloseSourceModal();
           handleSourceAdded();
         }}
-        onSubmit={(fileName, content) => onAddTextSource(fileName, content)}
+        onSubmit={(fileName, content) => {
+          console.log("Submitting text with KB name:", knowledgeBaseName);
+          return onAddTextSource(fileName, content);
+        }}
         currentKnowledgeBase={effectiveKnowledgeBase}
+        knowledgeBaseName={knowledgeBaseName}
       />
 
       {/* Source Delete Dialog */}
