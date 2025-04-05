@@ -60,6 +60,8 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
     }
   };
 
+  console.log("KnowledgeBaseSourceModals - currentKnowledgeBase:", currentKnowledgeBase);
+
   return (
     <>
       {/* URL Source Modal */}

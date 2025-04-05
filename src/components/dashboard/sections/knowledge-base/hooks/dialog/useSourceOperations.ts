@@ -86,15 +86,16 @@ export const useSourceOperations = ({
   };
 
   const handleAddFileSource = async (file: File, currentKb: KnowledgeBase | null) => {
-    if (!currentKb) {
-      toast.error('No knowledge base selected');
-      throw new Error('No current knowledge base');
-    }
-
     try {
       setAddingSource(true);
-      console.log("Adding file source:", file.name);
+      console.log("Adding file source:", file.name, "to KB:", currentKb);
       
+      if (!currentKb || !currentKb.id) {
+        console.error("No knowledge base ID available");
+        toast.error('No knowledge base selected');
+        throw new Error('No knowledge base ID available');
+      }
+
       // Add the source to either an existing KB or a temporary one
       const updatedKb = await onAddSource(currentKb.id, 'file', { 
         file,
@@ -114,14 +115,15 @@ export const useSourceOperations = ({
   };
 
   const handleAddTextSource = async (fileName: string, content: string, currentKb: KnowledgeBase | null) => {
-    if (!currentKb) {
-      toast.error('No knowledge base selected');
-      throw new Error('No current knowledge base');
-    }
-
     try {
       setAddingSource(true);
-      console.log("Adding text source:", { fileName, contentLength: content.length });
+      console.log("Adding text source:", { fileName, contentLength: content.length, currentKb });
+      
+      if (!currentKb || !currentKb.id) {
+        console.error("No knowledge base ID available");
+        toast.error('No knowledge base selected');
+        throw new Error('No knowledge base ID available');
+      }
       
       // Add the source to either an existing KB or a temporary one
       const updatedKb = await onAddSource(currentKb.id, 'text', { 

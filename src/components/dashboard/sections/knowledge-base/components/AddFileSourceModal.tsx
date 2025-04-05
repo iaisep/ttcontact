@@ -56,6 +56,12 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
     try {
       setIsSubmitting(true);
       console.log("Submitting file:", selectedFile.name);
+      console.log("Current knowledge base:", currentKnowledgeBase);
+      
+      if (!currentKnowledgeBase) {
+        throw new Error('No knowledge base selected');
+      }
+      
       await onSubmit(selectedFile);
       handleReset();
       toast.success('File source added successfully');

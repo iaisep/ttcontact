@@ -61,14 +61,17 @@ export const useKnowledgeBaseDialog = ({
   };
 
   const handleAddUrlSource = (url: string, autoSync: boolean, selectedPages: WebPage[]) => {
+    console.log("handleAddUrlSource - currentKb:", currentKb);
     return sourceAddUrlSource(url, autoSync, selectedPages, currentKb);
   };
 
   const handleAddFileSource = (file: File) => {
+    console.log("handleAddFileSource - currentKb:", currentKb);
     return sourceAddFileSource(file, currentKb);
   };
 
   const handleAddTextSource = (fileName: string, content: string) => {
+    console.log("handleAddTextSource - currentKb:", currentKb);
     return sourceAddTextSource(fileName, content, currentKb);
   };
 
