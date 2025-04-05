@@ -89,7 +89,8 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           handleCloseSourceModal();
           handleSourceAdded();
         }}
-        onAddSource={(file) => onAddFileSource(file)}
+        onSubmit={(file) => onAddFileSource(file)}
+        currentKnowledgeBase={currentKnowledgeBase}
       />
 
       {/* Text Source Modal */}
@@ -99,7 +100,8 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           handleCloseSourceModal();
           handleSourceAdded();
         }}
-        onAddSource={(fileName, content) => onAddTextSource(fileName, content)}
+        onSubmit={(fileName, content) => onAddTextSource(fileName, content)}
+        currentKnowledgeBase={currentKnowledgeBase}
       />
 
       {/* Source Delete Dialog */}
@@ -108,8 +110,9 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
         onOpenChange={setDeleteSourceDialogOpen}
         source={sourceToDelete}
         onConfirm={async () => {
-          await onDeleteSource();
+          const result = await onDeleteSource();
           handleSourceAdded();
+          return result; // Make sure we return the KnowledgeBase result
         }}
       />
     </>

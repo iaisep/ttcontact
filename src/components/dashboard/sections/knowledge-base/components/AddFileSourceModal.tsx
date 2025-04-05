@@ -16,7 +16,8 @@ import { toast } from 'sonner';
 
 interface AddFileSourceModalProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange?: (open: boolean) => void;
+  onClose?: () => void; // Added onClose prop
   onSubmit: (file: File) => Promise<KnowledgeBase>;
   currentKnowledgeBase: KnowledgeBase | null;
 }
@@ -24,6 +25,7 @@ interface AddFileSourceModalProps {
 const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
   open,
   onOpenChange,
+  onClose,
   onSubmit,
   currentKnowledgeBase
 }) => {
@@ -56,7 +58,13 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
       await onSubmit(selectedFile);
       handleReset();
       toast.success('File source added successfully');
-      onOpenChange(false); // Close modal after successful submission
+      
+      // Use onClose callback if provided
+      if (onClose) {
+        onClose();
+      } else if (onOpenChange) {
+        onOpenChange(false);
+      }
     } catch (error) {
       console.error('Failed to add file source:', error);
       toast.error('Failed to add file source');
@@ -65,15 +73,22 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
     }
   };
 
+  // Handle dialog open state changes
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isSubmitting) {
+      if (!isOpen && onClose) {
+        onClose();
+      }
+      if (onOpenChange) {
+        onOpenChange(isOpen);
+      }
+    }
+  };
+
   return (
     <Dialog 
       open={open} 
-      onOpenChange={(open) => {
-        if (!isSubmitting) {
-          onOpenChange(open);
-          if (!open) handleReset();
-        }
-      }}
+      onOpenChange={handleOpenChange}
     >
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
@@ -143,7 +158,11 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
             variant="outline"
             onClick={() => {
               handleReset();
-              onOpenChange(false);
+              if (onClose) {
+                onClose();
+              } else if (onOpenChange) {
+                onOpenChange(false);
+              }
             }}
             disabled={isSubmitting}
           >
