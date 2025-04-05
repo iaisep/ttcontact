@@ -20,6 +20,7 @@ interface AddFileSourceModalProps {
   onClose?: () => void;
   onSubmit: (file: File) => Promise<KnowledgeBase>;
   currentKnowledgeBase: KnowledgeBase | null;
+  knowledgeBaseName?: string;
 }
 
 const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
@@ -27,7 +28,8 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
   onOpenChange,
   onClose,
   onSubmit,
-  currentKnowledgeBase
+  currentKnowledgeBase,
+  knowledgeBaseName
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +63,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
       console.log("Submitting file:", selectedFile.name);
       console.log("Current knowledge base:", currentKnowledgeBase);
       console.log("Is creating new KB:", isCreating);
+      console.log("Knowledge base name:", knowledgeBaseName);
       
       // The logic for creating or adding to existing KB is handled in the hook
       // The file name will be used as KB name when creating a new KB
@@ -115,7 +118,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
           )}
           {isCreating && (
             <div className="text-sm text-muted-foreground mb-2">
-              Creating a new knowledge base with this file
+              Creating a new knowledge base {knowledgeBaseName ? `named "${knowledgeBaseName}"` : "with this file"}
             </div>
           )}
           
@@ -132,7 +135,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
                 <div className="flex items-center gap-2">
                   <File className="h-5 w-5 text-blue-500" />
                   <span>{selectedFile.name}</span>
-                  {isCreating && (
+                  {isCreating && !knowledgeBaseName && (
                     <span className="text-xs text-muted-foreground ml-2">
                       (Will be used as knowledge base name)
                     </span>

@@ -21,6 +21,7 @@ interface AddTextSourceModalProps {
   onClose?: () => void;
   onSubmit: (fileName: string, content: string) => Promise<KnowledgeBase>;
   currentKnowledgeBase: KnowledgeBase | null;
+  knowledgeBaseName?: string;
 }
 
 const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
@@ -28,7 +29,8 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
   onOpenChange,
   onClose,
   onSubmit,
-  currentKnowledgeBase
+  currentKnowledgeBase,
+  knowledgeBaseName
 }) => {
   const [fileName, setFileName] = useState('');
   const [content, setContent] = useState('');
@@ -59,7 +61,8 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
         fileName, 
         contentLength: content.length,
         isCreatingNew: isCreating, 
-        kb: currentKnowledgeBase 
+        kb: currentKnowledgeBase,
+        knowledgeBaseName
       });
       
       // The logic for creating or adding to existing KB is handled in the hook
@@ -116,7 +119,7 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
           )}
           {isCreating && (
             <div className="text-sm text-muted-foreground mb-2">
-              Creating a new knowledge base with this text
+              Creating a new knowledge base {knowledgeBaseName ? `named "${knowledgeBaseName}"` : "with this text"}
             </div>
           )}
           
@@ -129,7 +132,7 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
               onChange={(e) => setFileName(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              {isCreating ? "This will also be used as the knowledge base name" : ""}
+              {isCreating && !knowledgeBaseName ? "This will also be used as the knowledge base name" : ""}
             </p>
           </div>
           
