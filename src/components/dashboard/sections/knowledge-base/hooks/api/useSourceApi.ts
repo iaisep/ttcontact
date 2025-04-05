@@ -65,7 +65,7 @@ export const useSourceApi = () => {
     } 
     else if (sourceType === 'file' && sourceData.file) {
       // For file upload, include the file in formData as shown in the first image
-      formData.append('file', sourceData.file);
+      formData.append('knowledge_base_files', sourceData.file);
       
       console.log("Uploading file:", sourceData.file.name, "to KB:", isCreatingNew ? "New KB" : kbId);
     } 
