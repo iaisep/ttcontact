@@ -19,7 +19,6 @@ interface KnowledgeBaseSourceModalsProps {
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
   currentKnowledgeBase: KnowledgeBase | null;
   knowledgeBaseName?: string;
-  onSourceAdded?: () => void;
 }
 
 const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
@@ -34,24 +33,11 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
   onDeleteSource,
   onFetchSitemap,
   currentKnowledgeBase,
-  knowledgeBaseName,
-  onSourceAdded
+  knowledgeBaseName
 }) => {
   // Handler for closing all source modals
   const handleCloseModal = () => {
     setCurrentSourceType(null);
-    if (onSourceAdded) {
-      onSourceAdded();
-    }
-  };
-
-  // Handler for successful source addition
-  const handleSourceAdded = () => {
-    if (onSourceAdded) {
-      setTimeout(() => {
-        onSourceAdded();
-      }, 100);
-    }
   };
 
   return (
@@ -60,14 +46,11 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       <AddUrlSourceModal
         open={currentSourceType === 'url'}
         onClose={handleCloseModal}
-        onOpenChange={(open: boolean) => {
-          if (!open) handleCloseModal();
-        }}
-        onAddSource={(url, autoSync, selectedPages) => {
-          return onAddUrlSource(url, autoSync, selectedPages).then(result => {
-            handleSourceAdded();
-            return result;
-          });
+        onAddSource={(kbId, sourceType, sourceData) => {
+          if (sourceType === 'url') {
+            return onAddUrlSource(sourceData.url, sourceData.autoSync, sourceData.webPages);
+          }
+          throw new Error('Invalid source type in URL modal');
         }}
         onFetchSitemap={onFetchSitemap}
         currentKnowledgeBase={currentKnowledgeBase}
@@ -80,12 +63,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
         onOpenChange={(open) => {
           if (!open) handleCloseModal();
         }}
-        onSubmit={(file) => {
-          return onAddFileSource(file).then(result => {
-            handleSourceAdded();
-            return result;
-          });
-        }}
+        onSubmit={onAddFileSource}
         currentKnowledgeBase={currentKnowledgeBase}
       />
 
@@ -95,31 +73,16 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
         onOpenChange={(open) => {
           if (!open) handleCloseModal();
         }}
-        onSubmit={(fileName, content) => {
-          return onAddTextSource(fileName, content).then(result => {
-            handleSourceAdded();
-            return result;
-          });
-        }}
+        onSubmit={onAddTextSource}
         currentKnowledgeBase={currentKnowledgeBase}
       />
 
       {/* Delete Source Dialog */}
       <SourceDeleteDialog
         open={deleteSourceDialogOpen}
-        onOpenChange={(open) => {
-          setDeleteSourceDialogOpen(open);
-          if (!open && onSourceAdded) {
-            onSourceAdded();
-          }
-        }}
+        onOpenChange={setDeleteSourceDialogOpen}
         source={sourceToDelete}
-        onConfirm={() => {
-          return onDeleteSource().then(result => {
-            handleSourceAdded();
-            return result;
-          });
-        }}
+        onConfirm={onDeleteSource}
       />
     </>
   );

@@ -11,8 +11,12 @@ import { KnowledgeBase, WebPage } from '../../types';
 interface AddUrlSourceModalProps {
   open: boolean;
   onClose: () => void;
-  onOpenChange?: (open: boolean) => void; 
-  onAddSource: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<KnowledgeBase>;
+  onOpenChange?: (open: boolean) => void; // Added this prop
+  onAddSource: (
+    kbId: string,
+    sourceType: 'url' | 'file' | 'text',
+    sourceData: any
+  ) => Promise<KnowledgeBase>;
   onFetchSitemap: (url: string) => Promise<any[]>;
   currentKnowledgeBase?: KnowledgeBase | null;
   knowledgeBaseName?: string;
@@ -99,6 +103,10 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Add URL Source</span>
+            {/*<X 
+              className="h-4 w-4 cursor-pointer" 
+              onClick={onClose} 
+            />*/}
           </DialogTitle>
         </DialogHeader>
 
