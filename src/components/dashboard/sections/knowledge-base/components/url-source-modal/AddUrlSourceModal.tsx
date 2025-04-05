@@ -11,7 +11,7 @@ import { KnowledgeBase, WebPage } from '../../types';
 interface AddUrlSourceModalProps {
   open: boolean;
   onClose: () => void;
-  onOpenChange?: (open: boolean) => void; // Added this prop
+  onOpenChange?: (open: boolean) => void;
   onAddSource: (
     kbId: string,
     sourceType: 'url' | 'file' | 'text',

@@ -60,7 +60,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       {/* File Source Modal */}
       <AddFileSourceModal
         open={currentSourceType === 'file'}
-        onOpenChange={(open) => {
+        onOpenChange={(open: boolean) => {
           if (!open) handleCloseModal();
         }}
         onSubmit={onAddFileSource}
@@ -70,7 +70,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       {/* Text Source Modal */}
       <AddTextSourceModal
         open={currentSourceType === 'text'}
-        onOpenChange={(open) => {
+        onOpenChange={(open: boolean) => {
           if (!open) handleCloseModal();
         }}
         onSubmit={onAddTextSource}
