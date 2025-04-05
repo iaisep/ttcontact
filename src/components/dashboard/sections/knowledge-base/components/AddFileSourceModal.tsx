@@ -9,10 +9,11 @@ import {
   DialogTitle 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { File, X } from 'lucide-react';
 import { KnowledgeBase } from '../types';
 import { toast } from 'sonner';
+import { Upload } from 'lucide-react';
 
 interface AddFileSourceModalProps {
   open: boolean;
@@ -27,12 +28,16 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
   onSubmit,
   currentKnowledgeBase
 }) => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleReset = () => {
-    setSelectedFile(null);
+    setFile(null);
     setIsSubmitting(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   // Reset form when modal opens/closes
@@ -43,23 +48,23 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
   }, [open]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
     }
   };
 
   const handleSubmit = async () => {
-    if (!selectedFile) return;
+    if (!file) return;
     
     try {
       setIsSubmitting(true);
-      await onSubmit(selectedFile);
+      await onSubmit(file);
       handleReset();
-      toast.success('File source added successfully');
+      toast.success('File uploaded successfully');
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to add file source:', error);
-      toast.error('Failed to add file source');
+      console.error('Failed to upload file:', error);
+      toast.error('Failed to upload file');
     } finally {
       setIsSubmitting(false);
     }
@@ -69,7 +74,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
     <Dialog 
       open={open} 
       onOpenChange={(open) => {
-        if (!isSubmitting) {
+        if (!isSubmitting) { 
           onOpenChange(open);
           if (!open) handleReset();
         }
@@ -77,63 +82,65 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
     >
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Upload Files</DialogTitle>
+          <DialogTitle>Upload File</DialogTitle>
           <DialogDescription>
-            Upload documents to add to your knowledge base.
+            Upload a file to your knowledge base.
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
           {currentKnowledgeBase && (
             <div className="text-sm text-muted-foreground mb-2">
-              Adding file to: <span className="font-medium">{currentKnowledgeBase.name}</span>
+              Uploading file to: <span className="font-medium">{currentKnowledgeBase.name}</span>
             </div>
           )}
           
           <div className="grid gap-2">
-            <Label htmlFor="file">Select File</Label>
-            <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-md p-6">
-              <input
-                type="file"
+            <Label htmlFor="file">File</Label>
+            <div className="border-2 border-dashed rounded-lg p-6 text-center">
+              <Input
+                ref={fileInputRef}
                 id="file"
+                type="file"
                 onChange={handleFileChange}
                 className="hidden"
               />
-              {selectedFile ? (
-                <div className="flex items-center gap-2">
-                  <File className="h-5 w-5 text-blue-500" />
-                  <span>{selectedFile.name}</span>
+              {!file ? (
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <Upload className="h-10 w-10 text-muted-foreground" />
                   <Button 
                     type="button" 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => setSelectedFile(null)}
-                    disabled={isSubmitting}
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
                   >
-                    <X className="h-4 w-4" />
+                    Select File
                   </Button>
+                  <p className="text-xs text-muted-foreground">
+                    PDF, DOCX, CSV, TXT (100MB max)
+                  </p>
                 </div>
               ) : (
-                <div className="flex flex-col items-center text-center">
-                  <File className="h-10 w-10 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Drag and drop a file here, or click to select
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <p className="font-medium">{file.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {(file.size / 1024 / 1024).toFixed(2)} MB
                   </p>
                   <Button 
                     type="button" 
                     variant="outline" 
                     size="sm"
-                    onClick={() => document.getElementById('file')?.click()}
-                    disabled={isSubmitting}
+                    onClick={() => {
+                      setFile(null);
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                      }
+                    }}
                   >
-                    Select File
+                    Change
                   </Button>
                 </div>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Supported formats: PDF, DOCX, TXT, CSV (max 20MB)
-            </p>
           </div>
         </div>
         
@@ -149,10 +156,10 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             type="button"
             onClick={handleSubmit}
-            disabled={!selectedFile || isSubmitting}
+            disabled={!file || isSubmitting}
           >
             {isSubmitting ? 'Uploading...' : 'Upload'}
           </Button>

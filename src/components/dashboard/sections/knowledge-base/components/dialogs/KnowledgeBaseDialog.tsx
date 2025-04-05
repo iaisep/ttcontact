@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { 
   Dialog, 
@@ -76,6 +77,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
 
   const [showSourceMenu, setShowSourceMenu] = useState(false);
   const [knowledgeBaseName, setKnowledgeBaseName] = useState('');
+  const [mainDialogOpen, setMainDialogOpen] = useState(open);
 
   const form = useForm({
     defaultValues: {
@@ -84,7 +86,11 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   });
 
   useEffect(() => {
-    if (!open) {
+    setMainDialogOpen(open);
+  }, [open]);
+
+  useEffect(() => {
+    if (!mainDialogOpen) {
       const timeout = setTimeout(() => {
         resetSourceModals();
         form.reset();
@@ -93,7 +99,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
       
       return () => clearTimeout(timeout);
     }
-  }, [open]);
+  }, [mainDialogOpen]);
 
   useEffect(() => {
     if (knowledgeBase) {
@@ -127,6 +133,14 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     }
   };
 
+  const handleSourceSelection = (type: 'url' | 'file' | 'text') => {
+    handleAddSourceClick(type);
+    setShowSourceMenu(false);
+    // Close the main dialog when selecting a source type
+    setMainDialogOpen(false);
+    onOpenChange(false);
+  };
+
   const sourceOptions = [
     {
       id: 'url',
@@ -151,9 +165,10 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   return (
     <>
       <Dialog 
-        open={open} 
+        open={mainDialogOpen} 
         onOpenChange={(open) => {
           if (!isSaving && !addingSource) {
+            setMainDialogOpen(open);
             onOpenChange(open);
           }
         }}
@@ -163,13 +178,6 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
             <DialogTitle className="text-xl font-medium">
               Add Knowledge Base
             </DialogTitle>
-            {/* <button
-              onClick={() => onOpenChange(false)}
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </button> */}
           </DialogHeader>
           
           <div className="p-6 pt-2">
@@ -214,10 +222,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                             <div 
                               key={option.id}
                               className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer"
-                              onClick={() => {
-                                handleAddSourceClick(option.id as 'url' | 'file' | 'text');
-                                setShowSourceMenu(false);
-                              }}
+                              onClick={() => handleSourceSelection(option.id as 'url' | 'file' | 'text')}
                             >
                               <div className="flex-shrink-0 p-2 bg-white border rounded-full">
                                 {option.icon}
@@ -289,7 +294,10 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                     <Button 
                       type="button" 
                       variant="outline"
-                      onClick={() => onOpenChange(false)}
+                      onClick={() => {
+                        setMainDialogOpen(false);
+                        onOpenChange(false);
+                      }}
                       disabled={isSaving || addingSource}
                       className="w-20"
                     >
@@ -324,6 +332,13 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         onFetchSitemap={onFetchSitemap}
         currentKnowledgeBase={currentKb}
         knowledgeBaseName={knowledgeBaseName}
+        onSourceAdded={() => {
+          // This will handle reopening the main dialog after adding a source
+          if (!mainDialogOpen) {
+            setMainDialogOpen(true);
+            onOpenChange(true);
+          }
+        }}
       />
     </>
   );

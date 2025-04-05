@@ -43,7 +43,7 @@ export const useSourceApi = () => {
     } 
     else if (sourceType === 'file' && sourceData.file) {
       // For file upload, include the file in formData
-      formData.append('knowledge_base_files', sourceData.file);
+      formData.append('file', sourceData.file);
       
       // Empty arrays for text and URL content
       formData.append('knowledge_base_texts', '[]');
