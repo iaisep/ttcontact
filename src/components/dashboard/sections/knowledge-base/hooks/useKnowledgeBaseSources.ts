@@ -94,8 +94,12 @@ export const useKnowledgeBaseSources = (
       setIsProcessing(true);
       setLoading(true);
       
-      // Call the API endpoint
+      console.log(`Attempting to delete source ${sourceId} from KB ${kbId}`);
+      
+      // Call the API endpoint with the correct format
       await deleteSourceApi(kbId, sourceId);
+      
+      console.log(`Source deleted successfully`);
       
       // Update the local state
       const kb = knowledgeBases.find(kb => kb.id === kbId);

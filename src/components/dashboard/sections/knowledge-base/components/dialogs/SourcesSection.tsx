@@ -99,7 +99,10 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => onDeleteSource(source)}
+                onClick={() => {
+                  console.log("Delete button clicked for source:", source);
+                  onDeleteSource(source);
+                }}
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>

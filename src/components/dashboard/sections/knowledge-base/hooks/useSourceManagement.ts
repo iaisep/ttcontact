@@ -121,7 +121,9 @@ export const useSourceManagement = (
       setIsProcessing(true);
       setLoading(true);
       
-      // Call the API endpoint
+      console.log(`Deleting source ${sourceId} from KB ${kbId} via useSourceManagement`);
+      
+      // Call the API endpoint with correct endpoint format
       await deleteSourceApi(kbId, sourceId);
       
       // Update the local state
