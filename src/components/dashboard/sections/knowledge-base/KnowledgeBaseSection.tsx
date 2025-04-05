@@ -176,6 +176,9 @@ const KnowledgeBaseSection: React.FC = () => {
           
           toast.success(`Created knowledge base with ${urls.length} URLs`);
           
+          // Close the dialog after successful creation
+          setKbDialogOpen(false);
+          
           // Refresh the list after creation
           fetchKnowledgeBases();
           

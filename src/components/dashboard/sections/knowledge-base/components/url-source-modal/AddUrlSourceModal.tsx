@@ -55,17 +55,29 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   } = useUrlSourceModal({
     onFetchSitemap,
     onSubmit: async (url, autoSync, selectedPages) => {
-      // Pass the knowledge base name explicitly
-      const result = await handleUrlSourceSubmit(
-        url, 
-        autoSync, 
-        selectedPages, 
-        currentKnowledgeBase,
-        knowledgeBaseName
-      );
-      onClose();
-      resetState();
-      return result;
+      try {
+        // Pass the knowledge base name explicitly
+        const result = await handleUrlSourceSubmit(
+          url, 
+          autoSync, 
+          selectedPages, 
+          currentKnowledgeBase,
+          knowledgeBaseName
+        );
+        
+        // Close the modal after successful submission
+        onClose();
+        resetState();
+        
+        // Dispatch refresh event to update the UI
+        const refreshEvent = new CustomEvent('refreshKnowledgeBase');
+        window.dispatchEvent(refreshEvent);
+        
+        return result;
+      } catch (error) {
+        console.error("Error submitting URL source:", error);
+        throw error;
+      }
     },
     currentKnowledgeBase,
     knowledgeBaseName

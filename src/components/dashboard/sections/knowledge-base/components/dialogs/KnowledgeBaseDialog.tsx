@@ -82,6 +82,10 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     // Clean up and close the dialog
     resetSourceModals();
     onOpenChange(false);
+    
+    // Dispatch a refresh event when we close the dialog
+    const refreshEvent = new CustomEvent('refreshKnowledgeBase');
+    window.dispatchEvent(refreshEvent);
   };
 
   const handleSave = async () => {
@@ -125,6 +129,9 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
           onOpenChange(value);
           if (!value) {
             resetSourceModals();
+            // Refresh the list when closing the dialog
+            const refreshEvent = new CustomEvent('refreshKnowledgeBase');
+            window.dispatchEvent(refreshEvent);
           }
         }
       }}>
