@@ -62,6 +62,11 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
         throw new Error('No knowledge base selected');
       }
       
+      // Make sure we have a valid knowledge base ID before proceeding
+      if (!currentKnowledgeBase.id) {
+        throw new Error('Knowledge base has no ID');
+      }
+      
       await onSubmit(selectedFile);
       handleReset();
       toast.success('File source added successfully');
@@ -178,7 +183,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
           <Button 
             type="button"
             onClick={handleSubmit}
-            disabled={!selectedFile || isSubmitting}
+            disabled={!selectedFile || isSubmitting || !currentKnowledgeBase}
           >
             {isSubmitting ? 'Uploading...' : 'Upload'}
           </Button>

@@ -62,6 +62,23 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
 
   console.log("KnowledgeBaseSourceModals - currentKnowledgeBase:", currentKnowledgeBase);
 
+  // Create a temporary knowledge base if we don't have one but have a name
+  const effectiveKnowledgeBase = currentKnowledgeBase || 
+    (knowledgeBaseName ? {
+      id: `temp_${Date.now()}`,
+      name: knowledgeBaseName,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      source_count: 0,
+      sources: []
+    } : null);
+
+  console.log("KnowledgeBaseSourceModals - effectiveKnowledgeBase:", effectiveKnowledgeBase);
+  
+  if (!effectiveKnowledgeBase && currentSourceType) {
+    console.warn("Warning: No valid knowledge base for source modal!");
+  }
+
   return (
     <>
       {/* URL Source Modal */}
@@ -80,7 +97,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           );
         }}
         onFetchSitemap={onFetchSitemap}
-        currentKnowledgeBase={currentKnowledgeBase}
+        currentKnowledgeBase={effectiveKnowledgeBase}
         knowledgeBaseName={knowledgeBaseName}
       />
 
@@ -93,7 +110,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           handleSourceAdded();
         }}
         onSubmit={(file) => onAddFileSource(file)}
-        currentKnowledgeBase={currentKnowledgeBase}
+        currentKnowledgeBase={effectiveKnowledgeBase}
       />
 
       {/* Text Source Modal */}
@@ -105,7 +122,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           handleSourceAdded();
         }}
         onSubmit={(fileName, content) => onAddTextSource(fileName, content)}
-        currentKnowledgeBase={currentKnowledgeBase}
+        currentKnowledgeBase={effectiveKnowledgeBase}
       />
 
       {/* Source Delete Dialog */}

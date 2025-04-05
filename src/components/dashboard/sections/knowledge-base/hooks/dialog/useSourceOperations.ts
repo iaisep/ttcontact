@@ -26,12 +26,23 @@ export const useSourceOperations = ({
     selectedPages: WebPage[],
     currentKb: KnowledgeBase | null
   ) => {
+    // Validate currentKb first
+    if (!currentKb) {
+      toast.error('No knowledge base selected');
+      return Promise.reject(new Error('No knowledge base selected'));
+    }
+    
     try {
       setAddingSource(true);
       
       // Check if we have either a knowledge base ID or a name
       const hasKbId = currentKb && currentKb.id;
       const kbName = currentKb?.name || '';
+      
+      if (!hasKbId && !kbName) {
+        toast.error('Knowledge base ID or name is required');
+        throw new Error('Knowledge base ID or name is required');
+      }
       
       console.log("Adding URL source with params:", { 
         url, 
@@ -59,7 +70,7 @@ export const useSourceOperations = ({
       // 2. Creating a new KB with URLs (only have kbName)
       let updatedKb: KnowledgeBase;
       
-      if (hasKbId && currentKb) {
+      if (hasKbId) {
         // Call the API to add the source to the existing knowledge base
         updatedKb = await onAddSource(currentKb.id, 'url', sourceData);
       } else {
@@ -86,14 +97,21 @@ export const useSourceOperations = ({
   };
 
   const handleAddFileSource = async (file: File, currentKb: KnowledgeBase | null) => {
+    // Validate currentKb first
+    if (!currentKb) {
+      toast.error('No knowledge base selected');
+      return Promise.reject(new Error('No knowledge base selected'));
+    }
+    
     try {
       setAddingSource(true);
       console.log("Adding file source:", file.name, "to KB:", currentKb);
       
-      if (!currentKb || !currentKb.id) {
-        console.error("No knowledge base ID available");
-        toast.error('No knowledge base selected');
-        throw new Error('No knowledge base ID available');
+      // Ensure we have a valid KB ID
+      if (!currentKb.id) {
+        console.error("Knowledge base has no ID");
+        toast.error('Invalid knowledge base ID');
+        throw new Error('Invalid knowledge base ID');
       }
 
       // Add the source to either an existing KB or a temporary one
@@ -115,14 +133,21 @@ export const useSourceOperations = ({
   };
 
   const handleAddTextSource = async (fileName: string, content: string, currentKb: KnowledgeBase | null) => {
+    // Validate currentKb first
+    if (!currentKb) {
+      toast.error('No knowledge base selected');
+      return Promise.reject(new Error('No knowledge base selected'));
+    }
+    
     try {
       setAddingSource(true);
       console.log("Adding text source:", { fileName, contentLength: content.length, currentKb });
       
-      if (!currentKb || !currentKb.id) {
-        console.error("No knowledge base ID available");
-        toast.error('No knowledge base selected');
-        throw new Error('No knowledge base ID available');
+      // Ensure we have a valid KB ID
+      if (!currentKb.id) {
+        console.error("Knowledge base has no ID");
+        toast.error('Invalid knowledge base ID');
+        throw new Error('Invalid knowledge base ID');
       }
       
       // Add the source to either an existing KB or a temporary one
