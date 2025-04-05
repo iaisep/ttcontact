@@ -28,7 +28,8 @@ export const useSourceManagement = (
       fileName?: string,
       content?: string,
       autoSync?: boolean,
-      webPages?: WebPage[]
+      webPages?: WebPage[],
+      knowledgeBaseName?: string // Added this property to fix TypeScript errors
     }
   ) => {
     if (isProcessing) return Promise.reject(new Error('Operation in progress'));

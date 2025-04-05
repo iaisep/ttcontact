@@ -14,7 +14,8 @@ export const useSourceApi = () => {
       fileName?: string,
       content?: string,
       autoSync?: boolean,
-      webPages?: WebPage[]
+      webPages?: WebPage[],
+      knowledgeBaseName?: string // Added this property to fix TypeScript errors
     }
   ) => {
     console.log(`API call: Adding ${sourceType} source to KB ${kbId}:`, sourceData);
@@ -22,6 +23,11 @@ export const useSourceApi = () => {
     // Create FormData object for all types
     const formData = new FormData();
     formData.append('knowledge_base_id', kbId);
+    
+    // Add knowledge base name if it exists
+    if (sourceData.knowledgeBaseName) {
+      formData.append('knowledge_base_name', sourceData.knowledgeBaseName);
+    }
     
     if (sourceType === 'url') {
       // Format URLs according to the API documentation
@@ -38,7 +44,8 @@ export const useSourceApi = () => {
       
       console.log('API call data for URL source:', {
         urls,
-        autoSync: sourceData.autoSync || false
+        autoSync: sourceData.autoSync || false,
+        knowledgeBaseName: sourceData.knowledgeBaseName
       });
     } 
     else if (sourceType === 'file' && sourceData.file) {
@@ -106,7 +113,8 @@ export const useSourceApi = () => {
       fileName?: string,
       content?: string,
       autoSync?: boolean,
-      webPages?: WebPage[]
+      webPages?: WebPage[],
+      knowledgeBaseName?: string // Added this property to fix TypeScript errors
     }
   ): KnowledgeBaseSource | null => {
     if (sourceType === 'url') {
