@@ -70,14 +70,11 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       source_count: 0,
-      sources: []
+      sources: [],
+      auto_sync: false
     } : null);
 
   console.log("KnowledgeBaseSourceModals - effectiveKnowledgeBase:", effectiveKnowledgeBase);
-  
-  if (!effectiveKnowledgeBase && currentSourceType) {
-    console.warn("Warning: No valid knowledge base for source modal!");
-  }
 
   return (
     <>

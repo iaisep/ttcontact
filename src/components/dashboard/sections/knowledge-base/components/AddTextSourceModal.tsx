@@ -53,6 +53,9 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
     try {
       setIsSubmitting(true);
       console.log("Submitting text content:", { fileName, contentLength: content.length });
+      
+      // Solo validamos que exista una KB si no estamos en el proceso de creación
+      // La creación de KB temporal se maneja en useKnowledgeBaseDialog
       await onSubmit(fileName, content);
       handleReset();
       toast.success('Text source added successfully');

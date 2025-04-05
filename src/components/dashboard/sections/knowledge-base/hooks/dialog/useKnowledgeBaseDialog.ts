@@ -63,8 +63,23 @@ export const useKnowledgeBaseDialog = ({
   const handleAddUrlSource = (url: string, autoSync: boolean, selectedPages: WebPage[]) => {
     console.log("handleAddUrlSource - currentKb:", currentKb);
     if (!currentKb) {
-      toast.error('No knowledge base selected');
-      return Promise.reject(new Error('No knowledge base selected'));
+      // Si estamos creando una KB nueva, generamos una temporal
+      if (isCreating) {
+        const tempKb = {
+          id: `temp_${Date.now()}`,
+          name: "New Knowledge Base",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          source_count: 0,
+          sources: [],
+          auto_sync: false
+        };
+        setCurrentKb(tempKb);
+        return sourceAddUrlSource(url, autoSync, selectedPages, tempKb);
+      } else {
+        toast.error('No knowledge base selected');
+        return Promise.reject(new Error('No knowledge base selected'));
+      }
     }
     return sourceAddUrlSource(url, autoSync, selectedPages, currentKb);
   };
@@ -72,8 +87,23 @@ export const useKnowledgeBaseDialog = ({
   const handleAddFileSource = (file: File) => {
     console.log("handleAddFileSource - currentKb:", currentKb);
     if (!currentKb) {
-      toast.error('No knowledge base selected');
-      return Promise.reject(new Error('No knowledge base selected'));
+      // Si estamos creando una KB nueva, generamos una temporal
+      if (isCreating) {
+        const tempKb = {
+          id: `temp_${Date.now()}`,
+          name: file.name.split('.')[0] || "New Knowledge Base", // Usar el nombre del archivo como nombre
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          source_count: 0,
+          sources: [],
+          auto_sync: false
+        };
+        setCurrentKb(tempKb);
+        return sourceAddFileSource(file, tempKb);
+      } else {
+        toast.error('No knowledge base selected');
+        return Promise.reject(new Error('No knowledge base selected'));
+      }
     }
     
     // Ensure we actually pass the currentKb to the sourceAddFileSource function
@@ -83,8 +113,23 @@ export const useKnowledgeBaseDialog = ({
   const handleAddTextSource = (fileName: string, content: string) => {
     console.log("handleAddTextSource - currentKb:", currentKb);
     if (!currentKb) {
-      toast.error('No knowledge base selected');
-      return Promise.reject(new Error('No knowledge base selected'));
+      // Si estamos creando una KB nueva, generamos una temporal
+      if (isCreating) {
+        const tempKb = {
+          id: `temp_${Date.now()}`,
+          name: fileName || "New Knowledge Base", // Usar el nombre del archivo como nombre
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          source_count: 0,
+          sources: [],
+          auto_sync: false
+        };
+        setCurrentKb(tempKb);
+        return sourceAddTextSource(fileName, content, tempKb);
+      } else {
+        toast.error('No knowledge base selected');
+        return Promise.reject(new Error('No knowledge base selected'));
+      }
     }
     return sourceAddTextSource(fileName, content, currentKb);
   };

@@ -58,17 +58,8 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
       console.log("Submitting file:", selectedFile.name);
       console.log("Current knowledge base:", currentKnowledgeBase);
       
-      if (!currentKnowledgeBase) {
-        toast.error('No knowledge base selected');
-        throw new Error('No knowledge base selected');
-      }
-      
-      // Validate that we have a knowledge base with at least an ID
-      if (!currentKnowledgeBase.id) {
-        toast.error('Knowledge base has no ID');
-        throw new Error('Knowledge base has no ID');
-      }
-      
+      // Solo validamos que exista una KB si no estamos en el proceso de creación
+      // La creación de KB temporal se maneja en useKnowledgeBaseDialog
       await onSubmit(selectedFile);
       handleReset();
       toast.success('File source added successfully');
@@ -185,7 +176,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
           <Button 
             type="button"
             onClick={handleSubmit}
-            disabled={!selectedFile || isSubmitting || !currentKnowledgeBase}
+            disabled={!selectedFile || isSubmitting}
           >
             {isSubmitting ? 'Uploading...' : 'Upload'}
           </Button>
