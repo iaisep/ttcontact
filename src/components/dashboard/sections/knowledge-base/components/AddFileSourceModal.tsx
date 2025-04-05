@@ -56,7 +56,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
       await onSubmit(selectedFile);
       handleReset();
       toast.success('File source added successfully');
-      onOpenChange(false);
+      onOpenChange(false); // Close modal after successful submission
     } catch (error) {
       console.error('Failed to add file source:', error);
       toast.error('Failed to add file source');

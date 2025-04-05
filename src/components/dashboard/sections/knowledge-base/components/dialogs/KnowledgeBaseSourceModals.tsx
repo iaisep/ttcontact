@@ -19,8 +19,8 @@ interface KnowledgeBaseSourceModalsProps {
   onFetchSitemap: (url: string) => Promise<WebPage[]>;
   currentKnowledgeBase: KnowledgeBase | null;
   knowledgeBaseName?: string;
-  onSourceAdded?: () => void; // Nueva prop para notificar cuando se ha agregado una fuente
-  onCloseMainDialog?: () => void; // Nueva prop para cerrar el diálogo principal
+  onSourceAdded?: () => void; // Prop for notifying when a source has been added
+  onCloseMainDialog?: () => void; // Prop for closing the main dialog
 }
 
 const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
@@ -46,9 +46,12 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
 
   // Handler for when a source has been successfully added
   const handleSourceAdded = (knowledgeBase: KnowledgeBase) => {
-    handleCloseModal(); // Cierra el modal de fuente
+    handleCloseModal(); // Close the source modal
     if (onSourceAdded) {
-      onSourceAdded(); // Notifica que se ha agregado una fuente
+      onSourceAdded(); // Notify that a source has been added
+    }
+    if (onCloseMainDialog) {
+      onCloseMainDialog(); // Close the main dialog
     }
   };
 
@@ -63,9 +66,6 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
             return onAddUrlSource(sourceData.url, sourceData.autoSync, sourceData.webPages)
               .then(result => {
                 handleSourceAdded(result);
-                if (onCloseMainDialog) {
-                  onCloseMainDialog(); // Cierra el diálogo principal
-                }
                 return result;
               });
           }
