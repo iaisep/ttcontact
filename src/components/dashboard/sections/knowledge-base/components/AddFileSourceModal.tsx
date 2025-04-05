@@ -62,8 +62,9 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
       console.log("Current knowledge base:", currentKnowledgeBase);
       console.log("Is creating new KB:", isCreating);
       
-      // La lógica para crear o añadir a KB existente se maneja en el hook
-      // useSourceOperations a través de onSubmit
+      // The logic for creating or adding to existing KB is handled in the hook
+      // useSourceOperations through onSubmit
+      // The file name will be used as KB name when creating a new KB
       await onSubmit(selectedFile);
       handleReset();
       toast.success('File source added successfully');
@@ -103,7 +104,7 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
         <DialogHeader>
           <DialogTitle>Upload Files</DialogTitle>
           <DialogDescription>
-            Upload documents to add to your knowledge base.
+            Add documents to your knowledge base.
           </DialogDescription>
         </DialogHeader>
         
@@ -132,6 +133,11 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
                 <div className="flex items-center gap-2">
                   <File className="h-5 w-5 text-blue-500" />
                   <span>{selectedFile.name}</span>
+                  {isCreating && (
+                    <span className="text-xs text-muted-foreground ml-2">
+                      (Will be used as knowledge base name)
+                    </span>
+                  )}
                   <Button 
                     type="button" 
                     variant="ghost" 

@@ -1,3 +1,4 @@
+
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -30,7 +31,8 @@ export const useSourceApi = () => {
       formData.append('knowledge_base_id', kbId);
     }
     
-    // Add knowledge base name if it exists
+    // Always add knowledge base name if it exists
+    // This is required for new KBs as shown in the image
     if (sourceData.knowledgeBaseName) {
       formData.append('knowledge_base_name', sourceData.knowledgeBaseName);
     }

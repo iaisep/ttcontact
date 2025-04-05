@@ -29,13 +29,13 @@ export const useSourceOperations = ({
     try {
       setAddingSource(true);
       
-      // Para URL, necesitamos un KB (real o temporal)
+      // For URL, we need a KB (real or temporary)
       if (!currentKb) {
         console.error("No knowledge base provided for URL source");
         throw new Error('No knowledge base provided');
       }
       
-      // Determinamos si es una KB nueva o existente
+      // Determine if this is a new KB or existing one
       const isNewKB = !currentKb.id || currentKb.id.startsWith('temp_');
       const kbId = isNewKB ? 'temp_' + Date.now() : currentKb.id;
       const kbName = currentKb.name || '';
@@ -57,7 +57,7 @@ export const useSourceOperations = ({
           url: page.url,
           title: page.title
         })),
-        knowledgeBaseName: kbName
+        knowledgeBaseName: kbName // Important: Include the KB name for new KBs
       };
       
       console.log("Sending data to API:", sourceData);
@@ -85,17 +85,19 @@ export const useSourceOperations = ({
     try {
       setAddingSource(true);
       
-      // Para archivos, podemos crear una KB nueva si no hay una
+      // For files, we can create a new KB if there isn't one
       const isNewKB = !currentKb || !currentKb.id || currentKb.id.startsWith('temp_');
       
-      // Si estamos creando una KB nueva, generamos un ID temporal
+      // If creating a new KB, generate a temporary ID
       const kbId = isNewKB 
         ? 'temp_' + Date.now() 
         : (currentKb?.id || '');
       
-      // Para KB nueva, usamos el nombre del archivo como nombre de la KB
+      // For new KB, use the file name as the KB name
+      // Extract name without extension for KB name
+      const fileName = file.name;
       const kbName = isNewKB 
-        ? file.name.split('.')[0] || "New Knowledge Base"
+        ? fileName.split('.')[0] || "New Knowledge Base"
         : (currentKb?.name || "Unknown Knowledge Base");
       
       console.log("Adding file source:", { 
@@ -106,9 +108,10 @@ export const useSourceOperations = ({
       });
       
       // Add the source to the KB using the determined ID
+      // Make sure to include the knowledgeBaseName for new KBs
       const updatedKb = await onAddSource(kbId, 'file', { 
         file,
-        knowledgeBaseName: kbName 
+        knowledgeBaseName: kbName // This is required as shown in the image
       });
       
       setCurrentSourceType(null);
@@ -127,15 +130,15 @@ export const useSourceOperations = ({
     try {
       setAddingSource(true);
       
-      // Para texto, podemos crear una KB nueva si no hay una
+      // For text, we can create a new KB if there isn't one
       const isNewKB = !currentKb || !currentKb.id || currentKb.id.startsWith('temp_');
       
-      // Si estamos creando una KB nueva, generamos un ID temporal
+      // If creating a new KB, generate a temporary ID
       const kbId = isNewKB 
         ? 'temp_' + Date.now() 
         : (currentKb?.id || '');
       
-      // Para KB nueva, usamos el nombre del archivo de texto como nombre de la KB
+      // For new KB, use the text file name as the KB name
       const kbName = isNewKB 
         ? fileName || "New Knowledge Base"
         : (currentKb?.name || "Unknown Knowledge Base");
@@ -149,10 +152,11 @@ export const useSourceOperations = ({
       });
       
       // Add the source to the KB using the determined ID
+      // Make sure to include knowledgeBaseName for new KBs
       const updatedKb = await onAddSource(kbId, 'text', { 
         fileName, 
         content,
-        knowledgeBaseName: kbName
+        knowledgeBaseName: kbName // Important: Include the KB name as shown in the image
       });
       
       setCurrentSourceType(null);

@@ -64,6 +64,7 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
       
       // The logic for creating or adding to existing KB is handled in the hook
       // useSourceOperations through onSubmit
+      // Make sure we're passing the fileName as both content title and KB name when creating new
       await onSubmit(fileName, content);
       handleReset();
       toast.success('Text source added successfully');
@@ -127,6 +128,9 @@ const AddTextSourceModal: React.FC<AddTextSourceModalProps> = ({
               value={fileName}
               onChange={(e) => setFileName(e.target.value)}
             />
+            <p className="text-xs text-muted-foreground">
+              {isCreating ? "This will also be used as the knowledge base name" : ""}
+            </p>
           </div>
           
           <div className="grid gap-2">
