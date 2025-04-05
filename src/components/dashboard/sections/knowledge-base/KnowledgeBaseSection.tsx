@@ -50,6 +50,20 @@ const KnowledgeBaseSection: React.FC = () => {
     fetchKnowledgeBases();
   }, []);
 
+  // Add event listener for refresh events
+  useEffect(() => {
+    const handleRefresh = () => {
+      console.log("Refreshing knowledge bases list");
+      fetchKnowledgeBases();
+    };
+    
+    window.addEventListener('refreshKnowledgeBase', handleRefresh);
+    
+    return () => {
+      window.removeEventListener('refreshKnowledgeBase', handleRefresh);
+    };
+  }, [fetchKnowledgeBases]);
+
   const handleCreateClick = () => {
     setCurrentKb(null);
     setIsCreating(true);
@@ -82,10 +96,16 @@ const KnowledgeBaseSection: React.FC = () => {
         });
         
         toast.success('Knowledge base created successfully');
+        
+        // Refresh the list after creation
+        fetchKnowledgeBases();
       } else if (currentKb) {
         const updatedKb = { ...currentKb, name: data.name };
         await updateKnowledgeBase(updatedKb);
         setKbDialogOpen(false);
+        
+        // Refresh the list after update
+        fetchKnowledgeBases();
       }
     } catch (error) {
       console.error('Error saving knowledge base:', error);
@@ -107,6 +127,9 @@ const KnowledgeBaseSection: React.FC = () => {
         setDeleteDialogOpen(false);
         setKbToDelete(null);
         toast.success('Knowledge base deleted successfully');
+        
+        // Refresh the list after deletion
+        fetchKnowledgeBases();
       } catch (error) {
         console.error('Error deleting knowledge base:', error);
         toast.error('Failed to delete knowledge base');
@@ -136,7 +159,7 @@ const KnowledgeBaseSection: React.FC = () => {
           // For a new knowledge base, create it first with the URLs
           // Ensure we use the provided knowledge base name
           const kbName = sourceData.knowledgeBaseName || 'New Knowledge Base';
-          const urls = sourceData.webPages.map((page: any) => page.url) || [];
+          const urls = sourceData.webPages && sourceData.webPages.map((page: any) => page.url) || [];
           const autoSync = sourceData.autoSync || false;
           
           console.log('Creating new knowledge base with URLs:', {
@@ -152,6 +175,10 @@ const KnowledgeBaseSection: React.FC = () => {
           });
           
           toast.success(`Created knowledge base with ${urls.length} URLs`);
+          
+          // Refresh the list after creation
+          fetchKnowledgeBases();
+          
           return newKb;
         } else {
           // For existing knowledge base, add URLs as sources
@@ -174,7 +201,15 @@ const KnowledgeBaseSection: React.FC = () => {
         };
       }
       
-      const updatedKb = await addSourceToKnowledgeBase(kbId, sourceType, requestData);
+      const updatedKb = await addSourceToKnowledgeBase(
+        isNewKnowledgeBase ? 'create_new' : kbId, 
+        sourceType, 
+        requestData
+      );
+      
+      // Refresh the list after adding a source
+      fetchKnowledgeBases();
+      
       toast.success(`${sourceType} source added successfully`);
       return updatedKb;
     } catch (error) {
@@ -187,6 +222,10 @@ const KnowledgeBaseSection: React.FC = () => {
   const handleDeleteSource = async (kbId: string, sourceId: string) => {
     try {
       const updatedKb = await deleteSource(kbId, sourceId);
+      
+      // Refresh the list after deleting a source
+      fetchKnowledgeBases();
+      
       toast.success('Source deleted successfully');
       return updatedKb;
     } catch (error) {

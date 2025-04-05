@@ -95,10 +95,12 @@ export const useSourceOperations = ({
       setAddingSource(true);
       console.log("Adding file source:", file.name);
       
+      // Add the source to either an existing KB or a temporary one
       const updatedKb = await onAddSource(currentKb.id, 'file', { 
         file,
         knowledgeBaseName: currentKb.name 
       });
+      
       setCurrentSourceType(null);
       toast.success('File source added successfully');
       return updatedKb;
@@ -121,11 +123,13 @@ export const useSourceOperations = ({
       setAddingSource(true);
       console.log("Adding text source:", { fileName, contentLength: content.length });
       
+      // Add the source to either an existing KB or a temporary one
       const updatedKb = await onAddSource(currentKb.id, 'text', { 
         fileName, 
         content,
         knowledgeBaseName: currentKb.name
       });
+      
       setCurrentSourceType(null);
       toast.success('Text source added successfully');
       return updatedKb;

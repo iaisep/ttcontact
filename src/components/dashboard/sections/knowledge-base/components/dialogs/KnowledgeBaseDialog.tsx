@@ -104,6 +104,20 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     window.dispatchEvent(refreshEvent);
   };
 
+  // Create a temporary knowledge base for the creation flow
+  const tempKnowledgeBase = isCreating && !currentKb && name ? {
+    id: `temp_${Date.now()}`,
+    name: name,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    source_count: 0,
+    sources: [],
+    auto_sync: false
+  } : null;
+  
+  // Use either the current KB or the temp KB for display
+  const displayKb = currentKb || tempKnowledgeBase;
+
   return (
     <>
       <Sheet open={open} onOpenChange={(value) => {
@@ -128,21 +142,19 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
             <KnowledgeBaseFormContent
               name={name}
               setName={setName}
-              currentKb={currentKb}
+              currentKb={displayKb}
               handleAutoSyncChange={handleAutoSyncChange}
             />
 
-            {/* Only show sources section if editing or if we've completed the initial creation */}
-            {(!isCreating || creationComplete) && currentKb && (
-              <SourcesSection
-                sources={currentKb.sources || []}
-                onAddSourceClick={handleAddSourceClick}
-                onDeleteSource={(source) => {
-                  setSourceToDelete(source);
-                  setDeleteSourceDialogOpen(true);
-                }}
-              />
-            )}
+            {/* Always show the sources section to allow adding sources during creation */}
+            <SourcesSection
+              sources={displayKb?.sources || []}
+              onAddSourceClick={handleAddSourceClick}
+              onDeleteSource={(source) => {
+                setSourceToDelete(source);
+                setDeleteSourceDialogOpen(true);
+              }}
+            />
           </div>
 
           <SheetFooter className="pt-4">
@@ -176,7 +188,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
         onAddTextSource={handleAddTextSource}
         onDeleteSource={handleDeleteSource}
         onFetchSitemap={onFetchSitemap}
-        currentKnowledgeBase={currentKb}
+        currentKnowledgeBase={displayKb}
         knowledgeBaseName={name}
         onSourceAdded={handleSourceAdded}
         onCloseMainDialog={handleClose}
