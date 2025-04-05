@@ -42,7 +42,9 @@ export const useKnowledgeBaseCreateApi = () => {
       
       // Use the provided name - this is the critical part
       formData.append('knowledge_base_name', kbName);
-      formData.append('knowledge_base_texts', '[]');
+      
+      // Always include these fields as empty arrays if not provided
+      formData.append('knowledge_base_texts', JSON.stringify([]));
       formData.append('knowledge_base_urls', JSON.stringify(urls));
       formData.append('enable_auto_refresh', String(autoSync));
       

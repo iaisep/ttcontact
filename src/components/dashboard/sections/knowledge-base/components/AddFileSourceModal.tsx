@@ -63,7 +63,6 @@ const AddFileSourceModal: React.FC<AddFileSourceModalProps> = ({
       console.log("Is creating new KB:", isCreating);
       
       // The logic for creating or adding to existing KB is handled in the hook
-      // useSourceOperations through onSubmit
       // The file name will be used as KB name when creating a new KB
       await onSubmit(selectedFile);
       handleReset();

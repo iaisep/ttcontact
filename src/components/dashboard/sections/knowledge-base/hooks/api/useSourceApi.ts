@@ -26,26 +26,35 @@ export const useSourceApi = () => {
     // Determine if we are creating a new knowledge base or adding to an existing one
     const isCreatingNew = !kbId || kbId === 'create_new' || kbId.startsWith('temp_');
     
+    // Select the correct endpoint based on whether we're creating a new KB
+    // or adding to an existing one
+    const endpoint = isCreatingNew
+      ? '/create-knowledge-base'  // For new KB, use the create endpoint
+      : `/add-knowledge-base-sources/${kbId}`; // For existing KB, use the add sources endpoint
+    
+    console.log(`Using endpoint ${endpoint} for ${sourceType} source. Creating new KB: ${isCreatingNew}`);
+    
     // If creating a new KB, we need to provide a name
     if (isCreatingNew && sourceData.knowledgeBaseName) {
       formData.append('knowledge_base_name', sourceData.knowledgeBaseName);
     } else if (!isCreatingNew) {
-      // If adding to existing KB, include KB ID
+      // If adding to existing KB, include KB ID for the add-sources endpoint
       formData.append('knowledge_base_id', kbId);
     }
     
+    // Always include these fields as shown in the images
+    formData.append('knowledge_base_texts', JSON.stringify([]));
+    formData.append('knowledge_base_urls', JSON.stringify([]));
+    formData.append('enable_auto_refresh', 'false');
+    
     if (sourceType === 'url') {
       // Format according to the API requirements for URLs
-      // Empty arrays for text content if not provided
-      formData.append('knowledge_base_texts', JSON.stringify([]));
-      
-      // Add URL data
       const urls = sourceData.webPages && Array.isArray(sourceData.webPages) 
         ? sourceData.webPages.map(page => page.url) 
         : [sourceData.url];
       
-      formData.append('knowledge_base_urls', JSON.stringify(urls));
-      formData.append('enable_auto_refresh', String(sourceData.autoSync || false));
+      formData.set('knowledge_base_urls', JSON.stringify(urls));
+      formData.set('enable_auto_refresh', String(sourceData.autoSync || false));
       
       console.log('API call data for URL source:', {
         urls,
@@ -55,13 +64,8 @@ export const useSourceApi = () => {
       });
     } 
     else if (sourceType === 'file' && sourceData.file) {
-      // For file upload, include the file in formData
+      // For file upload, include the file in formData as shown in the first image
       formData.append('file', sourceData.file);
-      
-      // Per the image, we need to include these fields even if empty
-      formData.append('knowledge_base_texts', JSON.stringify([]));
-      formData.append('knowledge_base_urls', JSON.stringify([]));
-      formData.append('enable_auto_refresh', 'false');
       
       console.log("Uploading file:", sourceData.file.name, "to KB:", isCreatingNew ? "New KB" : kbId);
     } 
@@ -73,22 +77,12 @@ export const useSourceApi = () => {
         uuid: 'm' + Math.random().toString(36).substring(2, 15)
       }];
       
-      formData.append('knowledge_base_texts', JSON.stringify(textContent));
-      formData.append('knowledge_base_urls', JSON.stringify([]));
-      formData.append('enable_auto_refresh', 'false');
+      formData.set('knowledge_base_texts', JSON.stringify(textContent));
       
       console.log("Adding text content with title:", sourceData.fileName);
     }
     
     try {
-      // Select the correct endpoint based on whether we're creating a new KB
-      // or adding to an existing one
-      const endpoint = isCreatingNew
-        ? '/create-knowledge-base'  // For new KB, use the create endpoint
-        : `/add-knowledge-base-sources/${kbId}`; // For existing KB, use the add sources endpoint
-      
-      console.log(`Using endpoint ${endpoint} for ${sourceType} source. Creating new KB: ${isCreatingNew}`);
-      
       // Log the FormData for debugging
       console.log('FormData entries:', Object.fromEntries(formData.entries()));
       
