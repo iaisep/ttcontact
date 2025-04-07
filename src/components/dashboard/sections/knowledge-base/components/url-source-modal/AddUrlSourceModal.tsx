@@ -69,7 +69,8 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
         onClose();
         resetState();
         
-        // Dispatch refresh event to update the UI
+        // Trigger a single refresh event here at the completion of the flow
+        // This is a direct user action
         const refreshEvent = new CustomEvent('refreshKnowledgeBase');
         window.dispatchEvent(refreshEvent);
         

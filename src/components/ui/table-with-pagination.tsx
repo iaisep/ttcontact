@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -42,6 +42,17 @@ export function TableWithPagination<T>({
   onPageChange,
   onPageSizeChange
 }: TableWithPaginationProps<T>) {
+  // Store previous data length to avoid unnecessary page resets
+  const [prevDataLength, setPrevDataLength] = useState(data.length);
+  
+  // Only reset to page 1 when data length changes and we're not already on page 1
+  useEffect(() => {
+    if (data.length !== prevDataLength && currentPage !== 1) {
+      onPageChange(1);
+    }
+    setPrevDataLength(data.length);
+  }, [data.length, prevDataLength, currentPage, onPageChange]);
+
   const getRowClassName = (item: T): string => {
     if (typeof rowClassName === 'function') {
       return rowClassName(item);

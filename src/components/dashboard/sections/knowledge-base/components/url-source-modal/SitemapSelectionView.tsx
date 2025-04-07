@@ -48,12 +48,9 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
 
   const handleConfirm = () => {
     if (canProceed && !isLoading) {
-      // Execute the confirm action which should handle adding pages to the knowledge base
+      // Execute the confirm action without triggering any events
+      // The parent component will handle any necessary refreshing
       onConfirm();
-      
-      // Dispatch a custom event to refresh the knowledge base list after selection
-      const refreshEvent = new CustomEvent('refreshKnowledgeBase');
-      window.dispatchEvent(refreshEvent);
     }
   };
 

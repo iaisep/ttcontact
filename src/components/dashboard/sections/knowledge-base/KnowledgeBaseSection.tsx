@@ -45,13 +45,13 @@ const KnowledgeBaseSection: React.FC = () => {
     setCurrentPage(1);
   }, [searchQuery, pageSize]);
 
-  // Fetch knowledge bases when component mounts
+  // Only fetch knowledge bases when component mounts or when coming to this page
   useEffect(() => {
+    // Initial fetch when component mounts
     fetchKnowledgeBases();
-  }, []);
 
-  // Add event listener for refresh events
-  useEffect(() => {
+    // Add event listener for refresh events that will be triggered by other components
+    // but only after CRUD operations are completed
     const handleRefresh = () => {
       console.log("Refreshing knowledge bases list");
       fetchKnowledgeBases();
@@ -62,7 +62,7 @@ const KnowledgeBaseSection: React.FC = () => {
     return () => {
       window.removeEventListener('refreshKnowledgeBase', handleRefresh);
     };
-  }, [fetchKnowledgeBases]);
+  }, []);
 
   const handleCreateClick = () => {
     setCurrentKb(null);
@@ -97,14 +97,14 @@ const KnowledgeBaseSection: React.FC = () => {
         
         toast.success('Knowledge base created successfully');
         
-        // Refresh the list after creation
+        // Refresh the list after creation - this is a direct user action
         fetchKnowledgeBases();
       } else if (currentKb) {
         const updatedKb = { ...currentKb, name: data.name };
         await updateKnowledgeBase(updatedKb);
         setKbDialogOpen(false);
         
-        // Refresh the list after update
+        // Refresh the list after update - this is a direct user action
         fetchKnowledgeBases();
       }
     } catch (error) {
@@ -128,7 +128,7 @@ const KnowledgeBaseSection: React.FC = () => {
         setKbToDelete(null);
         toast.success('Knowledge base deleted successfully');
         
-        // Refresh the list after deletion
+        // Refresh the list after deletion - this is a direct user action
         fetchKnowledgeBases();
       } catch (error) {
         console.error('Error deleting knowledge base:', error);
@@ -179,7 +179,7 @@ const KnowledgeBaseSection: React.FC = () => {
           // Close the dialog after successful creation
           setKbDialogOpen(false);
           
-          // Refresh the list after creation
+          // This is a direct user action, trigger a refresh
           fetchKnowledgeBases();
           
           return newKb;
@@ -210,7 +210,7 @@ const KnowledgeBaseSection: React.FC = () => {
         requestData
       );
       
-      // Refresh the list after adding a source
+      // This is a direct user action, trigger a refresh
       fetchKnowledgeBases();
       
       toast.success(`${sourceType} source added successfully`);
@@ -226,7 +226,7 @@ const KnowledgeBaseSection: React.FC = () => {
     try {
       const updatedKb = await deleteSource(kbId, sourceId);
       
-      // Refresh the list after deleting a source
+      // This is a direct user action, trigger a refresh
       fetchKnowledgeBases();
       
       toast.success('Source deleted successfully');

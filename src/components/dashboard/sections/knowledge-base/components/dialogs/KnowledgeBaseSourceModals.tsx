@@ -44,10 +44,6 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
   };
 
   const handleSourceAdded = () => {
-    // Dispatch refresh event to update the UI
-    const refreshEvent = new CustomEvent('refreshKnowledgeBase');
-    window.dispatchEvent(refreshEvent);
-    
     // Call the optional callback to handle source addition
     if (onSourceAdded) {
       onSourceAdded();
@@ -58,6 +54,10 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
     if (currentKnowledgeBase?.id?.startsWith('temp_') && onCloseMainDialog) {
       onCloseMainDialog();
     }
+    
+    // Dispatch a single refresh event after all operations are complete
+    const refreshEvent = new CustomEvent('refreshKnowledgeBase');
+    window.dispatchEvent(refreshEvent);
   };
 
   console.log("KnowledgeBaseSourceModals - currentKnowledgeBase:", currentKnowledgeBase);
