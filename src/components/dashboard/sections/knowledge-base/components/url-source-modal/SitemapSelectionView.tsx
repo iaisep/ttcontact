@@ -46,13 +46,11 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   
   const displayName = knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name);
 
-  // Esta es la función principal modificada para manejar la confirmación
+  // Simplified confirm handler to reduce potential issues
   const handleConfirm = () => {
     if (canProceed && !isLoading) {
-      // Ejecuta la acción de confirmación que debería manejar la adición de páginas a la base de conocimiento
+      // Only execute the onConfirm function and let the parent handle all events
       onConfirm();
-      
-      // No despachamos el evento aquí - será manejado por el componente padre cuando sepa que la operación ha tenido éxito
     }
   };
 
