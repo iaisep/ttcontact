@@ -117,6 +117,12 @@ export const useSourceManagement = (
   const deleteSource = async (kbId: string, sourceId: string) => {
     if (isProcessing) return Promise.reject(new Error('Operation in progress'));
     
+    if (!kbId || !sourceId) {
+      const error = new Error('Missing required parameters: knowledge base ID or source ID');
+      toast.error('Cannot delete source: Missing required information');
+      return Promise.reject(error);
+    }
+    
     try {
       setIsProcessing(true);
       setLoading(true);
@@ -126,7 +132,9 @@ export const useSourceManagement = (
       // Find and verify the KB before making API call
       const kb = knowledgeBases.find(kb => kb.id === kbId);
       if (!kb) {
-        throw new Error('Knowledge base not found');
+        const error = new Error('Knowledge base not found');
+        toast.error('Knowledge base not found');
+        return Promise.reject(error);
       }
       
       // First update the state to give immediate feedback
@@ -137,14 +145,14 @@ export const useSourceManagement = (
       // Update the state before making API call for better UX
       updateKnowledgeBaseInState(updatedKb);
 
-      // Then make the API call (with error handling)
+      // Then make the API call
       try {
         await deleteSourceApi(kbId, sourceId);
-        toast.success('Source deleted from knowledge base');
+        // Don't show toast here as it should be handled by the caller
       } catch (error) {
         console.error('API error when deleting source:', error);
-        // Don't let API errors break the UI - already updated the state
-        toast.success('Source removed from display');
+        // If API fails, we've already updated the UI, so log but don't throw
+        // This prevents the UI from freezing
       }
       
       return updatedKb;

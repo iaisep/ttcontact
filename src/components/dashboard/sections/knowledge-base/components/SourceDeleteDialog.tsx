@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { KnowledgeBaseSource, KnowledgeBase } from '../types';
+import { toast } from 'sonner';
 
 interface SourceDeleteDialogProps {
   open: boolean;
@@ -38,8 +39,10 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
     try {
       setIsDeleting(true);
       await onConfirm();
+      toast.success('Source deleted successfully');
     } catch (error) {
       console.error('Error deleting source:', error);
+      toast.error('Error deleting source. Please try again.');
     } finally {
       // Always make sure to reset the state and close the dialog
       setIsDeleting(false);
@@ -50,7 +53,7 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
   return (
     <AlertDialog open={open} onOpenChange={(newOpen) => {
       // Only allow closing if we're not in the middle of deleting
-      if (!isDeleting || !newOpen) {
+      if (!isDeleting) {
         onOpenChange(newOpen);
       }
     }}>

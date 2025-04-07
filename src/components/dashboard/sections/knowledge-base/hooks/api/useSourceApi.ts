@@ -1,3 +1,4 @@
+
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -103,6 +104,11 @@ export const useSourceApi = () => {
   };
 
   const deleteSourceApi = async (kbId: string, sourceId: string) => {
+    if (!kbId || !sourceId) {
+      console.error('Missing required parameters for deleteSourceApi:', { kbId, sourceId });
+      throw new Error('Missing required parameters: knowledge base ID or source ID');
+    }
+    
     console.log(`Deleting source ${sourceId} from KB ${kbId}`);
     
     try {
@@ -122,9 +128,8 @@ export const useSourceApi = () => {
       return response;
     } catch (error) {
       console.error('Error in delete source API call:', error);
-      // Return a minimal success object to prevent UI from freezing
-      // This is a fallback to keep the UI working even if the API fails
-      return { success: true };
+      // Don't silently fail, propagate the error
+      throw error;
     }
   };
 

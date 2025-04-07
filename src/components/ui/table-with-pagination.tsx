@@ -48,13 +48,19 @@ export function TableWithPagination<T>({
   // Only reset to page 1 when data length changes significantly and we're not already on page 1
   useEffect(() => {
     // Only run this effect after the first render when prevDataLength is set
-    if (prevDataLength !== null && data.length !== prevDataLength && currentPage !== 1) {
-      onPageChange(1);
+    if (prevDataLength !== null) {
+      // Calculate max possible page based on current data and page size
+      const maxPage = Math.max(1, Math.ceil(data.length / initialPageSize));
+      
+      // If current page is greater than maxPage, reset to page 1
+      if (currentPage > maxPage && maxPage > 0) {
+        onPageChange(1);
+      }
     }
     
     // Always update the previous data length
     setPrevDataLength(data.length);
-  }, [data.length, currentPage, onPageChange]);
+  }, [data.length, currentPage, initialPageSize, onPageChange]);
 
   const getRowClassName = (item: T): string => {
     if (typeof rowClassName === 'function') {
@@ -62,6 +68,13 @@ export function TableWithPagination<T>({
     }
     return rowClassName || '';
   };
+
+  // Calculate start and end indices for current page
+  const startIndex = (currentPage - 1) * initialPageSize;
+  const endIndex = Math.min(startIndex + initialPageSize, data.length);
+  
+  // Get current page data
+  const currentPageData = data.slice(startIndex, endIndex);
 
   return (
     <div className="space-y-4">
@@ -84,15 +97,15 @@ export function TableWithPagination<T>({
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((item, index) => (
+              currentPageData.map((item, index) => (
                 <TableRow 
-                  key={index} 
+                  key={`row-${startIndex + index}`}
                   className={getRowClassName(item)}
                   onClick={onRowClick ? () => onRowClick(item) : undefined}
                   style={onRowClick ? { cursor: 'pointer' } : undefined}
                 >
                   {columns.map((column) => (
-                    <TableCell key={`${index}-${column.key}`} className={column.className}>
+                    <TableCell key={`cell-${startIndex + index}-${column.key}`} className={column.className}>
                       {column.cell(item)}
                     </TableCell>
                   ))}
