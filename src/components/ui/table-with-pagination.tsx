@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -42,27 +42,6 @@ export function TableWithPagination<T>({
   onPageChange,
   onPageSizeChange
 }: TableWithPaginationProps<T>) {
-  const prevDataLengthRef = useRef<number>(data.length);
-  
-  // Fix the effect to prevent infinite loops:
-  // Only reset to page 1 when data length decreases AND we're not on page 1
-  useEffect(() => {
-    const dataLengthChanged = prevDataLengthRef.current !== data.length;
-    const isDataLengthDecreased = data.length < prevDataLengthRef.current;
-    
-    // Only reset page when data length has decreased AND we're on a page that might now be invalid
-    if (dataLengthChanged && isDataLengthDecreased && currentPage > 1) {
-      // Check if current page would be out of bounds with new data length
-      const totalPages = Math.ceil(data.length / initialPageSize);
-      if (currentPage > totalPages) {
-        onPageChange(Math.max(1, totalPages));
-      }
-    }
-    
-    // Always update the reference with the latest length
-    prevDataLengthRef.current = data.length;
-  }, [data.length, currentPage, initialPageSize, onPageChange]); 
-  
   const getRowClassName = (item: T): string => {
     if (typeof rowClassName === 'function') {
       return rowClassName(item);
