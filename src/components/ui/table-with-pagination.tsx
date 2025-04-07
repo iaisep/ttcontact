@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -42,13 +42,6 @@ export function TableWithPagination<T>({
   onPageChange,
   onPageSizeChange
 }: TableWithPaginationProps<T>) {
-  // Reset to first page when data changes significantly
-  useEffect(() => {
-    if (data.length > 0 && currentPage > 1 && data.length <= initialPageSize) {
-      onPageChange(1);
-    }
-  }, [data, currentPage, initialPageSize, onPageChange]);
-
   const getRowClassName = (item: T): string => {
     if (typeof rowClassName === 'function') {
       return rowClassName(item);
