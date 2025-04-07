@@ -52,8 +52,11 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
       onConfirm();
       
       // Dispatch a custom event to refresh the knowledge base list after selection
-      const refreshEvent = new CustomEvent('refreshKnowledgeBase');
+      const refreshEvent = new CustomEvent('refreshKnowledgeBase', { 
+        detail: { timestamp: Date.now() } 
+      });
       window.dispatchEvent(refreshEvent);
+      console.log('Refresh event dispatched from SitemapSelectionView');
     }
   };
 

@@ -39,22 +39,24 @@ const KnowledgeBaseSection: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [kbToDelete, setKbToDelete] = useState<KnowledgeBase | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [refreshTimestamp, setRefreshTimestamp] = useState(Date.now());
 
   // Reset to first page when search query or page size changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, pageSize]);
 
-  // Fetch knowledge bases when component mounts
+  // Fetch knowledge bases when component mounts or refreshTimestamp changes
   useEffect(() => {
+    console.log('Fetching knowledge bases at timestamp:', refreshTimestamp);
     fetchKnowledgeBases();
-  }, []);
+  }, [fetchKnowledgeBases, refreshTimestamp]);
 
   // Add event listener for refresh events
   useEffect(() => {
-    const handleRefresh = () => {
-      console.log("Refreshing knowledge bases list");
-      fetchKnowledgeBases();
+    const handleRefresh = (event: Event) => {
+      console.log("Refreshing knowledge bases list", (event as CustomEvent).detail);
+      setRefreshTimestamp(Date.now());
     };
     
     window.addEventListener('refreshKnowledgeBase', handleRefresh);
@@ -62,7 +64,7 @@ const KnowledgeBaseSection: React.FC = () => {
     return () => {
       window.removeEventListener('refreshKnowledgeBase', handleRefresh);
     };
-  }, [fetchKnowledgeBases]);
+  }, []);
 
   const handleCreateClick = () => {
     setCurrentKb(null);
@@ -98,14 +100,14 @@ const KnowledgeBaseSection: React.FC = () => {
         toast.success('Knowledge base created successfully');
         
         // Refresh the list after creation
-        fetchKnowledgeBases();
+        setRefreshTimestamp(Date.now());
       } else if (currentKb) {
         const updatedKb = { ...currentKb, name: data.name };
         await updateKnowledgeBase(updatedKb);
         setKbDialogOpen(false);
         
         // Refresh the list after update
-        fetchKnowledgeBases();
+        setRefreshTimestamp(Date.now());
       }
     } catch (error) {
       console.error('Error saving knowledge base:', error);
@@ -129,7 +131,7 @@ const KnowledgeBaseSection: React.FC = () => {
         toast.success('Knowledge base deleted successfully');
         
         // Refresh the list after deletion
-        fetchKnowledgeBases();
+        setRefreshTimestamp(Date.now());
       } catch (error) {
         console.error('Error deleting knowledge base:', error);
         toast.error('Failed to delete knowledge base');
@@ -180,7 +182,7 @@ const KnowledgeBaseSection: React.FC = () => {
           setKbDialogOpen(false);
           
           // Refresh the list after creation
-          fetchKnowledgeBases();
+          setRefreshTimestamp(Date.now());
           
           return newKb;
         } else {
@@ -211,7 +213,7 @@ const KnowledgeBaseSection: React.FC = () => {
       );
       
       // Refresh the list after adding a source
-      fetchKnowledgeBases();
+      setRefreshTimestamp(Date.now());
       
       toast.success(`${sourceType} source added successfully`);
       return updatedKb;
@@ -227,7 +229,7 @@ const KnowledgeBaseSection: React.FC = () => {
       const updatedKb = await deleteSource(kbId, sourceId);
       
       // Refresh the list after deleting a source
-      fetchKnowledgeBases();
+      setRefreshTimestamp(Date.now());
       
       toast.success('Source deleted successfully');
       return updatedKb;

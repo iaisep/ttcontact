@@ -144,11 +144,18 @@ export const useUrlSourceModal = ({
       
       // Call the API with the selected pages and knowledge base info
       // Pass the knowledgeBaseName explicitly to ensure it gets used
-      await onSubmit(url, autoSync, selectedPages, knowledgeBaseName);
+      const result = await onSubmit(url, autoSync, selectedPages, knowledgeBaseName);
+      
+      // Trigger refresh event after successful submission
+      const refreshEvent = new CustomEvent('refreshKnowledgeBase', {
+        detail: { timestamp: Date.now(), source: 'handleConfirmSelection' }
+      });
+      window.dispatchEvent(refreshEvent);
+      console.log('Refresh event dispatched from handleConfirmSelection');
       
       toast.success('URL source added successfully');
       
-      // Reset state here - the parent component will handle closing the modal after successful API call
+      return result;
     } catch (error) {
       console.error('Failed to add URL source:', error);
       toast.error('Failed to add URL source');
