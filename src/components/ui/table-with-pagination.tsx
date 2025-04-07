@@ -44,17 +44,19 @@ export function TableWithPagination<T>({
 }: TableWithPaginationProps<T>) {
   const prevDataLengthRef = useRef<number>(data.length);
   
-  // Effect to reset to first page when total data length changes
-  // But only if we're not on the first page already
+  // Efecto para reiniciar a la primera página cuando cambia la longitud total de datos
+  // Pero solo si no estamos ya en la primera página
   useEffect(() => {
-    // Only reset to page 1 if data length changed AND we're not on page 1
-    if (prevDataLengthRef.current !== data.length && currentPage > 1) {
+    const dataLengthChanged = prevDataLengthRef.current !== data.length;
+    
+    // Solo resetear a página 1 si la cantidad de datos cambió Y no estamos en la página 1
+    if (dataLengthChanged && currentPage > 1) {
       onPageChange(1);
     }
     
-    // Update the ref with current length
+    // Actualizar la referencia con la longitud actual
     prevDataLengthRef.current = data.length;
-  }, [data.length]); // Only depend on data.length, not the entire data object
+  }, [data.length, currentPage, onPageChange]); // Asegurémonos de incluir las dependencias correctas
   
   const getRowClassName = (item: T): string => {
     if (typeof rowClassName === 'function') {
