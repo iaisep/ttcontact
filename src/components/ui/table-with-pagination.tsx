@@ -43,15 +43,18 @@ export function TableWithPagination<T>({
   onPageSizeChange
 }: TableWithPaginationProps<T>) {
   // Store previous data length to avoid unnecessary page resets
-  const [prevDataLength, setPrevDataLength] = useState(data.length);
+  const [prevDataLength, setPrevDataLength] = useState<number | null>(null);
   
-  // Only reset to page 1 when data length changes and we're not already on page 1
+  // Only reset to page 1 when data length changes significantly and we're not already on page 1
   useEffect(() => {
-    if (data.length !== prevDataLength && currentPage !== 1) {
+    // Only run this effect after the first render when prevDataLength is set
+    if (prevDataLength !== null && data.length !== prevDataLength && currentPage !== 1) {
       onPageChange(1);
     }
+    
+    // Always update the previous data length
     setPrevDataLength(data.length);
-  }, [data.length, prevDataLength, currentPage, onPageChange]);
+  }, [data.length, currentPage, onPageChange]);
 
   const getRowClassName = (item: T): string => {
     if (typeof rowClassName === 'function') {

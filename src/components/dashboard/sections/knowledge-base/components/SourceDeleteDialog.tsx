@@ -41,13 +41,19 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
     } catch (error) {
       console.error('Error deleting source:', error);
     } finally {
+      // Always make sure to reset the state and close the dialog
       setIsDeleting(false);
       onOpenChange(false);
     }
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={(newOpen) => {
+      // Only allow closing if we're not in the middle of deleting
+      if (!isDeleting || !newOpen) {
+        onOpenChange(newOpen);
+      }
+    }}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Source</AlertDialogTitle>

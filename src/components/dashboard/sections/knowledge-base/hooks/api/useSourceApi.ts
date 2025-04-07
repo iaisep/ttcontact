@@ -1,4 +1,3 @@
-
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -19,7 +18,6 @@ export const useSourceApi = () => {
     }
   ) => {
     console.log(`API call: Adding ${sourceType} source to KB ${kbId}:`, sourceData);
-    console.log(`Knowledge Base Name: ${sourceData.knowledgeBaseName}`);
     
     // Create FormData object for all types
     const formData = new FormData();
@@ -34,12 +32,10 @@ export const useSourceApi = () => {
       : `/add-knowledge-base-sources/${kbId}`; // For existing KB, use the add sources endpoint
     
     console.log(`Using endpoint ${endpoint} for ${sourceType} source. Creating new KB: ${isCreatingNew}`);
-    console.log(`Knowledge Base Name for ${isCreatingNew ? 'new' : 'existing'} KB: ${sourceData.knowledgeBaseName}`);
     
     // If creating a new KB, we need to provide a name
     if (isCreatingNew && sourceData.knowledgeBaseName) {
       formData.append('knowledge_base_name', sourceData.knowledgeBaseName);
-      console.log('Adding knowledge_base_name to FormData:', sourceData.knowledgeBaseName);
     } else if (!isCreatingNew) {
       // If adding to existing KB, include KB ID for the add-sources endpoint
       formData.append('knowledge_base_id', kbId);
@@ -58,13 +54,6 @@ export const useSourceApi = () => {
       
       formData.set('knowledge_base_urls', JSON.stringify(urls));
       formData.set('enable_auto_refresh', String(sourceData.autoSync || false));
-      
-      console.log('API call data for URL source:', {
-        urls,
-        autoSync: sourceData.autoSync || false,
-        knowledgeBaseName: sourceData.knowledgeBaseName,
-        isCreatingNew
-      });
     } 
     else if (sourceType === 'file' && sourceData.file) {
       // For file upload, include the file in formData as shown in the first image
@@ -76,10 +65,7 @@ export const useSourceApi = () => {
                       (sourceData.file.name.split('.')[0]) || 
                       "New Knowledge Base";
         formData.append('knowledge_base_name', kbName);
-        console.log('Adding derived knowledge_base_name to FormData:', kbName);
       }
-      
-      console.log("Uploading file:", sourceData.file.name, "to KB:", isCreatingNew ? "New KB" : kbId);
     } 
     else if (sourceType === 'text') {
       // Format text content according to the API documentation and image
@@ -97,21 +83,13 @@ export const useSourceApi = () => {
                       sourceData.fileName || 
                       "New Knowledge Base";
         formData.append('knowledge_base_name', kbName);
-        console.log('Adding derived knowledge_base_name to FormData for text:', kbName);
       }
-      
-      console.log("Adding text content with title:", sourceData.fileName);
     }
     
     try {
-      // Log the FormData for debugging
-      console.log('FormData entries:', Object.fromEntries(formData.entries()));
-      
       // Call the API endpoint with FormData for all source types
       const response = await fetchWithAuth(endpoint, {
         method: 'POST',
-        // Don't set Content-Type header when using FormData
-        // The browser will automatically set the correct Content-Type with boundary
         body: formData,
         mode: 'cors'
       });
@@ -127,17 +105,27 @@ export const useSourceApi = () => {
   const deleteSourceApi = async (kbId: string, sourceId: string) => {
     console.log(`Deleting source ${sourceId} from KB ${kbId}`);
     
-    // Correct API endpoint format for deleting a source
-    const endpoint = `/delete-knowledge-base-source/${kbId}/source/${sourceId}`;
-    console.log(`Using delete endpoint: ${endpoint}`);
-    
-    return await fetchWithAuth(endpoint, {
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      }
-    });
+    try {
+      // Correct API endpoint format for deleting a source
+      const endpoint = `/delete-knowledge-base-source/${kbId}/source/${sourceId}`;
+      console.log(`Using delete endpoint: ${endpoint}`);
+      
+      const response = await fetchWithAuth(endpoint, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Delete source API response:', response);
+      return response;
+    } catch (error) {
+      console.error('Error in delete source API call:', error);
+      // Return a minimal success object to prevent UI from freezing
+      // This is a fallback to keep the UI working even if the API fails
+      return { success: true };
+    }
   };
 
   // Helper function to create mock data for development

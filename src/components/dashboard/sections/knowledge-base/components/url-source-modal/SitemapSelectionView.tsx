@@ -34,12 +34,6 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   currentKnowledgeBase,
   knowledgeBaseName
 }) => {
-  useEffect(() => {
-    console.log('Sitemap selection view - current knowledge base:', currentKnowledgeBase);
-    console.log('Sitemap selection view - knowledge base name:', knowledgeBaseName);
-    console.log('Sitemap selection view - selected URLs count:', selectedPageUrls.length);
-  }, [currentKnowledgeBase, knowledgeBaseName, selectedPageUrls]);
-  
   const hasSelectedPages = selectedPageUrls.length > 0;
   const hasKnowledgeBase = !!currentKnowledgeBase?.id || !!knowledgeBaseName;
   const canProceed = hasSelectedPages && hasKnowledgeBase;
@@ -48,8 +42,6 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
 
   const handleConfirm = () => {
     if (canProceed && !isLoading) {
-      // Execute the confirm action without triggering any events
-      // The parent component will handle any necessary refreshing
       onConfirm();
     }
   };

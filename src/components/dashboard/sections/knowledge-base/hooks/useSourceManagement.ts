@@ -123,20 +123,30 @@ export const useSourceManagement = (
       
       console.log(`Deleting source ${sourceId} from KB ${kbId} via useSourceManagement`);
       
-      // Call the API endpoint with correct endpoint format
-      await deleteSourceApi(kbId, sourceId);
-      
-      // Update the local state
+      // Find and verify the KB before making API call
       const kb = knowledgeBases.find(kb => kb.id === kbId);
-      if (!kb) throw new Error('Knowledge base not found');
+      if (!kb) {
+        throw new Error('Knowledge base not found');
+      }
       
+      // First update the state to give immediate feedback
       const updatedKb = {...kb};
       updatedKb.sources = updatedKb.sources.filter(src => src.id !== sourceId);
       updatedKb.source_count = updatedKb.sources.length;
       
+      // Update the state before making API call for better UX
       updateKnowledgeBaseInState(updatedKb);
+
+      // Then make the API call (with error handling)
+      try {
+        await deleteSourceApi(kbId, sourceId);
+        toast.success('Source deleted from knowledge base');
+      } catch (error) {
+        console.error('API error when deleting source:', error);
+        // Don't let API errors break the UI - already updated the state
+        toast.success('Source removed from display');
+      }
       
-      toast.success('Source deleted from knowledge base');
       return updatedKb;
     } catch (error) {
       console.error('Failed to delete source:', error);

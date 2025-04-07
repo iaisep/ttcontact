@@ -54,14 +54,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
     if (currentKnowledgeBase?.id?.startsWith('temp_') && onCloseMainDialog) {
       onCloseMainDialog();
     }
-    
-    // Dispatch a single refresh event after all operations are complete
-    const refreshEvent = new CustomEvent('refreshKnowledgeBase');
-    window.dispatchEvent(refreshEvent);
   };
-
-  console.log("KnowledgeBaseSourceModals - currentKnowledgeBase:", currentKnowledgeBase);
-  console.log("KnowledgeBaseSourceModals - knowledgeBaseName:", knowledgeBaseName);
 
   // Create a temporary knowledge base if we don't have one but have a name
   const effectiveKnowledgeBase = currentKnowledgeBase || 
@@ -74,8 +67,6 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       sources: [],
       auto_sync: false
     } : null);
-
-  console.log("KnowledgeBaseSourceModals - effectiveKnowledgeBase:", effectiveKnowledgeBase);
 
   return (
     <>
@@ -108,7 +99,6 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           handleSourceAdded();
         }}
         onSubmit={(file) => {
-          console.log("Submitting file with KB name:", knowledgeBaseName);
           return onAddFileSource(file);
         }}
         currentKnowledgeBase={effectiveKnowledgeBase}
@@ -124,7 +114,6 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           handleSourceAdded();
         }}
         onSubmit={(fileName, content) => {
-          console.log("Submitting text with KB name:", knowledgeBaseName);
           return onAddTextSource(fileName, content);
         }}
         currentKnowledgeBase={effectiveKnowledgeBase}
@@ -137,9 +126,16 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
         onOpenChange={setDeleteSourceDialogOpen}
         source={sourceToDelete}
         onConfirm={async () => {
-          const result = await onDeleteSource();
-          handleSourceAdded();
-          return result; // Make sure we return the KnowledgeBase result
+          try {
+            const result = await onDeleteSource();
+            handleSourceAdded();
+            return result; // Make sure we return the KnowledgeBase result
+          } catch (error) {
+            console.error('Error in source deletion:', error);
+            // Make sure to clean up even if there's an error
+            setDeleteSourceDialogOpen(false);
+            throw error;
+          }
         }}
       />
     </>
