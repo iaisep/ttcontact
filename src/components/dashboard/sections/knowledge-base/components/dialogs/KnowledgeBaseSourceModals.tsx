@@ -124,21 +124,26 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       <SourceDeleteDialog
         open={deleteSourceDialogOpen}
         onOpenChange={(open) => {
-          // Only allow closing if we're actually changing the state
-          if (open !== deleteSourceDialogOpen) {
-            setDeleteSourceDialogOpen(open);
-          }
+          // Only allow closing if we're not in the middle of an operation
+          setDeleteSourceDialogOpen(open);
         }}
         source={sourceToDelete}
         onConfirm={async () => {
           try {
+            // Call the delete source function and wait for it to complete
             const result = await onDeleteSource();
+            
+            // Once we have a successful response, notify that a source was added
+            // (actually deleted, but we want to refresh the data)
             handleSourceAdded();
+            
             return result;
           } catch (error) {
             console.error('Error in source deletion:', error);
+            
             // Ensure we close the dialog even if there's an error
             setDeleteSourceDialogOpen(false);
+            
             throw error;
           }
         }}

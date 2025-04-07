@@ -36,6 +36,12 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
   }, [open]);
 
   const handleConfirm = async () => {
+    if (!source) {
+      console.error("Cannot delete source: Source is null");
+      onOpenChange(false);
+      return;
+    }
+
     try {
       setIsDeleting(true);
       await onConfirm();
@@ -45,6 +51,7 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
       toast.error('Error deleting source. Please try again.');
     } finally {
       // Always make sure to reset the state and close the dialog
+      // even if there was an error
       setIsDeleting(false);
       onOpenChange(false);
     }

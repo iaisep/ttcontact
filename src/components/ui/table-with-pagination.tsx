@@ -71,10 +71,12 @@ export function TableWithPagination<T>({
 
   // Calculate start and end indices for current page
   const startIndex = (currentPage - 1) * initialPageSize;
+  // Make sure we don't go out of bounds
   const endIndex = Math.min(startIndex + initialPageSize, data.length);
   
-  // Get current page data
-  const currentPageData = data.slice(startIndex, endIndex);
+  // Get current page data with defensive checks
+  const currentPageData = data && Array.isArray(data) && data.length > 0 ? 
+    data.slice(Math.max(0, startIndex), endIndex) : [];
 
   return (
     <div className="space-y-4">
@@ -90,7 +92,7 @@ export function TableWithPagination<T>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.length === 0 ? (
+            {!data || data.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
                   {emptyState || 'No data found'}
@@ -116,7 +118,7 @@ export function TableWithPagination<T>({
         </Table>
       </div>
       
-      {data.length > 0 && (
+      {data && data.length > 0 && (
         <PaginationControls
           totalItems={data.length}
           pageSize={initialPageSize}

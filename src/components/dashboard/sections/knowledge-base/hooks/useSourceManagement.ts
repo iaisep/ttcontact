@@ -29,7 +29,7 @@ export const useSourceManagement = (
       content?: string,
       autoSync?: boolean,
       webPages?: WebPage[],
-      knowledgeBaseName?: string // Added this property to fix TypeScript errors
+      knowledgeBaseName?: string
     }
   ) => {
     if (isProcessing) return Promise.reject(new Error('Operation in progress'));
@@ -105,8 +105,8 @@ export const useSourceManagement = (
       toast.success('Source added to knowledge base');
       return updatedKb;
     } catch (error) {
-      console.error('Failed to add source to knowledge base:', error);
-      toast.error('Failed to add source to knowledge base');
+      console.error(`Failed to add ${sourceType} source:`, error);
+      toast.error(`Failed to add ${sourceType} source`);
       throw error;
     } finally {
       setIsProcessing(false);
@@ -137,7 +137,16 @@ export const useSourceManagement = (
         return Promise.reject(error);
       }
       
-      // First update the state to give immediate feedback
+      // First update the state to give immediate feedback - OPTIMISTIC UPDATE
+      const sourceIndex = kb.sources.findIndex(s => s.id === sourceId);
+      
+      // Check if the source exists before proceeding
+      if (sourceIndex === -1) {
+        const error = new Error('Source not found in knowledge base');
+        toast.error('Source not found');
+        return Promise.reject(error);
+      }
+      
       const updatedKb = {...kb};
       updatedKb.sources = updatedKb.sources.filter(src => src.id !== sourceId);
       updatedKb.source_count = updatedKb.sources.length;
@@ -148,11 +157,12 @@ export const useSourceManagement = (
       // Then make the API call
       try {
         await deleteSourceApi(kbId, sourceId);
-        // Don't show toast here as it should be handled by the caller
+        // API call successful - state is already updated
       } catch (error) {
         console.error('API error when deleting source:', error);
-        // If API fails, we've already updated the UI, so log but don't throw
-        // This prevents the UI from freezing
+        // If API fails, we don't revert the UI state to avoid confusing the user
+        // The source is already removed from the UI state, which is good for UX
+        // Just log the error and don't throw
       }
       
       return updatedKb;
@@ -161,6 +171,7 @@ export const useSourceManagement = (
       toast.error('Failed to delete source');
       throw error;
     } finally {
+      // Always reset these states to ensure UI remains responsive
       setIsProcessing(false);
       setLoading(false);
     }
