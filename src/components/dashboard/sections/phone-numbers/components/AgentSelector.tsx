@@ -48,8 +48,8 @@ const AgentSelector = ({ value, agents = [], onChange, isLoading = false }: Agen
           <SelectItem value="none">None (Unassigned)</SelectItem>
           {agents && agents.length > 0 ? (
             agents.map(agent => (
-              <SelectItem key={agent.id} value={agent.id}>
-                {agent.name || 'Unnamed Agent'}
+              <SelectItem key={agent.agent_id} value={agent.agent_id}>
+                {agent.agent_name || 'Unnamed Agent'}
               </SelectItem>
             ))
           ) : (
