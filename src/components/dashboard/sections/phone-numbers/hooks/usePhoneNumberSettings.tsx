@@ -17,7 +17,7 @@ export const usePhoneNumberSettings = (
       console.log(`Updating phone name for phone: ${phone.number} to: ${name}`);
       
       await fetchWithAuth(`/update-phone-number/${phone.number}`, {
-        method: 'PUT',
+        method: 'PATCH',  // Changed from PUT to PATCH
         body: JSON.stringify({
           nickname: name,
           inbound_agent_id: phone.inbound_agent_id || null,
@@ -47,7 +47,7 @@ export const usePhoneNumberSettings = (
       console.log(`Updating webhook for phone: ${phone.number} to: ${webhookUrl}`);
       
       await fetchWithAuth(`/update-phone-number/${phone.number}`, {
-        method: 'PUT',
+        method: 'PATCH',  // Changed from PUT to PATCH
         body: JSON.stringify({
           nickname: phone.friendly_name,
           inbound_agent_id: phone.inbound_agent_id || null,

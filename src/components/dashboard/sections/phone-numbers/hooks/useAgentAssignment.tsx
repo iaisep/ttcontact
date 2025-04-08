@@ -33,7 +33,7 @@ export const useAgentAssignment = (
       
       console.log('Sending update data:', updatedData);
       
-      // Send the update request to the API
+      // Send the update request to the API using PATCH instead of PUT
       const response = await fetchWithAuth(`/update-phone-number/${phone.number}`, {
         method: 'PATCH',
         body: JSON.stringify(updatedData),
