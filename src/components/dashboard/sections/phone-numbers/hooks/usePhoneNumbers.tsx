@@ -172,7 +172,7 @@ export const usePhoneNumbers = () => {
       };
       
       await fetchWithAuth(`/update-phone-number/${phone.number}`, {
-        method: 'PUT',
+        method: 'PATCH',
         body: JSON.stringify(updatedData),
       });
       
