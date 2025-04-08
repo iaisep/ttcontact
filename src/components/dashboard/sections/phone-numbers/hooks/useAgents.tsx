@@ -1,3 +1,4 @@
+
 import { useCallback, useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -5,6 +6,14 @@ import { toast } from 'sonner';
 export interface Agent {
   id: string;
   name: string;
+  agent_id?: string;
+  agent_name?: string;
+  voice_id?: string;
+  last_modification_timestamp?: number;
+  response_engine?: {
+    type: string;
+    llm_id?: string;
+  };
 }
 
 export const useAgents = () => {
@@ -22,11 +31,32 @@ export const useAgents = () => {
       console.log('Agents data received:', data);
       
       if (Array.isArray(data)) {
-        setAgents(data);
+        // Transform the data to match our Agent interface
+        const transformedAgents = data.map(agent => ({
+          id: agent.agent_id,
+          name: agent.agent_name,
+          agent_id: agent.agent_id,
+          agent_name: agent.agent_name,
+          voice_id: agent.voice_id,
+          last_modification_timestamp: agent.last_modification_timestamp,
+          response_engine: agent.response_engine
+        }));
+        
+        setAgents(transformedAgents);
       } else if (data && typeof data === 'object' && Array.isArray(data.agents)) {
         // Some APIs might wrap the array in an object
-        setAgents(data.agents);
-        console.log('Extracted agents from response:', data.agents);
+        const transformedAgents = data.agents.map(agent => ({
+          id: agent.agent_id,
+          name: agent.agent_name,
+          agent_id: agent.agent_id,
+          agent_name: agent.agent_name,
+          voice_id: agent.voice_id,
+          last_modification_timestamp: agent.last_modification_timestamp,
+          response_engine: agent.response_engine
+        }));
+        
+        setAgents(transformedAgents);
+        console.log('Extracted agents from response:', transformedAgents);
       } else {
         console.error('Expected array but got:', data);
         setAgents([]);

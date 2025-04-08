@@ -13,9 +13,16 @@ export interface Agent {
   id: string;
   name: string;
   agent_id: string;
-  agent_type: string;
+  agent_name?: string;
+  agent_type?: string;
   voice_id: string;
-  folder?: string;
-  last_modification_timestamp: string;
-  updated_at: string;
+  voice_model?: string;
+  voice_temperature?: number;
+  voice_speed?: number;
+  response_engine?: {
+    type: string;
+    llm_id?: string;
+  };
+  last_modification_timestamp: number | string;
+  updated_at?: string;
 }
