@@ -134,8 +134,26 @@ export const useKnowledgeBaseDialog = ({
     return sourceAddTextSource(fileName, content, currentKb);
   };
 
+  // Esta función ahora realiza la eliminación directamente, sin usar el modal
   const handleDeleteSource = async () => {
-    return sourceDeleteSource(currentKb, sourceToDelete, setDeleteSourceDialogOpen, setSourceToDelete);
+    if (!currentKb || !sourceToDelete) {
+      toast.error('Missing knowledge base or source information');
+      return Promise.reject(new Error('Missing knowledge base or source information'));
+    }
+
+    try {
+      console.log(`Deleting source ${sourceToDelete.id} from KB ${currentKb.id}`);
+      const result = await onDeleteSource(currentKb.id, sourceToDelete.id);
+      toast.success('Source deleted successfully');
+      setSourceToDelete(null);
+      // Trigger UI refresh
+      window.dispatchEvent(new CustomEvent("refreshKnowledgeBase"));
+      return result;
+    } catch (error) {
+      console.error('Failed to delete source:', error);
+      toast.error('Error deleting source');
+      throw error;
+    }
   };
 
   const handleAutoSyncChangeWrapper = (checked: boolean) => {

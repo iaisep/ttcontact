@@ -3,7 +3,6 @@ import React from 'react';
 import AddUrlSourceModal from '../url-source-modal';
 import AddFileSourceModal from '../AddFileSourceModal';
 import AddTextSourceModal from '../AddTextSourceModal';
-import SourceDeleteDialog from '../SourceDeleteDialog';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
 interface KnowledgeBaseSourceModalsProps {
@@ -26,21 +25,15 @@ interface KnowledgeBaseSourceModalsProps {
 const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
   currentSourceType,
   setCurrentSourceType,
-  sourceToDelete,
-  deleteSourceDialogOpen,
-  setDeleteSourceDialogOpen,
   onAddUrlSource,
   onAddFileSource,
   onAddTextSource,
-  onDeleteSource,
   onFetchSitemap,
   currentKnowledgeBase,
   knowledgeBaseName,
   onSourceAdded,
   onCloseMainDialog
 }) => {
-  const [isProcessing, setIsProcessing] = React.useState(false);
-
   const handleCloseSourceModal = () => {
     setCurrentSourceType(null);
   };
@@ -122,57 +115,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
         knowledgeBaseName={knowledgeBaseName}
       />
 
-      {/* Source Delete Dialog */}
-      <SourceDeleteDialog
-        open={deleteSourceDialogOpen}
-        onOpenChange={(open) => {
-          // Only allow closing if we're not in the middle of an operation
-          if (!isProcessing) {
-            setDeleteSourceDialogOpen(open);
-          }
-        }}
-        source={sourceToDelete}
-        onConfirm={async () => {
-          try {
-            setIsProcessing(true);
-            
-            // Set a timeout for the operation to prevent UI freeze
-            const deletePromise = onDeleteSource();
-            const timeoutPromise = new Promise<KnowledgeBase>((_, reject) => {
-              setTimeout(() => reject(new Error("Delete operation timed out")), 10000);
-            });
-            
-            // Race the promises to ensure we don't freeze
-            const result = await Promise.race([deletePromise, timeoutPromise])
-              .catch(error => {
-                console.error('Error in source deletion:', error);
-                // Return a minimal valid KnowledgeBase object as fallback
-                return {
-                  id: currentKnowledgeBase?.id || '',
-                  name: currentKnowledgeBase?.name || '',
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString(),
-                  source_count: 0,
-                  sources: [],
-                  auto_sync: false
-                } as KnowledgeBase;
-              });
-            
-            // Notify that source was removed
-            handleSourceAdded();
-            
-            return result;
-          } finally {
-            // Always ensure we clean up regardless of success/failure
-            setIsProcessing(false);
-            
-            // Close the delete dialog with a short delay
-            setTimeout(() => {
-              setDeleteSourceDialogOpen(false);
-            }, 100);
-          }
-        }}
-      />
+      {/* Note: SourceDeleteDialog has been removed as requested */}
     </>
   );
 };
