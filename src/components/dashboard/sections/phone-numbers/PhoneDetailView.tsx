@@ -1,15 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pencil, Copy, Phone, Trash2 } from 'lucide-react';
@@ -24,31 +16,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
-
-interface Agent {
-  id: string;
-  name: string;
-}
-
-interface PhoneNumber {
-  id: string;
-  number: string;
-  friendly_name: string;
-  status: 'active' | 'inactive';
-  agent_id?: string;
-  created_at: string;
-  inbound_agent_id?: string;
-  outbound_agent_id?: string;
-  inbound_webhook_url?: string | null;
-}
+import { Agent } from './hooks/useAgents';
+import { PhoneNumber } from './hooks/usePhoneNumbers';
+import AgentSelector from './components/AgentSelector';
+import PhoneHeader from './components/PhoneHeader';
+import WebhookSettings from './components/WebhookSettings';
 
 interface PhoneDetailViewProps {
   phone: PhoneNumber;
   agents: Agent[];
-  onAssignAgent: (phoneId: string, agentId: string, direction: 'inbound' | 'outbound') => void;
-  onDeletePhone: (phoneId: string) => void;
-  onUpdatePhoneName: (phoneId: string, name: string) => void;
-  onUpdateWebhook: (phoneId: string, webhookUrl: string | null) => void;
+  onAssignAgent: (phoneId: string, agentId: string, direction: 'inbound' | 'outbound') => Promise<boolean>;
+  onDeletePhone: (phoneId: string) => Promise<boolean>;
+  onUpdatePhoneName: (phoneId: string, name: string) => Promise<boolean>;
+  onUpdateWebhook: (phoneId: string, webhookUrl: string | null) => Promise<boolean>;
 }
 
 const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({ 
@@ -59,207 +39,66 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
   onUpdatePhoneName,
   onUpdateWebhook
 }) => {
-  const [editingName, setEditingName] = useState(false);
-  const [name, setName] = useState(phone.friendly_name);
   const [inboundAgent, setInboundAgent] = useState<string>(phone.inbound_agent_id || 'none');
   const [outboundAgent, setOutboundAgent] = useState<string>(phone.outbound_agent_id || 'none');
-  const [webhookEnabled, setWebhookEnabled] = useState<boolean>(!!phone.inbound_webhook_url);
-  const [webhookUrl, setWebhookUrl] = useState<string>(phone.inbound_webhook_url || '');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Update state when phone changes
   useEffect(() => {
-    setName(phone.friendly_name);
     setInboundAgent(phone.inbound_agent_id || 'none');
     setOutboundAgent(phone.outbound_agent_id || 'none');
-    setWebhookEnabled(!!phone.inbound_webhook_url);
-    setWebhookUrl(phone.inbound_webhook_url || '');
   }, [phone]);
-
-  const handleCopyNumber = () => {
-    navigator.clipboard.writeText(phone.number);
-    toast.success('Phone number copied to clipboard');
-  };
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
-  };
-
-  const handleSaveName = () => {
-    onUpdatePhoneName(phone.id, name);
-    setEditingName(false);
-  };
-
-  const handleWebhookChange = (checked: boolean) => {
-    setWebhookEnabled(checked);
-    if (!checked) {
-      onUpdateWebhook(phone.id, null);
-      setWebhookUrl('');
-    }
-  };
-
-  const handleWebhookUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWebhookUrl(e.target.value);
-  };
-
-  const handleWebhookSave = () => {
-    if (webhookUrl) {
-      onUpdateWebhook(phone.id, webhookUrl);
-    }
-  };
 
   const handleMakeCall = () => {
     toast.info('Outbound call feature will be implemented soon');
   };
 
-  const handleDeleteConfirm = () => {
-    onDeletePhone(phone.id);
+  const handleDeleteConfirm = async () => {
+    await onDeletePhone(phone.id);
     setDeleteDialogOpen(false);
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          {editingName ? (
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={name}
-                onChange={handleNameChange}
-                className="border border-input bg-background rounded-md px-3 py-2 text-xl font-semibold"
-                autoFocus
-              />
-              <Button size="sm" onClick={handleSaveName}>Save</Button>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={() => {
-                  setName(phone.friendly_name);
-                  setEditingName(false);
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-semibold">{name}</h2>
-              <Button 
-                size="icon" 
-                variant="ghost" 
-                className="h-8 w-8" 
-                onClick={() => setEditingName(true)}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-          <div className="flex items-center text-sm text-muted-foreground">
-            <span className="flex items-center gap-2">
-              ID: {phone.number} 
-              <Button 
-                size="icon" 
-                variant="ghost" 
-                className="h-6 w-6" 
-                onClick={handleCopyNumber}
-              >
-                <Copy className="h-3 w-3" />
-              </Button>
-            </span>
-            <span className="mx-2">•</span>
-            <span>Provider: Custom telephony</span>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <Button onClick={handleMakeCall}>
-            <Phone className="mr-2 h-4 w-4" />
-            Make an outbound call
-          </Button>
-          <Button 
-            variant="outline" 
-            size="icon"
-            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={() => setDeleteDialogOpen(true)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <PhoneHeader 
+        phone={phone} 
+        onUpdatePhoneName={onUpdatePhoneName}
+        onCopyNumber={() => {
+          navigator.clipboard.writeText(phone.number);
+          toast.success('Phone number copied to clipboard');
+        }}
+        onMakeCall={handleMakeCall}
+        onDelete={() => setDeleteDialogOpen(true)}
+      />
 
       <div className="space-y-6">
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Inbound call agent</h3>
-          <Select 
-            value={inboundAgent} 
-            onValueChange={(value) => {
+          <AgentSelector
+            value={inboundAgent}
+            agents={agents}
+            onChange={(value) => {
               setInboundAgent(value);
               onAssignAgent(phone.id, value, 'inbound');
             }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select an agent" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">None (Unassigned)</SelectItem>
-              {agents.map(agent => (
-                <SelectItem key={`inbound-${agent.id}`} value={agent.id}>
-                  {agent.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
 
-        <div className="space-y-4">
-          <div className="flex flex-col space-y-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="webhook" 
-                checked={webhookEnabled}
-                onCheckedChange={handleWebhookChange}
-              />
-              <Label htmlFor="webhook" className="text-sm">
-                Add an inbound webhook (Learn more)
-              </Label>
-            </div>
-            
-            {webhookEnabled && (
-              <div className="flex items-center gap-2 mt-2">
-                <Input 
-                  placeholder="https://your-webhook-url.com" 
-                  value={webhookUrl}
-                  onChange={handleWebhookUrlChange}
-                  className="flex-1"
-                />
-                <Button size="sm" onClick={handleWebhookSave}>Save</Button>
-              </div>
-            )}
-          </div>
-        </div>
+        <WebhookSettings 
+          webhookUrl={phone.inbound_webhook_url || ''}
+          onUpdateWebhook={(url) => onUpdateWebhook(phone.id, url)}
+        />
 
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Outbound call agent</h3>
-          <Select 
-            value={outboundAgent} 
-            onValueChange={(value) => {
+          <AgentSelector
+            value={outboundAgent}
+            agents={agents}
+            onChange={(value) => {
               setOutboundAgent(value);
               onAssignAgent(phone.id, value, 'outbound');
             }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select an agent" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">None (Unassigned)</SelectItem>
-              {agents.map(agent => (
-                <SelectItem key={`outbound-${agent.id}`} value={agent.id}>
-                  {agent.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
       </div>
 

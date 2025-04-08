@@ -1,221 +1,60 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { useApiContext } from '@/context/ApiContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Phone, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Phone, Plus } from 'lucide-react';
 import PhoneNumbersList from './phone-numbers/PhoneNumbersList';
 import PhoneDetailView from './phone-numbers/PhoneDetailView';
-
-interface PhoneNumber {
-  id: string;
-  number: string;
-  friendly_name: string;
-  status: 'active' | 'inactive';
-  agent_id?: string;
-  created_at: string;
-  inbound_agent_id?: string;
-  outbound_agent_id?: string;
-  inbound_webhook_url?: string | null;
-}
-
-interface Agent {
-  id: string;
-  name: string;
-}
+import { usePhoneNumbers } from './phone-numbers/hooks/usePhoneNumbers';
+import { useAgents } from './phone-numbers/hooks/useAgents';
+import PurchaseDialog from './phone-numbers/dialogs/PurchaseDialog';
+import SipDialog from './phone-numbers/dialogs/SipDialog';
+import EmptyState from './phone-numbers/EmptyState';
+import LoadingState from './phone-numbers/LoadingState';
 
 const PhoneNumbersSection = () => {
-  const { fetchWithAuth } = useApiContext();
-  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumber[]>([]);
-  const [selectedPhoneId, setSelectedPhoneId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [agents, setAgents] = useState<Agent[]>([]);
+  const { 
+    phoneNumbers, 
+    selectedPhoneId,
+    setSelectedPhoneId, 
+    loading, 
+    error, 
+    fetchPhoneNumbers,
+    purchasePhoneNumber,
+    releasePhoneNumber,
+    updatePhoneName,
+    updateWebhook,
+    assignAgent
+  } = usePhoneNumbers();
+  
+  const { agents, fetchAgents } = useAgents();
+  
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const [sipDialogOpen, setSipDialogOpen] = useState(false);
-  const [areaCode, setAreaCode] = useState('');
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchPhoneNumbers = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchWithAuth('/list-phone-numbers');
-      console.log('Phone numbers data:', data);
-      if (Array.isArray(data)) {
-        setPhoneNumbers(data);
-        if (data.length > 0 && !selectedPhoneId) {
-          setSelectedPhoneId(data[0].id);
-        }
-      } else {
-        console.error('Expected array but got:', data);
-        setPhoneNumbers([]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch phone numbers:', error);
-      setError('Failed to fetch phone numbers');
-      toast.error('Failed to fetch phone numbers');
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchWithAuth, selectedPhoneId]);
-
-  const fetchAgents = useCallback(async () => {
-    try {
-      const data = await fetchWithAuth('/list-agents');
-      console.log('Agents data:', data);
-      if (Array.isArray(data)) {
-        setAgents(data);
-      } else {
-        console.error('Expected array but got:', data);
-        setAgents([]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch agents:', error);
-      toast.error('Failed to fetch agents');
-    }
-  }, [fetchWithAuth]);
 
   useEffect(() => {
     fetchPhoneNumbers();
     fetchAgents();
   }, [fetchPhoneNumbers, fetchAgents]);
 
-  const purchasePhoneNumber = async () => {
-    try {
-      const newNumber = await fetchWithAuth('/phone-numbers', {
-        method: 'POST',
-        body: JSON.stringify({ 
-          area_code: areaCode || '415',
-          country: 'US'
-        }),
-      });
-      setPhoneNumbers([...phoneNumbers, newNumber]);
-      setSelectedPhoneId(newNumber.id);
-      toast.success('Phone number purchased successfully');
-      setPurchaseDialogOpen(false);
-      setAreaCode('');
-    } catch (error) {
-      toast.error('Failed to purchase phone number');
-      console.error(error);
-    }
-  };
-
   const connectSipNumber = async (sipUri: string, nickname: string) => {
     try {
       // This would be implemented with the right API endpoint
       toast.success('SIP trunking connection will be implemented soon');
-      setSipDialogOpen(false);
     } catch (error) {
       toast.error('Failed to connect SIP trunking');
       console.error(error);
     }
   };
 
-  const releasePhoneNumber = async (phoneId: string) => {
-    try {
-      await fetchWithAuth(`/phone-numbers/${phoneId}`, {
-        method: 'DELETE',
-      });
-      setPhoneNumbers(phoneNumbers.filter(phone => phone.id !== phoneId));
-      if (selectedPhoneId === phoneId) {
-        setSelectedPhoneId(phoneNumbers.length > 1 ? phoneNumbers[0].id : null);
-      }
-      toast.success('Phone number released');
-    } catch (error) {
-      toast.error('Failed to release phone number');
-      console.error(error);
-    }
-  };
-
-  const updatePhoneName = async (phoneId: string, name: string) => {
-    try {
-      const phone = phoneNumbers.find(p => p.id === phoneId);
-      if (!phone) return;
-      
-      const updatedPhone = await fetchWithAuth(`/update-phone-number/${phone.number}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          nickname: name,
-          inbound_agent_id: phone.inbound_agent_id || null,
-          outbound_agent_id: phone.outbound_agent_id || null,
-          inbound_webhook_url: phone.inbound_webhook_url || null
-        }),
-      });
-      
-      setPhoneNumbers(phoneNumbers.map(p => 
-        p.id === phoneId ? { ...p, friendly_name: name } : p
-      ));
-      
-      toast.success('Phone name updated');
-    } catch (error) {
-      toast.error('Failed to update phone name');
-      console.error(error);
-    }
-  };
-
-  const updateWebhook = async (phoneId: string, webhookUrl: string | null) => {
-    try {
-      const phone = phoneNumbers.find(p => p.id === phoneId);
-      if (!phone) return;
-      
-      const updatedPhone = await fetchWithAuth(`/update-phone-number/${phone.number}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          nickname: phone.friendly_name,
-          inbound_agent_id: phone.inbound_agent_id || null,
-          outbound_agent_id: phone.outbound_agent_id || null,
-          inbound_webhook_url: webhookUrl
-        }),
-      });
-      
-      setPhoneNumbers(phoneNumbers.map(p => 
-        p.id === phoneId ? { ...p, inbound_webhook_url: webhookUrl } : p
-      ));
-      
-      toast.success(webhookUrl ? 'Webhook URL updated' : 'Webhook removed');
-    } catch (error) {
-      toast.error('Failed to update webhook');
-      console.error(error);
-    }
-  };
-
-  const assignAgent = async (phoneId: string, agentId: string, direction: 'inbound' | 'outbound') => {
-    try {
-      const phone = phoneNumbers.find(p => p.id === phoneId);
-      if (!phone) return;
-      
-      const updatedData = {
-        nickname: phone.friendly_name,
-        inbound_agent_id: direction === 'inbound' ? (agentId === "none" ? null : agentId) : (phone.inbound_agent_id || null),
-        outbound_agent_id: direction === 'outbound' ? (agentId === "none" ? null : agentId) : (phone.outbound_agent_id || null),
-        inbound_webhook_url: phone.inbound_webhook_url || null
-      };
-      
-      const updatedPhone = await fetchWithAuth(`/update-phone-number/${phone.number}`, {
-        method: 'PUT',
-        body: JSON.stringify(updatedData),
-      });
-      
-      setPhoneNumbers(phoneNumbers.map(p => 
-        p.id === phoneId ? { 
-          ...p, 
-          inbound_agent_id: direction === 'inbound' ? (agentId === "none" ? null : agentId) : p.inbound_agent_id,
-          outbound_agent_id: direction === 'outbound' ? (agentId === "none" ? null : agentId) : p.outbound_agent_id
-        } : p
-      ));
-      
-      toast.success(`${direction.charAt(0).toUpperCase() + direction.slice(1)} agent assigned`);
-    } catch (error) {
-      toast.error(`Failed to assign ${direction} agent`);
-      console.error(error);
-    }
-  };
-
   const selectedPhone = phoneNumbers.find(phone => phone.id === selectedPhoneId);
+  
+  // Show loading state while fetching data
+  if (loading) {
+    return <LoadingState />;
+  }
 
-  // Render empty state if there are no phone numbers
+  // Render empty state if there are no phone numbers or there was an error
   if ((phoneNumbers.length === 0 && !loading) || error) {
     return (
       <div className="h-full">
@@ -229,98 +68,20 @@ const PhoneNumbersSection = () => {
             onConnectSIPClick={() => setSipDialogOpen(true)}
           />
           
-          <div className="flex-grow flex flex-col items-center justify-center p-6">
-            <div className="flex flex-col items-center justify-center text-center max-w-md">
-              <div className="bg-gray-100 p-4 rounded-full mb-4">
-                <Phone className="h-6 w-6 text-gray-500" />
-              </div>
-              <h3 className="text-lg font-medium mb-2">You don't have any phone numbers</h3>
-              <p className="text-sm text-muted-foreground mb-6">
-                Purchase a new phone number or connect to your existing number via SIP trunking.
-              </p>
-              <Button onClick={() => setPurchaseDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Phone Number
-              </Button>
-            </div>
-          </div>
+          <EmptyState onAddPhoneNumber={() => setPurchaseDialogOpen(true)} />
         </div>
 
-        {/* Purchase Phone Number Dialog */}
-        <Dialog open={purchaseDialogOpen} onOpenChange={setPurchaseDialogOpen}>
-          <DialogContent className="sm:max-w-[525px]">
-            <DialogHeader>
-              <DialogTitle>Purchase Phone Number</DialogTitle>
-              <DialogDescription>
-                Purchase a new phone number to use with your AI agents.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label htmlFor="area-code" className="text-sm font-medium">Area Code</label>
-                <Input
-                  id="area-code"
-                  placeholder="e.g., 415"
-                  maxLength={3}
-                  value={areaCode}
-                  onChange={(e) => setAreaCode(e.target.value)}
-                />
-                <p className="text-sm text-muted-foreground">
-                  Enter a 3-digit area code to find available numbers in that region.
-                </p>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setPurchaseDialogOpen(false)}>Cancel</Button>
-              <Button onClick={purchasePhoneNumber}>
-                Search & Purchase
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Connect SIP Dialog */}
-        <Dialog open={sipDialogOpen} onOpenChange={setSipDialogOpen}>
-          <DialogContent className="sm:max-w-[525px]">
-            <DialogHeader>
-              <DialogTitle>Connect via SIP Trunking</DialogTitle>
-              <DialogDescription>
-                Connect your existing phone number using SIP trunking.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label htmlFor="sip-uri" className="text-sm font-medium">SIP URI</label>
-                <Input
-                  id="sip-uri"
-                  placeholder="sip:username@domain.com"
-                />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="sip-name" className="text-sm font-medium">Display Name</label>
-                <Input
-                  id="sip-name"
-                  placeholder="My SIP Number"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setSipDialogOpen(false)}>Cancel</Button>
-              <Button onClick={() => connectSipNumber("", "")}>
-                Connect
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-    );
-  }
-
-  // Show loading state while fetching data
-  if (loading) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <PurchaseDialog 
+          open={purchaseDialogOpen}
+          onOpenChange={setPurchaseDialogOpen}
+          onPurchase={purchasePhoneNumber}
+        />
+        
+        <SipDialog
+          open={sipDialogOpen}
+          onOpenChange={setSipDialogOpen}
+          onConnect={connectSipNumber}
+        />
       </div>
     );
   }
@@ -363,72 +124,17 @@ const PhoneNumbersSection = () => {
         </div>
       </div>
 
-      {/* Purchase Phone Number Dialog */}
-      <Dialog open={purchaseDialogOpen} onOpenChange={setPurchaseDialogOpen}>
-        <DialogContent className="sm:max-w-[525px]">
-          <DialogHeader>
-            <DialogTitle>Purchase Phone Number</DialogTitle>
-            <DialogDescription>
-              Purchase a new phone number to use with your AI agents.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <label htmlFor="area-code" className="text-sm font-medium">Area Code</label>
-              <Input
-                id="area-code"
-                placeholder="e.g., 415"
-                maxLength={3}
-                value={areaCode}
-                onChange={(e) => setAreaCode(e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground">
-                Enter a 3-digit area code to find available numbers in that region.
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setPurchaseDialogOpen(false)}>Cancel</Button>
-            <Button onClick={purchasePhoneNumber}>
-              Search & Purchase
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Connect SIP Dialog */}
-      <Dialog open={sipDialogOpen} onOpenChange={setSipDialogOpen}>
-        <DialogContent className="sm:max-w-[525px]">
-          <DialogHeader>
-            <DialogTitle>Connect via SIP Trunking</DialogTitle>
-            <DialogDescription>
-              Connect your existing phone number using SIP trunking.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <label htmlFor="sip-uri" className="text-sm font-medium">SIP URI</label>
-              <Input
-                id="sip-uri"
-                placeholder="sip:username@domain.com"
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="sip-name" className="text-sm font-medium">Display Name</label>
-              <Input
-                id="sip-name"
-                placeholder="My SIP Number"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setSipDialogOpen(false)}>Cancel</Button>
-            <Button onClick={() => connectSipNumber("", "")}>
-              Connect
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PurchaseDialog 
+        open={purchaseDialogOpen}
+        onOpenChange={setPurchaseDialogOpen}
+        onPurchase={purchasePhoneNumber}
+      />
+      
+      <SipDialog
+        open={sipDialogOpen}
+        onOpenChange={setSipDialogOpen}
+        onConnect={connectSipNumber}
+      />
     </div>
   );
 };
