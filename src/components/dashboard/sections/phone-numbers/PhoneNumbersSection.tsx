@@ -1,0 +1,161 @@
+
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Phone, Plus, RefreshCw } from 'lucide-react';
+import PhoneNumbersList from './PhoneNumbersList';
+import PhoneDetailView from './PhoneDetailView';
+import { usePhoneNumbers } from './hooks/usePhoneNumbers';
+import { useAgents } from './hooks/useAgents';
+import PurchaseDialog from './dialogs/PurchaseDialog';
+import SipDialog from './dialogs/SipDialog';
+import EmptyState from './EmptyState';
+import LoadingState from './LoadingState';
+
+const PhoneNumbersSection = () => {
+  const { 
+    phoneNumbers, 
+    selectedPhoneId,
+    setSelectedPhoneId, 
+    loading: phoneLoading, 
+    error, 
+    fetchPhoneNumbers,
+    purchasePhoneNumber,
+    releasePhoneNumber,
+    updatePhoneName,
+    updateWebhook,
+    assignAgent
+  } = usePhoneNumbers();
+  
+  const { agents, loading: agentLoading, error: agentError, fetchAgents } = useAgents();
+  
+  const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
+  const [sipDialogOpen, setSipDialogOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    fetchPhoneNumbers();
+    fetchAgents();
+  }, [fetchPhoneNumbers, fetchAgents]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        fetchPhoneNumbers(),
+        fetchAgents()
+      ]);
+      toast.success('Data refreshed successfully');
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      toast.error('Failed to refresh data');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const connectSipNumber = async (sipUri: string, nickname: string) => {
+    try {
+      // This would be implemented with the right API endpoint
+      toast.success('SIP trunking connection will be implemented soon');
+    } catch (error) {
+      toast.error('Failed to connect SIP trunking');
+      console.error(error);
+    }
+  };
+
+  const selectedPhone = phoneNumbers.find(phone => phone.id === selectedPhoneId);
+  
+  // Show loading state while fetching data
+  if (phoneLoading || agentLoading) {
+    return <LoadingState />;
+  }
+
+  // Render empty state if there are no phone numbers or there was an error
+  if ((phoneNumbers.length === 0 && !phoneLoading) || error) {
+    return (
+      <div className="h-full">
+        <div className="flex border rounded-md overflow-hidden h-full">
+          <PhoneNumbersList 
+            phoneNumbers={[]}
+            selectedPhoneId={null}
+            onSelectPhone={() => {}}
+            onAddClick={() => setPurchaseDialogOpen(true)}
+            onBuyNewClick={() => setPurchaseDialogOpen(true)}
+            onConnectSIPClick={() => setSipDialogOpen(true)}
+          />
+          
+          <EmptyState onAddPhoneNumber={() => setPurchaseDialogOpen(true)} />
+        </div>
+
+        <PurchaseDialog 
+          open={purchaseDialogOpen}
+          onOpenChange={setPurchaseDialogOpen}
+          onPurchase={purchasePhoneNumber}
+        />
+        
+        <SipDialog
+          open={sipDialogOpen}
+          onOpenChange={setSipDialogOpen}
+          onConnect={connectSipNumber}
+        />
+      </div>
+    );
+  }
+
+  // Regular view with phone numbers
+  return (
+    <div className="h-full">
+      <div className="flex border rounded-md overflow-hidden h-full">
+        <PhoneNumbersList 
+          phoneNumbers={phoneNumbers}
+          selectedPhoneId={selectedPhoneId}
+          onSelectPhone={(phone) => setSelectedPhoneId(phone.id)}
+          onAddClick={() => setPurchaseDialogOpen(true)}
+          onBuyNewClick={() => setPurchaseDialogOpen(true)}
+          onConnectSIPClick={() => setSipDialogOpen(true)}
+        />
+        
+        <div className="flex-grow p-6">
+          {selectedPhone ? (
+            <PhoneDetailView 
+              phone={selectedPhone}
+              agents={agents}
+              loading={{ agents: agentLoading, phones: phoneLoading }}
+              onAssignAgent={assignAgent}
+              onDeletePhone={releasePhoneNumber}
+              onUpdatePhoneName={updatePhoneName}
+              onUpdateWebhook={updateWebhook}
+              onRefresh={handleRefresh}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-64 text-center">
+              <h3 className="text-lg font-medium">No phone number selected</h3>
+              <p className="text-sm text-muted-foreground mt-2 max-w-md">
+                Select a phone number from the list or add a new one to configure its settings.
+              </p>
+              <Button onClick={() => setPurchaseDialogOpen(true)} className="mt-4">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Phone Number
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <PurchaseDialog 
+        open={purchaseDialogOpen}
+        onOpenChange={setPurchaseDialogOpen}
+        onPurchase={purchasePhoneNumber}
+      />
+      
+      <SipDialog
+        open={sipDialogOpen}
+        onOpenChange={setSipDialogOpen}
+        onConnect={connectSipNumber}
+      />
+    </div>
+  );
+};
+
+export default PhoneNumbersSection;

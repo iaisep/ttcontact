@@ -1,10 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Pencil, Copy, Phone, Trash2 } from 'lucide-react';
+import { Pencil, Copy, Phone, Trash2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -25,23 +22,33 @@ import WebhookSettings from './components/WebhookSettings';
 interface PhoneDetailViewProps {
   phone: PhoneNumber;
   agents: Agent[];
+  loading: {
+    agents: boolean;
+    phones: boolean;
+  };
   onAssignAgent: (phoneId: string, agentId: string, direction: 'inbound' | 'outbound') => Promise<boolean>;
   onDeletePhone: (phoneId: string) => Promise<boolean>;
   onUpdatePhoneName: (phoneId: string, name: string) => Promise<boolean>;
   onUpdateWebhook: (phoneId: string, webhookUrl: string | null) => Promise<boolean>;
+  onRefresh: () => Promise<void>;
 }
 
 const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({ 
   phone, 
   agents,
+  loading,
   onAssignAgent,
   onDeletePhone,
   onUpdatePhoneName,
-  onUpdateWebhook
+  onUpdateWebhook,
+  onRefresh
 }) => {
   const [inboundAgent, setInboundAgent] = useState<string>(phone.inbound_agent_id || 'none');
   const [outboundAgent, setOutboundAgent] = useState<string>(phone.outbound_agent_id || 'none');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isUpdatingInbound, setIsUpdatingInbound] = useState(false);
+  const [isUpdatingOutbound, setIsUpdatingOutbound] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Update state when phone changes
   useEffect(() => {
@@ -58,18 +65,91 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
     setDeleteDialogOpen(false);
   };
 
+  const handleInboundAgentChange = async (value: string) => {
+    setIsUpdatingInbound(true);
+    try {
+      const success = await onAssignAgent(phone.id, value, 'inbound');
+      if (success) {
+        setInboundAgent(value);
+        toast.success('Inbound agent assigned successfully');
+      } else {
+        toast.error('Failed to assign inbound agent');
+        // Revert to previous value if update failed
+        setInboundAgent(phone.inbound_agent_id || 'none');
+      }
+    } catch (error) {
+      console.error('Error assigning inbound agent:', error);
+      toast.error('Error assigning inbound agent');
+      // Revert to previous value
+      setInboundAgent(phone.inbound_agent_id || 'none');
+    } finally {
+      setIsUpdatingInbound(false);
+    }
+  };
+
+  const handleOutboundAgentChange = async (value: string) => {
+    setIsUpdatingOutbound(true);
+    try {
+      const success = await onAssignAgent(phone.id, value, 'outbound');
+      if (success) {
+        setOutboundAgent(value);
+        toast.success('Outbound agent assigned successfully');
+      } else {
+        toast.error('Failed to assign outbound agent');
+        // Revert to previous value if update failed
+        setOutboundAgent(phone.outbound_agent_id || 'none');
+      }
+    } catch (error) {
+      console.error('Error assigning outbound agent:', error);
+      toast.error('Error assigning outbound agent');
+      // Revert to previous value
+      setOutboundAgent(phone.outbound_agent_id || 'none');
+    } finally {
+      setIsUpdatingOutbound(false);
+    }
+  };
+
+  const handleUpdateWebhook = async (webhookUrl: string | null) => {
+    return await onUpdateWebhook(phone.id, webhookUrl);
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await onRefresh();
+      toast.success('Data refreshed successfully');
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      toast.error('Failed to refresh data');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <PhoneHeader 
-        phone={phone} 
-        onUpdatePhoneName={onUpdatePhoneName}
-        onCopyNumber={() => {
-          navigator.clipboard.writeText(phone.number);
-          toast.success('Phone number copied to clipboard');
-        }}
-        onMakeCall={handleMakeCall}
-        onDelete={() => setDeleteDialogOpen(true)}
-      />
+      <div className="flex justify-between items-center">
+        <PhoneHeader 
+          phone={phone} 
+          onUpdatePhoneName={onUpdatePhoneName}
+          onCopyNumber={() => {
+            navigator.clipboard.writeText(phone.number);
+            toast.success('Phone number copied to clipboard');
+          }}
+          onMakeCall={handleMakeCall}
+          onDelete={() => setDeleteDialogOpen(true)}
+        />
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleRefresh} 
+          disabled={isRefreshing}
+          className="ml-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <span className="ml-2">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+        </Button>
+      </div>
 
       <div className="space-y-6">
         <div className="space-y-4">
@@ -77,16 +157,17 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
           <AgentSelector
             value={inboundAgent}
             agents={agents}
-            onChange={(value) => {
-              setInboundAgent(value);
-              onAssignAgent(phone.id, value, 'inbound');
-            }}
+            onChange={handleInboundAgentChange}
+            isLoading={isUpdatingInbound || loading.agents}
           />
+          {isUpdatingInbound && (
+            <p className="text-xs text-muted-foreground">Updating inbound agent...</p>
+          )}
         </div>
 
         <WebhookSettings 
           webhookUrl={phone.inbound_webhook_url || ''}
-          onUpdateWebhook={(url) => onUpdateWebhook(phone.id, url)}
+          onUpdateWebhook={handleUpdateWebhook}
         />
 
         <div className="space-y-4">
@@ -94,11 +175,12 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
           <AgentSelector
             value={outboundAgent}
             agents={agents}
-            onChange={(value) => {
-              setOutboundAgent(value);
-              onAssignAgent(phone.id, value, 'outbound');
-            }}
+            onChange={handleOutboundAgentChange}
+            isLoading={isUpdatingOutbound || loading.agents}
           />
+          {isUpdatingOutbound && (
+            <p className="text-xs text-muted-foreground">Updating outbound agent...</p>
+          )}
         </div>
       </div>
 
