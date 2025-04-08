@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,36 +35,52 @@ const PhoneNumbersSection = () => {
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const [sipDialogOpen, setSipDialogOpen] = useState(false);
   const [areaCode, setAreaCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchPhoneNumbers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchWithAuth('/list-phone-numbers');
+      console.log('Phone numbers data:', data);
+      if (Array.isArray(data)) {
+        setPhoneNumbers(data);
+        if (data.length > 0 && !selectedPhoneId) {
+          setSelectedPhoneId(data[0].id);
+        }
+      } else {
+        console.error('Expected array but got:', data);
+        setPhoneNumbers([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch phone numbers:', error);
+      setError('Failed to fetch phone numbers');
+      toast.error('Failed to fetch phone numbers');
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchWithAuth, selectedPhoneId]);
+
+  const fetchAgents = useCallback(async () => {
+    try {
+      const data = await fetchWithAuth('/list-agents');
+      console.log('Agents data:', data);
+      if (Array.isArray(data)) {
+        setAgents(data);
+      } else {
+        console.error('Expected array but got:', data);
+        setAgents([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch agents:', error);
+      toast.error('Failed to fetch agents');
+    }
+  }, [fetchWithAuth]);
 
   useEffect(() => {
     fetchPhoneNumbers();
     fetchAgents();
-  }, []);
-
-  const fetchPhoneNumbers = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchWithAuth('/list-phone-numbers');
-      setPhoneNumbers(data);
-      if (data.length > 0 && !selectedPhoneId) {
-        setSelectedPhoneId(data[0].id);
-      }
-    } catch (error) {
-      toast.error('Failed to fetch phone numbers');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchAgents = async () => {
-    try {
-      const data = await fetchWithAuth('/list-agents');
-      setAgents(data);
-    } catch (error) {
-      console.error('Failed to fetch agents:', error);
-    }
-  };
+  }, [fetchPhoneNumbers, fetchAgents]);
 
   const purchasePhoneNumber = async () => {
     try {
@@ -172,8 +188,8 @@ const PhoneNumbersSection = () => {
       
       const updatedData = {
         nickname: phone.friendly_name,
-        inbound_agent_id: direction === 'inbound' ? agentId || null : (phone.inbound_agent_id || null),
-        outbound_agent_id: direction === 'outbound' ? agentId || null : (phone.outbound_agent_id || null),
+        inbound_agent_id: direction === 'inbound' ? (agentId === "none" ? null : agentId) : (phone.inbound_agent_id || null),
+        outbound_agent_id: direction === 'outbound' ? (agentId === "none" ? null : agentId) : (phone.outbound_agent_id || null),
         inbound_webhook_url: phone.inbound_webhook_url || null
       };
       
@@ -185,8 +201,8 @@ const PhoneNumbersSection = () => {
       setPhoneNumbers(phoneNumbers.map(p => 
         p.id === phoneId ? { 
           ...p, 
-          inbound_agent_id: direction === 'inbound' ? agentId : p.inbound_agent_id,
-          outbound_agent_id: direction === 'outbound' ? agentId : p.outbound_agent_id
+          inbound_agent_id: direction === 'inbound' ? (agentId === "none" ? null : agentId) : p.inbound_agent_id,
+          outbound_agent_id: direction === 'outbound' ? (agentId === "none" ? null : agentId) : p.outbound_agent_id
         } : p
       ));
       
@@ -199,8 +215,8 @@ const PhoneNumbersSection = () => {
 
   const selectedPhone = phoneNumbers.find(phone => phone.id === selectedPhoneId);
 
-  // Render different layouts based on whether there are phone numbers
-  if (phoneNumbers.length === 0 && !loading) {
+  // Render empty state if there are no phone numbers
+  if ((phoneNumbers.length === 0 && !loading) || error) {
     return (
       <div className="h-full">
         <div className="flex border rounded-md overflow-hidden h-full">
@@ -215,7 +231,7 @@ const PhoneNumbersSection = () => {
           
           <div className="flex-grow flex flex-col items-center justify-center p-6">
             <div className="flex flex-col items-center justify-center text-center max-w-md">
-              <div className="bg-gray-100 p-4 rounded-lg mb-4">
+              <div className="bg-gray-100 p-4 rounded-full mb-4">
                 <Phone className="h-6 w-6 text-gray-500" />
               </div>
               <h3 className="text-lg font-medium mb-2">You don't have any phone numbers</h3>
@@ -300,6 +316,15 @@ const PhoneNumbersSection = () => {
     );
   }
 
+  // Show loading state while fetching data
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   // Regular view with phone numbers
   return (
     <div className="h-full">
@@ -314,11 +339,7 @@ const PhoneNumbersSection = () => {
         />
         
         <div className="flex-grow p-6">
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : selectedPhone ? (
+          {selectedPhone ? (
             <PhoneDetailView 
               phone={selectedPhone}
               agents={agents}

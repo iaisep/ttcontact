@@ -61,8 +61,8 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
 }) => {
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(phone.friendly_name);
-  const [inboundAgent, setInboundAgent] = useState<string>(phone.inbound_agent_id || '');
-  const [outboundAgent, setOutboundAgent] = useState<string>(phone.outbound_agent_id || '');
+  const [inboundAgent, setInboundAgent] = useState<string>(phone.inbound_agent_id || 'none');
+  const [outboundAgent, setOutboundAgent] = useState<string>(phone.outbound_agent_id || 'none');
   const [webhookEnabled, setWebhookEnabled] = useState<boolean>(!!phone.inbound_webhook_url);
   const [webhookUrl, setWebhookUrl] = useState<string>(phone.inbound_webhook_url || '');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -70,8 +70,8 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
   // Update state when phone changes
   useEffect(() => {
     setName(phone.friendly_name);
-    setInboundAgent(phone.inbound_agent_id || '');
-    setOutboundAgent(phone.outbound_agent_id || '');
+    setInboundAgent(phone.inbound_agent_id || 'none');
+    setOutboundAgent(phone.outbound_agent_id || 'none');
     setWebhookEnabled(!!phone.inbound_webhook_url);
     setWebhookUrl(phone.inbound_webhook_url || '');
   }, [phone]);
