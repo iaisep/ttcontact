@@ -86,7 +86,9 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
           <AlertDialogTitle>Delete Source</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete this source?
-            {source && <div className="font-semibold mt-1">{source.title}</div>}
+            {source && (
+              <span className="block font-semibold mt-1">{source.title}</span>
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
