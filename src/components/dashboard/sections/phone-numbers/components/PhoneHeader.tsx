@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PhoneNumber } from '../hooks/types';
-import { Pencil, Copy, Phone, Trash2 } from 'lucide-react';
+import { Pencil, Copy, Phone, PhoneOutgoing, Trash2 } from 'lucide-react';
+import OutboundCallDialog from '../dialogs/OutboundCallDialog';
 
 interface PhoneHeaderProps {
   phone: PhoneNumber;
@@ -23,6 +24,7 @@ const PhoneHeader: React.FC<PhoneHeaderProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [nameValue, setNameValue] = useState(phone.friendly_name || phone.nickname || '');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [outboundCallDialogOpen, setOutboundCallDialogOpen] = useState(false);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -142,6 +144,24 @@ const PhoneHeader: React.FC<PhoneHeaderProps> = ({
           </Button>
         </div>
       </div>
+
+      <div className="mt-4">
+        <Button 
+          variant="outline"
+          size="sm"
+          onClick={() => setOutboundCallDialogOpen(true)}
+          className="flex items-center gap-2"
+        >
+          <PhoneOutgoing className="h-4 w-4" />
+          Make Outbound Call
+        </Button>
+      </div>
+
+      <OutboundCallDialog
+        open={outboundCallDialogOpen}
+        onOpenChange={setOutboundCallDialogOpen}
+        fromNumber={phone.number}
+      />
     </div>
   );
 };
