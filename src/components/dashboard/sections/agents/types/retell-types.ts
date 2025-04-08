@@ -38,6 +38,7 @@ export interface RetellAgent {
   prompt?: string;
   welcome_message?: string;
   knowledge_base?: string;
+  knowledge_base_ids?: string[];
   speech_settings?: {
     stability: number;
     similarity: number;
@@ -46,6 +47,16 @@ export interface RetellAgent {
   };
   functions?: RetellFunction[];
   folder?: string;
+  
+  // Additional properties for backward compatibility
+  name?: string;
+  id?: string;
+  avatar_url?: string;
+  llm_id?: string;
+  voice?: {
+    name: string;
+    avatar_url?: string;
+  };
 }
 
 export interface PostCallAnalysisItem {
@@ -65,7 +76,9 @@ export interface RetellFunction {
 
 export interface RetellVoice {
   id: string;
+  voice_id?: string;
   name: string;
+  voice_name?: string;
   avatar_url?: string;
   [key: string]: any;
 }
@@ -79,6 +92,7 @@ export interface RetellFolder {
 export interface RetellLLM {
   id: string;
   name: string;
+  general_prompt?: string;
   [key: string]: any;
 }
 

@@ -26,4 +26,14 @@ export interface Agent {
   language?: string;
   webhook_url?: string;
   boosted_keywords?: string[];
+  
+  // For compatibility with RetellAgent
+  agent_id?: string;
+  agent_name?: string;
+  knowledge_base_ids?: string[];
+  llm_id?: string;
+  response_engine?: { 
+    type: string;
+    llm_id?: string;
+  };
 }

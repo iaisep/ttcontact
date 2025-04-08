@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
 }) => {
   const navigate = useNavigate();
   const [isEditingName, setIsEditingName] = useState(false);
-  const [agentName, setAgentName] = useState(agent.agent_name || agent.name || '');
+  const [agentName, setAgentName] = useState(agent.agent_name || '');
   
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -74,7 +75,7 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
               </div>
             ) : (
               <div className="flex items-center">
-                <h1 className="text-lg font-semibold">{agent.agent_name || agent.name}</h1>
+                <h1 className="text-lg font-semibold">{agent.agent_name}</h1>
                 <Button 
                   variant="ghost" 
                   size="icon"
@@ -88,24 +89,24 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
           </div>
           <div className="flex text-xs text-muted-foreground space-x-2 items-center">
             <div className="flex items-center gap-1">
-              <span>Agent ID: {agent.agent_id?.substring(0, 8) || agent.id?.substring(0, 8)}</span>
+              <span>Agent ID: {agent.agent_id.substring(0, 8)}</span>
               <Button 
                 variant="ghost" 
                 size="icon" 
                 className="h-6 w-6"
-                onClick={() => handleCopy(agent.agent_id || agent.id || '')}
+                onClick={() => handleCopy(agent.agent_id)}
               >
                 <Copy className="h-4 w-4" />
               </Button>
             </div>
             <span>•</span>
             <div className="flex items-center gap-1">
-              <span>Retell LLM ID: {agent.llm_id?.substring(0, 5) || 'll-49'}</span>
+              <span>Retell LLM ID: {agent.response_engine?.llm_id?.substring(0, 5) || 'll-49'}</span>
               <Button 
                 variant="ghost" 
                 size="icon" 
                 className="h-6 w-6"
-                onClick={() => handleCopy(agent.llm_id || 'll-49')}
+                onClick={() => handleCopy(agent.response_engine?.llm_id || 'll-49')}
               >
                 <Copy className="h-4 w-4" />
               </Button>

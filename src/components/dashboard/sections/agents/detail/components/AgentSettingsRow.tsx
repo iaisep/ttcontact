@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import SelectorsRow from './SelectorsRow';
@@ -40,12 +39,9 @@ export const AgentSettingsRow: React.FC<AgentSettingsRowProps> = ({
 
   // Update selected voice when agent voice changes
   useEffect(() => {
-    if (agent.voice) {
-      voiceSettings.setSelectedVoice(agent.voice);
-    } else if (voice?.name || voice?.voice_name) {
-      voiceSettings.setSelectedVoice(voice.name || voice.voice_name || 'Select Voice');
-    }
-  }, [agent.voice, voice]);
+    const voiceName = voice?.name || voice?.voice_name || 'Select Voice';
+    voiceSettings.setSelectedVoice(voiceName);
+  }, [voice]);
 
   return (
     <>
