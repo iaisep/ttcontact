@@ -33,17 +33,24 @@ const PhoneNumbersSection = () => {
   const [sipDialogOpen, setSipDialogOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Initial data fetch
   useEffect(() => {
-    console.log('Fetching phone numbers and agents...');
+    console.log('PhoneNumbersSection: Initial data fetch');
     fetchPhoneNumbers();
     fetchAgents();
   }, [fetchPhoneNumbers, fetchAgents]);
 
-  // Log phone numbers every time they change
+  // Log agents data every time it changes for debugging
   useEffect(() => {
-    console.log('PhoneNumbers data updated:', phoneNumbers);
+    console.log('PhoneNumbersSection: Agents data updated:', agents);
+  }, [agents]);
+
+  // Log phone numbers data every time it changes for debugging
+  useEffect(() => {
+    console.log('PhoneNumbersSection: PhoneNumbers data updated:', phoneNumbers);
   }, [phoneNumbers]);
 
+  // Handle refreshing both phone numbers and agents data
   const handleRefresh = async () => {
     setRefreshing(true);
     try {

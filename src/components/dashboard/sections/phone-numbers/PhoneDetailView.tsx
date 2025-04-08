@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pencil, Copy, Phone, Trash2, RefreshCw } from 'lucide-react';
@@ -12,7 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
-import { Agent } from './hooks/useAgents';
+import { Agent } from '../agents/types';
 import { PhoneNumber } from './hooks/usePhoneNumbers';
 import AgentSelector from './components/AgentSelector';
 import PhoneHeader from './components/PhoneHeader';
@@ -55,10 +56,16 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
     setOutboundAgent(phone.outbound_agent_id || 'none');
   }, [phone]);
 
+  // Debugging logging
   useEffect(() => {
-    console.log('PhoneDetailView rendering with agents:', agents);
-    console.log('PhoneDetailView phone data:', phone);
-  }, [agents, phone]);
+    console.log('PhoneDetailView: Phone data updated', phone);
+    console.log('PhoneDetailView: Inbound agent ID:', inboundAgent);
+    console.log('PhoneDetailView: Outbound agent ID:', outboundAgent);
+  }, [phone, inboundAgent, outboundAgent]);
+
+  useEffect(() => {
+    console.log('PhoneDetailView: Agents data received:', agents.length, 'agents');
+  }, [agents]);
 
   const handleMakeCall = () => {
     toast.info('Outbound call feature will be implemented soon');

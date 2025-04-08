@@ -6,7 +6,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Agent } from '../hooks/useAgents';
+import { Agent } from '../../agents/types';
 import { useEffect, useState } from 'react';
 
 interface AgentSelectorProps {
@@ -19,17 +19,22 @@ interface AgentSelectorProps {
 const AgentSelector = ({ value, agents = [], onChange, isLoading = false }: AgentSelectorProps) => {
   const [currentValue, setCurrentValue] = useState<string>(value);
 
+  // Update local state when value changes from parent
   useEffect(() => {
     setCurrentValue(value);
   }, [value]);
 
+  // Debugging logs
   useEffect(() => {
-    console.log("AgentSelector rendering with agents:", agents);
-    console.log("Current selected value:", value);
-  }, [agents, value]);
+    console.log("AgentSelector: Agents data updated", agents.length, "agents");
+  }, [agents]);
+
+  useEffect(() => {
+    console.log("AgentSelector: Selected value updated:", value);
+  }, [value]);
 
   const handleChange = (newValue: string) => {
-    console.log("Selected new agent:", newValue);
+    console.log("AgentSelector: Selected new agent:", newValue);
     setCurrentValue(newValue);
     onChange(newValue);
   };
@@ -42,14 +47,16 @@ const AgentSelector = ({ value, agents = [], onChange, isLoading = false }: Agen
         disabled={isLoading}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select an agent" />
+          <SelectValue placeholder="Select an agent">
+            {isLoading ? 'Loading agents...' : ''}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="none">None (Unassigned)</SelectItem>
           {agents && agents.length > 0 ? (
             agents.map(agent => (
               <SelectItem key={agent.id} value={agent.id}>
-                {agent.name || 'Unnamed Agent'}
+                {agent.name || agent.agent_name || 'Unnamed Agent'}
               </SelectItem>
             ))
           ) : (

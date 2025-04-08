@@ -1,20 +1,7 @@
-
 import { useCallback, useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
-
-export interface Agent {
-  id: string;
-  name: string;
-  agent_id?: string;
-  agent_name?: string;
-  voice_id?: string;
-  last_modification_timestamp?: number;
-  response_engine?: {
-    type: string;
-    llm_id?: string;
-  };
-}
+import { Agent } from '../../agents/types';
 
 export const useAgents = () => {
   const { fetchWithAuth } = useApiContext();
@@ -39,9 +26,13 @@ export const useAgents = () => {
           agent_name: agent.agent_name,
           voice_id: agent.voice_id,
           last_modification_timestamp: agent.last_modification_timestamp,
-          response_engine: agent.response_engine
+          response_engine: agent.response_engine,
+          description: agent.description || '',
+          language: agent.language,
+          webhook_url: agent.webhook_url
         }));
         
+        console.log('Transformed agents data:', transformedAgents);
         setAgents(transformedAgents);
       } else if (data && typeof data === 'object' && Array.isArray(data.agents)) {
         // Some APIs might wrap the array in an object
@@ -52,7 +43,10 @@ export const useAgents = () => {
           agent_name: agent.agent_name,
           voice_id: agent.voice_id,
           last_modification_timestamp: agent.last_modification_timestamp,
-          response_engine: agent.response_engine
+          response_engine: agent.response_engine,
+          description: agent.description || '',
+          language: agent.language,
+          webhook_url: agent.webhook_url
         }));
         
         setAgents(transformedAgents);
@@ -139,3 +133,5 @@ export const useAgents = () => {
     deleteAgent
   };
 };
+
+export type { Agent };
