@@ -1,4 +1,3 @@
-
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -148,7 +147,7 @@ export const useSourceApi = () => {
       
       console.log('Delete source API response:', response);
       return response;
-    } catch (error) {
+    } catch (error: any) { // Explicitly type error as any to safely access properties
       // Check if it's a timeout error
       if (error.name === 'AbortError') {
         console.warn('Delete source API call timed out, but UI will continue as if successful');
@@ -162,10 +161,8 @@ export const useSourceApi = () => {
       }
       
       console.error('Error in delete source API call:', error);
-      // Don't silently fail, propagate the error but with useful information
-      const enhancedError = new Error(`Failed to delete source: ${error.message || 'Unknown error'}`);
-      enhancedError.originalError = error;
-      throw enhancedError;
+      // Don't add custom properties to the error, just return a new Error
+      throw new Error(`Failed to delete source: ${error.message || 'Unknown error'}`);
     }
   };
 

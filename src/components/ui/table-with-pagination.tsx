@@ -42,26 +42,32 @@ export function TableWithPagination<T>({
   onPageChange,
   onPageSizeChange
 }: TableWithPaginationProps<T>) {
-  // Store previous data length to avoid unnecessary page resets
+  // Store previous data length for pagination management
   const [prevDataLength, setPrevDataLength] = useState<number | null>(null);
   
-  // Only reset to page 1 when data length changes significantly and we're not already on page 1
+  // Check validity of data
+  const safeData = Array.isArray(data) ? data : [];
+  
+  // Effect to handle pagination when data changes
   useEffect(() => {
-    // Only run this effect after the first render when prevDataLength is set
+    // Only run after initial render
     if (prevDataLength !== null) {
-      // Calculate max possible page based on current data and page size
-      const maxPage = Math.max(1, Math.ceil(data.length / initialPageSize));
+      const maxPage = Math.max(1, Math.ceil(safeData.length / initialPageSize));
       
-      // If current page is greater than maxPage, reset to page 1
+      // If current page is out of bounds after data change, reset to page 1
       if (currentPage > maxPage && maxPage > 0) {
+        console.log('Resetting to page 1 due to data change', { 
+          currentPage, maxPage, dataLength: safeData.length 
+        });
         onPageChange(1);
       }
     }
     
-    // Always update the previous data length
-    setPrevDataLength(data.length);
-  }, [data.length, currentPage, initialPageSize, onPageChange]);
+    // Update previous data length
+    setPrevDataLength(safeData.length);
+  }, [safeData.length, currentPage, initialPageSize, onPageChange]);
 
+  // Get row class name with safety checks
   const getRowClassName = (item: T): string => {
     if (typeof rowClassName === 'function') {
       return rowClassName(item);
@@ -69,20 +75,14 @@ export function TableWithPagination<T>({
     return rowClassName || '';
   };
 
-  // Calculate max page
-  const maxPage = Math.max(1, Math.ceil(data.length / initialPageSize));
-  
-  // Ensure currentPage is within bounds
+  // Calculate pagination values with defensive coding
+  const maxPage = Math.max(1, Math.ceil(safeData.length / initialPageSize));
   const safePage = Math.min(Math.max(1, currentPage), maxPage);
+  const startIndex = Math.max(0, (safePage - 1) * initialPageSize);
+  const endIndex = Math.min(startIndex + initialPageSize, safeData.length);
   
-  // Calculate start and end indices for current page
-  const startIndex = (safePage - 1) * initialPageSize;
-  // Make sure we don't go out of bounds
-  const endIndex = Math.min(startIndex + initialPageSize, data.length);
-  
-  // Get current page data with defensive checks
-  const currentPageData = data && Array.isArray(data) && data.length > 0 ? 
-    data.slice(Math.max(0, startIndex), endIndex) : [];
+  // Get safely calculated page data
+  const currentPageData = safeData.slice(startIndex, endIndex);
 
   return (
     <div className="space-y-4">
@@ -98,7 +98,7 @@ export function TableWithPagination<T>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {!data || data.length === 0 ? (
+            {!safeData.length ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
                   {emptyState || 'No data found'}
@@ -124,9 +124,9 @@ export function TableWithPagination<T>({
         </Table>
       </div>
       
-      {data && data.length > 0 && (
+      {safeData.length > 0 && (
         <PaginationControls
-          totalItems={data.length}
+          totalItems={safeData.length}
           pageSize={initialPageSize}
           currentPage={safePage}
           onPageChange={onPageChange}

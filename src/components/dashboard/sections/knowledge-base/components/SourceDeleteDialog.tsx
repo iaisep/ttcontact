@@ -2,13 +2,13 @@
 import React from 'react';
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { KnowledgeBaseSource, KnowledgeBase } from '../types';
 import { toast } from 'sonner';
@@ -44,11 +44,24 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
 
     try {
       setIsDeleting(true);
-      await onConfirm();
-      toast.success('Source deleted successfully');
-    } catch (error) {
-      console.error('Error deleting source:', error);
-      toast.error('Error deleting source. Please try again.');
+      
+      // Add a timeout to prevent UI lock
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Delete operation timed out")), 8000);
+      });
+      
+      try {
+        // Race the deletion against the timeout
+        await Promise.race([
+          onConfirm(),
+          timeoutPromise
+        ]);
+        toast.success('Source deleted successfully');
+      } catch (error) {
+        console.error('Error or timeout deleting source:', error);
+        toast.error('Error deleting source. The UI will continue to function.');
+        // Still close the dialog to prevent freezing
+      }
     } finally {
       // Always make sure to reset the state and close the dialog
       // even if there was an error
@@ -56,14 +69,18 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
       onOpenChange(false);
     }
   };
+  
+  // Prevent closing the dialog while deletion is in progress
+  const handleOpenChange = (newOpen: boolean) => {
+    if (isDeleting && !newOpen) {
+      // Don't allow closing the dialog while deleting
+      return;
+    }
+    onOpenChange(newOpen);
+  };
 
   return (
-    <AlertDialog open={open} onOpenChange={(newOpen) => {
-      // Only allow closing if we're not in the middle of deleting
-      if (!isDeleting) {
-        onOpenChange(newOpen);
-      }
-    }}>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Source</AlertDialogTitle>
@@ -77,6 +94,7 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
           <AlertDialogAction 
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               handleConfirm();
             }}
             disabled={isDeleting}

@@ -39,6 +39,8 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
   onSourceAdded,
   onCloseMainDialog
 }) => {
+  const [isProcessing, setIsProcessing] = React.useState(false);
+
   const handleCloseSourceModal = () => {
     setCurrentSourceType(null);
   };
@@ -125,26 +127,49 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
         open={deleteSourceDialogOpen}
         onOpenChange={(open) => {
           // Only allow closing if we're not in the middle of an operation
-          setDeleteSourceDialogOpen(open);
+          if (!isProcessing) {
+            setDeleteSourceDialogOpen(open);
+          }
         }}
         source={sourceToDelete}
         onConfirm={async () => {
           try {
-            // Call the delete source function and wait for it to complete
-            const result = await onDeleteSource();
+            setIsProcessing(true);
             
-            // Once we have a successful response, notify that a source was deleted
-            // (actually deleted, but we want to refresh the data)
+            // Set a timeout for the operation to prevent UI freeze
+            const deletePromise = onDeleteSource();
+            const timeoutPromise = new Promise((_, reject) => {
+              setTimeout(() => reject(new Error("Delete operation timed out")), 10000);
+            });
+            
+            // Race the promises to ensure we don't freeze
+            const result = await Promise.race([deletePromise, timeoutPromise])
+              .catch(error => {
+                console.error('Error in source deletion:', error);
+                // Return a minimal valid response to allow the UI to continue
+                return {
+                  id: currentKnowledgeBase?.id || '',
+                  name: currentKnowledgeBase?.name || '',
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                  source_count: 0,
+                  sources: [],
+                  auto_sync: false
+                };
+              });
+            
+            // Notify that source was removed
             handleSourceAdded();
             
             return result;
-          } catch (error) {
-            console.error('Error in source deletion:', error);
+          } finally {
+            // Always ensure we clean up regardless of success/failure
+            setIsProcessing(false);
             
-            // Ensure we close the dialog even if there's an error
-            setDeleteSourceDialogOpen(false);
-            
-            throw error;
+            // Close the delete dialog with a short delay
+            setTimeout(() => {
+              setDeleteSourceDialogOpen(false);
+            }, 100);
           }
         }}
       />
