@@ -47,9 +47,11 @@ const KnowledgeBaseSection: React.FC<AccordionSectionProps> = ({ agent, updateAg
     // If agent has knowledge_base_ids, set them as selected
     if (agent?.knowledge_base_ids && Array.isArray(agent.knowledge_base_ids)) {
       setSelectedKbs(agent.knowledge_base_ids);
+
     } else if (agent?.knowledge_base && typeof agent.knowledge_base === 'string') {
       // For backward compatibility, if there's a single knowledge_base
       setSelectedKbs([agent.knowledge_base]);
+
     }
   }, [agent]);
 
