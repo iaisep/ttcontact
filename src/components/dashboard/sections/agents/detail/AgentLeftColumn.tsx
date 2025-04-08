@@ -3,7 +3,7 @@ import React from 'react';
 import EditablePrompt from './EditablePrompt';
 import { WelcomeMessageEditor } from './welcome-message';
 import GeneralPromptEditor from './GeneralPromptEditor';
-import { RetellAgent, RetellLLM, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
+import { RetellAgent, RetellVoice, RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
 import { VoiceSelectionModal } from './voice-selection';
 import { AgentSettingsRow } from './components/AgentSettingsRow';
 import { useVoiceSettings } from './hooks/useVoiceSettings';
@@ -29,9 +29,12 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
   // Get the LLM ID safely
   const llmId = agent.response_engine?.llm_id || llm?.id;
   
+  // Determine the initial voice name
+  const initialVoiceName = voice?.name || voice?.voice_name || 'Select Voice';
+  
   // Use custom hooks to manage state and logic
   const voiceSettings = useVoiceSettings({ 
-    initialVoice: agent.voice || (voice?.name || voice?.voice_name || 'Select Voice'), 
+    initialVoice: initialVoiceName, 
     updateAgentField 
   });
   
@@ -91,4 +94,3 @@ const AgentLeftColumn: React.FC<AgentLeftColumnProps> = ({
 };
 
 export default AgentLeftColumn;
-

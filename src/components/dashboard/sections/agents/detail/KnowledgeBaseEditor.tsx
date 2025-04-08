@@ -25,9 +25,14 @@ const KnowledgeBaseEditor: React.FC<KnowledgeBaseEditorProps> = ({
   onUpdate
 }) => {
   const { t } = useLanguage();
-  const [selectedKbs, setSelectedKbs] = React.useState<string[]>(
-    agent.knowledge_base_ids || []
-  );
+  const [selectedKbs, setSelectedKbs] = React.useState<string[]>(() => {
+    if (agent.knowledge_base_ids && Array.isArray(agent.knowledge_base_ids)) {
+      return agent.knowledge_base_ids;
+    } else if (agent.knowledge_base) {
+      return [agent.knowledge_base];
+    }
+    return [];
+  });
 
   const handleKbChange = (kbId: string, checked: boolean) => {
     let newSelectedKbs;

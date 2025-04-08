@@ -22,7 +22,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   
   const filteredAgents = agents.filter(agent => {
-    const name = agent.agent_name || agent.name || '';
+    const name = agent.agent_name || '';
     return name.toLowerCase().includes(searchTerm.toLowerCase());
   });
   
@@ -52,9 +52,9 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
             <div className="space-y-2">
               {filteredAgents.map(agent => (
                 <div
-                  key={agent.agent_id || agent.id}
+                  key={agent.agent_id}
                   className={`flex items-center p-3 rounded-md cursor-pointer hover:bg-muted transition-colors ${
-                    (agent.agent_id || agent.id) === currentAgentId ? 'bg-muted' : ''
+                    agent.agent_id === currentAgentId ? 'bg-muted' : ''
                   }`}
                   onClick={() => onSelect(agent)}
                 >
@@ -67,10 +67,10 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
                   </div>
                   <div className="flex-1">
                     <div className="font-medium">
-                      {agent.agent_name || agent.name || 'Unnamed Agent'}
+                      {agent.agent_name || 'Unnamed Agent'}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      ID: {(agent.agent_id || agent.id || '').substring(0, 8)}...
+                      ID: {agent.agent_id.substring(0, 8)}...
                     </div>
                   </div>
                 </div>

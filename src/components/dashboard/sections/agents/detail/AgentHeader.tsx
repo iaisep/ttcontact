@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Input } from '@/components/ui/input';
@@ -14,7 +13,7 @@ interface AgentHeaderProps {
 
 const AgentHeader: React.FC<AgentHeaderProps> = ({ agent, voices, onUpdate }) => {
   const { t } = useLanguage();
-  const [name, setName] = useState(agent.agent_name || agent.name || '');
+  const [name, setName] = useState(agent.agent_name || '');
   const [description, setDescription] = useState(agent.description || '');
   const [voice, setVoice] = useState(agent.voice_id || '');
 

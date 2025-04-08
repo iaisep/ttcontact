@@ -1,0 +1,54 @@
+
+import { useCallback, useState } from 'react';
+import { useApiContext } from '@/context/ApiContext';
+import { toast } from 'sonner';
+import { PhoneNumber } from './types';
+
+export const useFetchPhoneNumbers = () => {
+  const { fetchWithAuth } = useApiContext();
+  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumber[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchPhoneNumbers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchWithAuth('/list-phone-numbers');
+      console.log('Raw phone numbers data from API:', data);
+
+      if (Array.isArray(data)) {
+        // Ensure each phone number has all the required properties
+        const processedData = data.map(phone => ({
+          ...phone,
+          id: phone.id || phone.phone_number,
+          number: phone.number || phone.phone_number,
+          friendly_name: phone.friendly_name || phone.nickname || phone.number || phone.phone_number || 'Unnamed Phone',
+          inbound_agent_id: phone.inbound_agent_id || null,
+          outbound_agent_id: phone.outbound_agent_id || null,
+          status: phone.status || 'active'
+        }));
+        
+        console.log('Processed phone numbers data:', processedData);
+        setPhoneNumbers(processedData);
+      } else {
+        console.error('Expected array but got:', data);
+        setPhoneNumbers([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch phone numbers:', error);
+      setError('Failed to fetch phone numbers');
+      toast.error('Failed to fetch phone numbers');
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchWithAuth]);
+
+  return {
+    phoneNumbers,
+    setPhoneNumbers,
+    loading,
+    error,
+    fetchPhoneNumbers
+  };
+};

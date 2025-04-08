@@ -57,7 +57,7 @@ export const useRetellData = () => {
         const transformedAgents: Agent[] = agentsData.map((agent: RetellAgent) => {
           // Find the voice information
           const voiceInfo = voicesData?.voices?.find((v: RetellVoice) => 
-            v.id === agent.voice_id
+            v.id === agent.voice_id || v.voice_id === agent.voice_id
           );
 
           // Find phone number assigned to this agent
@@ -66,19 +66,37 @@ export const useRetellData = () => {
           );
 
           return {
-            id: agent.agent_id || agent.id,
-            name: agent.agent_name || agent.name,
+            id: agent.agent_id,
+            agent_id: agent.agent_id,
+            name: agent.agent_name,
+            agent_name: agent.agent_name,
             description: agent.description || '',
-            agent_type: agent.response_engine?.type || agent.agent_type || '',
+            agent_type: agent.response_engine?.type || '',
             voice_id: agent.voice_id,
+            voice_model: agent.voice_model,
             folder: agent.folder || '',
             // Add new properties
             voice: voiceInfo ? {
-              name: voiceInfo.name,
+              name: voiceInfo.name || voiceInfo.voice_name || '',
               avatar_url: voiceInfo.avatar_url
             } : undefined,
             phone: phoneNumber?.phone_number,
             last_modification_timestamp: agent.last_modification_timestamp,
+            // Add all the other properties from RetellAgent
+            voice_temperature: agent.voice_temperature,
+            voice_speed: agent.voice_speed,
+            volume: agent.volume,
+            enable_backchannel: agent.enable_backchannel,
+            backchannel_words: agent.backchannel_words,
+            interruption_sensitivity: agent.interruption_sensitivity,
+            ambient_sound: agent.ambient_sound,
+            responsiveness: agent.responsiveness,
+            language: agent.language,
+            webhook_url: agent.webhook_url,
+            boosted_keywords: agent.boosted_keywords,
+            response_engine: agent.response_engine,
+            knowledge_base_ids: agent.knowledge_base_ids,
+            llm_id: agent.response_engine?.llm_id
           };
         });
 

@@ -44,11 +44,14 @@ export const useAgentDetails = (agentId: string | undefined) => {
       // Step 1: Fetch the agent details using fetchWithAuth
       const agentData = await fetchWithAuth(`/get-agent/${agentId}`);
       
-      // Ensure we have a consistent agent object format
-      const formattedAgent = {
+      // Ensure we have a consistent agent object format with backward compatibility
+      const formattedAgent: RetellAgent = {
         ...agentData,
-        agent_id: agentData.agent_id || agentData.id,
-        agent_name: agentData.agent_name || agentData.name
+        agent_id: agentData.agent_id,
+        agent_name: agentData.agent_name,
+        // Add aliases for backward compatibility
+        id: agentData.agent_id,
+        name: agentData.agent_name
       };
       
       setState(prev => ({ ...prev, agent: formattedAgent }));
@@ -83,7 +86,7 @@ export const useAgentDetails = (agentId: string | undefined) => {
         llm: llmData,
         voice: voiceData,
         knowledgeBases: agentKnowledgeBases,
-        availableVoices: voicesList ?? [],
+        availableVoices: voicesList?.voices ?? [],
         isLoading: false
       }));
       
@@ -136,7 +139,7 @@ export const useAgentDetails = (agentId: string | undefined) => {
       }
       
       // Send the update to the server in the background
-      await fetchWithAuth(`/update-agent/${state.agent.agent_id || state.agent.id}`, {
+      await fetchWithAuth(`/update-agent/${state.agent.agent_id}`, {
         method: 'PATCH',
         body: JSON.stringify({ [fieldName]: value })
       });

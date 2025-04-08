@@ -21,15 +21,18 @@ const AgentHeaderInfo: React.FC<AgentHeaderInfoProps> = ({
   onDescriptionChange
 }) => {
   const { t } = useLanguage();
+  
+  // Get avatar URL from the appropriate property
+  const avatarUrl = agent.avatar_url || (agent.voice && agent.voice.avatar_url);
 
   return (
     <div className="px-6 pb-4 border-b">
       <div className="flex gap-4 items-start">
-        {agent.avatar_url && (
+        {avatarUrl && (
           <div className="flex-shrink-0">
             <img 
-              src={agent.avatar_url} 
-              alt={agent.agent_name || agent.name} 
+              src={avatarUrl} 
+              alt={agent.agent_name || "Agent"} 
               className="w-20 h-20 rounded-full object-cover"
             />
           </div>
