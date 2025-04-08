@@ -40,6 +40,7 @@ const AgentSelectionStep = ({
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberData[]>([]);
   const [fetchingPhoneNumbers, setFetchingPhoneNumbers] = useState<boolean>(true);
   const [phoneNumberError, setPhoneNumberError] = useState<string | null>(null);
+  const [selectedPhoneNumber, setSelectedPhoneNumber] = useState<string>('');
 
   const fetchPhoneNumbers = async () => {
     setFetchingPhoneNumbers(true);
@@ -53,9 +54,11 @@ const AgentSelectionStep = ({
         const phonesWithAgents = data.filter(phone => phone.outbound_agent_id);
         setPhoneNumbers(phonesWithAgents);
         
-        // If we have phone numbers with agents and no agent is selected yet, select the first one
-        if (phonesWithAgents.length > 0 && !selectedAgent) {
-          setSelectedAgent(phonesWithAgents[0].outbound_agent_id);
+        // If we have phone numbers with agents and no phone number is selected yet, select the first one
+        if (phonesWithAgents.length > 0 && !selectedPhoneNumber) {
+          const firstPhone = phonesWithAgents[0];
+          setSelectedPhoneNumber(firstPhone.phone_number);
+          setSelectedAgent(firstPhone.outbound_agent_id);
         }
       } else {
         console.error('Expected array but got:', data);
@@ -74,6 +77,19 @@ const AgentSelectionStep = ({
   useEffect(() => {
     fetchPhoneNumbers();
   }, []);
+
+  const handlePhoneNumberChange = (phoneNumber: string) => {
+    // Find the corresponding phone number object
+    const selectedPhone = phoneNumbers.find(phone => phone.phone_number === phoneNumber);
+    
+    // Update both states
+    setSelectedPhoneNumber(phoneNumber);
+    
+    // Only update the agent if we found a matching phone number
+    if (selectedPhone) {
+      setSelectedAgent(selectedPhone.outbound_agent_id);
+    }
+  };
 
   const handleRefresh = () => {
     fetchPhoneNumbers();
@@ -100,8 +116,8 @@ const AgentSelectionStep = ({
         
         <select
           id="agent-select"
-          value={selectedAgent}
-          onChange={(e) => setSelectedAgent(e.target.value)}
+          value={selectedPhoneNumber}
+          onChange={(e) => handlePhoneNumberChange(e.target.value)}
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
           disabled={fetchingPhoneNumbers || phoneNumbers.length === 0}
         >
@@ -113,7 +129,7 @@ const AgentSelectionStep = ({
             <>
               <option value="">Select a phone number</option>
               {phoneNumbers.map((phone) => (
-                <option key={phone.id || phone.phone_number} value={phone.outbound_agent_id}>
+                <option key={phone.id || phone.phone_number} value={phone.phone_number}>
                   {phone.phone_number_pretty || phone.phone_number} ({phone.nickname || phone.friendly_name})
                 </option>
               ))}
