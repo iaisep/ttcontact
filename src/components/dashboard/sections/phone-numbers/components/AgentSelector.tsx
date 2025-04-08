@@ -21,23 +21,30 @@ const AgentSelector = ({ value, agents = [], onChange, isLoading = false }: Agen
 
   // Update local state when value changes from parent
   useEffect(() => {
+    console.log("AgentSelector: Value prop changed to:", value);
     setCurrentValue(value);
   }, [value]);
 
-  // Debugging logs
+  // Debug logs
   useEffect(() => {
-    console.log("AgentSelector: Agents data updated", agents.length, "agents");
-  }, [agents]);
-
-  useEffect(() => {
-    console.log("AgentSelector: Selected value updated:", value);
-  }, [value]);
+    console.log("AgentSelector: Agents data updated, count:", agents.length);
+    console.log("AgentSelector: Current selected value:", currentValue);
+    
+    // Check if the current value exists in the agents list
+    const selectedAgent = agents.find(agent => agent.id === currentValue);
+    console.log("AgentSelector: Selected agent:", selectedAgent);
+  }, [agents, currentValue]);
 
   const handleChange = (newValue: string) => {
     console.log("AgentSelector: Selected new agent:", newValue);
     setCurrentValue(newValue);
     onChange(newValue);
   };
+
+  // Find the name of the currently selected agent for display
+  const selectedAgentName = currentValue && currentValue !== 'none' 
+    ? agents.find(agent => agent.id === currentValue)?.name || 'Unknown Agent'
+    : '';
 
   return (
     <div>
@@ -48,7 +55,7 @@ const AgentSelector = ({ value, agents = [], onChange, isLoading = false }: Agen
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select an agent">
-            {isLoading ? 'Loading agents...' : ''}
+            {currentValue === 'none' ? 'None (Unassigned)' : selectedAgentName}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>

@@ -14,7 +14,7 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
 import { Agent } from '../agents/types';
-import { PhoneNumber } from './hooks/usePhoneNumbers';
+import { PhoneNumber } from './hooks/types';
 import AgentSelector from './components/AgentSelector';
 import PhoneHeader from './components/PhoneHeader';
 import WebhookSettings from './components/WebhookSettings';
@@ -52,6 +52,10 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
 
   // Update state when phone changes
   useEffect(() => {
+    console.log('PhoneDetailView: Updating agent state from phone:', phone.number);
+    console.log('PhoneDetailView: inbound_agent_id:', phone.inbound_agent_id);
+    console.log('PhoneDetailView: outbound_agent_id:', phone.outbound_agent_id);
+    
     setInboundAgent(phone.inbound_agent_id || 'none');
     setOutboundAgent(phone.outbound_agent_id || 'none');
   }, [phone]);

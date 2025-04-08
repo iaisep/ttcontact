@@ -16,14 +16,19 @@ export const useFetchPhoneNumbers = () => {
     try {
       const data = await fetchWithAuth('/list-phone-numbers');
       console.log('Raw phone numbers data from API:', data);
+
       if (Array.isArray(data)) {
-        // Ensure each phone number has an id and friendly_name
+        // Ensure each phone number has all the required properties
         const processedData = data.map(phone => ({
           ...phone,
           id: phone.id || phone.phone_number,
           number: phone.number || phone.phone_number,
-          friendly_name: phone.friendly_name || phone.nickname || phone.number || phone.phone_number || 'Unnamed Phone'
+          friendly_name: phone.friendly_name || phone.nickname || phone.number || phone.phone_number || 'Unnamed Phone',
+          inbound_agent_id: phone.inbound_agent_id || null,
+          outbound_agent_id: phone.outbound_agent_id || null,
+          status: phone.status || 'active'
         }));
+        
         console.log('Processed phone numbers data:', processedData);
         setPhoneNumbers(processedData);
       } else {
