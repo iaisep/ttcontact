@@ -15,4 +15,5 @@ export interface PhoneNumber {
   phone_number_pretty?: string;
   area_code?: number;
   last_modification_timestamp?: number;
+  provider?: string;
 }
