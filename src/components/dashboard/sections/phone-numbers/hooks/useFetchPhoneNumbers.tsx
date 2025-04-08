@@ -17,10 +17,12 @@ export const useFetchPhoneNumbers = () => {
       const data = await fetchWithAuth('/list-phone-numbers');
       console.log('Raw phone numbers data from API:', data);
       if (Array.isArray(data)) {
-        // Ensure each phone number has a friendly_name
+        // Ensure each phone number has an id and friendly_name
         const processedData = data.map(phone => ({
           ...phone,
-          friendly_name: phone.friendly_name || phone.number || 'Unnamed Phone'
+          id: phone.id || phone.phone_number,
+          number: phone.number || phone.phone_number,
+          friendly_name: phone.friendly_name || phone.nickname || phone.number || phone.phone_number || 'Unnamed Phone'
         }));
         console.log('Processed phone numbers data:', processedData);
         setPhoneNumbers(processedData);

@@ -2,7 +2,8 @@
 export interface PhoneNumber {
   id: string;
   number: string;
-  friendly_name: string;
+  friendly_name?: string;
+  nickname?: string;
   status: 'active' | 'inactive';
   agent_id?: string;
   created_at: string;

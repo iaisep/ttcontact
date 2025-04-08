@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PhoneNumber } from '../hooks/usePhoneNumbers';
+import { PhoneNumber } from '../hooks/types';
 import { Pencil, Copy, Phone, Trash2 } from 'lucide-react';
 
 interface PhoneHeaderProps {
@@ -21,7 +21,7 @@ const PhoneHeader: React.FC<PhoneHeaderProps> = ({
   onDelete
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [nameValue, setNameValue] = useState(phone.friendly_name || '');
+  const [nameValue, setNameValue] = useState(phone.friendly_name || phone.nickname || '');
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleEdit = () => {
@@ -43,7 +43,7 @@ const PhoneHeader: React.FC<PhoneHeaderProps> = ({
   };
 
   const handleCancel = () => {
-    setNameValue(phone.friendly_name || '');
+    setNameValue(phone.friendly_name || phone.nickname || '');
     setIsEditing(false);
   };
 
@@ -54,6 +54,9 @@ const PhoneHeader: React.FC<PhoneHeaderProps> = ({
       handleCancel();
     }
   };
+
+  // Get the display name, prioritizing friendly_name, then nickname, then default to 'Unnamed Phone'
+  const displayName = phone.friendly_name || phone.nickname || 'Unnamed Phone';
 
   console.log('PhoneHeader rendering with phone:', phone);
 
@@ -93,7 +96,7 @@ const PhoneHeader: React.FC<PhoneHeaderProps> = ({
         ) : (
           <>
             <h2 className="text-2xl font-semibold flex-1">
-              {phone.friendly_name || 'Unnamed Phone'}
+              {displayName}
             </h2>
             <Button 
               variant="ghost" 
