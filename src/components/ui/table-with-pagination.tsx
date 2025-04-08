@@ -69,8 +69,14 @@ export function TableWithPagination<T>({
     return rowClassName || '';
   };
 
+  // Calculate max page
+  const maxPage = Math.max(1, Math.ceil(data.length / initialPageSize));
+  
+  // Ensure currentPage is within bounds
+  const safePage = Math.min(Math.max(1, currentPage), maxPage);
+  
   // Calculate start and end indices for current page
-  const startIndex = (currentPage - 1) * initialPageSize;
+  const startIndex = (safePage - 1) * initialPageSize;
   // Make sure we don't go out of bounds
   const endIndex = Math.min(startIndex + initialPageSize, data.length);
   
@@ -122,7 +128,7 @@ export function TableWithPagination<T>({
         <PaginationControls
           totalItems={data.length}
           pageSize={initialPageSize}
-          currentPage={currentPage}
+          currentPage={safePage}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
           pageSizeOptions={pageSizeOptions}

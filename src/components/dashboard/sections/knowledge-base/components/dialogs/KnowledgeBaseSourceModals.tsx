@@ -133,7 +133,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
             // Call the delete source function and wait for it to complete
             const result = await onDeleteSource();
             
-            // Once we have a successful response, notify that a source was added
+            // Once we have a successful response, notify that a source was deleted
             // (actually deleted, but we want to refresh the data)
             handleSourceAdded();
             

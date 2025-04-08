@@ -134,19 +134,22 @@ export const useSourceManagement = (
       if (!kb) {
         const error = new Error('Knowledge base not found');
         toast.error('Knowledge base not found');
+        setIsProcessing(false);
+        setLoading(false);
         return Promise.reject(error);
       }
       
-      // First update the state to give immediate feedback - OPTIMISTIC UPDATE
-      const sourceIndex = kb.sources.findIndex(s => s.id === sourceId);
-      
       // Check if the source exists before proceeding
+      const sourceIndex = kb.sources.findIndex(s => s.id === sourceId);
       if (sourceIndex === -1) {
         const error = new Error('Source not found in knowledge base');
         toast.error('Source not found');
+        setIsProcessing(false);
+        setLoading(false);
         return Promise.reject(error);
       }
       
+      // OPTIMISTIC UPDATE: Update the state immediately for better UX
       const updatedKb = {...kb};
       updatedKb.sources = updatedKb.sources.filter(src => src.id !== sourceId);
       updatedKb.source_count = updatedKb.sources.length;
@@ -154,15 +157,24 @@ export const useSourceManagement = (
       // Update the state before making API call for better UX
       updateKnowledgeBaseInState(updatedKb);
 
-      // Then make the API call
+      // Then make the API call with a timeout to prevent hanging
       try {
-        await deleteSourceApi(kbId, sourceId);
+        // Create a timeout promise that rejects after 15 seconds
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('API call timed out')), 15000);
+        });
+        
+        // Race the API call against the timeout
+        await Promise.race([
+          deleteSourceApi(kbId, sourceId),
+          timeoutPromise
+        ]);
+        
         // API call successful - state is already updated
       } catch (error) {
         console.error('API error when deleting source:', error);
-        // If API fails, we don't revert the UI state to avoid confusing the user
+        // We don't revert the UI state even if API fails 
         // The source is already removed from the UI state, which is good for UX
-        // Just log the error and don't throw
       }
       
       return updatedKb;
@@ -171,7 +183,7 @@ export const useSourceManagement = (
       toast.error('Failed to delete source');
       throw error;
     } finally {
-      // Always reset these states to ensure UI remains responsive
+      // IMPORTANT: Always reset these states to ensure UI remains responsive
       setIsProcessing(false);
       setLoading(false);
     }

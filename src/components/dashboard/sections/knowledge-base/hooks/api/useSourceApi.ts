@@ -57,7 +57,7 @@ export const useSourceApi = () => {
       formData.set('enable_auto_refresh', String(sourceData.autoSync || false));
     } 
     else if (sourceType === 'file' && sourceData.file) {
-      // For file upload, include the file in formData as shown in the first image
+      // For file upload, include the file in formData
       formData.append('knowledge_base_files', sourceData.file);
       
       // Make sure we have a knowledge base name
@@ -69,7 +69,7 @@ export const useSourceApi = () => {
       }
     } 
     else if (sourceType === 'text') {
-      // Format text content according to the API documentation and image
+      // Format text content according to the API documentation
       const textContent = [{
         title: sourceData.fileName || 'Untitled',
         text: sourceData.content || '',
@@ -88,17 +88,31 @@ export const useSourceApi = () => {
     }
     
     try {
+      // Create an AbortController to handle timeouts
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+      
       // Call the API endpoint with FormData for all source types
       const response = await fetchWithAuth(endpoint, {
         method: 'POST',
         body: formData,
-        mode: 'cors'
+        mode: 'cors',
+        signal: controller.signal
       });
+      
+      // Clear the timeout since we got a response
+      clearTimeout(timeoutId);
       
       console.log(`Added ${sourceType} source response:`, response);
       return response;
     } catch (error) {
       console.error(`API error adding ${sourceType} source:`, error);
+      
+      // If it's an abort error (timeout), provide a cleaner error message
+      if (error.name === 'AbortError') {
+        throw new Error(`Request timed out when adding ${sourceType} source`);
+      }
+      
       throw error;
     }
   };
@@ -116,29 +130,42 @@ export const useSourceApi = () => {
       const endpoint = `/delete-knowledge-base-source/${kbId}/source/${sourceId}`;
       console.log(`Using delete endpoint: ${endpoint}`);
       
+      // Create an AbortController for timeout handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+      
       const response = await fetchWithAuth(endpoint, {
         method: 'DELETE',
         headers: {
           'Accept': 'application/json, text/plain, */*',
           'Content-Type': 'application/json'
         },
-        // Add a timeout to prevent infinite waiting
-        signal: AbortSignal.timeout(15000) // 15 seconds timeout
+        signal: controller.signal
       });
+      
+      // Clear the timeout since we got a response
+      clearTimeout(timeoutId);
       
       console.log('Delete source API response:', response);
       return response;
     } catch (error) {
       // Check if it's a timeout error
-      if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+      if (error.name === 'AbortError') {
         console.warn('Delete source API call timed out, but UI will continue as if successful');
         // Return a mock successful response to not block UI
-        return { success: true, message: "Deletion processed (timeout occurred)" };
+        return { 
+          success: true, 
+          message: "Deletion processed (timeout occurred)",
+          knowledge_base_id: kbId,
+          source_id: sourceId
+        };
       }
       
       console.error('Error in delete source API call:', error);
-      // Don't silently fail, propagate the error
-      throw error;
+      // Don't silently fail, propagate the error but with useful information
+      const enhancedError = new Error(`Failed to delete source: ${error.message || 'Unknown error'}`);
+      enhancedError.originalError = error;
+      throw enhancedError;
     }
   };
 
