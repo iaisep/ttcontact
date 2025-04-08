@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Phone, Plus } from 'lucide-react';
+import { Phone, Plus, RefreshCw } from 'lucide-react';
 import PhoneNumbersList from './phone-numbers/PhoneNumbersList';
 import PhoneDetailView from './phone-numbers/PhoneDetailView';
 import { usePhoneNumbers } from './phone-numbers/hooks/usePhoneNumbers';
@@ -34,9 +34,15 @@ const PhoneNumbersSection = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
+    console.log('Fetching phone numbers and agents...');
     fetchPhoneNumbers();
     fetchAgents();
   }, [fetchPhoneNumbers, fetchAgents]);
+
+  // Log phone numbers every time they change
+  useEffect(() => {
+    console.log('PhoneNumbers data updated:', phoneNumbers);
+  }, [phoneNumbers]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -141,6 +147,19 @@ const PhoneNumbersSection = () => {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="flex justify-end mt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Refreshing...' : 'Refresh Data'}
+        </Button>
       </div>
 
       <PurchaseDialog 

@@ -1,5 +1,5 @@
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 
@@ -27,11 +27,17 @@ export const usePhoneNumbers = () => {
     setError(null);
     try {
       const data = await fetchWithAuth('/list-phone-numbers');
-      console.log('Phone numbers data:', data);
+      console.log('Raw phone numbers data from API:', data);
       if (Array.isArray(data)) {
-        setPhoneNumbers(data);
-        if (data.length > 0 && !selectedPhoneId) {
-          setSelectedPhoneId(data[0].id);
+        // Asegurarse de que cada número telefónico tenga un friendly_name
+        const processedData = data.map(phone => ({
+          ...phone,
+          friendly_name: phone.friendly_name || phone.number || 'Unnamed Phone'
+        }));
+        console.log('Processed phone numbers data:', processedData);
+        setPhoneNumbers(processedData);
+        if (processedData.length > 0 && !selectedPhoneId) {
+          setSelectedPhoneId(processedData[0].id);
         }
       } else {
         console.error('Expected array but got:', data);
@@ -46,6 +52,11 @@ export const usePhoneNumbers = () => {
     }
   }, [fetchWithAuth, selectedPhoneId]);
 
+  // Log state changes for debugging
+  useEffect(() => {
+    console.log('phoneNumbers state updated:', phoneNumbers);
+  }, [phoneNumbers]);
+
   const purchasePhoneNumber = async (areaCode: string) => {
     try {
       const newNumber = await fetchWithAuth('/phone-numbers', {
@@ -55,8 +66,16 @@ export const usePhoneNumbers = () => {
           country: 'US'
         }),
       });
-      setPhoneNumbers([...phoneNumbers, newNumber]);
-      setSelectedPhoneId(newNumber.id);
+      console.log('Purchased new phone number:', newNumber);
+      
+      // Ensure the new number has a friendly_name
+      const processedNewNumber = {
+        ...newNumber,
+        friendly_name: newNumber.friendly_name || newNumber.number || 'New Phone'
+      };
+      
+      setPhoneNumbers([...phoneNumbers, processedNewNumber]);
+      setSelectedPhoneId(processedNewNumber.id);
       toast.success('Phone number purchased successfully');
       return true;
     } catch (error) {

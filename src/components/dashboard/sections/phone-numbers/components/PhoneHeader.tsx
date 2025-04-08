@@ -1,8 +1,9 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Pencil, Copy, Phone, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { PhoneNumber } from '../hooks/usePhoneNumbers';
+import { Pencil, Copy, Phone, Trash2 } from 'lucide-react';
 
 interface PhoneHeaderProps {
   phone: PhoneNumber;
@@ -12,94 +13,131 @@ interface PhoneHeaderProps {
   onDelete: () => void;
 }
 
-const PhoneHeader = ({ 
+const PhoneHeader: React.FC<PhoneHeaderProps> = ({ 
   phone, 
-  onUpdatePhoneName, 
-  onCopyNumber, 
-  onMakeCall, 
-  onDelete 
-}: PhoneHeaderProps) => {
-  const [editingName, setEditingName] = useState(false);
-  const [name, setName] = useState(phone.friendly_name);
+  onUpdatePhoneName,
+  onCopyNumber,
+  onMakeCall,
+  onDelete
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [nameValue, setNameValue] = useState(phone.friendly_name || '');
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
+  const handleEdit = () => {
+    setIsEditing(true);
   };
 
-  const handleSaveName = async () => {
-    const success = await onUpdatePhoneName(phone.id, name);
-    if (success) {
-      setEditingName(false);
+  const handleSave = async () => {
+    if (!nameValue.trim()) return;
+    setIsUpdating(true);
+    
+    try {
+      const success = await onUpdatePhoneName(phone.id, nameValue);
+      if (success) {
+        setIsEditing(false);
+      }
+    } finally {
+      setIsUpdating(false);
     }
   };
 
+  const handleCancel = () => {
+    setNameValue(phone.friendly_name || '');
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      handleCancel();
+    }
+  };
+
+  console.log('PhoneHeader rendering with phone:', phone);
+
   return (
-    <div className="flex items-center justify-between">
-      <div className="space-y-1">
-        {editingName ? (
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={name}
-              onChange={handleNameChange}
-              className="border border-input bg-background rounded-md px-3 py-2 text-xl font-semibold"
+    <div className="space-y-2">
+      <div className="flex items-center space-x-2">
+        {isEditing ? (
+          <>
+            <Input
+              value={nameValue}
+              onChange={(e) => setNameValue(e.target.value)}
+              onKeyDown={handleKeyDown}
               autoFocus
+              disabled={isUpdating}
+              className="flex-1"
+              aria-label="Phone name"
             />
-            <Button size="sm" onClick={handleSaveName}>Save</Button>
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={() => {
-                setName(phone.friendly_name);
-                setEditingName(false);
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
+            <div className="flex space-x-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSave}
+                disabled={isUpdating}
+              >
+                Save
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleCancel}
+                disabled={isUpdating}
+              >
+                Cancel
+              </Button>
+            </div>
+          </>
         ) : (
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-semibold">{name}</h2>
+          <>
+            <h2 className="text-2xl font-semibold flex-1">
+              {phone.friendly_name || 'Unnamed Phone'}
+            </h2>
             <Button 
-              size="icon" 
               variant="ghost" 
-              className="h-8 w-8" 
-              onClick={() => setEditingName(true)}
+              size="sm" 
+              onClick={handleEdit} 
+              className="ml-2"
             >
               <Pencil className="h-4 w-4" />
             </Button>
-          </div>
+          </>
         )}
-        <div className="flex items-center text-sm text-muted-foreground">
-          <span className="flex items-center gap-2">
-            ID: {phone.number} 
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              className="h-6 w-6" 
-              onClick={onCopyNumber}
-            >
-              <Copy className="h-3 w-3" />
-            </Button>
-          </span>
-          <span className="mx-2">•</span>
-          <span>Provider: Custom telephony</span>
-        </div>
       </div>
-
-      <div className="flex gap-2">
-        <Button onClick={onMakeCall}>
-          <Phone className="mr-2 h-4 w-4" />
-          Make an outbound call
-        </Button>
-        <Button 
-          variant="outline" 
-          size="icon"
-          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-          onClick={onDelete}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+      
+      <div className="flex items-center text-sm text-muted-foreground space-x-1">
+        <span>{phone.number}</span>
+        <div className="flex space-x-1 ml-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onCopyNumber} 
+            className="h-6 w-6 p-0"
+            title="Copy phone number"
+          >
+            <Copy className="h-3.5 w-3.5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onMakeCall} 
+            className="h-6 w-6 p-0"
+            title="Make a test call"
+          >
+            <Phone className="h-3.5 w-3.5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onDelete} 
+            className="h-6 w-6 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+            title="Release phone number"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
     </div>
   );

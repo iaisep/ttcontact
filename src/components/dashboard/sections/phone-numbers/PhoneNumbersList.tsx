@@ -65,15 +65,19 @@ const PhoneNumbersList: React.FC<PhoneNumbersListProps> = ({
           <div
             key={phone.id}
             className={cn(
-              'px-3 py-2 rounded cursor-pointer text-sm flex justify-between items-center',
+              'px-3 py-2 rounded cursor-pointer text-sm flex flex-col gap-1',
               selectedPhoneId === phone.id
                 ? 'bg-primary/10 text-primary font-medium'
                 : 'hover:bg-muted'
             )}
             onClick={() => onSelectPhone(phone)}
           >
-            <span>{phone.friendly_name}</span>
-            <span className="text-xs text-muted-foreground">{phone.number}</span>
+            <div className="font-medium truncate w-full">
+              {phone.friendly_name || 'Unnamed'}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {phone.number}
+            </div>
           </div>
         ))}
         
