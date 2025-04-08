@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Pencil, Copy, Phone, Trash2, RefreshCw } from 'lucide-react';
+import { Pencil, Copy, Phone, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -35,8 +35,8 @@ interface PhoneDetailViewProps {
 
 const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({ 
   phone, 
-  agents = [], // Provide default empty array to prevent undefined errors
-  loading = { agents: false, phones: false }, // Provide default values
+  agents = [], 
+  loading = { agents: false, phones: false }, 
   onAssignAgent,
   onDeletePhone,
   onUpdatePhoneName,
@@ -48,7 +48,6 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isUpdatingInbound, setIsUpdatingInbound] = useState(false);
   const [isUpdatingOutbound, setIsUpdatingOutbound] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Update state when phone changes
   useEffect(() => {
@@ -129,22 +128,9 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
     return await onUpdateWebhook(phone.id, webhookUrl);
   };
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await onRefresh();
-      toast.success('Data refreshed successfully');
-    } catch (error) {
-      console.error('Error refreshing data:', error);
-      toast.error('Failed to refresh data');
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div>
         <PhoneHeader 
           phone={phone} 
           onUpdatePhoneName={onUpdatePhoneName}
@@ -155,16 +141,6 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
           onMakeCall={handleMakeCall}
           onDelete={() => setDeleteDialogOpen(true)}
         />
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleRefresh} 
-          disabled={isRefreshing}
-          className="ml-2"
-        >
-          <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          <span className="ml-2">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
-        </Button>
       </div>
 
       <div className="space-y-6">

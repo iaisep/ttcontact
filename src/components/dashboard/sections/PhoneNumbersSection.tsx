@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Phone, Plus, RefreshCw } from 'lucide-react';
+import { Phone, Plus } from 'lucide-react';
 import PhoneNumbersList from './phone-numbers/PhoneNumbersList';
 import PhoneDetailView from './phone-numbers/PhoneDetailView';
 import { usePhoneNumbers } from './phone-numbers/hooks/usePhoneNumbers';
@@ -32,7 +32,6 @@ const PhoneNumbersSection = () => {
   
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const [sipDialogOpen, setSipDialogOpen] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
 
   // Initial data fetch
   useEffect(() => {
@@ -50,23 +49,6 @@ const PhoneNumbersSection = () => {
   useEffect(() => {
     console.log('PhoneNumbersSection: PhoneNumbers data updated:', phoneNumbers);
   }, [phoneNumbers]);
-
-  // Handle refreshing both phone numbers and agents data
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await Promise.all([
-        fetchPhoneNumbers(),
-        fetchAgents()
-      ]);
-      toast.success('Data refreshed successfully');
-    } catch (error) {
-      console.error('Error refreshing data:', error);
-      toast.error('Failed to refresh data');
-    } finally {
-      setRefreshing(false);
-    }
-  };
 
   const connectSipNumber = async (sipUri: string, nickname: string) => {
     try {
@@ -140,7 +122,11 @@ const PhoneNumbersSection = () => {
               onDeletePhone={releasePhoneNumber}
               onUpdatePhoneName={updatePhoneName}
               onUpdateWebhook={updateWebhook}
-              onRefresh={handleRefresh}
+              onRefresh={() => {
+                fetchPhoneNumbers();
+                fetchAgents();
+                return Promise.resolve();
+              }}
             />
           ) : (
             <div className="flex flex-col items-center justify-center h-64 text-center">
@@ -155,19 +141,6 @@ const PhoneNumbersSection = () => {
             </div>
           )}
         </div>
-      </div>
-
-      <div className="flex justify-end mt-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-          {refreshing ? 'Refreshing...' : 'Refresh Data'}
-        </Button>
       </div>
 
       <PurchaseDialog 
