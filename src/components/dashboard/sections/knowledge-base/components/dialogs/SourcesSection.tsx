@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -39,7 +38,15 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
   const handleMarkForDeletion = (source: KnowledgeBaseSource) => {
     console.log("Marking source for deletion:", source);
     const newSet = new Set(sourcesToDelete);
-    newSet.add(source.id);
+    
+    if (newSet.has(source.id)) {
+      // If source is already marked, unmark it
+      newSet.delete(source.id);
+    } else {
+      // Otherwise mark it for deletion
+      newSet.add(source.id);
+    }
+    
     setSourcesMarkedForDeletion(newSet);
   };
 
@@ -119,17 +126,7 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
                 <Button 
                   variant={isMarkedForDeletion ? "destructive" : "ghost"}
                   size="icon"
-                  onClick={() => {
-                    if (isMarkedForDeletion) {
-                      // Unmark for deletion
-                      const newSet = new Set(sourcesToDelete);
-                      newSet.delete(source.id);
-                      setSourcesMarkedForDeletion(newSet);
-                    } else {
-                      // Mark for deletion
-                      handleMarkForDeletion(source);
-                    }
-                  }}
+                  onClick={() => handleMarkForDeletion(source)}
                   title={isMarkedForDeletion ? "Undo deletion" : "Mark for deletion"}
                 >
                   <Trash2 className="h-4 w-4" />

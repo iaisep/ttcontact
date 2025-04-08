@@ -48,18 +48,21 @@ const KnowledgeBaseSection: React.FC = () => {
   // Only fetch knowledge bases when component mounts or when coming to this page
   useEffect(() => {
     // Initial fetch when component mounts
+    console.log('KnowledgeBaseSection: Initial fetch');
     fetchKnowledgeBases();
 
     // Add event listener for refresh events that will be triggered by other components
     // but only after CRUD operations are completed
     const handleRefresh = () => {
-      console.log("Refreshing knowledge bases list");
+      console.log("KnowledgeBaseSection: Refreshing knowledge bases list");
       fetchKnowledgeBases();
     };
     
+    // Using a named function allows us to properly remove it in cleanup
     window.addEventListener('refreshKnowledgeBase', handleRefresh);
     
     return () => {
+      console.log('KnowledgeBaseSection: Cleaning up event listener');
       window.removeEventListener('refreshKnowledgeBase', handleRefresh);
     };
   }, []);
@@ -300,6 +303,180 @@ const KnowledgeBaseSection: React.FC = () => {
       />
     </div>
   );
+
+  function handleCreateClick() {
+    setCurrentKb(null);
+    setIsCreating(true);
+    setKbDialogOpen(true);
+  }
+
+  function handleEditClick(kb: KnowledgeBase) {
+    setCurrentKb(kb);
+    setIsCreating(false);
+    setKbDialogOpen(true);
+  }
+
+  async function handleSaveKnowledgeBase(data: { name: string }) {
+    setIsSaving(true);
+    try {
+      console.log('Saving knowledge base with name:', data.name);
+      
+      if (isCreating) {
+        console.log('Creating knowledge base with data:', {
+          name: data.name,
+          urls: [],
+          autoSync: false
+        });
+        
+        // Use the user-provided name directly
+        await createKnowledgeBase({
+          name: data.name, // Pass the name as is, validation happens in the API
+          urls: [],
+          autoSync: false
+        });
+        
+        toast.success('Knowledge base created successfully');
+        
+        // Refresh the list after creation - this is a direct user action
+        fetchKnowledgeBases();
+      } else if (currentKb) {
+        const updatedKb = { ...currentKb, name: data.name };
+        await updateKnowledgeBase(updatedKb);
+        setKbDialogOpen(false);
+        
+        // Refresh the list after update - this is a direct user action
+        fetchKnowledgeBases();
+      }
+    } catch (error) {
+      console.error('Error saving knowledge base:', error);
+      toast.error('Failed to save knowledge base');
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  function handleDeleteClick(kb: KnowledgeBase) {
+    setKbToDelete(kb);
+    setDeleteDialogOpen(true);
+  }
+
+  async function handleConfirmDelete() {
+    if (kbToDelete) {
+      try {
+        await deleteKnowledgeBase(kbToDelete.id);
+        setDeleteDialogOpen(false);
+        setKbToDelete(null);
+        toast.success('Knowledge base deleted successfully');
+        
+        // Refresh the list after deletion - this is a direct user action
+        fetchKnowledgeBases();
+      } catch (error) {
+        console.error('Error deleting knowledge base:', error);
+        toast.error('Failed to delete knowledge base');
+      }
+    }
+  }
+
+  async function handleAddSource(
+    kbId: string,
+    sourceType: 'url' | 'file' | 'text',
+    sourceData: any
+  ) {
+    try {
+      console.log(`Adding ${sourceType} source to KB ${kbId}:`, sourceData);
+      
+      // Check if this is for a new knowledge base (with a temporary ID)
+      const isNewKnowledgeBase = kbId.startsWith('temp_');
+      
+      // Prepare the request data based on the source type
+      let requestData: any = {};
+      
+      if (sourceType === 'url') {
+        // Handle URL source
+        console.log('Adding url source to KB', kbId, ':', sourceData);
+        
+        if (isNewKnowledgeBase) {
+          // For a new knowledge base, create it first with the URLs
+          // Ensure we use the provided knowledge base name
+          const kbName = sourceData.knowledgeBaseName || 'New Knowledge Base';
+          const urls = sourceData.webPages && sourceData.webPages.map((page: any) => page.url) || [];
+          const autoSync = sourceData.autoSync || false;
+          
+          console.log('Creating new knowledge base with URLs:', {
+            name: kbName,
+            urls,
+            autoSync
+          });
+          
+          const newKb = await createKnowledgeBase({
+            name: kbName,
+            urls: urls,
+            autoSync: autoSync
+          });
+          
+          toast.success(`Created knowledge base with ${urls.length} URLs`);
+          
+          // Close the dialog after successful creation
+          setKbDialogOpen(false);
+          
+          // This is a direct user action, trigger a refresh
+          fetchKnowledgeBases();
+          
+          return newKb;
+        } else {
+          // For existing knowledge base, add URLs as sources
+          requestData = {
+            url: sourceData.url,
+            autoSync: sourceData.autoSync,
+            webPages: sourceData.webPages || []
+          };
+        }
+      } else if (sourceType === 'file') {
+        // Handle file source
+        requestData = {
+          file: sourceData.file
+        };
+      } else if (sourceType === 'text') {
+        // Handle text source
+        requestData = {
+          fileName: sourceData.fileName,
+          content: sourceData.content
+        };
+      }
+      
+      const updatedKb = await addSourceToKnowledgeBase(
+        isNewKnowledgeBase ? 'create_new' : kbId, 
+        sourceType, 
+        requestData
+      );
+      
+      // This is a direct user action, trigger a refresh
+      fetchKnowledgeBases();
+      
+      toast.success(`${sourceType} source added successfully`);
+      return updatedKb;
+    } catch (error) {
+      console.error(`Error adding ${sourceType} source:`, error);
+      toast.error(`Failed to add ${sourceType} source`);
+      throw error;
+    }
+  }
+
+  async function handleDeleteSource(kbId: string, sourceId: string) {
+    try {
+      const updatedKb = await deleteSource(kbId, sourceId);
+      
+      // This is a direct user action, trigger a refresh
+      fetchKnowledgeBases();
+      
+      toast.success('Source deleted successfully');
+      return updatedKb;
+    } catch (error) {
+      console.error('Error deleting source:', error);
+      toast.error('Failed to delete source');
+      throw error;
+    }
+  }
 };
 
 export default KnowledgeBaseSection;

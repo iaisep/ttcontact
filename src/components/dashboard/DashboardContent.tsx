@@ -27,17 +27,28 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection }) =>
     setRefreshKey(prevKey => prevKey + 1);
   };
 
-  // Listen for custom event to refresh UI
+  // Listen for custom event to refresh UI, but only in sections that need it
   useEffect(() => {
+    // Only add the event listener if we're in the knowledge-base section
+    // This prevents redundant event handling
+    if (activeSection !== 'knowledge-base') {
+      return;
+    }
+
+    console.log('DashboardContent: Adding refreshKnowledgeBase event listener');
+    
     const handleRefreshEvent = () => {
+      console.log('DashboardContent: Refresh event triggered');
       refreshUI();
     };
 
     window.addEventListener('refreshKnowledgeBase', handleRefreshEvent);
+    
     return () => {
+      console.log('DashboardContent: Removing refreshKnowledgeBase event listener');
       window.removeEventListener('refreshKnowledgeBase', handleRefreshEvent);
     };
-  }, []);
+  }, [activeSection]); // Re-add the listener when activeSection changes
 
   // Function to render the appropriate section based on the active section
   const renderSection = () => {
