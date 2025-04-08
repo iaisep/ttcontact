@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus } from 'lucide-react';
+import { Phone, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import PhoneNumbersList from './phone-numbers/PhoneNumbersList';
@@ -199,6 +199,108 @@ const PhoneNumbersSection = () => {
 
   const selectedPhone = phoneNumbers.find(phone => phone.id === selectedPhoneId);
 
+  // Render different layouts based on whether there are phone numbers
+  if (phoneNumbers.length === 0 && !loading) {
+    return (
+      <div className="h-full">
+        <div className="flex border rounded-md overflow-hidden h-full">
+          <PhoneNumbersList 
+            phoneNumbers={[]}
+            selectedPhoneId={null}
+            onSelectPhone={() => {}}
+            onAddClick={() => setPurchaseDialogOpen(true)}
+            onBuyNewClick={() => setPurchaseDialogOpen(true)}
+            onConnectSIPClick={() => setSipDialogOpen(true)}
+          />
+          
+          <div className="flex-grow flex flex-col items-center justify-center p-6">
+            <div className="flex flex-col items-center justify-center text-center max-w-md">
+              <div className="bg-gray-100 p-4 rounded-lg mb-4">
+                <Phone className="h-6 w-6 text-gray-500" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">You don't have any phone numbers</h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Purchase a new phone number or connect to your existing number via SIP trunking.
+              </p>
+              <Button onClick={() => setPurchaseDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Phone Number
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Purchase Phone Number Dialog */}
+        <Dialog open={purchaseDialogOpen} onOpenChange={setPurchaseDialogOpen}>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>Purchase Phone Number</DialogTitle>
+              <DialogDescription>
+                Purchase a new phone number to use with your AI agents.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label htmlFor="area-code" className="text-sm font-medium">Area Code</label>
+                <Input
+                  id="area-code"
+                  placeholder="e.g., 415"
+                  maxLength={3}
+                  value={areaCode}
+                  onChange={(e) => setAreaCode(e.target.value)}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Enter a 3-digit area code to find available numbers in that region.
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setPurchaseDialogOpen(false)}>Cancel</Button>
+              <Button onClick={purchasePhoneNumber}>
+                Search & Purchase
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Connect SIP Dialog */}
+        <Dialog open={sipDialogOpen} onOpenChange={setSipDialogOpen}>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>Connect via SIP Trunking</DialogTitle>
+              <DialogDescription>
+                Connect your existing phone number using SIP trunking.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label htmlFor="sip-uri" className="text-sm font-medium">SIP URI</label>
+                <Input
+                  id="sip-uri"
+                  placeholder="sip:username@domain.com"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="sip-name" className="text-sm font-medium">Display Name</label>
+                <Input
+                  id="sip-name"
+                  placeholder="My SIP Number"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSipDialogOpen(false)}>Cancel</Button>
+              <Button onClick={() => connectSipNumber("", "")}>
+                Connect
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+
+  // Regular view with phone numbers
   return (
     <div className="h-full">
       <div className="flex border rounded-md overflow-hidden h-full">
