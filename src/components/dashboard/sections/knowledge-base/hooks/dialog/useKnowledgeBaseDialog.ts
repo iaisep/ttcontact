@@ -1,0 +1,207 @@
+
+import { toast } from 'sonner';
+import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
+import { useDialogState } from './useDialogState';
+import { useDialogSourceTypes } from './useDialogSourceTypes';
+import { useSourceOperations } from './useSourceOperations';
+
+interface UseKnowledgeBaseDialogProps {
+  knowledgeBase: KnowledgeBase | null;
+  isCreating: boolean;
+  onAddSource: (
+    kbId: string,
+    sourceType: 'url' | 'file' | 'text',
+    sourceData: any
+  ) => Promise<KnowledgeBase>;
+  onDeleteSource: (kbId: string, sourceId: string) => Promise<KnowledgeBase>;
+}
+
+export const useKnowledgeBaseDialog = ({
+  knowledgeBase,
+  isCreating,
+  onAddSource,
+  onDeleteSource
+}: UseKnowledgeBaseDialogProps) => {
+  // Import the state management hook
+  const {
+    currentSourceType,
+    sourceToDelete,
+    deleteSourceDialogOpen,
+    currentKb,
+    creationComplete,
+    addingSource,
+    setCurrentSourceType,
+    setSourceToDelete,
+    setDeleteSourceDialogOpen,
+    setCurrentKb,
+    setCreationComplete,
+    setAddingSource,
+    resetSourceModals
+  } = useDialogState(knowledgeBase, isCreating);
+
+  // Import source type management hook
+  const { handleAutoSyncChange } = useDialogSourceTypes();
+
+  // Import source operations hook
+  const { 
+    handleAddUrlSource: sourceAddUrlSource,
+    handleAddFileSource: sourceAddFileSource,
+    handleAddTextSource: sourceAddTextSource,
+    handleDeleteSource: sourceDeleteSource
+  } = useSourceOperations({
+    onAddSource,
+    onDeleteSource,
+    setAddingSource,
+    setCurrentSourceType
+  });
+
+  // Handler adapters to maintain the original interface
+  const handleAddSourceClick = (type: 'url' | 'file' | 'text') => {
+    setCurrentSourceType(type);
+  };
+
+  const handleAddUrlSource = (url: string, autoSync: boolean, selectedPages: WebPage[]) => {
+    console.log("handleAddUrlSource - currentKb:", currentKb);
+    if (!currentKb) {
+      // Si estamos creando una KB nueva, generamos una temporal
+      if (isCreating) {
+        const tempKb = {
+          id: `temp_${Date.now()}`,
+          name: "New Knowledge Base",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          source_count: 0,
+          sources: [],
+          auto_sync: false
+        };
+        setCurrentKb(tempKb);
+        return sourceAddUrlSource(url, autoSync, selectedPages, tempKb);
+      } else {
+        toast.error('No knowledge base selected');
+        return Promise.reject(new Error('No knowledge base selected'));
+      }
+    }
+    return sourceAddUrlSource(url, autoSync, selectedPages, currentKb);
+  };
+
+  const handleAddFileSource = (file: File) => {
+    console.log("handleAddFileSource - currentKb:", currentKb);
+    if (!currentKb) {
+      // Si estamos creando una KB nueva, generamos una temporal
+      if (isCreating) {
+        const tempKb = {
+          id: `temp_${Date.now()}`,
+          name: file.name.split('.')[0] || "New Knowledge Base", // Usar el nombre del archivo como nombre
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          source_count: 0,
+          sources: [],
+          auto_sync: false
+        };
+        setCurrentKb(tempKb);
+        return sourceAddFileSource(file, tempKb);
+      } else {
+        toast.error('No knowledge base selected');
+        return Promise.reject(new Error('No knowledge base selected'));
+      }
+    }
+    
+    // Ensure we actually pass the currentKb to the sourceAddFileSource function
+    return sourceAddFileSource(file, currentKb);
+  };
+
+  const handleAddTextSource = (fileName: string, content: string) => {
+    console.log("handleAddTextSource - currentKb:", currentKb);
+    if (!currentKb) {
+      // Si estamos creando una KB nueva, generamos una temporal
+      if (isCreating) {
+        const tempKb = {
+          id: `temp_${Date.now()}`,
+          name: fileName || "New Knowledge Base", // Usar el nombre del archivo como nombre
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          source_count: 0,
+          sources: [],
+          auto_sync: false
+        };
+        setCurrentKb(tempKb);
+        return sourceAddTextSource(fileName, content, tempKb);
+      } else {
+        toast.error('No knowledge base selected');
+        return Promise.reject(new Error('No knowledge base selected'));
+      }
+    }
+    return sourceAddTextSource(fileName, content, currentKb);
+  };
+
+  // Esta función ahora realiza la eliminación directamente, sin usar el modal
+  const handleDeleteSource = async () => {
+    if (!currentKb || !sourceToDelete) {
+      toast.error('Missing knowledge base or source information');
+      return Promise.reject(new Error('Missing knowledge base or source information'));
+    }
+
+    try {
+      console.log(`Deleting source ${sourceToDelete.id} from KB ${currentKb.id}`);
+      const result = await onDeleteSource(currentKb.id, sourceToDelete.id);
+      toast.success('Source deleted successfully');
+      setSourceToDelete(null);
+      // Trigger UI refresh
+      window.dispatchEvent(new CustomEvent("refreshKnowledgeBase"));
+      return result;
+    } catch (error) {
+      console.error('Failed to delete source:', error);
+      toast.error('Error deleting source');
+      throw error;
+    }
+  };
+
+  const handleAutoSyncChangeWrapper = (checked: boolean) => {
+    const updatedKb = handleAutoSyncChange(checked, currentKb, setCurrentKb);
+    if (updatedKb) {
+      setCurrentKb(updatedKb);
+    }
+  };
+
+  const handleKnowledgeBaseSave = async (data: { name: string }, onSave: (data: { name: string }) => Promise<void>): Promise<boolean> => {
+    try {
+      console.log("Saving knowledge base with data:", data);
+      
+      // Call the API with the provided data
+      await onSave(data);
+      
+      if (isCreating) {
+        setCreationComplete(true);
+        toast.success('Knowledge base created successfully');
+      } else {
+        toast.success('Knowledge base updated successfully');
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error saving knowledge base:', error);
+      toast.error('Failed to save knowledge base');
+      return false;
+    }
+  };
+
+  return {
+    currentSourceType,
+    sourceToDelete,
+    deleteSourceDialogOpen,
+    currentKb,
+    creationComplete,
+    addingSource,
+    setCurrentSourceType,
+    setSourceToDelete,
+    setDeleteSourceDialogOpen,
+    resetSourceModals,
+    handleAddSourceClick,
+    handleAddUrlSource,
+    handleAddFileSource,
+    handleAddTextSource,
+    handleDeleteSource,
+    handleAutoSyncChange: handleAutoSyncChangeWrapper,
+    handleKnowledgeBaseSave
+  };
+};

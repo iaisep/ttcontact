@@ -2,12 +2,18 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { toast } from 'sonner';
 
+// Extend the function type to include baseURL property
+interface FetchWithAuthFunction extends Function {
+  (endpoint: string, options?: RequestInit): Promise<any>;
+  baseURL?: string;
+}
+
 interface ApiContextType {
   apiKey: string;
   baseURL: string;
   setApiKey: (key: string) => void;
   setBaseURL: (url: string) => void;
-  fetchWithAuth: (endpoint: string, options?: RequestInit) => Promise<any>;
+  fetchWithAuth: FetchWithAuthFunction;
   login: (email: string, password: string) => Promise<boolean>;
   register: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
@@ -27,25 +33,54 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
     localStorage.getItem('auth_token') !== null
   );
 
-  const fetchWithAuth = async (endpoint: string, options?: RequestInit) => {
+  // Define fetchWithAuth as a FetchWithAuthFunction
+  const fetchWithAuth: FetchWithAuthFunction = async (endpoint: string, options?: RequestInit) => {
     try {
-      const url = `${baseURL}${endpoint}`;
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+      // Ensure the endpoint starts with a slash if it doesn't already
+      const formattedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+      
+      // Make sure we don't duplicate the baseURL
+      const url = endpoint.includes('http') ? endpoint : `${baseURL}${formattedEndpoint}`;
+      
+      // Get auth token from localStorage or use the apiKey as fallback
+      const authToken = localStorage.getItem('auth_token') || apiKey;
+      console.log('Using auth token:', authToken ? 'Token exists' : 'No token available');
+      
+      // Only set default headers if they're not already set in options
+      // This allows custom handling of multipart/form-data
+      const defaultHeaders = {
+        'Authorization': `Bearer ${authToken}`,
       };
-
-      if (localStorage.getItem('auth_token')) {
-        headers['Authorization'] = `Bearer ${localStorage.getItem('auth_token')}`;
+      
+      // If Content-Type is not set in options and body is not FormData, set default Content-Type
+      if (options?.body && 
+          !(options.body instanceof FormData) && 
+          !options.headers?.['Content-Type'] &&
+          !options.headers?.['content-type']) {
+        defaultHeaders['Content-Type'] = 'application/json';
       }
-
-      const response = await fetch(url, {
+      
+      console.log('Making API request to:', url);
+      
+      // Create fetch options without credentials mode by default
+      const fetchOptions = {
         ...options,
         headers: {
+          ...defaultHeaders,
           ...options?.headers,
-          ...headers,
         },
-      });
+        // Don't include credentials mode by default
+      };
+      
+      // For this demo app, let's use 'same-origin' instead of 'include' to avoid CORS issues
+      // In a real-world app, the backend would need to be properly configured for CORS
+      if (!fetchOptions.credentials) {
+        fetchOptions.credentials = 'same-origin';
+      }
+      
+      console.log('Fetch options:', fetchOptions);
+      
+      const response = await fetch(url, fetchOptions);
 
       if (!response.ok) {
         const error = await response.text();
@@ -58,6 +93,9 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
       throw error;
     }
   };
+  
+  // Add baseURL property to fetchWithAuth
+  fetchWithAuth.baseURL = baseURL;
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {

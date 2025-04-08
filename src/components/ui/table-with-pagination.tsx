@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -24,9 +24,12 @@ interface TableWithPaginationProps<T> {
   emptyState?: React.ReactNode;
   className?: string;
   rowClassName?: string | ((item: T) => string);
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }
 
-function TableWithPagination<T>({
+export function TableWithPagination<T>({
   data,
   columns,
   initialPageSize = 10,
@@ -34,28 +37,52 @@ function TableWithPagination<T>({
   onRowClick,
   emptyState,
   className,
-  rowClassName
+  rowClassName,
+  currentPage,
+  onPageChange,
+  onPageSizeChange
 }: TableWithPaginationProps<T>) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(initialPageSize);
-
-  // Reset to first page when data changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [data.length]);
-
-  // Calculate paginated data
-  const paginatedData = data.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  // Store previous data length for pagination management
+  const [prevDataLength, setPrevDataLength] = useState<number | null>(null);
   
+  // Check validity of data
+  const safeData = Array.isArray(data) ? data : [];
+  
+  // Effect to handle pagination when data changes
+  useEffect(() => {
+    // Only run after initial render
+    if (prevDataLength !== null) {
+      const maxPage = Math.max(1, Math.ceil(safeData.length / initialPageSize));
+      
+      // If current page is out of bounds after data change, reset to page 1
+      if (currentPage > maxPage && maxPage > 0) {
+        console.log('Resetting to page 1 due to data change', { 
+          currentPage, maxPage, dataLength: safeData.length 
+        });
+        onPageChange(1);
+      }
+    }
+    
+    // Update previous data length
+    setPrevDataLength(safeData.length);
+  }, [safeData.length, currentPage, initialPageSize, onPageChange]);
+
+  // Get row class name with safety checks
   const getRowClassName = (item: T): string => {
     if (typeof rowClassName === 'function') {
       return rowClassName(item);
     }
     return rowClassName || '';
   };
+
+  // Calculate pagination values with defensive coding
+  const maxPage = Math.max(1, Math.ceil(safeData.length / initialPageSize));
+  const safePage = Math.min(Math.max(1, currentPage), maxPage);
+  const startIndex = Math.max(0, (safePage - 1) * initialPageSize);
+  const endIndex = Math.min(startIndex + initialPageSize, safeData.length);
+  
+  // Get safely calculated page data
+  const currentPageData = safeData.slice(startIndex, endIndex);
 
   return (
     <div className="space-y-4">
@@ -71,22 +98,22 @@ function TableWithPagination<T>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.length === 0 ? (
+            {!safeData.length ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
                   {emptyState || 'No data found'}
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedData.map((item, index) => (
+              currentPageData.map((item, index) => (
                 <TableRow 
-                  key={index} 
+                  key={`row-${startIndex + index}`}
                   className={getRowClassName(item)}
                   onClick={onRowClick ? () => onRowClick(item) : undefined}
                   style={onRowClick ? { cursor: 'pointer' } : undefined}
                 >
                   {columns.map((column) => (
-                    <TableCell key={`${index}-${column.key}`} className={column.className}>
+                    <TableCell key={`cell-${startIndex + index}-${column.key}`} className={column.className}>
                       {column.cell(item)}
                     </TableCell>
                   ))}
@@ -97,18 +124,16 @@ function TableWithPagination<T>({
         </Table>
       </div>
       
-      {data.length > 0 && (
+      {safeData.length > 0 && (
         <PaginationControls
-          totalItems={data.length}
-          pageSize={pageSize}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={setPageSize}
+          totalItems={safeData.length}
+          pageSize={initialPageSize}
+          currentPage={safePage}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
           pageSizeOptions={pageSizeOptions}
         />
       )}
     </div>
   );
 }
-
-export default TableWithPagination;

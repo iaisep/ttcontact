@@ -1,10 +1,10 @@
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
 // Lazy load all dashboard sections
 const AgentsSection = React.lazy(() => import('./sections/AgentsSection'));
-const KnowledgeBaseSection = React.lazy(() => import('./sections/KnowledgeBaseSection'));
+const KnowledgeBaseSection = React.lazy(() => import('./sections/knowledge-base'));
 const PhoneNumbersSection = React.lazy(() => import('./sections/PhoneNumbersSection'));
 const BatchCallSection = React.lazy(() => import('./sections/BatchCallSection'));
 const CallHistorySection = React.lazy(() => import('./sections/CallHistorySection'));
@@ -19,31 +19,51 @@ interface DashboardContentProps {
 }
 
 const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection }) => {
+  // Add a refresh key to force re-render when needed
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Function to trigger a UI refresh
+  const refreshUI = () => {
+    setRefreshKey(prevKey => prevKey + 1);
+  };
+
+  // Listen for custom event to refresh UI
+  useEffect(() => {
+    const handleRefreshEvent = () => {
+      refreshUI();
+    };
+
+    window.addEventListener('refreshKnowledgeBase', handleRefreshEvent);
+    return () => {
+      window.removeEventListener('refreshKnowledgeBase', handleRefreshEvent);
+    };
+  }, []);
+
   // Function to render the appropriate section based on the active section
   const renderSection = () => {
     switch (activeSection) {
       case 'agents':
-        return <AgentsSection />;
+        return <AgentsSection key={refreshKey} />;
       case 'knowledge-base':
-        return <KnowledgeBaseSection />;
+        return <KnowledgeBaseSection key={refreshKey} />;
       case 'phone-numbers':
-        return <PhoneNumbersSection />;
+        return <PhoneNumbersSection key={refreshKey} />;
       case 'batch-call':
-        return <BatchCallSection />;
+        return <BatchCallSection key={refreshKey} />;
       case 'call-history':
-        return <CallHistorySection />;
+        return <CallHistorySection key={refreshKey} />;
       case 'analytics':
-        return <AnalyticsSection />;
+        return <AnalyticsSection key={refreshKey} />;
       case 'billing':
-        return <BillingSection />;
+        return <BillingSection key={refreshKey} />;
       case 'api-keys':
-        return <ApiKeysSection />;
+        return <ApiKeysSection key={refreshKey} />;
       case 'webhooks':
-        return <WebhooksSection />;
+        return <WebhooksSection key={refreshKey} />;
       case 'account-info':
-        return <AccountInfoSection />;
+        return <AccountInfoSection key={refreshKey} />;
       default:
-        return <AgentsSection />;
+        return <AgentsSection key={refreshKey} />;
     }
   };
 
