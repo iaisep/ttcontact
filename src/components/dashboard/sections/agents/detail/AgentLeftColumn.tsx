@@ -1,8 +1,9 @@
+
 import React from 'react';
 import EditablePrompt from './EditablePrompt';
 import { WelcomeMessageEditor } from './welcome-message';
 import GeneralPromptEditor from './GeneralPromptEditor';
-import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
+import { RetellAgent, RetellVoice, RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
 import { VoiceSelectionModal } from './voice-selection';
 import { AgentSettingsRow } from './components/AgentSettingsRow';
 import { useVoiceSettings } from './hooks/useVoiceSettings';
