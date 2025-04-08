@@ -76,33 +76,26 @@ const WebhookSettings = ({ webhookUrl, onUpdateWebhook }: WebhookSettingsProps) 
     <div className="space-y-4">
       <div className="flex flex-col space-y-2">
         <div className="flex items-center space-x-2">
-          <Switch 
-            id="webhook" 
+          <Checkbox 
+            id="webhook"
             checked={webhookEnabled}
-            onCheckedChange={handleWebhookChange}
+            onCheckedChange={(checked) => handleWebhookChange(checked === true)}
             disabled={isLoading}
           />
-          <Label htmlFor="webhook" className="text-sm">
-            Add an inbound webhook {webhookEnabled ? '(Enabled)' : '(Disabled)'}
+          <Label htmlFor="webhook" className="text-sm font-medium">
+            Add an inbound webhook. {webhookEnabled ? '(Learn more)' : '(Learn more)'}
           </Label>
         </div>
         
         {webhookEnabled && (
-          <div className="flex items-center gap-2 mt-2">
+          <div className="mt-2">
             <Input 
               placeholder="https://your-webhook-url.com" 
               value={url}
               onChange={handleWebhookUrlChange}
-              className="flex-1"
+              className="w-full"
               disabled={isLoading}
             />
-            <Button 
-              size="sm" 
-              onClick={handleWebhookSave} 
-              disabled={isLoading || !url}
-            >
-              {isLoading ? 'Saving...' : 'Save'}
-            </Button>
           </div>
         )}
       </div>

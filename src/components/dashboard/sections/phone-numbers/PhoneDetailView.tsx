@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Pencil, Copy, Phone, Trash2 } from 'lucide-react';
+import { Pencil, Copy, Phone, Trash2, PhoneOutgoing } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -16,8 +16,9 @@ import {
 import { Agent } from '../agents/types';
 import { PhoneNumber } from './hooks/types';
 import AgentSelector from './components/AgentSelector';
-import PhoneHeader from './components/PhoneHeader';
 import WebhookSettings from './components/WebhookSettings';
+import OutboundCallDialog from './dialogs/OutboundCallDialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface PhoneDetailViewProps {
   phone: PhoneNumber;
@@ -48,6 +49,7 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isUpdatingInbound, setIsUpdatingInbound] = useState(false);
   const [isUpdatingOutbound, setIsUpdatingOutbound] = useState(false);
+  const [outboundCallDialogOpen, setOutboundCallDialogOpen] = useState(false);
 
   // Update state when phone changes
   useEffect(() => {
@@ -71,7 +73,7 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
   }, [agents]);
 
   const handleMakeCall = () => {
-    toast.info('Outbound call feature will be implemented soon');
+    setOutboundCallDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -128,21 +130,88 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
     return await onUpdateWebhook(phone.id, webhookUrl);
   };
 
+  // Get the display name, prioritizing friendly_name, then nickname, then default to 'Unnamed Phone'
+  const displayName = phone.friendly_name || phone.nickname || 'Unnamed Phone';
+
   return (
     <div className="space-y-6">
-      <div>
-        <PhoneHeader 
-          phone={phone} 
-          onUpdatePhoneName={onUpdatePhoneName}
-          onCopyNumber={() => {
-            navigator.clipboard.writeText(phone.number);
-            toast.success('Phone number copied to clipboard');
-          }}
-          onMakeCall={handleMakeCall}
-          onDelete={() => setDeleteDialogOpen(true)}
-        />
+      {/* Header Section */}
+      <div className="flex justify-between items-center pb-4 border-b">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-semibold">
+              {displayName}
+            </h2>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => {
+                const newName = prompt('Enter new name', displayName);
+                if (newName && newName !== displayName) {
+                  onUpdatePhoneName(phone.id, newName);
+                }
+              }} 
+              className="h-8 w-8 p-0"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex items-center text-sm text-muted-foreground">
+            <span>ID: {phone.number}</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => {
+                      navigator.clipboard.writeText(phone.number);
+                      toast.success('Phone number copied to clipboard');
+                    }} 
+                    className="h-6 w-6 p-0 ml-1"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Copy number
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <span className="ml-3">Provider: {phone.provider || 'Custom telephony'}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline"
+            size="sm"
+            onClick={handleMakeCall}
+            className="flex items-center gap-2"
+          >
+            <PhoneOutgoing className="h-4 w-4" />
+            Make an outbound call
+          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setDeleteDialogOpen(true)} 
+                  className="h-9 w-9 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                Release phone number
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
 
+      {/* Agent Settings and Webhook Section */}
       <div className="space-y-6">
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Inbound call agent</h3>
@@ -176,6 +245,14 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
         </div>
       </div>
 
+      {/* Outbound Call Dialog */}
+      <OutboundCallDialog
+        open={outboundCallDialogOpen}
+        onOpenChange={setOutboundCallDialogOpen}
+        fromNumber={phone.number}
+      />
+
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +13,8 @@ interface PhoneHeaderProps {
   onDelete: () => void;
 }
 
+// We're keeping this component for backward compatibility,
+// but we've moved its functionality directly into PhoneDetailView
 const PhoneHeader: React.FC<PhoneHeaderProps> = ({ 
   phone, 
   onUpdatePhoneName,
