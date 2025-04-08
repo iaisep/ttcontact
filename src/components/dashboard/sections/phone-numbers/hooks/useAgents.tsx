@@ -66,7 +66,7 @@ export const useAgents = () => {
   const updateAgent = async (id: string, name: string): Promise<boolean> => {
     try {
       await fetchWithAuth(`/update-agent/${id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         body: JSON.stringify({ name }),
       });
       
