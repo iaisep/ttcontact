@@ -202,7 +202,7 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
               <SelectValue placeholder="Select an agent" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None (Unassigned)</SelectItem>
+              <SelectItem value="none">None (Unassigned)</SelectItem>
               {agents.map(agent => (
                 <SelectItem key={`inbound-${agent.id}`} value={agent.id}>
                   {agent.name}
@@ -252,7 +252,7 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
               <SelectValue placeholder="Select an agent" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None (Unassigned)</SelectItem>
+              <SelectItem value="none">None (Unassigned)</SelectItem>
               {agents.map(agent => (
                 <SelectItem key={`outbound-${agent.id}`} value={agent.id}>
                   {agent.name}
