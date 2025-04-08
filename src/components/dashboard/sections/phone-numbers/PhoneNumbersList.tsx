@@ -9,15 +9,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-
-interface PhoneNumber {
-  id: string;
-  number: string;
-  friendly_name: string;
-  status: 'active' | 'inactive';
-  agent_id?: string;
-  created_at: string;
-}
+import { PhoneNumber } from './hooks/types';
 
 interface PhoneNumbersListProps {
   phoneNumbers: PhoneNumber[];
@@ -73,7 +65,7 @@ const PhoneNumbersList: React.FC<PhoneNumbersListProps> = ({
             onClick={() => onSelectPhone(phone)}
           >
             <div className="font-medium truncate w-full">
-              {phone.friendly_name || 'Unnamed'}
+              {phone.friendly_name || phone.nickname || 'Unnamed'}
             </div>
             <div className="text-xs text-muted-foreground">
               {phone.number}

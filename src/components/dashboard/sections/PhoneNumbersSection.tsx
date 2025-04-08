@@ -11,6 +11,7 @@ import PurchaseDialog from './phone-numbers/dialogs/PurchaseDialog';
 import SipDialog from './phone-numbers/dialogs/SipDialog';
 import EmptyState from './phone-numbers/EmptyState';
 import LoadingState from './phone-numbers/LoadingState';
+import { PhoneNumber } from './phone-numbers/hooks/types';
 
 const PhoneNumbersSection = () => {
   const { 

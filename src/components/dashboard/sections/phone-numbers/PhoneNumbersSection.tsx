@@ -11,6 +11,7 @@ import PurchaseDialog from './dialogs/PurchaseDialog';
 import SipDialog from './dialogs/SipDialog';
 import EmptyState from './EmptyState';
 import LoadingState from './LoadingState';
+import { PhoneNumber } from './hooks/types';
 
 const PhoneNumbersSection = () => {
   const { 
@@ -39,12 +40,12 @@ const PhoneNumbersSection = () => {
     fetchAgents();
   }, [fetchPhoneNumbers, fetchAgents]);
 
-  // Log agents data every time it changes
+  // Log agents data every time it changes for debugging
   useEffect(() => {
     console.log('PhoneNumbersSection: Agents data updated:', agents);
   }, [agents]);
 
-  // Log phone numbers data every time it changes
+  // Log phone numbers data every time it changes for debugging
   useEffect(() => {
     console.log('PhoneNumbersSection: PhoneNumbers data updated:', phoneNumbers);
   }, [phoneNumbers]);
