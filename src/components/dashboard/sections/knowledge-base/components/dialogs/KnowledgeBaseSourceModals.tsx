@@ -138,7 +138,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
             
             // Set a timeout for the operation to prevent UI freeze
             const deletePromise = onDeleteSource();
-            const timeoutPromise = new Promise((_, reject) => {
+            const timeoutPromise = new Promise<KnowledgeBase>((_, reject) => {
               setTimeout(() => reject(new Error("Delete operation timed out")), 10000);
             });
             
@@ -146,7 +146,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
             const result = await Promise.race([deletePromise, timeoutPromise])
               .catch(error => {
                 console.error('Error in source deletion:', error);
-                // Return a minimal valid response to allow the UI to continue
+                // Return a minimal valid KnowledgeBase object as fallback
                 return {
                   id: currentKnowledgeBase?.id || '',
                   name: currentKnowledgeBase?.name || '',
@@ -155,7 +155,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
                   source_count: 0,
                   sources: [],
                   auto_sync: false
-                };
+                } as KnowledgeBase;
               });
             
             // Notify that source was removed
