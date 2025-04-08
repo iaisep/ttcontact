@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { KnowledgeBaseSource, KnowledgeBase } from '../types';
 import { toast } from 'sonner';
+import { Trash2 } from 'lucide-react';
 
 interface SourceDeleteDialogProps {
   open: boolean;
@@ -36,31 +37,32 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
   }, [open]);
 
   const handleConfirm = async () => {
-  if (!source) {
-    console.error("Cannot delete source: Source is null");
-    onOpenChange(false);
-    return;
-  }
+    if (!source) {
+      console.error("Cannot delete source: Source is null");
+      onOpenChange(false);
+      return;
+    }
 
-  setIsDeleting(true);
-  
-  const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Delete operation timed out")), 8000)
-  );
+    setIsDeleting(true);
+    
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Delete operation timed out")), 8000)
+    );
 
-  try {
-    await Promise.race([onConfirm(), timeoutPromise]);
-    toast.success("Source deleted successfully");
-    // 👉 Disparar evento para refrescar KB list
-    window.dispatchEvent(new CustomEvent("refreshKnowledgeBase"));
-  } catch (error) {
-    console.error("Error or timeout deleting source:", error);
-    toast.error("Error deleting source. The UI will continue to function.");
-  } finally {
-    setIsDeleting(false);
-    onOpenChange(false);
-  }
-};
+    try {
+      await Promise.race([onConfirm(), timeoutPromise]);
+      toast.success("Source deleted successfully");
+      // Dispatch event to refresh KB list
+      window.dispatchEvent(new CustomEvent("refreshKnowledgeBase"));
+    } catch (error) {
+      console.error("Error or timeout deleting source:", error);
+      toast.error("Error deleting source. The UI will continue to function.");
+    } finally {
+      setIsDeleting(false);
+      onOpenChange(false);
+    }
+  };
+
   // Prevent closing the dialog while deletion is in progress
   const handleOpenChange = (newOpen: boolean) => {
     if (isDeleting && !newOpen) {
@@ -74,7 +76,10 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Source</AlertDialogTitle>
+          <AlertDialogTitle className="flex items-center">
+            <Trash2 className="h-5 w-5 mr-2 text-destructive" />
+            Delete Source
+          </AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete this source?
             {source && (

@@ -1,3 +1,4 @@
+
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -125,7 +126,7 @@ export const useSourceApi = () => {
     console.log(`Deleting source ${sourceId} from KB ${kbId}`);
     
     try {
-      // Correct API endpoint format for deleting a source
+      // Updated API endpoint format as requested
       const endpoint = `/delete-knowledge-base-source/${kbId}/source/${sourceId}`;
       console.log(`Using delete endpoint: ${endpoint}`);
       
