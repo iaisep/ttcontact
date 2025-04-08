@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -31,7 +32,6 @@ import { Label } from '@/components/ui/label';
 import { Loader2, Plus, Phone, PhoneOff, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { PaginationControls } from '@/components/ui/pagination';
-import Image from '@/components/ui/image';
 
 interface PhoneNumber {
   id: string;
@@ -50,6 +50,7 @@ const PhoneNumbersSection = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [agents, setAgents] = useState<any[]>([]);
   
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -132,11 +133,13 @@ const PhoneNumbersSection = () => {
     phone.friendly_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Get paginated data
   const paginatedPhoneNumbers = filteredPhoneNumbers.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
+  // Reset to first page when search query or page size changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, pageSize]);
@@ -336,13 +339,34 @@ const PhoneNumbersSection = () => {
           </CardContent>
         </Card>
         
-        <Image 
-          src="/lovable-uploads/1000b0fd-c630-4795-8a44-f72788633428.png"
-          alt="Brasil tets Phone Number Details"
-          width={400}
-          height={300}
-          className="w-full h-auto object-cover rounded-lg shadow-md"
-        />
+        <Card>
+          <CardHeader>
+            <CardTitle>Features</CardTitle>
+            <CardDescription>Included with all numbers</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-center gap-2">
+                <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Unlimited agent assignments
+              </li>
+              <li className="flex items-center gap-2">
+                <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Call recording & transcription
+              </li>
+              <li className="flex items-center gap-2">
+                <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Webhooks integration
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
