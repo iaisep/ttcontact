@@ -1,9 +1,23 @@
 
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Play } from 'lucide-react';
+import { Loader2, Play, RefreshCw } from 'lucide-react';
 import { Agent } from './types';
+import { toast } from 'sonner';
+import { useApiContext } from '@/context/ApiContext';
+
+interface PhoneNumberData {
+  id: string;
+  phone_number: string;
+  phone_number_type: string;
+  phone_number_pretty: string;
+  nickname: string;
+  friendly_name: string;
+  outbound_agent_id: string;
+  inbound_agent_id: string;
+}
 
 interface AgentSelectionStepProps {
   agents: Agent[];
@@ -22,23 +36,94 @@ const AgentSelectionStep = ({
   onStartBatch,
   loading,
 }: AgentSelectionStepProps) => {
+  const { fetchWithAuth } = useApiContext();
+  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberData[]>([]);
+  const [fetchingPhoneNumbers, setFetchingPhoneNumbers] = useState<boolean>(true);
+  const [phoneNumberError, setPhoneNumberError] = useState<string | null>(null);
+
+  const fetchPhoneNumbers = async () => {
+    setFetchingPhoneNumbers(true);
+    setPhoneNumberError(null);
+    try {
+      const data = await fetchWithAuth('/list-phone-numbers');
+      console.log('Fetched phone numbers:', data);
+      
+      if (Array.isArray(data)) {
+        // Filter phone numbers that have an outbound agent assigned
+        const phonesWithAgents = data.filter(phone => phone.outbound_agent_id);
+        setPhoneNumbers(phonesWithAgents);
+        
+        // If we have phone numbers with agents and no agent is selected yet, select the first one
+        if (phonesWithAgents.length > 0 && !selectedAgent) {
+          setSelectedAgent(phonesWithAgents[0].outbound_agent_id);
+        }
+      } else {
+        console.error('Expected array but got:', data);
+        setPhoneNumberError('Invalid phone number data format');
+      }
+    } catch (error) {
+      console.error('Failed to fetch phone numbers:', error);
+      setPhoneNumberError('Failed to load phone numbers');
+      toast.error('Failed to load phone numbers');
+    } finally {
+      setFetchingPhoneNumbers(false);
+    }
+  };
+
+  // Fetch phone numbers on component mount
+  useEffect(() => {
+    fetchPhoneNumbers();
+  }, []);
+
+  const handleRefresh = () => {
+    fetchPhoneNumbers();
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="agent-select">Select Agent for Calls</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="agent-select">Select Phone Number with Agent</Label>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleRefresh}
+            disabled={fetchingPhoneNumbers}
+          >
+            {fetchingPhoneNumbers ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+        
         <select
           id="agent-select"
           value={selectedAgent}
           onChange={(e) => setSelectedAgent(e.target.value)}
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+          disabled={fetchingPhoneNumbers || phoneNumbers.length === 0}
         >
-          <option value="">Select an agent</option>
-          {agents.map((agent) => (
-            <option key={agent.agent_id} value={agent.agent_id}>
-              {agent.name}
-            </option>
-          ))}
+          {fetchingPhoneNumbers ? (
+            <option value="">Loading...</option>
+          ) : phoneNumbers.length === 0 ? (
+            <option value="" disabled>No phone numbers available</option>
+          ) : (
+            <>
+              <option value="">Select a phone number</option>
+              {phoneNumbers.map((phone) => (
+                <option key={phone.id || phone.phone_number} value={phone.outbound_agent_id}>
+                  {phone.phone_number_pretty || phone.phone_number} ({phone.nickname || phone.friendly_name})
+                </option>
+              ))}
+            </>
+          )}
         </select>
+        
+        {phoneNumberError && (
+          <p className="text-xs text-destructive">{phoneNumberError}</p>
+        )}
       </div>
       
       <div className="space-y-2">
@@ -57,7 +142,7 @@ const AgentSelectionStep = ({
         <Button variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button onClick={onStartBatch} disabled={!selectedAgent || loading}>
+        <Button onClick={onStartBatch} disabled={!selectedAgent || loading || fetchingPhoneNumbers}>
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
