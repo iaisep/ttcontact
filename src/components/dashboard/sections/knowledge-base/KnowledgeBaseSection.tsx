@@ -48,21 +48,18 @@ const KnowledgeBaseSection: React.FC = () => {
   // Only fetch knowledge bases when component mounts or when coming to this page
   useEffect(() => {
     // Initial fetch when component mounts
-    console.log('KnowledgeBaseSection: Initial fetch');
     fetchKnowledgeBases();
 
     // Add event listener for refresh events that will be triggered by other components
     // but only after CRUD operations are completed
     const handleRefresh = () => {
-      console.log("KnowledgeBaseSection: Refreshing knowledge bases list");
+      console.log("Refreshing knowledge bases list");
       fetchKnowledgeBases();
     };
     
-    // Using a named function allows us to properly remove it in cleanup
     window.addEventListener('refreshKnowledgeBase', handleRefresh);
     
     return () => {
-      console.log('KnowledgeBaseSection: Cleaning up event listener');
       window.removeEventListener('refreshKnowledgeBase', handleRefresh);
     };
   }, []);
