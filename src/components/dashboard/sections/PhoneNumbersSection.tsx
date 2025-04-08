@@ -44,7 +44,7 @@ const PhoneNumbersSection = () => {
   const fetchPhoneNumbers = async () => {
     setLoading(true);
     try {
-      const data = await fetchWithAuth('/phone-numbers');
+      const data = await fetchWithAuth('/list-phone-numbers');
       setPhoneNumbers(data);
       if (data.length > 0 && !selectedPhoneId) {
         setSelectedPhoneId(data[0].id);
@@ -59,7 +59,7 @@ const PhoneNumbersSection = () => {
 
   const fetchAgents = async () => {
     try {
-      const data = await fetchWithAuth('/agents');
+      const data = await fetchWithAuth('/list-agents');
       setAgents(data);
     } catch (error) {
       console.error('Failed to fetch agents:', error);
