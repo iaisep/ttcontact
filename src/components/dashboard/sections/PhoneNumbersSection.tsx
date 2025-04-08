@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Phone } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import PhoneNumbersList from './phone-numbers/PhoneNumbersList';
@@ -16,6 +16,9 @@ interface PhoneNumber {
   status: 'active' | 'inactive';
   agent_id?: string;
   created_at: string;
+  inbound_agent_id?: string;
+  outbound_agent_id?: string;
+  inbound_webhook_url?: string | null;
 }
 
 interface Agent {
@@ -29,7 +32,8 @@ const PhoneNumbersSection = () => {
   const [selectedPhoneId, setSelectedPhoneId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
+  const [sipDialogOpen, setSipDialogOpen] = useState(false);
   const [areaCode, setAreaCode] = useState('');
 
   useEffect(() => {
@@ -74,10 +78,21 @@ const PhoneNumbersSection = () => {
       setPhoneNumbers([...phoneNumbers, newNumber]);
       setSelectedPhoneId(newNumber.id);
       toast.success('Phone number purchased successfully');
-      setDialogOpen(false);
+      setPurchaseDialogOpen(false);
       setAreaCode('');
     } catch (error) {
       toast.error('Failed to purchase phone number');
+      console.error(error);
+    }
+  };
+
+  const connectSipNumber = async (sipUri: string, nickname: string) => {
+    try {
+      // This would be implemented with the right API endpoint
+      toast.success('SIP trunking connection will be implemented soon');
+      setSipDialogOpen(false);
+    } catch (error) {
+      toast.error('Failed to connect SIP trunking');
       console.error(error);
     }
   };
@@ -98,15 +113,81 @@ const PhoneNumbersSection = () => {
     }
   };
 
-  const assignAgent = async (phoneId: string, agentId: string, direction: 'inbound' | 'outbound') => {
+  const updatePhoneName = async (phoneId: string, name: string) => {
     try {
-      const updatedPhone = await fetchWithAuth(`/phone-numbers/${phoneId}/assign-agent`, {
+      const phone = phoneNumbers.find(p => p.id === phoneId);
+      if (!phone) return;
+      
+      const updatedPhone = await fetchWithAuth(`/update-phone-number/${phone.number}`, {
         method: 'PUT',
-        body: JSON.stringify({ agent_id: agentId, direction }),
+        body: JSON.stringify({
+          nickname: name,
+          inbound_agent_id: phone.inbound_agent_id || null,
+          outbound_agent_id: phone.outbound_agent_id || null,
+          inbound_webhook_url: phone.inbound_webhook_url || null
+        }),
       });
       
-      setPhoneNumbers(phoneNumbers.map(phone => 
-        phone.id === phoneId ? { ...phone, agent_id: agentId } : phone
+      setPhoneNumbers(phoneNumbers.map(p => 
+        p.id === phoneId ? { ...p, friendly_name: name } : p
+      ));
+      
+      toast.success('Phone name updated');
+    } catch (error) {
+      toast.error('Failed to update phone name');
+      console.error(error);
+    }
+  };
+
+  const updateWebhook = async (phoneId: string, webhookUrl: string | null) => {
+    try {
+      const phone = phoneNumbers.find(p => p.id === phoneId);
+      if (!phone) return;
+      
+      const updatedPhone = await fetchWithAuth(`/update-phone-number/${phone.number}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          nickname: phone.friendly_name,
+          inbound_agent_id: phone.inbound_agent_id || null,
+          outbound_agent_id: phone.outbound_agent_id || null,
+          inbound_webhook_url: webhookUrl
+        }),
+      });
+      
+      setPhoneNumbers(phoneNumbers.map(p => 
+        p.id === phoneId ? { ...p, inbound_webhook_url: webhookUrl } : p
+      ));
+      
+      toast.success(webhookUrl ? 'Webhook URL updated' : 'Webhook removed');
+    } catch (error) {
+      toast.error('Failed to update webhook');
+      console.error(error);
+    }
+  };
+
+  const assignAgent = async (phoneId: string, agentId: string, direction: 'inbound' | 'outbound') => {
+    try {
+      const phone = phoneNumbers.find(p => p.id === phoneId);
+      if (!phone) return;
+      
+      const updatedData = {
+        nickname: phone.friendly_name,
+        inbound_agent_id: direction === 'inbound' ? agentId || null : (phone.inbound_agent_id || null),
+        outbound_agent_id: direction === 'outbound' ? agentId || null : (phone.outbound_agent_id || null),
+        inbound_webhook_url: phone.inbound_webhook_url || null
+      };
+      
+      const updatedPhone = await fetchWithAuth(`/update-phone-number/${phone.number}`, {
+        method: 'PUT',
+        body: JSON.stringify(updatedData),
+      });
+      
+      setPhoneNumbers(phoneNumbers.map(p => 
+        p.id === phoneId ? { 
+          ...p, 
+          inbound_agent_id: direction === 'inbound' ? agentId : p.inbound_agent_id,
+          outbound_agent_id: direction === 'outbound' ? agentId : p.outbound_agent_id
+        } : p
       ));
       
       toast.success(`${direction.charAt(0).toUpperCase() + direction.slice(1)} agent assigned`);
@@ -119,52 +200,48 @@ const PhoneNumbersSection = () => {
   const selectedPhone = phoneNumbers.find(phone => phone.id === selectedPhoneId);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Phone Numbers</h1>
-        <Button onClick={() => setDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Phone Number
-        </Button>
+    <div className="h-full">
+      <div className="flex border rounded-md overflow-hidden h-full">
+        <PhoneNumbersList 
+          phoneNumbers={phoneNumbers}
+          selectedPhoneId={selectedPhoneId}
+          onSelectPhone={(phone) => setSelectedPhoneId(phone.id)}
+          onAddClick={() => setPurchaseDialogOpen(true)}
+          onBuyNewClick={() => setPurchaseDialogOpen(true)}
+          onConnectSIPClick={() => setSipDialogOpen(true)}
+        />
+        
+        <div className="flex-grow p-6">
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : selectedPhone ? (
+            <PhoneDetailView 
+              phone={selectedPhone}
+              agents={agents}
+              onAssignAgent={assignAgent}
+              onDeletePhone={releasePhoneNumber}
+              onUpdatePhoneName={updatePhoneName}
+              onUpdateWebhook={updateWebhook}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-64 text-center">
+              <h3 className="text-lg font-medium">No phone number selected</h3>
+              <p className="text-sm text-muted-foreground mt-2 max-w-md">
+                Select a phone number from the list or add a new one to configure its settings.
+              </p>
+              <Button onClick={() => setPurchaseDialogOpen(true)} className="mt-4">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Phone Number
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      ) : (
-        <div className="flex border rounded-md overflow-hidden">
-          <PhoneNumbersList 
-            phoneNumbers={phoneNumbers}
-            selectedPhoneId={selectedPhoneId}
-            onSelectPhone={(phone) => setSelectedPhoneId(phone.id)}
-          />
-          
-          <div className="flex-grow p-6">
-            {selectedPhone ? (
-              <PhoneDetailView 
-                phone={selectedPhone}
-                agents={agents}
-                onAssignAgent={assignAgent}
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center h-64 text-center">
-                <Phone className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium">No phone number selected</h3>
-                <p className="text-sm text-muted-foreground mt-2 max-w-md">
-                  Select a phone number from the list or purchase a new one to configure its settings.
-                </p>
-                <Button onClick={() => setDialogOpen(true)} className="mt-4">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Phone Number
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {/* Purchase Phone Number Dialog */}
+      <Dialog open={purchaseDialogOpen} onOpenChange={setPurchaseDialogOpen}>
         <DialogContent className="sm:max-w-[525px]">
           <DialogHeader>
             <DialogTitle>Purchase Phone Number</DialogTitle>
@@ -188,9 +265,43 @@ const PhoneNumbersSection = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setPurchaseDialogOpen(false)}>Cancel</Button>
             <Button onClick={purchasePhoneNumber}>
               Search & Purchase
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Connect SIP Dialog */}
+      <Dialog open={sipDialogOpen} onOpenChange={setSipDialogOpen}>
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>Connect via SIP Trunking</DialogTitle>
+            <DialogDescription>
+              Connect your existing phone number using SIP trunking.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="sip-uri" className="text-sm font-medium">SIP URI</label>
+              <Input
+                id="sip-uri"
+                placeholder="sip:username@domain.com"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="sip-name" className="text-sm font-medium">Display Name</label>
+              <Input
+                id="sip-name"
+                placeholder="My SIP Number"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSipDialogOpen(false)}>Cancel</Button>
+            <Button onClick={() => connectSipNumber("", "")}>
+              Connect
             </Button>
           </DialogFooter>
         </DialogContent>
