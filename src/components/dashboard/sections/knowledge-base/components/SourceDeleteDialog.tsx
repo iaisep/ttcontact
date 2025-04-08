@@ -36,40 +36,31 @@ const SourceDeleteDialog: React.FC<SourceDeleteDialogProps> = ({
   }, [open]);
 
   const handleConfirm = async () => {
-    if (!source) {
-      console.error("Cannot delete source: Source is null");
-      onOpenChange(false);
-      return;
-    }
+  if (!source) {
+    console.error("Cannot delete source: Source is null");
+    onOpenChange(false);
+    return;
+  }
 
-    try {
-      setIsDeleting(true);
-      
-      // Add a timeout to prevent UI lock
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Delete operation timed out")), 8000);
-      });
-      
-      try {
-        // Race the deletion against the timeout
-        await Promise.race([
-          onConfirm(),
-          timeoutPromise
-        ]);
-        toast.success('Source deleted successfully');
-      } catch (error) {
-        console.error('Error or timeout deleting source:', error);
-        toast.error('Error deleting source. The UI will continue to function.');
-        // Still close the dialog to prevent freezing
-      }
-    } finally {
-      // Always make sure to reset the state and close the dialog
-      // even if there was an error
-      setIsDeleting(false);
-      onOpenChange(false);
-    }
-  };
+  setIsDeleting(true);
   
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Delete operation timed out")), 8000)
+  );
+
+  try {
+    await Promise.race([onConfirm(), timeoutPromise]);
+    toast.success("Source deleted successfully");
+    // 👉 Disparar evento para refrescar KB list
+    window.dispatchEvent(new CustomEvent("refreshKnowledgeBase"));
+  } catch (error) {
+    console.error("Error or timeout deleting source:", error);
+    toast.error("Error deleting source. The UI will continue to function.");
+  } finally {
+    setIsDeleting(false);
+    onOpenChange(false);
+  }
+};
   // Prevent closing the dialog while deletion is in progress
   const handleOpenChange = (newOpen: boolean) => {
     if (isDeleting && !newOpen) {
