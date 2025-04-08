@@ -17,7 +17,7 @@ const PhoneNumbersSection = () => {
     phoneNumbers, 
     selectedPhoneId,
     setSelectedPhoneId, 
-    loading, 
+    loading: phoneLoading, 
     error, 
     fetchPhoneNumbers,
     purchasePhoneNumber,
@@ -27,15 +27,32 @@ const PhoneNumbersSection = () => {
     assignAgent
   } = usePhoneNumbers();
   
-  const { agents, fetchAgents } = useAgents();
+  const { agents, loading: agentLoading, error: agentError, fetchAgents } = useAgents();
   
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false);
   const [sipDialogOpen, setSipDialogOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchPhoneNumbers();
     fetchAgents();
   }, [fetchPhoneNumbers, fetchAgents]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        fetchPhoneNumbers(),
+        fetchAgents()
+      ]);
+      toast.success('Data refreshed successfully');
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      toast.error('Failed to refresh data');
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const connectSipNumber = async (sipUri: string, nickname: string) => {
     try {
@@ -50,12 +67,12 @@ const PhoneNumbersSection = () => {
   const selectedPhone = phoneNumbers.find(phone => phone.id === selectedPhoneId);
   
   // Show loading state while fetching data
-  if (loading) {
+  if (phoneLoading || agentLoading) {
     return <LoadingState />;
   }
 
   // Render empty state if there are no phone numbers or there was an error
-  if ((phoneNumbers.length === 0 && !loading) || error) {
+  if ((phoneNumbers.length === 0 && !phoneLoading) || error) {
     return (
       <div className="h-full">
         <div className="flex border rounded-md overflow-hidden h-full">
@@ -103,11 +120,13 @@ const PhoneNumbersSection = () => {
           {selectedPhone ? (
             <PhoneDetailView 
               phone={selectedPhone}
-              agents={agents}
+              agents={agents || []} // Ensure agents is always an array even if undefined
+              loading={{ agents: agentLoading, phones: phoneLoading }}
               onAssignAgent={assignAgent}
               onDeletePhone={releasePhoneNumber}
               onUpdatePhoneName={updatePhoneName}
               onUpdateWebhook={updateWebhook}
+              onRefresh={handleRefresh}
             />
           ) : (
             <div className="flex flex-col items-center justify-center h-64 text-center">
