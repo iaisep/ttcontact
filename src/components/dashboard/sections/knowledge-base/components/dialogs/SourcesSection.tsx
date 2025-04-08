@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -24,13 +24,25 @@ interface SourcesSectionProps {
   sources: KnowledgeBaseSource[];
   onAddSourceClick: (type: 'url' | 'file' | 'text') => void;
   onDeleteSource: (source: KnowledgeBaseSource) => void;
+  sourcesToDelete?: Set<string>; 
+  setSourcesMarkedForDeletion?: (sources: Set<string>) => void;
 }
 
 const SourcesSection: React.FC<SourcesSectionProps> = ({
   sources,
   onAddSourceClick,
   onDeleteSource,
+  sourcesToDelete = new Set<string>(),
+  setSourcesMarkedForDeletion = () => {},
 }) => {
+  // Mark a source for deletion instead of immediately deleting it
+  const handleMarkForDeletion = (source: KnowledgeBaseSource) => {
+    console.log("Marking source for deletion:", source);
+    const newSet = new Set(sourcesToDelete);
+    newSet.add(source.id);
+    setSourcesMarkedForDeletion(newSet);
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
@@ -64,50 +76,67 @@ const SourcesSection: React.FC<SourcesSectionProps> = ({
             No sources added yet. Click "Add" to add your first source.
           </div>
         ) : (
-          sources.map((source) => (
-            <div key={source.id} className="flex items-center justify-between p-3">
-              <div className="flex items-center">
-                {source.type === 'url' && (
-                  <div className="flex items-center">
-                    <Globe className="h-4 w-4 mr-2 text-blue-500" />
-                    <span className="text-sm" title={source.url}>{source.title || source.url}</span>
-                    {source.auto_sync && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="ml-2">
-                              <RefreshCcw className="h-3 w-3 text-blue-500" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Auto-sync enabled</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-                  </div>
-                )}
-                {source.type === 'file' && <div className="flex items-center">
-                  <File className="h-4 w-4 mr-2 text-amber-500" />
-                  <span className="text-sm">{source.title}</span>
-                </div>}
-                {source.type === 'text' && <div className="flex items-center">
-                  <FileText className="h-4 w-4 mr-2 text-green-500" />
-                  <span className="text-sm">{source.title}</span>
-                </div>}
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => {
-                  console.log("Delete button clicked for source:", source);
-                  onDeleteSource(source);
-                }}
+          sources.map((source) => {
+            const isMarkedForDeletion = sourcesToDelete.has(source.id);
+            
+            return (
+              <div 
+                key={source.id} 
+                className={`flex items-center justify-between p-3 ${
+                  isMarkedForDeletion ? 'opacity-50 bg-gray-50 dark:bg-gray-800' : ''
+                }`}
               >
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            </div>
-          ))
+                <div className="flex items-center">
+                  {source.type === 'url' && (
+                    <div className="flex items-center">
+                      <Globe className="h-4 w-4 mr-2 text-blue-500" />
+                      <span className="text-sm" title={source.url}>{source.title || source.url}</span>
+                      {source.auto_sync && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="ml-2">
+                                <RefreshCcw className="h-3 w-3 text-blue-500" />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Auto-sync enabled</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                    </div>
+                  )}
+                  {source.type === 'file' && <div className="flex items-center">
+                    <File className="h-4 w-4 mr-2 text-amber-500" />
+                    <span className="text-sm">{source.title}</span>
+                  </div>}
+                  {source.type === 'text' && <div className="flex items-center">
+                    <FileText className="h-4 w-4 mr-2 text-green-500" />
+                    <span className="text-sm">{source.title}</span>
+                  </div>}
+                </div>
+                <Button 
+                  variant={isMarkedForDeletion ? "destructive" : "ghost"}
+                  size="icon"
+                  onClick={() => {
+                    if (isMarkedForDeletion) {
+                      // Unmark for deletion
+                      const newSet = new Set(sourcesToDelete);
+                      newSet.delete(source.id);
+                      setSourcesMarkedForDeletion(newSet);
+                    } else {
+                      // Mark for deletion
+                      handleMarkForDeletion(source);
+                    }
+                  }}
+                  title={isMarkedForDeletion ? "Undo deletion" : "Mark for deletion"}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })
         )}
       </div>
       

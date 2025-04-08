@@ -69,6 +69,8 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   });
 
   const [name, setName] = useState('');
+  const [sourcesMarkedForDeletion, setSourcesMarkedForDeletion] = useState<Set<string>>(new Set());
+  const [deletingSourceIds, setDeletingSourceIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (knowledgeBase) {
@@ -76,11 +78,14 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
     } else {
       setName('');
     }
+    // Reset sources marked for deletion when dialog opens/closes or KB changes
+    setSourcesMarkedForDeletion(new Set());
   }, [knowledgeBase, open]);
 
   const handleClose = () => {
     // Clean up and close the dialog
     resetSourceModals();
+    setSourcesMarkedForDeletion(new Set());
     onOpenChange(false);
     
     // Dispatch a refresh event when we close the dialog
@@ -90,7 +95,36 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
 
   const handleSave = async () => {
     try {
+      // Set loading state
+      const savingToast = toast.loading('Saving knowledge base...');
+      
+      // First handle name update
       await handleKnowledgeBaseSave({ name }, () => onSave({ name }));
+      
+      // Then process any sources marked for deletion
+      if (sourcesMarkedForDeletion.size > 0 && currentKb) {
+        console.log(`Processing ${sourcesMarkedForDeletion.size} sources marked for deletion`);
+        setDeletingSourceIds(Array.from(sourcesMarkedForDeletion));
+        
+        // Process deletions one by one
+        for (const sourceId of sourcesMarkedForDeletion) {
+          try {
+            console.log(`Deleting source ${sourceId} from KB ${currentKb.id}`);
+            await onDeleteSource(currentKb.id, sourceId);
+          } catch (error) {
+            console.error(`Failed to delete source ${sourceId}:`, error);
+            // Continue with other deletions even if one fails
+          }
+        }
+        
+        // Reset the deletion tracking
+        setSourcesMarkedForDeletion(new Set());
+        setDeletingSourceIds([]);
+      }
+      
+      toast.dismiss(savingToast);
+      toast.success('Knowledge base saved successfully');
+      
       // Only close if not creating or if we've completed creation
       if (!isCreating || creationComplete) {
         handleClose();
@@ -122,6 +156,11 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
   // Use either the current KB or the temp KB for display
   const displayKb = currentKb || tempKnowledgeBase;
 
+  // Filter out sources that are marked for deletion (for display purposes)
+  const filteredSources = displayKb?.sources.filter(
+    source => !sourcesMarkedForDeletion.has(source.id)
+  ) || [];
+
   return (
     <>
       <Sheet open={open} onOpenChange={(value) => {
@@ -129,6 +168,7 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
           onOpenChange(value);
           if (!value) {
             resetSourceModals();
+            setSourcesMarkedForDeletion(new Set());
             // Refresh the list when closing the dialog
             const refreshEvent = new CustomEvent('refreshKnowledgeBase');
             window.dispatchEvent(refreshEvent);
@@ -161,7 +201,16 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
                 setSourceToDelete(source);
                 setDeleteSourceDialogOpen(true);
               }}
+              sourcesToDelete={sourcesMarkedForDeletion}
+              setSourcesMarkedForDeletion={setSourcesMarkedForDeletion}
             />
+            
+            {sourcesMarkedForDeletion.size > 0 && (
+              <div className="text-sm text-amber-600 dark:text-amber-400">
+                {sourcesMarkedForDeletion.size} source(s) marked for deletion. 
+                Changes will be applied when you click Save.
+              </div>
+            )}
           </div>
 
           <SheetFooter className="pt-4">
@@ -169,16 +218,16 @@ const KnowledgeBaseDialog: React.FC<KnowledgeBaseDialogProps> = ({
               type="button" 
               variant="outline" 
               onClick={handleClose}
-              disabled={isSaving || addingSource}
+              disabled={isSaving || addingSource || deletingSourceIds.length > 0}
             >
               Cancel
             </Button>
             <Button 
               type="button" 
               onClick={handleSave}
-              disabled={!name.trim() || isSaving || addingSource}
+              disabled={!name.trim() || isSaving || addingSource || deletingSourceIds.length > 0}
             >
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving || deletingSourceIds.length > 0 ? 'Saving...' : 'Save'}
             </Button>
           </SheetFooter>
         </SheetContent>

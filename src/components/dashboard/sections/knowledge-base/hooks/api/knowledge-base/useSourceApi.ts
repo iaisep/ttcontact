@@ -133,9 +133,11 @@ export const useSourceApi = () => {
       setLoading(true);
       
       // API endpoint for deleting a source
-      const endpoint = `/kb/${kbId}/sources/${sourceId}`;
+      // Using the correct format: delete-knowledge-base-source/{kbId}/source/{sourceId}
+      const endpoint = `/delete-knowledge-base-source/${kbId}/source/${sourceId}`;
       
       console.log(`Deleting source ${sourceId} from KB ${kbId}`);
+      console.log(`Using delete endpoint: ${endpoint}`);
       
       // Make the API call
       await fetchWithAuth(endpoint, {
