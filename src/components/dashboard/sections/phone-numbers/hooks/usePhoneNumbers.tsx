@@ -108,6 +108,8 @@ export const usePhoneNumbers = () => {
       const phone = phoneNumbers.find(p => p.id === phoneId);
       if (!phone) return false;
       
+      console.log(`Updating phone name for phone: ${phone.number} to: ${name}`);
+      
       await fetchWithAuth(`/update-phone-number/${phone.number}`, {
         method: 'PUT',
         body: JSON.stringify({
@@ -136,6 +138,8 @@ export const usePhoneNumbers = () => {
       const phone = phoneNumbers.find(p => p.id === phoneId);
       if (!phone) return false;
       
+      console.log(`Updating webhook for phone: ${phone.number} to: ${webhookUrl}`);
+      
       await fetchWithAuth(`/update-phone-number/${phone.number}`, {
         method: 'PUT',
         body: JSON.stringify({
@@ -162,7 +166,12 @@ export const usePhoneNumbers = () => {
   const assignAgent = async (phoneId: string, agentId: string, direction: 'inbound' | 'outbound') => {
     try {
       const phone = phoneNumbers.find(p => p.id === phoneId);
-      if (!phone) return false;
+      if (!phone) {
+        console.error("Phone not found with ID:", phoneId);
+        return false;
+      }
+      
+      console.log(`Assigning ${direction} agent: ${agentId} to phone: ${phone.number}`);
       
       const updatedData = {
         nickname: phone.friendly_name,
