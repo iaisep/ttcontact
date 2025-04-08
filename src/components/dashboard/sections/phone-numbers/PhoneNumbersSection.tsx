@@ -120,7 +120,7 @@ const PhoneNumbersSection = () => {
           {selectedPhone ? (
             <PhoneDetailView 
               phone={selectedPhone}
-              agents={agents}
+              agents={agents || []} // Ensure agents is always an array even if undefined
               loading={{ agents: agentLoading, phones: phoneLoading }}
               onAssignAgent={assignAgent}
               onDeletePhone={releasePhoneNumber}

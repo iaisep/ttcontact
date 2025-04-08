@@ -16,7 +16,7 @@ interface AgentSelectorProps {
   isLoading?: boolean;
 }
 
-const AgentSelector = ({ value, agents, onChange, isLoading = false }: AgentSelectorProps) => {
+const AgentSelector = ({ value, agents = [], onChange, isLoading = false }: AgentSelectorProps) => {
   const [currentValue, setCurrentValue] = useState<string>(value);
 
   useEffect(() => {

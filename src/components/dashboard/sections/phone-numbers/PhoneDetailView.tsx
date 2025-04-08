@@ -35,8 +35,8 @@ interface PhoneDetailViewProps {
 
 const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({ 
   phone, 
-  agents,
-  loading,
+  agents = [], // Provide default empty array to prevent undefined errors
+  loading = { agents: false, phones: false }, // Provide default values
   onAssignAgent,
   onDeletePhone,
   onUpdatePhoneName,
