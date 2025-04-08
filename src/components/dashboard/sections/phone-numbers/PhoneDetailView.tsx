@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pencil, Copy, Phone, Trash2, RefreshCw } from 'lucide-react';
@@ -56,6 +55,11 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
     setOutboundAgent(phone.outbound_agent_id || 'none');
   }, [phone]);
 
+  useEffect(() => {
+    console.log('PhoneDetailView rendering with agents:', agents);
+    console.log('PhoneDetailView phone data:', phone);
+  }, [agents, phone]);
+
   const handleMakeCall = () => {
     toast.info('Outbound call feature will be implemented soon');
   };
@@ -68,6 +72,7 @@ const PhoneDetailView: React.FC<PhoneDetailViewProps> = ({
   const handleInboundAgentChange = async (value: string) => {
     setIsUpdatingInbound(true);
     try {
+      console.log('Assigning inbound agent:', value, 'to phone:', phone.id);
       const success = await onAssignAgent(phone.id, value, 'inbound');
       if (success) {
         setInboundAgent(value);

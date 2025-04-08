@@ -1,4 +1,3 @@
-
 import { useCallback, useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -18,10 +17,16 @@ export const useAgents = () => {
     try {
       setLoading(true);
       setError(null);
+      console.log('Fetching agents data...');
       const data = await fetchWithAuth('/list-agents');
-      console.log('Agents data:', data);
+      console.log('Agents data received:', data);
+      
       if (Array.isArray(data)) {
         setAgents(data);
+      } else if (data && typeof data === 'object' && Array.isArray(data.agents)) {
+        // Some APIs might wrap the array in an object
+        setAgents(data.agents);
+        console.log('Extracted agents from response:', data.agents);
       } else {
         console.error('Expected array but got:', data);
         setAgents([]);
@@ -31,6 +36,7 @@ export const useAgents = () => {
       console.error('Failed to fetch agents:', error);
       setError('Failed to fetch agents');
       toast.error('Failed to fetch agents');
+      setAgents([]); // Ensure we have a valid array even after error
     } finally {
       setLoading(false);
     }

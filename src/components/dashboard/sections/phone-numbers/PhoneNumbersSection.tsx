@@ -34,9 +34,20 @@ const PhoneNumbersSection = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
+    console.log('PhoneNumbersSection: Initial data fetch');
     fetchPhoneNumbers();
     fetchAgents();
   }, [fetchPhoneNumbers, fetchAgents]);
+
+  // Log agents data every time it changes
+  useEffect(() => {
+    console.log('PhoneNumbersSection: Agents data updated:', agents);
+  }, [agents]);
+
+  // Log phone numbers data every time it changes
+  useEffect(() => {
+    console.log('PhoneNumbersSection: PhoneNumbers data updated:', phoneNumbers);
+  }, [phoneNumbers]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -141,6 +152,19 @@ const PhoneNumbersSection = () => {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="flex justify-end mt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Refreshing...' : 'Refresh Data'}
+        </Button>
       </div>
 
       <PurchaseDialog 
