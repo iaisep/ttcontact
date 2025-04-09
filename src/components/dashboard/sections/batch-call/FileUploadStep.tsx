@@ -40,11 +40,11 @@ const FileUploadStep = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center">
-        <Upload className="h-10 w-10 text-muted-foreground mb-4" />
+    <div className="space-y-6">
+      <div className="border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center">
+        <Upload className="h-12 w-12 text-muted-foreground mb-4" />
         <h3 className="text-lg font-medium">Upload your file</h3>
-        <p className="text-sm text-muted-foreground mb-4 text-center">
+        <p className="text-sm text-muted-foreground mb-6 text-center">
           Drag and drop your CSV or JSON file, or click to browse
         </p>
         <Input
