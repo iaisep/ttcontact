@@ -141,19 +141,7 @@ const AgentSelectionStep = ({
           <p className="text-xs text-destructive">{phoneNumberError}</p>
         )}
       </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="call-variables">Call Variables (Optional)</Label>
-        <Textarea
-          id="call-variables"
-          placeholder="Enter any global variables for all calls in JSON format"
-          rows={3}
-        />
-        <p className="text-xs text-muted-foreground">
-          Variables defined here will be available to all calls, but can be overridden by per-contact variables.
-        </p>
-      </div>
-      
+
       <div className="flex items-center space-x-2 pt-4">
         <Button variant="outline" onClick={onBack}>
           Back
