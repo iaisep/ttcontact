@@ -43,47 +43,15 @@ const BatchCallSection = () => {
     fetchAgents();
   }, []);
 
-  const startBatchCall = async () => {
-    if (!uploadedFile || !selectedAgent) {
-      toast.error('Please select a file and an agent');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Create form data for file upload
-      const formData = new FormData();
-      formData.append('file', uploadedFile);
-      formData.append('agent_id', selectedAgent);
-
-      // In a real app, this would be the API call
-      /*
-      const newBatch = await fetchWithAuth('/batch-call', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          // Don't set Content-Type when using FormData, browser will set it
-        }
-      });
-      */
-
-      // Mock success for UI demonstration
-      toast.success('Batch call started successfully');
-      
-      // Reset form
-      setUploadedFile(null);
-      setFilePreview(null);
-      setSelectedAgent('');
-      setUploadStep(1);
-      
-      // Notify user that they can view the batch history in Analytics
-      toast.info('You can view batch call history in the Analytics section');
-    } catch (error) {
-      toast.error('Failed to start batch call');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+  const handleBatchCallCompletion = () => {
+    // Reset form
+    setUploadedFile(null);
+    setFilePreview(null);
+    setSelectedAgent('');
+    setUploadStep(1);
+    
+    // Notify user that they can view the batch history in Analytics
+    toast.info('You can view batch call history in the Analytics section');
   };
 
   return (
@@ -114,7 +82,7 @@ const BatchCallSection = () => {
                   selectedAgent={selectedAgent}
                   setSelectedAgent={setSelectedAgent}
                   onBack={() => setUploadStep(1)}
-                  onStartBatch={startBatchCall}
+                  onStartBatch={handleBatchCallCompletion}
                   loading={loading}
                 />
               )}

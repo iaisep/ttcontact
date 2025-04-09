@@ -41,6 +41,7 @@ const AgentSelectionStep = ({
   const [fetchingPhoneNumbers, setFetchingPhoneNumbers] = useState<boolean>(true);
   const [phoneNumberError, setPhoneNumberError] = useState<string | null>(null);
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState<string>('');
+  const [processingBatchCall, setProcessingBatchCall] = useState<boolean>(false);
 
   const fetchPhoneNumbers = async () => {
     setFetchingPhoneNumbers(true);
@@ -95,6 +96,47 @@ const AgentSelectionStep = ({
     fetchPhoneNumbers();
   };
 
+  const startBatchCall = async () => {
+    if (!selectedPhoneNumber) {
+      toast.error('Please select a phone number');
+      return;
+    }
+
+    setProcessingBatchCall(true);
+    try {
+      // Prepare the payload for the batch call
+      const payload = {
+        name: "",
+        from_number: selectedPhoneNumber,
+        status: "planned",
+        timezone: "America/Sao_Paulo",
+        tasks: [
+          {
+            to_number: "+5511947414271" // This is a fixed number as per the example
+          }
+        ]
+      };
+
+      // Make the API call
+      const response = await fetchWithAuth('/create-batch-call', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Batch call created:', response);
+      toast.success('Batch call successfully created');
+      onStartBatch(); // Notify parent component
+    } catch (error) {
+      console.error('Failed to create batch call:', error);
+      toast.error('Failed to create batch call');
+    } finally {
+      setProcessingBatchCall(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -146,8 +188,11 @@ const AgentSelectionStep = ({
         <Button variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button onClick={onStartBatch} disabled={!selectedAgent || loading || fetchingPhoneNumbers}>
-          {loading ? (
+        <Button 
+          onClick={startBatchCall} 
+          disabled={!selectedPhoneNumber || fetchingPhoneNumbers || processingBatchCall}
+        >
+          {processingBatchCall ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Processing...
