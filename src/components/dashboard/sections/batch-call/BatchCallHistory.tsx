@@ -1,16 +1,24 @@
 
-import { useMemo, useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Progress } from '@/components/ui/progress';
+  TableWithPagination
+} from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
-import { PaginationControls } from '@/components/ui/pagination';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Download, Eye, MoreHorizontal } from 'lucide-react';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 import { BatchCall, Agent } from './types';
 
 interface BatchCallHistoryProps {
@@ -18,101 +26,185 @@ interface BatchCallHistoryProps {
   agents: Agent[];
 }
 
-const BatchCallHistory = ({ batches, agents }: BatchCallHistoryProps) => {
+const BatchCallHistory: React.FC<BatchCallHistoryProps> = ({ batches, agents }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
-
-  // Reset to first page when batch data changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [batches.length]);
-
-  // Get paginated data
-  const paginatedBatches = useMemo(() => {
-    return batches.slice(
-      (currentPage - 1) * pageSize,
-      currentPage * pageSize
-    );
-  }, [batches, currentPage, pageSize]);
+  const [pageSize, setPageSize] = useState(10);
+  const [detailDialog, setDetailDialog] = useState(false);
+  const [selectedBatch, setSelectedBatch] = useState<BatchCall | null>(null);
 
   const getAgentName = (agentId: string) => {
-    const agent = agents.find(a => a.agent_id === agentId);
-    return agent ? agent.name : 'Unknown Agent';
+    const agent = agents.find(a => a.id === agentId);
+    return agent ? agent.name : agentId;
   };
 
-  return (
-    <div className="space-y-4">
-      {batches.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          <p>No batch calls found. Upload a file to create your first batch.</p>
+  const viewDetails = (batch: BatchCall) => {
+    setSelectedBatch(batch);
+    setDetailDialog(true);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <span className="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs">Completed</span>;
+      case 'in-progress':
+        return <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs">In Progress</span>;
+      case 'failed':
+        return <span className="px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs">Failed</span>;
+      default:
+        return <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-800 text-xs">{status}</span>;
+    }
+  };
+
+  const columns = [
+    {
+      key: 'id',
+      header: 'Batch ID',
+      cell: (batch: BatchCall) => <span className="font-mono text-xs">{batch.id}</span>,
+    },
+    {
+      key: 'agent',
+      header: 'Agent',
+      cell: (batch: BatchCall) => getAgentName(batch.agent_id),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      cell: (batch: BatchCall) => getStatusBadge(batch.status),
+    },
+    {
+      key: 'progress',
+      header: 'Progress',
+      cell: (batch: BatchCall) => (
+        <div className="space-y-1">
+          <div className="text-xs">{batch.completed_calls} / {batch.total_calls} calls</div>
+          <div className="w-full bg-gray-200 rounded-full h-1.5">
+            <div 
+              className="bg-primary h-1.5 rounded-full" 
+              style={{ width: `${(batch.completed_calls / batch.total_calls) * 100}%` }}
+            ></div>
+          </div>
         </div>
-      ) : (
-        <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Status</TableHead>
-                <TableHead>Agent</TableHead>
-                <TableHead>Progress</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedBatches.map((batch) => {
-                const progress = batch.total_calls > 0 
-                  ? Math.round((batch.completed_calls / batch.total_calls) * 100) 
-                  : 0;
-                
-                return (
-                  <TableRow key={batch.id}>
-                    <TableCell>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        batch.status === 'completed' 
-                          ? 'bg-green-100 text-green-800' 
-                          : batch.status === 'in-progress' 
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {batch.status.charAt(0).toUpperCase() + batch.status.slice(1)}
-                      </span>
-                    </TableCell>
-                    <TableCell>{getAgentName(batch.agent_id)}</TableCell>
-                    <TableCell>
-                      <div className="w-full space-y-1">
-                        <div className="flex justify-between text-xs">
-                          <span>{progress}% complete</span>
-                          <span>{batch.completed_calls}/{batch.total_calls} calls</span>
-                        </div>
-                        <Progress value={progress} />
-                        {batch.failed_calls > 0 && (
-                          <div className="text-xs text-destructive">
-                            {batch.failed_calls} failed calls
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>{new Date(batch.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm">View Details</Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-          
-          <PaginationControls
-            totalItems={batches.length}
-            pageSize={pageSize}
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-            onPageSizeChange={setPageSize}
-            pageSizeOptions={[5, 10, 25]}
-          />
-        </>
-      )}
+      ),
+    },
+    {
+      key: 'created',
+      header: 'Started',
+      cell: (batch: BatchCall) => formatDate(batch.created_at),
+    },
+    {
+      key: 'actions',
+      header: '',
+      cell: (batch: BatchCall) => (
+        <div className="text-right">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => viewDetails(batch)}>
+                <Eye className="h-4 w-4 mr-2" />
+                View Details
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.info("Download initiated")}>
+                <Download className="h-4 w-4 mr-2" />
+                Download Report
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      ),
+    },
+  ];
+
+  const emptyState = (
+    <div className="flex flex-col items-center py-8">
+      <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
+        <Download className="h-6 w-6 text-muted-foreground" />
+      </div>
+      <h3 className="text-lg font-medium">No batch calls found</h3>
+      <p className="text-muted-foreground text-sm">
+        When you start batch calls, they will appear here.
+      </p>
     </div>
+  );
+
+  return (
+    <>
+      <TableWithPagination
+        data={batches}
+        columns={columns}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+        emptyState={emptyState}
+      />
+
+      {selectedBatch && (
+        <Dialog open={detailDialog} onOpenChange={setDetailDialog}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Batch Call Details</DialogTitle>
+              <DialogDescription>
+                Details for batch call initiated on {formatDate(selectedBatch.created_at)}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div>
+                <div className="text-sm font-medium">Status</div>
+                <div>{getStatusBadge(selectedBatch.status)}</div>
+              </div>
+              
+              <div>
+                <div className="text-sm font-medium">Agent</div>
+                <div>{getAgentName(selectedBatch.agent_id)}</div>
+              </div>
+              
+              <div>
+                <div className="text-sm font-medium">Total Calls</div>
+                <div>{selectedBatch.total_calls}</div>
+              </div>
+              
+              <div>
+                <div className="text-sm font-medium">Completed</div>
+                <div>{selectedBatch.completed_calls}</div>
+              </div>
+              
+              <div>
+                <div className="text-sm font-medium">Failed</div>
+                <div>{selectedBatch.failed_calls}</div>
+              </div>
+              
+              <div>
+                <div className="text-sm font-medium">Success Rate</div>
+                <div>
+                  {selectedBatch.total_calls > 0 
+                    ? `${Math.round((selectedBatch.completed_calls / selectedBatch.total_calls) * 100)}%` 
+                    : 'N/A'}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => toast.info("Download initiated")}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download Report
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 };
 

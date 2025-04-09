@@ -12,40 +12,16 @@ import { toast } from 'sonner';
 import { BatchCall, Agent } from './types';
 import FileUploadStep from './FileUploadStep';
 import AgentSelectionStep from './AgentSelectionStep';
-import BatchCallHistory from './BatchCallHistory';
 import BatchCallGuide from './BatchCallGuide';
 
 const BatchCallSection = () => {
   const { fetchWithAuth } = useApiContext();
-  const [batches, setBatches] = useState<BatchCall[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [selectedAgent, setSelectedAgent] = useState('');
   const [agents, setAgents] = useState<Agent[]>([]);
   const [uploadStep, setUploadStep] = useState(1);
-
-  // Mock data for UI demonstration
-  const mockBatches: BatchCall[] = [
-    {
-      id: '1',
-      status: 'completed',
-      total_calls: 50,
-      completed_calls: 48,
-      failed_calls: 2,
-      agent_id: 'agent_1',
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      status: 'in-progress',
-      total_calls: 100,
-      completed_calls: 45,
-      failed_calls: 3,
-      agent_id: 'agent_2',
-      created_at: new Date().toISOString(),
-    },
-  ];
 
   const fetchAgents = async () => {
     try {
@@ -65,68 +41,25 @@ const BatchCallSection = () => {
   // Use mock data for UI demonstration
   useEffect(() => {
     fetchAgents();
-    setBatches(mockBatches);
   }, []);
 
-  const startBatchCall = async () => {
-    if (!uploadedFile || !selectedAgent) {
-      toast.error('Please select a file and an agent');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Create form data for file upload
-      const formData = new FormData();
-      formData.append('file', uploadedFile);
-      formData.append('agent_id', selectedAgent);
-
-      // In a real app, this would be the API call
-      /*
-      const newBatch = await fetchWithAuth('/batch-call', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          // Don't set Content-Type when using FormData, browser will set it
-        }
-      });
-      */
-
-      // Mock success for UI demonstration
-      const newBatch: BatchCall = {
-        id: `batch_${Date.now()}`,
-        status: 'pending',
-        total_calls: Math.floor(Math.random() * 50) + 50,
-        completed_calls: 0,
-        failed_calls: 0,
-        agent_id: selectedAgent,
-        created_at: new Date().toISOString(),
-      };
-
-      setBatches([newBatch, ...batches]);
-      toast.success('Batch call started successfully');
-      
-      // Reset form
-      setUploadedFile(null);
-      setFilePreview(null);
-      setSelectedAgent('');
-      setUploadStep(1);
-    } catch (error) {
-      toast.error('Failed to start batch call');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+  const handleBatchCallCompletion = () => {
+    // Reset form
+    setUploadedFile(null);
+    setFilePreview(null);
+    setSelectedAgent('');
+    setUploadStep(1);
+    
+    // Notify user that they can view the batch history in Analytics
+    toast.info('You can view batch call history in the Analytics section');
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Batch Call</h1>
-      </div>
+      <h1 className="text-2xl font-bold">Batch Call</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>Upload Contacts</CardTitle>
@@ -149,22 +82,10 @@ const BatchCallSection = () => {
                   selectedAgent={selectedAgent}
                   setSelectedAgent={setSelectedAgent}
                   onBack={() => setUploadStep(1)}
-                  onStartBatch={startBatchCall}
+                  onStartBatch={handleBatchCallCompletion}
                   loading={loading}
                 />
               )}
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Batch Call History</CardTitle>
-              <CardDescription>
-                View and manage your batch call campaigns.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <BatchCallHistory batches={batches} agents={agents} />
             </CardContent>
           </Card>
         </div>

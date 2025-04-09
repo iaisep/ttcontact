@@ -6,8 +6,7 @@ import { Loader2 } from 'lucide-react';
 const AgentsSection = React.lazy(() => import('./sections/AgentsSection'));
 const KnowledgeBaseSection = React.lazy(() => import('./sections/knowledge-base'));
 const PhoneNumbersSection = React.lazy(() => import('./sections/PhoneNumbersSection'));
-const BatchCallSection = React.lazy(() => import('./sections/BatchCallSection'));
-const CallHistorySection = React.lazy(() => import('./sections/CallHistorySection'));
+const BatchCallSection = React.lazy(() => import('./sections/batch-call/BatchCallSection'));
 const AnalyticsSection = React.lazy(() => import('./sections/AnalyticsSection'));
 const BillingSection = React.lazy(() => import('./sections/BillingSection'));
 const ApiKeysSection = React.lazy(() => import('./sections/ApiKeysSection'));
@@ -50,8 +49,6 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection }) =>
         return <PhoneNumbersSection key={refreshKey} />;
       case 'batch-call':
         return <BatchCallSection key={refreshKey} />;
-      case 'call-history':
-        return <CallHistorySection key={refreshKey} />;
       case 'analytics':
         return <AnalyticsSection key={refreshKey} />;
       case 'billing':

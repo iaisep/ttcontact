@@ -9,14 +9,14 @@ import {
 
 const BatchCallGuide = () => {
   return (
-    <Card className="sticky top-6">
+    <Card>
       <CardHeader>
         <CardTitle>Batch Call Guide</CardTitle>
         <CardDescription>
           How to set up batch calls with your AI agents
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div className="space-y-2">
           <h4 className="font-medium flex items-center">
             <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 inline-flex items-center justify-center text-xs mr-2">1</span>
@@ -49,7 +49,7 @@ const BatchCallGuide = () => {
         
         <div className="border-t pt-4 mt-4">
           <h4 className="font-medium mb-2">Example CSV Format:</h4>
-          <pre className="bg-muted p-2 rounded text-xs">
+          <pre className="bg-muted p-2 rounded text-xs whitespace-pre overflow-x-auto">
 {`phone,name,variables
 +14155552671,John Smith,{"company":"Acme Inc"}
 +16505557812,Jane Doe,{"appointment":"3pm"}
@@ -59,7 +59,7 @@ const BatchCallGuide = () => {
         
         <div>
           <h4 className="font-medium mb-2">Example JSON Format:</h4>
-          <pre className="bg-muted p-2 rounded text-xs overflow-auto">
+          <pre className="bg-muted p-2 rounded text-xs overflow-auto whitespace-pre">
 {`[
   {
     "phone": "+14155552671",
