@@ -2,13 +2,15 @@
 import React, { Suspense, useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
-// Lazy load all dashboard sections
+// Import sections directly without lazy loading for the problematic component
+import BillingSection from './sections/BillingSection';
+
+// Lazy load other dashboard sections
 const AgentsSection = React.lazy(() => import('./sections/AgentsSection'));
 const KnowledgeBaseSection = React.lazy(() => import('./sections/knowledge-base'));
 const PhoneNumbersSection = React.lazy(() => import('./sections/PhoneNumbersSection'));
 const BatchCallSection = React.lazy(() => import('./sections/batch-call/BatchCallSection'));
 const AnalyticsSection = React.lazy(() => import('./sections/AnalyticsSection'));
-const BillingSection = React.lazy(() => import('./sections/BillingSection'));
 const ApiKeysSection = React.lazy(() => import('./sections/ApiKeysSection'));
 const WebhooksSection = React.lazy(() => import('./sections/WebhooksSection'));
 const AccountInfoSection = React.lazy(() => import('./sections/AccountInfoSection'));
@@ -52,6 +54,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection }) =>
       case 'analytics':
         return <AnalyticsSection key={refreshKey} />;
       case 'billing':
+        // Use directly imported component instead of lazy-loaded one
         return <BillingSection key={refreshKey} />;
       case 'api-keys':
         return <ApiKeysSection key={refreshKey} />;
