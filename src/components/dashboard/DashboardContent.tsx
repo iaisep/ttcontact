@@ -11,7 +11,7 @@ const KnowledgeBaseSection = React.lazy(() => import('./sections/knowledge-base'
 const PhoneNumbersSection = React.lazy(() => import('./sections/PhoneNumbersSection'));
 const BatchCallSection = React.lazy(() => import('./sections/batch-call/BatchCallSection'));
 const AnalyticsSection = React.lazy(() => import('./sections/AnalyticsSection'));
-const ApiKeysSection = React.lazy(() => import('./sections/ApiKeysSection'));
+const ApiKeysSection = React.lazy(() => import('./sections/api-keys'));
 const WebhooksSection = React.lazy(() => import('./sections/WebhooksSection'));
 const AccountInfoSection = React.lazy(() => import('./sections/AccountInfoSection'));
 
