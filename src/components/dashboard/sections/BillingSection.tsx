@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ const BillingSection = () => {
   const [usage, setUsage] = useState<UsageData | null>(null);
   const [usageHistory, setUsageHistory] = useState<UsageHistoryItem[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [apiKeys, setApiKeys] = useState<any[]>([]);
 
   // Mock data for UI demonstration
   const mockInvoices: Invoice[] = [
@@ -81,21 +83,38 @@ const BillingSection = () => {
     }
   ];
 
-  // Use mock data for UI demonstration
   useEffect(() => {
-    setInvoices(mockInvoices);
-    setUsage(mockUsage);
-    setUsageHistory(mockUsageHistory);
-    setPaymentMethods(mockPaymentMethods);
-    setLoading(false);
+    fetchBillingData();
   }, []);
+
+  const fetchApiKeys = async () => {
+    try {
+      console.log('Fetching API keys...');
+      const response = await fetchWithAuth('/list-api-keys');
+      console.log('API keys response:', response);
+      
+      if (Array.isArray(response)) {
+        setApiKeys(response);
+        return response;
+      } else {
+        console.error('Expected array but received:', response);
+        return [];
+      }
+    } catch (error) {
+      console.error('Failed to fetch API keys:', error);
+      toast.error('Failed to load API keys');
+      return [];
+    }
+  };
 
   const fetchBillingData = async () => {
     setLoading(true);
     try {
-      // In a real app, these would be API calls
-      // Simulate API calls with mock data
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Fetch real data if available, fall back to mock data
+      const apiKeysResponse = await fetchApiKeys();
+      console.log('Fetched API keys:', apiKeysResponse);
+      
+      // For now, use mock data for other billing information
       setInvoices(mockInvoices);
       setUsage(mockUsage);
       setUsageHistory(mockUsageHistory);
@@ -103,6 +122,12 @@ const BillingSection = () => {
     } catch (error) {
       console.error('Failed to fetch billing data:', error);
       toast.error('Failed to load billing information');
+      
+      // Still use mock data as fallback
+      setInvoices(mockInvoices);
+      setUsage(mockUsage);
+      setUsageHistory(mockUsageHistory);
+      setPaymentMethods(mockPaymentMethods);
     } finally {
       setLoading(false);
     }
