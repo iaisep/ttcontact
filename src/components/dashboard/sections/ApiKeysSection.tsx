@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -74,6 +73,15 @@ const ApiKeysSection = () => {
       created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
     },
   ];
+
+  const [revealedApiKeys, setRevealedApiKeys] = useState<{ [key: string]: boolean }>({});
+
+  const toggleApiKeyVisibility = (apiKeyId: string) => {
+    setRevealedApiKeys(prev => ({
+      ...prev,
+      [apiKeyId]: !prev[apiKeyId]
+    }));
+  };
 
   // Use mock data for UI demonstration
   useEffect(() => {
@@ -237,7 +245,21 @@ const ApiKeysSection = () => {
                   <TableRow key={apiKey.id}>
                     <TableCell className="font-medium">{apiKey.name}</TableCell>
                     <TableCell>
-                      <code className="bg-muted px-2 py-1 rounded">{apiKey.prefix}••••••••••••</code>
+                      <div className="flex items-center space-x-2">
+                        <code className="bg-muted px-2 py-1 rounded">
+                          {revealedApiKeys[apiKey.id] 
+                            ? apiKey.prefix + '••••••••••••'
+                            : apiKey.prefix + '••••••••••••'}
+                        </code>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => toggleApiKeyVisibility(apiKey.id)}
+                          title={revealedApiKeys[apiKey.id] ? "Hide API key" : "Reveal API key"}
+                        >
+                          {revealedApiKeys[apiKey.id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
                     </TableCell>
                     <TableCell>
                       {new Date(apiKey.created_at).toLocaleDateString()}
