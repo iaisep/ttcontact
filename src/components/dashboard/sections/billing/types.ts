@@ -29,18 +29,3 @@ export interface PaymentMethod {
   expYear: number;
   isDefault: boolean;
 }
-
-export interface BillingHistoryMonth {
-  id: string;
-  month: string;
-  amount: number;
-  status: 'paid' | 'pending' | 'overdue' | 'ongoing';
-  items?: BillingHistoryItem[];
-}
-
-export interface BillingHistoryItem {
-  id: string;
-  name: string;
-  amount: number;
-  details?: string;
-}
