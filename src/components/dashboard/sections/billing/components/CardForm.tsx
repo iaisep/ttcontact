@@ -44,16 +44,16 @@ const CardForm = ({ paymentMethods, setPaymentMethods, closeDialog }: CardFormPr
 
     setIsAddingCard(true);
     try {
-      // Crear el método de pago en Stripe
+      // Create payment method in Stripe
       const paymentMethod = await createPaymentMethod(stripe, elements);
       
-      // En una implementación real, aquí enviaríamos el paymentMethod.id al servidor
-      // para asociarlo con el usuario actual
+      // In a real implementation, we'd send paymentMethod.id to the server
+      // to associate it with the current user
       
-      // Simular una respuesta exitosa
+      // Simulate a successful response
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Añadir la nueva tarjeta a la lista local
+      // Add the new card to the local list
       const newCard = mapStripePaymentMethod({
         ...paymentMethod,
         isDefault: paymentMethods.length === 0
@@ -64,8 +64,8 @@ const CardForm = ({ paymentMethods, setPaymentMethods, closeDialog }: CardFormPr
       cardForm.reset();
       closeDialog();
     } catch (error) {
-      console.error('Error al agregar la tarjeta:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al agregar la tarjeta');
+      console.error('Error adding card:', error);
+      toast.error(error instanceof Error ? error.message : 'Error adding card');
     } finally {
       setIsAddingCard(false);
     }

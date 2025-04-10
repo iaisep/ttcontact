@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -6,10 +7,10 @@ import { Loader2, CreditCard } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
-// Importaciones de tipos
+// Import types
 import { Invoice, UsageData, PaymentMethod, UsageHistoryItem } from './billing/types';
 
-// Importaciones de componentes
+// Import components
 import BillingSummaryCards from './billing/BillingSummaryCards';
 import CurrentUsageTab from './billing/tabs/CurrentUsageTab';
 import UsageHistoryTab from './billing/tabs/UsageHistoryTab';
@@ -17,8 +18,6 @@ import InvoicesTab from './billing/tabs/InvoicesTab';
 import PaymentMethodsTab from './billing/tabs/PaymentMethodsTab';
 import AddCardDialog from './billing/dialogs/AddCardDialog';
 import StripeWrapper from './billing/components/StripeWrapper';
-import { Elements } from '@stripe/react-stripe-js';
-import { stripePromise } from './billing/utils/BillingUtils';
 
 const BillingSection = () => {
   const { fetchWithAuth } = useApiContext();
