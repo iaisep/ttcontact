@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
@@ -152,7 +151,6 @@ const BillingHistoryTab = () => {
   );
 };
 
-// Mock data function for fallback
 const getMockBillingHistory = (): BillingHistoryMonth[] => [
   {
     id: '2025-04',
