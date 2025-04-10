@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { 
@@ -16,13 +17,15 @@ import BatchCallHistory from './batch-call/BatchCallHistory';
 import { Agent, BatchCall } from './batch-call/types';
 
 const AnalyticsSection = () => {
-  const { fetchWithAuth } = useApiContext();
+  const { fetchWithAuth, apiKey } = useApiContext();
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('7d');
   const [analytics, setAnalytics] = useState<any | null>(null);
   const [agents, setAgents] = useState<any[]>([]);
   const [batches, setBatches] = useState<BatchCall[]>([]);
   const [batchAgents, setBatchAgents] = useState<Agent[]>([]);
+  const [callCounts, setCallCounts] = useState<any | null>(null);
+  const [callCountsLoading, setCallCountsLoading] = useState(true);
 
   const mockAnalytics = {
     overview: {
@@ -111,7 +114,69 @@ const AnalyticsSection = () => {
       { id: 'agent_3', name: 'Appointment Scheduler', agent_id: 'agent_3', voice_id: 'voice_3', agent_type: 'scheduler', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
     ]);
     setLoading(false);
+    
+    // Fetch dashboard call counts data
+    fetchCallCountsData();
   }, []);
+
+  const fetchCallCountsData = async () => {
+    setCallCountsLoading(true);
+    try {
+      const payload = {
+        size: "small",
+        filter: [],
+        unit: "day",
+        comparison: true,
+        show: [
+          {
+            measurement: {
+              type: "count"
+            },
+            source: {
+              type: "call_id"
+            }
+          }
+        ],
+        time: {
+          type: "since",
+          value: [1743476400000]
+        },
+        title: "Call Counts",
+        type: "number",
+        id: 0.596305120479717,
+        group: []
+      };
+
+      // Try using the fetchWithAuth method first which handles API key automatically
+      const response = await fetch("https://api.retellai.com/fetch-dashboard-data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify(payload),
+        referrerPolicy: "no-referrer"
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Dashboard data response:", data);
+      setCallCounts(data);
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+      toast.error("Failed to load call count data");
+      // Set fallback mock data
+      setCallCounts({
+        total: mockAnalytics.overview.total_calls,
+        change: "+12%"
+      });
+    } finally {
+      setCallCountsLoading(false);
+    }
+  };
 
   const fetchAnalytics = async () => {
     setLoading(true);
@@ -122,6 +187,9 @@ const AnalyticsSection = () => {
       // Simulate API call with mock data
       await new Promise(resolve => setTimeout(resolve, 1000));
       setAnalytics(mockAnalytics);
+      
+      // Also refresh dashboard data when changing time range
+      fetchCallCountsData();
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
       toast.error('Failed to load analytics data');
@@ -133,7 +201,7 @@ const AnalyticsSection = () => {
   const handleTimeRangeChange = (range: string) => {
     setTimeRange(range);
     toast.info(`Fetching data for the last ${range}`);
-    // In a real app, we'd call fetchAnalytics() again
+    fetchAnalytics();
   };
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
@@ -145,6 +213,22 @@ const AnalyticsSection = () => {
       </div>
     );
   }
+
+  // Format the percentage change for display
+  const getFormattedChange = () => {
+    if (callCounts?.change) {
+      return callCounts.change;
+    }
+    return `+${Math.floor(Math.random() * 20)}%`;
+  };
+
+  // Get the total calls count
+  const getTotalCalls = () => {
+    if (callCounts?.total) {
+      return callCounts.total;
+    }
+    return analytics.overview.total_calls;
+  };
 
   return (
     <div className="space-y-6">
@@ -172,10 +256,16 @@ const AnalyticsSection = () => {
             <PhoneOutgoing className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.overview.total_calls}</div>
-            <p className="text-xs text-muted-foreground">
-              +{Math.floor(Math.random() * 20)}% from last period
-            </p>
+            {callCountsLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            ) : (
+              <>
+                <div className="text-2xl font-bold">{getTotalCalls()}</div>
+                <p className="text-xs text-muted-foreground">
+                  {getFormattedChange()} from last period
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
         

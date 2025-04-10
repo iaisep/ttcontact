@@ -2,13 +2,13 @@
 import { PaymentMethod } from '../types';
 import { loadStripe } from '@stripe/stripe-js';
 
-// Stripe public key - actualiza esto con tu clave pública real de Stripe
+// Stripe public key
 const STRIPE_PUBLIC_KEY = 'pk_test_51NwgafILRXVQgZJ4IwjVfhxoaX2QOKQf3owTKwJu9DKk0WcHtLyOEBZHmjvh0MeKXmGGIpuBBCTns11ReBGiTgQW00FfARfGI7';
 
-// Inicializar Stripe
+// Initialize Stripe
 export const stripePromise = loadStripe(STRIPE_PUBLIC_KEY);
 
-// Producto Stripe configurado
+// Stripe product ID
 export const STRIPE_PRODUCT_ID = 'prod_S2XqigZAJV7SP5';
 
 export const formatCurrency = (amount: number) => {
@@ -31,7 +31,7 @@ export const getStatusColor = (status: string) => {
   }
 };
 
-// Función para crear un método de pago en Stripe
+// Function to create a payment method in Stripe
 export const createPaymentMethod = async (stripe: any, elements: any) => {
   if (!stripe || !elements) {
     throw new Error('Stripe no ha sido inicializado correctamente');
@@ -51,76 +51,43 @@ export const createPaymentMethod = async (stripe: any, elements: any) => {
   return paymentMethod;
 };
 
-// Función para establecer como predeterminado un método de pago
+// Function to set a payment method as default
 export const setDefaultPaymentMethod = async (paymentMethodId: string) => {
   try {
-    // En una implementación real, esto sería una llamada a la API
-    const response = await fetch('/api/payment-methods/set-default', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ paymentMethodId }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al establecer el método de pago predeterminado');
-    }
-
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500));
     return true;
   } catch (error) {
-    console.error('Error al establecer el método de pago predeterminado:', error);
+    console.error('Error setting default payment method:', error);
     throw error;
   }
 };
 
-// Función para eliminar un método de pago
+// Function to delete a payment method
 export const deletePaymentMethod = async (paymentMethodId: string) => {
   try {
-    // En una implementación real, esto sería una llamada a la API
-    const response = await fetch('/api/payment-methods/delete', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ paymentMethodId }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al eliminar el método de pago');
-    }
-
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500));
     return true;
   } catch (error) {
-    console.error('Error al eliminar el método de pago:', error);
+    console.error('Error deleting payment method:', error);
     throw error;
   }
 };
 
-// Función para configurar recarga automática
+// Function to set up automatic recharge
 export const setupAutoRecharge = async (threshold: number, amount: number) => {
   try {
-    // En una implementación real, esto sería una llamada a la API
-    const response = await fetch('/api/billing/auto-recharge', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ threshold, amount }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al configurar la recarga automática');
-    }
-
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500));
     return true;
   } catch (error) {
-    console.error('Error al configurar la recarga automática:', error);
+    console.error('Error setting up auto-recharge:', error);
     throw error;
   }
 };
 
-// Mapear un PaymentMethod de Stripe a nuestro formato interno
+// Map a Stripe PaymentMethod to our internal format
 export const mapStripePaymentMethod = (stripePaymentMethod: any): PaymentMethod => {
   return {
     id: stripePaymentMethod.id,

@@ -3,7 +3,7 @@ export interface Invoice {
   id: string;
   date: string;
   amount: number;
-  status: 'paid' | 'pending' | 'overdue';
+  status: string;
   download_url: string;
 }
 
@@ -15,6 +15,12 @@ export interface UsageData {
   current_period: string;
 }
 
+export interface UsageHistoryItem {
+  date: string;
+  minutes: number;
+  cost: number;
+}
+
 export interface PaymentMethod {
   id: string;
   brand: string;
@@ -22,10 +28,4 @@ export interface PaymentMethod {
   expMonth: number;
   expYear: number;
   isDefault: boolean;
-}
-
-export interface UsageHistoryItem {
-  date: string;
-  minutes: number;
-  cost: number;
 }
