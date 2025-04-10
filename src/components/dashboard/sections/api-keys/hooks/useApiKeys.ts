@@ -41,7 +41,7 @@ export function useApiKeys() {
   const toggleApiKeyVisibility = (apiKeyId: string) => {
     setRevealedApiKeys(prev => ({
       ...prev,
-      [apiKeyId]: prev[apiKeyId] ? null : `${apiKeyId}_mock_full_api_key`
+      [apiKeyId]: prev[apiKeyId] ? null : `${apiKeyId}_mock_full_api_keyyyyyyyyyyyyyyyyyyyyyyy`
     }));
   };
 
