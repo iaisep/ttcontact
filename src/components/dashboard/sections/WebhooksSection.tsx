@@ -31,7 +31,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
-import { Loader2, Plus, Webhook, Trash2, RefreshCw, Check, X, Search } from 'lucide-react';
+import { Loader2, Plus, Webhook, Trash2, RefreshCw, Check, X, Search, Edit2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { PaginationControls } from '@/components/ui/pagination';
 
@@ -52,6 +52,8 @@ const WebhooksSection = () => {
   const [newWebhookUrl, setNewWebhookUrl] = useState('');
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [editingWebhookId, setEditingWebhookId] = useState<string | null>(null);
+  const [editingWebhookUrl, setEditingWebhookUrl] = useState('');
   
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -184,6 +186,36 @@ const WebhooksSection = () => {
         : [...prev, eventId]
     );
   };
+  
+  const startEditingWebhook = (webhook: Webhook) => {
+    setEditingWebhookId(webhook.id);
+    setEditingWebhookUrl(webhook.url);
+  };
+  
+  const saveWebhookUrl = (id: string) => {
+    if (!editingWebhookUrl.trim()) {
+      toast.error('Webhook URL cannot be empty');
+      return;
+    }
+    
+    try {
+      setWebhooks(webhooks.map(webhook => 
+        webhook.id === id 
+          ? { ...webhook, url: editingWebhookUrl } 
+          : webhook
+      ));
+      
+      setEditingWebhookId(null);
+      toast.success('Webhook URL updated');
+    } catch (error) {
+      console.error('Failed to update webhook URL:', error);
+      toast.error('Failed to update webhook URL');
+    }
+  };
+  
+  const cancelEditingWebhook = () => {
+    setEditingWebhookId(null);
+  };
 
   const filteredWebhooks = webhooks.filter(webhook =>
     webhook.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -241,16 +273,16 @@ const WebhooksSection = () => {
         </div>
       ) : (
         <>
-          <div className="border rounded-md">
+          <div className="border rounded-md overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>URL</TableHead>
-                  <TableHead>Events</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Last Triggered</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-2/5">URL</TableHead>
+                  <TableHead className="w-1/4">Events</TableHead>
+                  <TableHead className="w-[10%]">Status</TableHead>
+                  <TableHead className="w-[10%]">Created</TableHead>
+                  <TableHead className="w-[10%]">Last Triggered</TableHead>
+                  <TableHead className="w-[15%] text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -271,18 +303,62 @@ const WebhooksSection = () => {
                   paginatedWebhooks.map((webhook) => (
                     <TableRow key={webhook.id}>
                       <TableCell className="font-medium">
-                        <code className="text-xs bg-muted px-2 py-1 rounded break-all">
-                          {webhook.url}
-                        </code>
+                        {editingWebhookId === webhook.id ? (
+                          <div className="flex items-center space-x-2">
+                            <Input 
+                              value={editingWebhookUrl}
+                              onChange={(e) => setEditingWebhookUrl(e.target.value)}
+                              className="text-xs flex-grow"
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  saveWebhookUrl(webhook.id);
+                                } else if (e.key === 'Escape') {
+                                  cancelEditingWebhook();
+                                }
+                              }}
+                            />
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => saveWebhookUrl(webhook.id)}
+                              className="text-green-500 hover:text-green-700 hover:bg-green-100"
+                            >
+                              <Save className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={cancelEditingWebhook}
+                              className="text-red-500 hover:text-red-700 hover:bg-red-100"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <code className="text-xs bg-muted px-2 py-1 rounded whitespace-nowrap block overflow-hidden text-ellipsis">
+                              {webhook.url}
+                            </code>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => startEditingWebhook(webhook)}
+                              className="flex-shrink-0"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-1 whitespace-nowrap overflow-hidden">
                           {webhook.events.map((eventId) => {
                             const event = eventOptions.find(e => e.id === eventId);
                             return (
                               <span 
                                 key={eventId} 
-                                className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full"
+                                className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full whitespace-nowrap"
                                 title={event?.description}
                               >
                                 {event?.name || eventId}
