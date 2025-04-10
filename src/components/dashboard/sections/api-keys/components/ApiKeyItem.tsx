@@ -40,14 +40,16 @@ const ApiKeyItem = ({ apiKey, revealed, onToggleReveal, onDelete }: ApiKeyItemPr
     <tr key={apiKey.id}>
       <td className="p-4 align-middle font-medium">{apiKey.name}</td>
       <td className="p-4 align-middle">
-        <div className="flex items-center space-x-2">
-          <code className="bg-muted px-2 py-1 rounded">
+        <div className="flex items-center space-x-2 w-full">
+          <code className="bg-muted px-2 py-1 rounded w-full text-ellipsis overflow-hidden whitespace-nowrap">
             {revealed ? revealed : apiKey.prefix + '••••••••••••'}
           </code>
-          <ApiKeyRevealButton 
-            isRevealed={!!revealed}
-            onClick={onToggleReveal}
-          />
+          <div className="flex-shrink-0">
+            <ApiKeyRevealButton 
+              isRevealed={!!revealed}
+              onClick={onToggleReveal}
+            />
+          </div>
         </div>
       </td>
       <td className="p-4 align-middle">
