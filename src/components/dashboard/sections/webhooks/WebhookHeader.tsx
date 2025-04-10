@@ -1,20 +1,26 @@
 
 import { Button } from '@/components/ui/button';
 import { Plus, Webhook } from 'lucide-react';
+import { WebhookExport } from './WebhookExport';
+import { Webhook as WebhookType } from './types';
 
 interface WebhookHeaderProps {
   onCreateWebhook: () => void;
+  webhooks: WebhookType[];
 }
 
-export const WebhookHeader = ({ onCreateWebhook }: WebhookHeaderProps) => {
+export const WebhookHeader = ({ onCreateWebhook, webhooks }: WebhookHeaderProps) => {
   return (
     <>
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Webhooks</h1>
-        <Button onClick={onCreateWebhook}>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Webhook
-        </Button>
+        <div className="flex items-center gap-2">
+          <WebhookExport webhooks={webhooks} />
+          <Button onClick={onCreateWebhook}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Webhook
+          </Button>
+        </div>
       </div>
 
       <div className="border rounded-lg p-4 bg-muted/30">

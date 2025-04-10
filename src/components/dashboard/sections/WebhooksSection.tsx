@@ -31,7 +31,8 @@ const WebhooksSection = () => {
     testWebhook,
     toggleWebhookStatus,
     deleteWebhook,
-    createWebhook
+    createWebhook,
+    webhooks
   } = useWebhooks();
 
   const handleCreateWebhook = async (url: string, selectedEvents: string[]) => {
@@ -44,7 +45,7 @@ const WebhooksSection = () => {
 
   return (
     <div className="space-y-6">
-      <WebhookHeader onCreateWebhook={() => setDialogOpen(true)} />
+      <WebhookHeader onCreateWebhook={() => setDialogOpen(true)} webhooks={webhooks} />
       <WebhookSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       {loading ? (
