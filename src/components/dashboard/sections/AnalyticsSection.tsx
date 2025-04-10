@@ -143,7 +143,7 @@ const AnalyticsSection = () => {
         },
         title: "Call Counts",
         type: "number",
-        id: 0.9599996663726809,
+        id: 0.596305120479717,
         group: []
       };
 
