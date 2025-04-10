@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -153,6 +152,15 @@ export const useWebhooks = () => {
     }
   };
 
+  const importWebhooks = async (importedWebhooks: Webhook[]) => {
+    try {
+      setWebhooks([...webhooks, ...importedWebhooks]);
+    } catch (error) {
+      console.error('Failed to import webhooks:', error);
+      toast.error('Failed to import webhooks');
+    }
+  };
+
   const filteredWebhooks = webhooks.filter(webhook =>
     webhook.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
     webhook.events.some(event => event.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -188,6 +196,7 @@ export const useWebhooks = () => {
     startEditingWebhook,
     saveWebhookUrl,
     cancelEditingWebhook,
-    createWebhook
+    createWebhook,
+    importWebhooks
   };
 };

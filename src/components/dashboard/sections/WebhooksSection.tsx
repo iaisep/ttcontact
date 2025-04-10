@@ -32,6 +32,7 @@ const WebhooksSection = () => {
     toggleWebhookStatus,
     deleteWebhook,
     createWebhook,
+    importWebhooks,
     webhooks
   } = useWebhooks();
 
@@ -45,7 +46,11 @@ const WebhooksSection = () => {
 
   return (
     <div className="space-y-6">
-      <WebhookHeader onCreateWebhook={() => setDialogOpen(true)} webhooks={webhooks} />
+      <WebhookHeader 
+        onCreateWebhook={() => setDialogOpen(true)} 
+        webhooks={webhooks} 
+        onImportWebhooks={importWebhooks} 
+      />
       <WebhookSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       {loading ? (
