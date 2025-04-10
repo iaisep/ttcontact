@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { User } from './types';
 import { useLanguage } from '@/context/LanguageContext';
 import { PasswordChangeDialog } from './PasswordChangeDialog';
+import TwoFactorAuthDialog from './TwoFactorAuthDialog';
 
 interface ProfileTabProps {
   currentUser: User | null;
@@ -23,6 +24,7 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
     email: currentUser?.email || '',
   });
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [twoFactorDialogOpen, setTwoFactorDialogOpen] = useState(false);
 
   const updateUserProfile = async () => {
     try {
@@ -160,9 +162,15 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
           <div className="space-y-2">
             <Label>{t('two_factor')}</Label>
             <div className="flex justify-between items-center">
-              <p className="text-muted-foreground">{t('not_enabled')}</p>
-              <Button variant="outline" size="sm">
-                {t('enable_2fa')}
+              <p className="text-muted-foreground">
+                {currentUser?.mfa_enabled ? t('enabled') : t('not_enabled')}
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setTwoFactorDialogOpen(true)}
+              >
+                {currentUser?.mfa_enabled ? t('disable_2fa') : t('enable_2fa')}
               </Button>
             </div>
           </div>
@@ -172,6 +180,12 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
       <PasswordChangeDialog 
         open={passwordDialogOpen} 
         onOpenChange={setPasswordDialogOpen} 
+      />
+      
+      <TwoFactorAuthDialog
+        open={twoFactorDialogOpen}
+        onOpenChange={setTwoFactorDialogOpen}
+        is2FAEnabled={!!currentUser?.mfa_enabled}
       />
     </div>
   );
