@@ -5,20 +5,31 @@ import { Button } from "@/components/ui/button";
 interface SidebarToggleProps {
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
+  variant?: "default" | "outline" | "collapse";
+  showLabel?: boolean;
+  label?: string;
 }
 
 const SidebarToggle = ({
   sidebarCollapsed,
-  toggleSidebar
+  toggleSidebar,
+  variant = "collapse",
+  showLabel = false,
+  label = "Collapse"
 }: SidebarToggleProps) => {
   return (
     <Button 
-      variant="ghost" 
-      size="icon" 
+      variant={variant} 
+      size={variant === "collapse" ? "icon" : "sm"}
       onClick={toggleSidebar} 
-      className="h-8 w-8 p-0"
+      className="flex items-center justify-center"
+      title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
     >
-      {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+      {sidebarCollapsed ? 
+        <ChevronRight className="h-4 w-4" /> : 
+        <ChevronLeft className="h-4 w-4" />
+      }
+      {showLabel && !sidebarCollapsed && <span>{label}</span>}
     </Button>
   );
 };

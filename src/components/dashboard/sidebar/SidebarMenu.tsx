@@ -12,16 +12,24 @@ import {
   Webhook,
   UserCircle,
   HelpCircle,
+  ChevronLeft,
 } from "lucide-react";
 import SidebarMenuItem from "./SidebarMenuItem";
+import { Button } from "@/components/ui/button";
 
 interface SidebarMenuProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
   sidebarCollapsed: boolean;
+  setSidebarCollapsed?: (collapsed: boolean) => void;
 }
 
-const SidebarMenu = ({ activeSection, setActiveSection, sidebarCollapsed }: SidebarMenuProps) => {
+const SidebarMenu = ({ 
+  activeSection, 
+  setActiveSection, 
+  sidebarCollapsed,
+  setSidebarCollapsed 
+}: SidebarMenuProps) => {
   const { t } = useLanguage();
 
   const menuItems = [
@@ -84,9 +92,15 @@ const SidebarMenu = ({ activeSection, setActiveSection, sidebarCollapsed }: Side
     },
   ];
 
+  const handleToggleSidebar = () => {
+    if (setSidebarCollapsed) {
+      setSidebarCollapsed(!sidebarCollapsed);
+    }
+  };
+
   return (
-    <div className="py-2 flex-1 overflow-y-auto">
-      <ul>
+    <div className="py-2 flex-1 overflow-y-auto flex flex-col">
+      <ul className="flex-1">
         {menuItems.map((item) => (
           <SidebarMenuItem
             key={item.id}
@@ -97,6 +111,21 @@ const SidebarMenu = ({ activeSection, setActiveSection, sidebarCollapsed }: Side
           />
         ))}
       </ul>
+      
+      {/* Collapse/Expand Button */}
+      {setSidebarCollapsed && (
+        <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-800">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full flex items-center justify-center gap-2"
+            onClick={handleToggleSidebar}
+          >
+            <ChevronLeft className={`h-4 w-4 transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
+            {!sidebarCollapsed && <span>{t('collapse')}</span>}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
