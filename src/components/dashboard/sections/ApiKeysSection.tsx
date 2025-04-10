@@ -50,7 +50,6 @@ const ApiKeysSection = () => {
   const [newApiKey, setNewApiKey] = useState<string | null>(null);
   const [showNewApiKey, setShowNewApiKey] = useState(false);
 
-  // Mock data for UI demonstration
   const mockApiKeys: ApiKey[] = [
     {
       id: '1',
@@ -74,16 +73,15 @@ const ApiKeysSection = () => {
     },
   ];
 
-  const [revealedApiKeys, setRevealedApiKeys] = useState<{ [key: string]: boolean }>({});
+  const [revealedApiKeys, setRevealedApiKeys] = useState<{ [key: string]: string | null }>({});
 
   const toggleApiKeyVisibility = (apiKeyId: string) => {
     setRevealedApiKeys(prev => ({
       ...prev,
-      [apiKeyId]: !prev[apiKeyId]
+      [apiKeyId]: prev[apiKeyId] ? null : `${apiKeyId}_mock_full_api_key`
     }));
   };
 
-  // Use mock data for UI demonstration
   useEffect(() => {
     setApiKeys(mockApiKeys);
     setLoading(false);
@@ -92,10 +90,6 @@ const ApiKeysSection = () => {
   const fetchApiKeys = async () => {
     setLoading(true);
     try {
-      // In a real app, this would fetch from API
-      // const data = await fetchWithAuth('/api-keys');
-      
-      // Using mock data for UI demonstration
       setApiKeys(mockApiKeys);
     } catch (error) {
       console.error('Failed to fetch API keys:', error);
@@ -112,15 +106,6 @@ const ApiKeysSection = () => {
     }
 
     try {
-      // In a real app, this would be an API call
-      /*
-      const response = await fetchWithAuth('/api-keys', {
-        method: 'POST',
-        body: JSON.stringify({ name: newApiKeyName }),
-      });
-      */
-
-      // Mock response for UI demonstration
       const prefix = 'ak_' + Math.random().toString(36).substring(2, 8) + '_';
       const newKey = prefix + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
       
@@ -129,10 +114,9 @@ const ApiKeysSection = () => {
         name: newApiKeyName,
         prefix: prefix,
         created_at: new Date().toISOString(),
-        key: newKey, // This would be returned only once when creating
+        key: newKey,
       };
 
-      // Update UI with new key
       setApiKeys([...apiKeys, {
         id: mockResponse.id,
         name: mockResponse.name,
@@ -140,10 +124,8 @@ const ApiKeysSection = () => {
         created_at: mockResponse.created_at,
       }]);
       
-      // Store the full key for display
       setNewApiKey(mockResponse.key);
       
-      // Reset form
       setNewApiKeyName('');
       
       toast.success('API key created successfully');
@@ -155,10 +137,6 @@ const ApiKeysSection = () => {
 
   const deleteApiKey = async (id: string) => {
     try {
-      // In a real app, this would be an API call
-      // await fetchWithAuth(`/api-keys/${id}`, { method: 'DELETE' });
-
-      // Update UI by removing the deleted key
       setApiKeys(apiKeys.filter(key => key.id !== id));
       toast.success('API key deleted successfully');
     } catch (error) {
@@ -248,7 +226,7 @@ const ApiKeysSection = () => {
                       <div className="flex items-center space-x-2">
                         <code className="bg-muted px-2 py-1 rounded">
                           {revealedApiKeys[apiKey.id] 
-                            ? apiKey.prefix + '••••••••••••'
+                            ? revealedApiKeys[apiKey.id] 
                             : apiKey.prefix + '••••••••••••'}
                         </code>
                         <Button 
