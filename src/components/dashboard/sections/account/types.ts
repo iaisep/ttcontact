@@ -6,6 +6,7 @@ export interface User {
   avatar_url?: string;
   role: string;
   created_at: string;
+  mfa_enabled?: boolean;
 }
 
 export interface Workspace {
