@@ -216,7 +216,7 @@ const WebhooksSection = () => {
                       </div>
                     </TableCell>
                   </TableRow> : paginatedWebhooks.map(webhook => <TableRow key={webhook.id}>
-                      <TableCell className="font-medium max-w-0 mx-2">
+                      <TableCell className="font-medium max-w-0 mx-0">
                         <code className="text-xs bg-muted px-2 py-1 rounded whitespace-nowrap block overflow-hidden text-ellipsis">
                           {webhook.url}
                         </code>
