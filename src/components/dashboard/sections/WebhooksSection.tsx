@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
@@ -241,16 +240,16 @@ const WebhooksSection = () => {
         </div>
       ) : (
         <>
-          <div className="border rounded-md">
+          <div className="border rounded-md overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>URL</TableHead>
-                  <TableHead>Events</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Last Triggered</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-[40%]">URL</TableHead>
+                  <TableHead className="w-[25%]">Events</TableHead>
+                  <TableHead className="w-[10%]">Status</TableHead>
+                  <TableHead className="w-[10%]">Created</TableHead>
+                  <TableHead className="w-[10%]">Last Triggered</TableHead>
+                  <TableHead className="w-[5%] text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -270,19 +269,19 @@ const WebhooksSection = () => {
                 ) : (
                   paginatedWebhooks.map((webhook) => (
                     <TableRow key={webhook.id}>
-                      <TableCell className="font-medium">
-                        <code className="text-xs bg-muted px-2 py-1 rounded break-all">
+                      <TableCell className="font-medium max-w-0">
+                        <code className="text-xs bg-muted px-2 py-1 rounded whitespace-nowrap block overflow-hidden text-ellipsis">
                           {webhook.url}
                         </code>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
+                      <TableCell className="max-w-0">
+                        <div className="flex flex-wrap gap-1 overflow-hidden">
                           {webhook.events.map((eventId) => {
                             const event = eventOptions.find(e => e.id === eventId);
                             return (
                               <span 
                                 key={eventId} 
-                                className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full"
+                                className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full whitespace-nowrap"
                                 title={event?.description}
                               >
                                 {event?.name || eventId}
