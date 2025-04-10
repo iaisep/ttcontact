@@ -37,7 +37,7 @@ const SidebarWrapper: React.FC<SidebarWrapperProps> = ({
       />
 
       {/* Main Content */}
-      <main className="flex-1 transition-all duration-300">
+      <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
         {children}
       </main>
     </div>

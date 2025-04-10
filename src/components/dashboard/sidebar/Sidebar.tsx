@@ -24,13 +24,16 @@ const Sidebar = ({
   };
 
   return (
-    <div className="">
+    <div className={`bg-background border-r transition-all duration-300 ${
+      sidebarCollapsed ? 'w-16' : 'w-64'
+    } flex flex-col`}>
       <SidebarHeader sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
       
       <SidebarMenu 
         activeSection={activeSection} 
         setActiveSection={setActiveSection} 
         sidebarCollapsed={sidebarCollapsed} 
+        setSidebarCollapsed={setSidebarCollapsed}
       />
       
       <SidebarFooter 

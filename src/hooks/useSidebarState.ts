@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export function useSidebarState(defaultCollapsed: boolean = false) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(defaultCollapsed);
@@ -17,8 +17,14 @@ export function useSidebarState(defaultCollapsed: boolean = false) {
     localStorage.setItem("sidebar-collapsed", sidebarCollapsed.toString());
   }, [sidebarCollapsed]);
 
+  // Toggle sidebar function
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed(prev => !prev);
+  }, []);
+
   return {
     sidebarCollapsed,
-    setSidebarCollapsed
+    setSidebarCollapsed,
+    toggleSidebar
   };
 }
