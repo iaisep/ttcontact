@@ -1,9 +1,9 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, CreditCard } from 'lucide-react';
+import { Loader2, CreditCard, ArrowUpRight, Info } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
@@ -12,12 +12,14 @@ import { Invoice, UsageData, PaymentMethod, UsageHistoryItem } from './billing/t
 
 // Import components
 import BillingSummaryCards from './billing/BillingSummaryCards';
+import BillingHistoryTab from './billing/tabs/BillingHistoryTab';
 import CurrentUsageTab from './billing/tabs/CurrentUsageTab';
 import UsageHistoryTab from './billing/tabs/UsageHistoryTab';
 import InvoicesTab from './billing/tabs/InvoicesTab';
 import PaymentMethodsTab from './billing/tabs/PaymentMethodsTab';
 import AddCardDialog from './billing/dialogs/AddCardDialog';
 import StripeWrapper from './billing/components/StripeWrapper';
+import LimitsTab from './billing/tabs/LimitsTab';
 
 const BillingSection = () => {
   const { fetchWithAuth } = useApiContext();
@@ -81,13 +83,13 @@ const BillingSection = () => {
   ];
 
   // Use mock data for UI demonstration
-  useEffect(() => {
+  useState(() => {
     setInvoices(mockInvoices);
     setUsage(mockUsage);
     setUsageHistory(mockUsageHistory);
     setPaymentMethods(mockPaymentMethods);
     setLoading(false);
-  }, []);
+  });
 
   const fetchBillingData = async () => {
     setLoading(true);
@@ -119,57 +121,35 @@ const BillingSection = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Facturación</h1>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>
-              <CreditCard className="mr-2 h-4 w-4" />
-              Actualizar método de pago
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Agregar nueva tarjeta</DialogTitle>
-              <DialogDescription>
-                Ingresa los detalles de tu tarjeta para agregarla como método de pago.
-              </DialogDescription>
-            </DialogHeader>
-            <StripeWrapper>
-              <AddCardDialog 
-                paymentMethods={paymentMethods}
-                setPaymentMethods={setPaymentMethods}
-              />
-            </StripeWrapper>
-          </DialogContent>
-        </Dialog>
+        <div className="flex space-x-2">
+          <Button variant="outline" className="flex items-center">
+            <ArrowUpRight className="mr-2 h-4 w-4" />
+            Change payment methods
+          </Button>
+          <Button className="flex items-center">
+            <Info className="mr-2 h-4 w-4" />
+            Manage billing info
+          </Button>
+        </div>
       </div>
-
-      <BillingSummaryCards usage={usage} />
       
-      <Tabs defaultValue="usage" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="usage">Uso actual</TabsTrigger>
-          <TabsTrigger value="history">Historial de uso</TabsTrigger>
-          <TabsTrigger value="invoices">Facturas</TabsTrigger>
-          <TabsTrigger value="payment">Métodos de pago</TabsTrigger>
+      <Tabs defaultValue="history" className="space-y-4">
+        <TabsList className="grid w-full md:w-[400px] grid-cols-3">
+          <TabsTrigger value="history">Billing History</TabsTrigger>
+          <TabsTrigger value="usage">Usage</TabsTrigger>
+          <TabsTrigger value="limits">Limits</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="history">
+          <BillingHistoryTab />
+        </TabsContent>
         
         <TabsContent value="usage">
           <CurrentUsageTab usage={usage} />
         </TabsContent>
         
-        <TabsContent value="history">
-          <UsageHistoryTab usageHistory={usageHistory} usage={usage} />
-        </TabsContent>
-        
-        <TabsContent value="invoices">
-          <InvoicesTab invoices={invoices} />
-        </TabsContent>
-        
-        <TabsContent value="payment">
-          <PaymentMethodsTab 
-            paymentMethods={paymentMethods}
-            setPaymentMethods={setPaymentMethods}
-          />
+        <TabsContent value="limits">
+          <LimitsTab />
         </TabsContent>
       </Tabs>
     </div>
