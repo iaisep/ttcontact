@@ -15,35 +15,6 @@ import { toast } from 'sonner';
 import BatchCallHistory from './batch-call/BatchCallHistory';
 import { Agent, BatchCall } from './batch-call/types';
 
-interface DashboardDataPayload {
-  size: string;
-  filter: any[];
-  unit: string;
-  comparison: boolean;
-  show: {
-    measurement: {
-      type: string;
-    };
-    source: {
-      type: string;
-    };
-  }[];
-  time: {
-    type: string;
-    value: number[];
-  };
-  title: string;
-  type: string;
-  id: number;
-  group: any[];
-}
-
-interface DashboardDataResponse {
-  calls: number;
-  previousCalls?: number;
-  percentChange?: number;
-}
-
 const AnalyticsSection = () => {
   const { fetchWithAuth } = useApiContext();
   const [loading, setLoading] = useState(true);
@@ -52,8 +23,6 @@ const AnalyticsSection = () => {
   const [agents, setAgents] = useState<any[]>([]);
   const [batches, setBatches] = useState<BatchCall[]>([]);
   const [batchAgents, setBatchAgents] = useState<Agent[]>([]);
-  const [dashboardData, setDashboardData] = useState<DashboardDataResponse | null>(null);
-  const [fetchingDashboardData, setFetchingDashboardData] = useState(false);
 
   const mockAnalytics = {
     overview: {
@@ -141,8 +110,6 @@ const AnalyticsSection = () => {
       { id: 'agent_2', name: 'Support Agent', agent_id: 'agent_2', voice_id: 'voice_2', agent_type: 'support', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
       { id: 'agent_3', name: 'Appointment Scheduler', agent_id: 'agent_3', voice_id: 'voice_3', agent_type: 'scheduler', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
     ]);
-
-    fetchDashboardData();
     setLoading(false);
   }, []);
 
@@ -160,59 +127,6 @@ const AnalyticsSection = () => {
       toast.error('Failed to load analytics data');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchDashboardData = async () => {
-    setFetchingDashboardData(true);
-    try {
-      const payload: DashboardDataPayload = {
-        size: "small",
-        filter: [],
-        unit: "day",
-        comparison: true,
-        show: [
-          {
-            measurement: {
-              type: "count"
-            },
-            source: {
-              type: "call_id"
-            }
-          }
-        ],
-        time: {
-          type: "since",
-          value: [
-            1743476400000
-          ]
-        },
-        title: "Call Counts",
-        type: "number",
-        id: 0.9599996663726809,
-        group: []
-      };
-
-      const data = await fetchWithAuth('/fetch-dashboard-data', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log('Dashboard data fetched:', data);
-      setDashboardData(data);
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
-      // Set mock data as fallback
-      setDashboardData({
-        calls: 456,
-        previousCalls: 389,
-        percentChange: 17.2
-      });
-    } finally {
-      setFetchingDashboardData(false);
     }
   };
 
@@ -258,17 +172,9 @@ const AnalyticsSection = () => {
             <PhoneOutgoing className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {fetchingDashboardData ? (
-                <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
-              ) : dashboardData?.calls || analytics.overview.total_calls}
-            </div>
+            <div className="text-2xl font-bold">{analytics.overview.total_calls}</div>
             <p className="text-xs text-muted-foreground">
-              {dashboardData?.percentChange !== undefined ? (
-                `${dashboardData.percentChange >= 0 ? '+' : ''}${dashboardData.percentChange.toFixed(1)}% from last period`
-              ) : (
-                `+${Math.floor(Math.random() * 20)}% from last period`
-              )}
+              +{Math.floor(Math.random() * 20)}% from last period
             </p>
           </CardContent>
         </Card>
