@@ -1,2 +1,5 @@
 
-export { default as ApiKeysSection } from './ApiKeysSection';
+import ApiKeysSection from './ApiKeysSection';
+
+export default ApiKeysSection;
+export * from './types';
