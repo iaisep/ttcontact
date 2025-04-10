@@ -17,7 +17,7 @@ const BillingHistoryTab = () => {
     const fetchBillingHistory = async () => {
       setLoading(true);
       try {
-        const response = await fetchWithAuth('/list-invoices');
+        const response = await fetchWithAuth('/list-api-keys');
         
         if (response && Array.isArray(response)) {
           setBillingHistory(response);
