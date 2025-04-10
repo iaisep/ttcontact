@@ -154,7 +154,8 @@ const AnalyticsSection = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${apiKey}`
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        referrerPolicy: "no-referrer"
       });
 
       if (!response.ok) {
