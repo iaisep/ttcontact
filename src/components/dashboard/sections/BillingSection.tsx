@@ -82,48 +82,39 @@ const BillingSection = () => {
       isDefault: true,
     }
   ];
+  
+  // Mock API Keys data
+  const mockApiKeys = [
+    { id: 'key_1', name: 'Production API Key', key: 'pk_prod_123456789', created: '2025-03-01' },
+    { id: 'key_2', name: 'Development API Key', key: 'pk_dev_987654321', created: '2025-03-15' }
+  ];
 
   useEffect(() => {
     fetchBillingData();
   }, []);
 
-  const fetchApiKeys = async () => {
-    try {
-      console.log('Fetching API keys...');
-      const response = await fetchWithAuth('/list-api-keys');
-      console.log('API keys response:', response);
-      
-      if (Array.isArray(response)) {
-        setApiKeys(response);
-        return response;
-      } else {
-        console.error('Expected array but received:', response);
-        return [];
-      }
-    } catch (error) {
-      console.error('Failed to fetch API keys:', error);
-      toast.error('Failed to load API keys');
-      return [];
-    }
-  };
-
   const fetchBillingData = async () => {
     setLoading(true);
     try {
-      // Fetch real data if available, fall back to mock data
-      const apiKeysResponse = await fetchApiKeys();
-      console.log('Fetched API keys:', apiKeysResponse);
+      // Using mock data instead of API calls
+      console.log('Setting mock API keys');
+      setApiKeys(mockApiKeys);
       
       // For now, use mock data for other billing information
       setInvoices(mockInvoices);
       setUsage(mockUsage);
       setUsageHistory(mockUsageHistory);
       setPaymentMethods(mockPaymentMethods);
+      
+      // Simulate a delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
     } catch (error) {
       console.error('Failed to fetch billing data:', error);
       toast.error('Failed to load billing information');
       
       // Still use mock data as fallback
+      setApiKeys(mockApiKeys);
       setInvoices(mockInvoices);
       setUsage(mockUsage);
       setUsageHistory(mockUsageHistory);
