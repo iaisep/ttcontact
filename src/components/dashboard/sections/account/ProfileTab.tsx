@@ -9,6 +9,7 @@ import { Save, Upload } from "lucide-react";
 import { toast } from 'sonner';
 import { User } from './types';
 import { useLanguage } from '@/context/LanguageContext';
+import { PasswordChangeDialog } from './PasswordChangeDialog';
 
 interface ProfileTabProps {
   currentUser: User | null;
@@ -21,6 +22,7 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
     name: currentUser?.name || '',
     email: currentUser?.email || '',
   });
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
 
   const updateUserProfile = async () => {
     try {
@@ -149,7 +151,7 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
             <Label>{t('password')}</Label>
             <div className="flex justify-between items-center">
               <p className="text-muted-foreground">••••••••••••</p>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => setPasswordDialogOpen(true)}>
                 {t('change_password')}
               </Button>
             </div>
@@ -166,6 +168,11 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
           </div>
         </CardContent>
       </Card>
+
+      <PasswordChangeDialog 
+        open={passwordDialogOpen} 
+        onOpenChange={setPasswordDialogOpen} 
+      />
     </div>
   );
 };

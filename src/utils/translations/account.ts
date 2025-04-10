@@ -24,6 +24,17 @@ const accountTranslations = {
     "spanish": "Español",
     "english": "English",
     
+    // Password Change Dialog
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "confirm_new_password": "Confirm New Password",
+    "password_updated_successfully": "Password updated successfully",
+    "failed_to_update_password": "Failed to update password",
+    "hide_password": "Hide password",
+    "show_password": "Show password",
+    "update_password": "Update Password",
+    "cancel": "Cancel",
+    
     // Workspace Tab
     "workspace_information": "Workspace Information",
     "manage_workspace": "Manage your workspace settings",
@@ -68,6 +79,17 @@ const accountTranslations = {
     "choose_language": "Elige tu idioma preferido",
     "spanish": "Español",
     "english": "English",
+    
+    // Password Change Dialog
+    "current_password": "Contraseña Actual",
+    "new_password": "Nueva Contraseña",
+    "confirm_new_password": "Confirmar Nueva Contraseña",
+    "password_updated_successfully": "Contraseña actualizada exitosamente",
+    "failed_to_update_password": "Error al actualizar la contraseña",
+    "hide_password": "Ocultar contraseña",
+    "show_password": "Mostrar contraseña",
+    "update_password": "Actualizar Contraseña",
+    "cancel": "Cancelar",
     
     // Workspace Tab
     "workspace_information": "Información del Espacio de Trabajo",
