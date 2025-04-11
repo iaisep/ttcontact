@@ -1,0 +1,60 @@
+
+// Help Center related translations
+const helpCenterTranslations = {
+  en: {
+    "help_center": "Help Center",
+    "help_center_description": "Find answers to common questions and learn how to get the most out of Retell AI",
+    "search_help_center": "Search for help articles...",
+    "search": "Search",
+    "back_to_dashboard": "Back to Dashboard",
+    "all_rights_reserved": "All rights reserved.",
+    "introduction": "Introduction",
+    "guides": "Guides",
+    "agents": "Agents",
+    "phone_numbers": "Phone Numbers",
+    "call_history": "Call History",
+    "api": "API",
+    "api_keys": "API Keys",
+    "knowledge_base": "Knowledge Base",
+    "security": "Security",
+    "settings": "Settings",
+    "faq": "FAQ",
+    "search_results_for": "Search results for",
+    "result_found": "result found",
+    "results_found": "results found",
+    "no_results_found": "No results found",
+    "try_different_search_terms": "Try different search terms or browse categories on the left.",
+    "no_content_for_category": "No content is available for this category yet.",
+    "close": "Close",
+    "documentation": "Documentation"
+  },
+  es: {
+    "help_center": "Centro de Ayuda",
+    "help_center_description": "Encuentra respuestas a preguntas frecuentes y aprende a sacar el máximo provecho de Retell AI",
+    "search_help_center": "Buscar artículos de ayuda...",
+    "search": "Buscar",
+    "back_to_dashboard": "Volver al Panel",
+    "all_rights_reserved": "Todos los derechos reservados.",
+    "introduction": "Introducción",
+    "guides": "Guías",
+    "agents": "Agentes",
+    "phone_numbers": "Números de Teléfono",
+    "call_history": "Historial de Llamadas",
+    "api": "API",
+    "api_keys": "Claves API",
+    "knowledge_base": "Base de Conocimiento",
+    "security": "Seguridad",
+    "settings": "Configuración",
+    "faq": "Preguntas Frecuentes",
+    "search_results_for": "Resultados de búsqueda para",
+    "result_found": "resultado encontrado",
+    "results_found": "resultados encontrados",
+    "no_results_found": "No se encontraron resultados",
+    "try_different_search_terms": "Intenta con diferentes términos de búsqueda o navega por las categorías de la izquierda.",
+    "no_content_for_category": "Aún no hay contenido disponible para esta categoría.",
+    "close": "Cerrar",
+    "documentation": "Documentación"
+  }
+};
+
+export default helpCenterTranslations;

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, Webhook } from 'lucide-react';
 import { WebhookExport } from './WebhookExport';
 import { WebhookImport } from './WebhookImport';
-import { Webhook as WebhookType } from './types';
+import type { Webhook as WebhookType } from './types';
 
 interface WebhookHeaderProps {
   onCreateWebhook: () => void;

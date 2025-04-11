@@ -1,30 +1,34 @@
 
-import { mergeDeep } from "@/lib/utils";
-import navigationTranslations from "./navigation";
-import accountTranslations from "./account";
-import landingTranslations from "./landing";
-import formsTranslations from "./forms";
-import featuresTranslations from "./features";
-import dashboardTranslations from "./dashboard";
-import contactTranslations from "./contact";
+import accountTranslations from './account';
+import contactTranslations from './contact';
+import dashboardTranslations from './dashboard';
+import featuresTranslations from './features';
+import formsTranslations from './forms';
+import landingTranslations from './landing';
+import navigationTranslations from './navigation';
+import helpCenterTranslations from './help-center';
 
-// Define a type for our translations
-export type TranslationsType = {
-  [language: string]: {
-    [key: string]: string;
-  };
+const translations = {
+  en: {
+    ...accountTranslations.en,
+    ...contactTranslations.en,
+    ...dashboardTranslations.en,
+    ...featuresTranslations.en,
+    ...formsTranslations.en,
+    ...landingTranslations.en,
+    ...navigationTranslations.en,
+    ...helpCenterTranslations.en,
+  },
+  es: {
+    ...accountTranslations.es,
+    ...contactTranslations.es,
+    ...dashboardTranslations.es,
+    ...featuresTranslations.es,
+    ...formsTranslations.es,
+    ...landingTranslations.es,
+    ...navigationTranslations.es,
+    ...helpCenterTranslations.es,
+  },
 };
-
-// Merge all translation files together
-const translations: TranslationsType = mergeDeep(
-  {},
-  navigationTranslations,
-  accountTranslations,
-  landingTranslations,
-  formsTranslations,
-  featuresTranslations,
-  dashboardTranslations,
-  contactTranslations
-);
 
 export default translations;
