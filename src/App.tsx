@@ -11,6 +11,9 @@ import NotFound from "./pages/NotFound";
 import { ApiProvider } from "@/context/ApiContext";
 import LanguageProvider from "@/context/LanguageContext";
 
+// Help Center page
+import HelpCenterPage from "./pages/HelpCenterPage";
+
 // Importamos las páginas relacionadas con agentes
 import AgentsPage from "./pages/AgentsPage";
 import AgentEditPage from "./pages/AgentEditPage";
@@ -46,6 +49,9 @@ const App = () => (
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              
+              {/* Help Center route */}
+              <Route path="/help-center" element={<HelpCenterPage />} />
               
               {/* Rutas de agentes */}
               <Route path="/agentes" element={<AgentsPage />} />

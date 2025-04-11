@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import SidebarMenuItem from "./SidebarMenuItem";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface SidebarMenuProps {
   activeSection: string;
@@ -88,7 +89,7 @@ const SidebarMenu = ({
       title: t('help_center'),
       id: "help-center",
       external: true,
-      url: "https://docs.retellai.com/",
+      url: "/help-center",
     },
   ];
 
