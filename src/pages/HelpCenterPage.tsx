@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async'; // Changed to react-helmet-async for better React 18 compatibility
 import { useLanguage } from '@/context/LanguageContext';
 import HelpCenterLayout from '@/components/help-center/HelpCenterLayout';
 import HelpCenterSidebar from '@/components/help-center/HelpCenterSidebar';
