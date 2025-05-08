@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { 
@@ -170,7 +171,7 @@ const AnalyticsSection = () => {
 
   // Mock data fallback function
   const useMockData = () => {
-    const mockAnalytics = {
+    const mockAnalyticsData = {
       overview: {
         total_calls: 456,
         total_minutes: 4328,
@@ -224,8 +225,8 @@ const AnalyticsSection = () => {
       ],
     };
 
-    setAnalytics(mockAnalytics);
-    setAgents(mockAnalytics.agent_performance.map(a => ({
+    setAnalytics(mockAnalyticsData);
+    setAgents(mockAnalyticsData.agent_performance.map(a => ({
       id: a.agent_id,
       name: a.agent_name,
     })));
@@ -283,7 +284,7 @@ const AnalyticsSection = () => {
       toast.error("Failed to load call count data");
       // Set fallback mock data
       setCallCounts({
-        total: mockAnalytics.overview.total_calls,
+        total: analytics?.overview.total_calls || 0,
         change: "+12%"
       });
     } finally {
@@ -323,7 +324,7 @@ const AnalyticsSection = () => {
   const handleTimeRangeChange = (range: string) => {
     setTimeRange(range);
     toast.info(`Fetching data for the last ${range}`);
-    fetchAnalytics();
+    fetchAnalyticsData();
   };
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
