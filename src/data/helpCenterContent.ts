@@ -4,11 +4,11 @@ export const helpCenterContent: Record<string, any[]> = {
     {
       id: 'intro-1',
       categoryName: 'Introduction',
-      title: 'What is Retell AI?',
-      excerpt: 'Learn about Retell AI and how it can transform your business communications',
+      title: 'What is UISEP AI?',
+      excerpt: 'Learn about UISEP AI and how it can transform your business communications',
       content: `
-        <h2>What is Retell AI?</h2>
-        <p>Retell AI is a platform that empowers businesses to create natural, contextual voice conversations between users and LLMs. Our technology enables you to build AI voice agents that can handle complex interactions through phone, web, or mobile applications.</p>
+        <h2>What is UISEP AI?</h2>
+        <p>UISEP AI is a platform that empowers businesses to create natural, contextual voice conversations between users and LLMs. Our technology enables you to build AI voice agents that can handle complex interactions through phone, web, or mobile applications.</p>
         
         <h3>Key Features</h3>
         <ul>
@@ -18,19 +18,19 @@ export const helpCenterContent: Record<string, any[]> = {
           <li><strong>Knowledge Base Integration</strong>: Enhance agents with your company's specific information</li>
         </ul>
         
-        <p>With Retell AI, businesses can automate customer service, sales, support, and other communication tasks while maintaining a natural and personalized experience for their users.</p>
+        <p>With UISEP AI, businesses can automate customer service, sales, support, and other communication tasks while maintaining a natural and personalized experience for their users.</p>
       `
     },
     {
       id: 'intro-2',
-      title: 'Getting Started with Retell AI',
+      title: 'Getting Started with UISEP AI',
       excerpt: 'Step-by-step guide to set up your first AI voice agent',
       content: `
-        <h2>Getting Started with Retell AI</h2>
+        <h2>Getting Started with UISEP AI</h2>
         <p>Follow these simple steps to create your first AI voice agent:</p>
         
         <h3>1. Create an Account</h3>
-        <p>Sign up for a Retell AI account at <a href="https://app.retell.ai" target="_blank" rel="noopener noreferrer">app.retell.ai</a>.</p>
+        <p>Sign up for a UISEP AI account at <a href="https://app.uisep.ai" target="_blank" rel="noopener noreferrer">app.uisep.ai</a>.</p>
         
         <h3>2. Create Your First Agent</h3>
         <p>Navigate to the Agents section in your dashboard and click "Add Agent". Give your agent a name and select your preferred LLM (Language Model) and voice.</p>
@@ -59,7 +59,7 @@ export const helpCenterContent: Record<string, any[]> = {
       excerpt: 'Learn how to create and configure AI voice agents for your specific needs',
       content: `
         <h2>Creating and Configuring Agents</h2>
-        <p>Agents are at the core of the Retell AI platform. They represent the AI entities that interact with your users through voice conversations.</p>
+        <p>Agents are at the core of the UISEP AI platform. They represent the AI entities that interact with your users through voice conversations.</p>
         
         <h3>Creating a New Agent</h3>
         <ol>
@@ -99,7 +99,7 @@ export const helpCenterContent: Record<string, any[]> = {
       excerpt: 'Learn how to connect phone numbers to your AI voice agents',
       content: `
         <h2>Setting Up Phone Numbers for Your Agents</h2>
-        <p>Retell AI allows you to connect phone numbers to your AI voice agents, enabling them to receive and make calls on standard phone networks.</p>
+        <p>UISEP AI allows you to connect phone numbers to your AI voice agents, enabling them to receive and make calls on standard phone networks.</p>
         
         <h3>Purchasing a Phone Number</h3>
         <ol>
@@ -187,14 +187,14 @@ export const helpCenterContent: Record<string, any[]> = {
     {
       id: 'api-1',
       categoryName: 'API',
-      title: 'Introduction to Retell API',
-      excerpt: 'Learn how to interact with Retell AI programmatically through our API',
+      title: 'Introduction to UISEP API',
+      excerpt: 'Learn how to interact with UISEP AI programmatically through our API',
       content: `
-        <h2>Introduction to Retell API</h2>
-        <p>The Retell API enables developers to integrate AI voice agents into their own applications and workflows programmatically.</p>
+        <h2>Introduction to UISEP API</h2>
+        <p>The UISEP API enables developers to integrate AI voice agents into their own applications and workflows programmatically.</p>
         
         <h3>API Overview</h3>
-        <p>The Retell API provides endpoints for:</p>
+        <p>The UISEP API provides endpoints for:</p>
         <ul>
           <li>Creating and managing agents</li>
           <li>Starting and controlling voice conversations</li>
@@ -206,7 +206,7 @@ export const helpCenterContent: Record<string, any[]> = {
         <h3>Authentication</h3>
         <p>All API requests require authentication using API keys:</p>
         <pre>
-        curl -X GET https://api.retellai.com/v1/agents \\
+        curl -X GET https://api.uisepai.com/v1/agents \\
         -H "Authorization: Bearer YOUR_API_KEY"
         </pre>
         
@@ -227,7 +227,7 @@ export const helpCenterContent: Record<string, any[]> = {
           <li><code>POST /v1/calls/:id/end</code> - End a call</li>
         </ul>
         
-        <p>For complete API documentation and code examples, please visit our <a href="https://docs.retellai.com/api-reference/introduction" target="_blank" rel="noopener noreferrer">API Reference</a>.</p>
+        <p>For complete API documentation and code examples, please visit our <a href="https://docs.uisepai.com/api-reference/introduction" target="_blank" rel="noopener noreferrer">API Reference</a>.</p>
       `
     }
   ],
@@ -236,10 +236,10 @@ export const helpCenterContent: Record<string, any[]> = {
       id: 'security-1',
       categoryName: 'Security',
       title: 'Security Best Practices',
-      excerpt: 'Learn how to secure your Retell AI implementation',
+      excerpt: 'Learn how to secure your UISEP AI implementation',
       content: `
         <h2>Security Best Practices</h2>
-        <p>Securing your Retell AI implementation is crucial for protecting sensitive data and ensuring compliance with regulations.</p>
+        <p>Securing your UISEP AI implementation is crucial for protecting sensitive data and ensuring compliance with regulations.</p>
         
         <h3>API Key Security</h3>
         <ul>
@@ -252,7 +252,7 @@ export const helpCenterContent: Record<string, any[]> = {
         
         <h3>Access Control</h3>
         <ul>
-          <li>Implement role-based access control for your Retell dashboard</li>
+          <li>Implement role-based access control for your UISEP dashboard</li>
           <li>Regularly review and remove unused accounts</li>
           <li>Enable two-factor authentication for all team members</li>
         </ul>
@@ -279,7 +279,7 @@ export const helpCenterContent: Record<string, any[]> = {
           <li>Implement rate limiting to prevent abuse</li>
         </ul>
         
-        <p>By following these best practices, you can ensure that your use of Retell AI remains secure and compliant with relevant regulations.</p>
+        <p>By following these best practices, you can ensure that your use of UISEP AI remains secure and compliant with relevant regulations.</p>
       `
     }
   ],
@@ -288,7 +288,7 @@ export const helpCenterContent: Record<string, any[]> = {
       id: 'faq-1',
       categoryName: 'FAQ',
       title: 'Frequently Asked Questions',
-      excerpt: 'Common questions and answers about using Retell AI',
+      excerpt: 'Common questions and answers about using UISEP AI',
       content: `
         <h2>Frequently Asked Questions</h2>
         
@@ -298,10 +298,10 @@ export const helpCenterContent: Record<string, any[]> = {
         <p>An agent is the AI entity that conducts conversations with users, while a phone number is a telecommunication endpoint that can be connected to an agent to enable phone calls.</p>
         
         <h4>Can I use my own LLM or voice models?</h4>
-        <p>Yes, Retell supports integration with certain custom LLMs and voice models. Contact our support team for more information about custom integrations.</p>
+        <p>Yes, UISEP supports integration with certain custom LLMs and voice models. Contact our support team for more information about custom integrations.</p>
         
-        <h4>Does Retell work internationally?</h4>
-        <p>Yes, Retell supports phone numbers in multiple countries and can conduct conversations in various languages, depending on the LLM and voice models you select.</p>
+        <h4>Does UISEP work internationally?</h4>
+        <p>Yes, UISEP supports phone numbers in multiple countries and can conduct conversations in various languages, depending on the LLM and voice models you select.</p>
         
         <h3>Billing Questions</h3>
         
@@ -320,7 +320,7 @@ export const helpCenterContent: Record<string, any[]> = {
         <p>Response quality can be improved by providing better prompts, connecting relevant knowledge bases, selecting appropriate LLM parameters, and iteratively testing and refining your agent's behavior.</p>
         
         <h4>What formats are supported for knowledge base documents?</h4>
-        <p>Retell supports PDF, DOCX, TXT, CSV, and HTML formats for knowledge base documents, as well as direct URL imports from websites.</p>
+        <p>UISEP supports PDF, DOCX, TXT, CSV, and HTML formats for knowledge base documents, as well as direct URL imports from websites.</p>
       `
     }
   ],
@@ -377,10 +377,10 @@ export const helpCenterContent: Record<string, any[]> = {
       id: 'apikeys-1',
       categoryName: 'API Keys',
       title: 'Managing API Keys',
-      excerpt: 'Learn how to create and manage API keys for secure access to Retell API',
+      excerpt: 'Learn how to create and manage API keys for secure access to UISEP API',
       content: `
         <h2>Managing API Keys</h2>
-        <p>API keys are essential for authenticating your applications when making requests to the Retell API.</p>
+        <p>API keys are essential for authenticating your applications when making requests to the UISEP API.</p>
         
         <h3>Creating API Keys</h3>
         <ol>
@@ -417,7 +417,7 @@ export const helpCenterContent: Record<string, any[]> = {
           <li>Set up alerts for unusual API key usage or failed authorization attempts</li>
         </ul>
         
-        <p>By following these best practices, you can ensure that your integration with Retell API remains secure and reliable.</p>
+        <p>By following these best practices, you can ensure that your integration with UISEP API remains secure and reliable.</p>
       `
     }
   ],
@@ -429,7 +429,7 @@ export const helpCenterContent: Record<string, any[]> = {
       excerpt: 'Learn how to manage your account and workspace settings',
       content: `
         <h2>Account and Workspace Settings</h2>
-        <p>Properly configuring your account and workspace settings ensures a smooth experience with Retell AI.</p>
+        <p>Properly configuring your account and workspace settings ensures a smooth experience with UISEP AI.</p>
         
         <h3>Account Settings</h3>
         
@@ -479,7 +479,7 @@ export const helpCenterContent: Record<string, any[]> = {
           <li>Configure security settings and IP restrictions</li>
         </ul>
         
-        <p>Regularly reviewing and updating these settings helps ensure that your Retell AI implementation remains secure, efficient, and aligned with your business needs.</p>
+        <p>Regularly reviewing and updating these settings helps ensure that your UISEP AI implementation remains secure, efficient, and aligned with your business needs.</p>
       `
     }
   ],

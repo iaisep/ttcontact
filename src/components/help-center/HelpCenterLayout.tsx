@@ -22,7 +22,7 @@ const HelpCenterLayout = ({ children }: HelpCenterLayoutProps) => {
               {t('back_to_dashboard')}
             </Link>
             <Link to="/" className="text-xl font-bold">
-              Retell
+              UISEP
             </Link>
           </div>
           <div className="flex items-center gap-4">
@@ -43,7 +43,7 @@ const HelpCenterLayout = ({ children }: HelpCenterLayoutProps) => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <p className="text-sm text-muted-foreground">
-                &copy; {new Date().getFullYear()} Retell. {t('all_rights_reserved')}
+                &copy; {new Date().getFullYear()} UISEP. {t('all_rights_reserved')}
               </p>
             </div>
             <div className="flex gap-6">

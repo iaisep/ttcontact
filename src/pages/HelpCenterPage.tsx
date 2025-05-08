@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useLanguage } from '@/context/LanguageContext';
@@ -24,7 +25,7 @@ const HelpCenterPage = () => {
     <HelmetProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Helmet>
-          <title>{t('help_center')} | Retell</title>
+          <title>{t('help_center')} | UISEP</title>
         </Helmet>
 
         <HelpCenterLayout>
