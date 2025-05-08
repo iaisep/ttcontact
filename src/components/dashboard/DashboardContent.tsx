@@ -1,8 +1,11 @@
+
 import React, { Suspense, useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
 // Import sections directly without lazy loading for the problematic component
 import BillingSection from './sections/BillingSection';
+// Import CallHistorySection directly to avoid issues with dynamic imports
+import CallHistorySection from './sections/CallHistorySection';
 
 // Lazy load other dashboard sections
 const AgentsSection = React.lazy(() => import('./sections/AgentsSection'));
@@ -13,7 +16,6 @@ const AnalyticsSection = React.lazy(() => import('./sections/analytics'));
 const ApiKeysSection = React.lazy(() => import('./sections/api-keys'));
 const WebhooksSection = React.lazy(() => import('./sections/WebhooksSection'));
 const AccountInfoSection = React.lazy(() => import('./sections/AccountInfoSection'));
-const CallHistorySection = React.lazy(() => import('./sections/CallHistorySection'));
 
 interface DashboardContentProps {
   activeSection: string;
@@ -63,6 +65,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection }) =>
       case 'account-info':
         return <AccountInfoSection key={refreshKey} />;
       case 'call-history':
+        // Use the directly imported component instead of a lazy-loaded one
         return <CallHistorySection key={refreshKey} />;
       default:
         return <AgentsSection key={refreshKey} />;

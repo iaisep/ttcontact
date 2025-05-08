@@ -1,10 +1,10 @@
 
 import CallHistorySection from './CallHistorySection';
 
-// Export the main component as default export
+// Exportar el componente principal como exportación por defecto
 export default CallHistorySection;
 
-// Re-export components, hooks, and types
+// Re-exportar componentes, hooks y tipos
 export * from './components';
 export * from './hooks';
 export * from './types';
