@@ -33,6 +33,11 @@ export const mockUsage: UsageData = {
   phone_numbers: 5,
   total_cost: 342.75,
   current_period: 'Apr 1 - Apr 27, 2025',
+  // Add the new API response fields
+  voice_total: 324.60,
+  telephony_total: 5.00,
+  llm_total: 12.18,
+  kb_extra_total: 0.97,
 };
 
 // Mock usage history data
