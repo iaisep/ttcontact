@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/dialog';
 import { Copy, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
-import ApiKeyRevealButton from './ApiKeyRevealButton';
 
 interface ApiKeyDialogProps {
   isOpen: boolean;
@@ -37,7 +36,7 @@ const ApiKeyDialog = ({ isOpen, onOpenChange, onCreateApiKey }: ApiKeyDialogProp
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(
       () => {
-        toast.success('Copied to clipboard');
+        toast.success('API key copied to clipboard');
       },
       (err) => {
         console.error('Could not copy text: ', err);
@@ -52,7 +51,7 @@ const ApiKeyDialog = ({ isOpen, onOpenChange, onCreateApiKey }: ApiKeyDialogProp
         <DialogHeader>
           <DialogTitle>Create API Key</DialogTitle>
           <DialogDescription>
-            Create a new API key to authenticate with the Retell AI API.
+            Create a new API key to authenticate with the API.
           </DialogDescription>
         </DialogHeader>
 

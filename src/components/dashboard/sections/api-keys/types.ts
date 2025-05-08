@@ -5,4 +5,5 @@ export interface ApiKey {
   prefix: string;
   created_at: string;
   last_used?: string;
+  is_active: boolean;
 }

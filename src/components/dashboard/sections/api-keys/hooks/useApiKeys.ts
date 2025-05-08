@@ -2,35 +2,47 @@
 import { useState, useEffect } from 'react';
 import { ApiKey } from '../types';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 
 export function useApiKeys() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [revealedApiKeys, setRevealedApiKeys] = useState<{ [key: string]: string | null }>({});
 
-  // Mock data for API keys
-  const mockApiKeys: ApiKey[] = [
-    {
-      id: '1',
-      name: 'Production API Key',
-      prefix: 'ak_prod_',
-      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
-      last_used: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-    },
-    {
-      id: '2',
-      name: 'Development API Key',
-      prefix: 'ak_dev_',
-      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(),
-      last_used: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-    },
-    {
-      id: '3',
-      name: 'Testing API Key',
-      prefix: 'ak_test_',
-      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
-    },
-  ];
+  // Fetch API keys from Supabase
+  const fetchApiKeys = async () => {
+    setLoading(true);
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) {
+        throw new Error('No authenticated user found');
+      }
+
+      const { data, error } = await supabase
+        .from('api_keys')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Map the data from Supabase to our ApiKey type
+      const formattedKeys = data.map((key): ApiKey => ({
+        id: key.id,
+        name: key.name,
+        prefix: key.key.substring(0, 8), // First 8 characters as prefix
+        created_at: key.created_at,
+        last_used: key.last_used_at || undefined,
+        is_active: key.is_active
+      }));
+      
+      setApiKeys(formattedKeys);
+    } catch (error) {
+      console.error('Failed to fetch API keys:', error);
+      toast.error('Failed to load API keys');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Load initial data
   useEffect(() => {
@@ -41,21 +53,20 @@ export function useApiKeys() {
   const toggleApiKeyVisibility = (apiKeyId: string) => {
     setRevealedApiKeys(prev => ({
       ...prev,
-      [apiKeyId]: prev[apiKeyId] ? null : `${apiKeyId}_mock_full_api_keyyyyyyyyyyyyyyyyyyyyyyy`
+      [apiKeyId]: prev[apiKeyId] ? null : null // We can't reveal the full key after creation
     }));
+    
+    toast.info("Full API key is only visible once when created", {
+      description: "For security reasons, we can't show the full key again"
+    });
   };
 
-  // Fetch API keys from server (mock)
-  const fetchApiKeys = async () => {
-    setLoading(true);
-    try {
-      setApiKeys(mockApiKeys);
-    } catch (error) {
-      console.error('Failed to fetch API keys:', error);
-      toast.error('Failed to load API keys');
-    } finally {
-      setLoading(false);
-    }
+  // Generate secure API key
+  const generateSecureKey = (): string => {
+    // Generate a random string of 32 characters
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const randomPart = Array(32).fill(0).map(() => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+    return `ak_${randomPart}`;
   };
 
   // Create new API key
@@ -66,26 +77,40 @@ export function useApiKeys() {
     }
 
     try {
-      const prefix = 'ak_' + Math.random().toString(36).substring(2, 8) + '_';
-      const newKey = prefix + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      const newKey = generateSecureKey();
+      const { data: user } = await supabase.auth.getUser();
       
-      const mockResponse = {
-        id: 'new_' + Math.random().toString(36).substring(2, 9),
-        name: name,
-        prefix: prefix,
-        created_at: new Date().toISOString(),
-        key: newKey,
-      };
+      if (!user.user) {
+        throw new Error('No authenticated user found');
+      }
 
-      setApiKeys([...apiKeys, {
-        id: mockResponse.id,
-        name: mockResponse.name,
-        prefix: mockResponse.prefix,
-        created_at: mockResponse.created_at,
-      }]);
+      const { data, error } = await supabase
+        .from('api_keys')
+        .insert([{
+          name: name,
+          key: newKey,
+          user_id: user.user.id
+        }])
+        .select();
+
+      if (error) throw error;
+
+      if (data && data[0]) {
+        // Add the new key to the state
+        const formattedKey: ApiKey = {
+          id: data[0].id,
+          name: data[0].name,
+          prefix: newKey.substring(0, 8), // First 8 characters as prefix
+          created_at: data[0].created_at,
+          is_active: data[0].is_active
+        };
+
+        setApiKeys([formattedKey, ...apiKeys]);
+        toast.success('API key created successfully');
+        return newKey; // Return full key only at creation time
+      }
       
-      toast.success('API key created successfully');
-      return mockResponse.key;
+      return null;
     } catch (error) {
       console.error('Failed to create API key:', error);
       toast.error('Failed to create API key');
@@ -93,14 +118,26 @@ export function useApiKeys() {
     }
   };
 
-  // Delete API key
+  // Delete/revoke API key
   const deleteApiKey = async (id: string) => {
     try {
-      setApiKeys(apiKeys.filter(key => key.id !== id));
-      toast.success('API key deleted successfully');
+      // We're not actually deleting, just setting is_active to false (revoking)
+      const { error } = await supabase
+        .from('api_keys')
+        .update({ is_active: false })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state to reflect the change
+      setApiKeys(apiKeys.map(key => 
+        key.id === id ? { ...key, is_active: false } : key
+      ));
+      
+      toast.success('API key revoked successfully');
     } catch (error) {
-      console.error('Failed to delete API key:', error);
-      toast.error('Failed to delete API key');
+      console.error('Failed to revoke API key:', error);
+      toast.error('Failed to revoke API key');
     }
   };
 

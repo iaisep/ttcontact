@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import ApiKeyRevealButton from "./ApiKeyRevealButton";
 import { toast } from "sonner";
 
@@ -60,6 +61,11 @@ const ApiKeyItem = ({ apiKey, revealed, onToggleReveal, onDelete }: ApiKeyItemPr
           ? new Date(apiKey.last_used).toLocaleDateString() 
           : 'Never used'}
       </td>
+      <td className="p-4 align-middle">
+        <Badge variant={apiKey.is_active ? "success" : "destructive"}>
+          {apiKey.is_active ? "Active" : "Revoked"}
+        </Badge>
+      </td>
       <td className="p-4 align-middle text-right">
         <Button 
           variant="ghost" 
@@ -75,15 +81,16 @@ const ApiKeyItem = ({ apiKey, revealed, onToggleReveal, onDelete }: ApiKeyItemPr
               variant="ghost" 
               size="icon"
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              disabled={!apiKey.is_active}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete API Key</AlertDialogTitle>
+              <AlertDialogTitle>Revoke API Key</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete the API key "{apiKey.name}"? This action cannot be undone
+                Are you sure you want to revoke the API key "{apiKey.name}"? This action cannot be undone
                 and any applications using this key will no longer be able to access the API.
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -93,7 +100,7 @@ const ApiKeyItem = ({ apiKey, revealed, onToggleReveal, onDelete }: ApiKeyItemPr
                 className="bg-destructive text-destructive-foreground"
                 onClick={() => onDelete(apiKey.id)}
               >
-                Delete
+                Revoke
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

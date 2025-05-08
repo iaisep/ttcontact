@@ -37,6 +37,9 @@ const ApiKeyList = ({
     );
   }
 
+  const filteredApiKeys = apiKeys.filter(key => key.is_active); // Only show active keys
+  const hasActiveKeys = filteredApiKeys.length > 0;
+
   return (
     <div className="border rounded-md">
       <Table>
@@ -46,16 +49,17 @@ const ApiKeyList = ({
             <TableHead>API Key</TableHead>
             <TableHead>Created</TableHead>
             <TableHead>Last Used</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {apiKeys.length === 0 ? (
+          {!hasActiveKeys ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 <div className="flex flex-col items-center gap-2">
                   <Key className="h-8 w-8 text-muted-foreground" />
-                  <p>No API keys found</p>
+                  <p>No active API keys found</p>
                   <Button variant="outline" size="sm" onClick={onCreateClick}>
                     <Plus className="mr-2 h-4 w-4" />
                     Create Your First API Key
@@ -64,7 +68,7 @@ const ApiKeyList = ({
               </TableCell>
             </TableRow>
           ) : (
-            apiKeys.map((apiKey) => (
+            filteredApiKeys.map((apiKey) => (
               <ApiKeyItem
                 key={apiKey.id}
                 apiKey={apiKey}
