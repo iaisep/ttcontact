@@ -1,9 +1,12 @@
 
 import React, { createContext, useContext, useState } from 'react';
 
+// Define and export the Language type
+export type Language = 'en' | 'es';
+
 type LanguageContextType = {
-  language: string;
-  setLanguage: (lang: string) => void;
+  language: Language;
+  setLanguage: (lang: Language) => void;
   t: (key: string) => string;
 };
 
@@ -13,7 +16,7 @@ const initialContext: LanguageContextType = {
   t: (key) => key,
 };
 
-const translations: Record<string, Record<string, string>> = {
+const translations: Record<Language, Record<string, string>> = {
   en: {
     name: 'Name',
     description: 'Description',
@@ -67,7 +70,30 @@ const translations: Record<string, Record<string, string>> = {
     error_fetching_functions: 'Error fetching functions',
     functions_updated_successfully: 'Functions updated successfully',
     error_updating_functions: 'Error updating functions',
-    function_name_already_exists: 'A function with this name already exists'
+    function_name_already_exists: 'A function with this name already exists',
+    choose_language: 'Choose language',
+    english: 'English',
+    spanish: 'Spanish',
+    select_language: 'Select language',
+    products: 'Products',
+    documentation: 'Documentation',
+    resources: 'Resources',
+    pricing: 'Pricing',
+    features: 'Features',
+    discover_features: 'Discover our features',
+    voice_sdk: 'Voice SDK',
+    voice_sdk_desc: 'Integrate voice capabilities into your app',
+    ai_agents: 'AI Agents',
+    ai_agents_desc: 'Build powerful AI agents for your business',
+    blog: 'Blog',
+    blog_desc: 'Latest updates and articles',
+    guides: 'Guides',
+    guides_desc: 'Step-by-step tutorials',
+    examples: 'Examples',
+    examples_desc: 'See our solutions in action',
+    login: 'Login',
+    get_started: 'Get Started',
+    voice_agent_hub: 'Voice Agent Hub'
   },
   es: {
     name: 'Nombre',
@@ -122,7 +148,30 @@ const translations: Record<string, Record<string, string>> = {
     error_fetching_functions: 'Error al obtener las funciones',
     functions_updated_successfully: 'Funciones actualizadas exitosamente',
     error_updating_functions: 'Error al actualizar las funciones',
-    function_name_already_exists: 'Ya existe una función con este nombre'
+    function_name_already_exists: 'Ya existe una función con este nombre',
+    choose_language: 'Elegir idioma',
+    english: 'Inglés',
+    spanish: 'Español',
+    select_language: 'Seleccionar idioma',
+    products: 'Productos',
+    documentation: 'Documentación',
+    resources: 'Recursos',
+    pricing: 'Precios',
+    features: 'Características',
+    discover_features: 'Descubre nuestras características',
+    voice_sdk: 'SDK de Voz',
+    voice_sdk_desc: 'Integra capacidades de voz en tu aplicación',
+    ai_agents: 'Agentes de IA',
+    ai_agents_desc: 'Construye agentes de IA potentes para tu negocio',
+    blog: 'Blog',
+    blog_desc: 'Últimas actualizaciones y artículos',
+    guides: 'Guías',
+    guides_desc: 'Tutoriales paso a paso',
+    examples: 'Ejemplos',
+    examples_desc: 'Ve nuestras soluciones en acción',
+    login: 'Iniciar sesión',
+    get_started: 'Comenzar',
+    voice_agent_hub: 'Portal de Agentes de Voz'
   },
 };
 
@@ -137,7 +186,7 @@ export const useLanguage = (): LanguageContextType => {
 };
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<string>('es');
+  const [language, setLanguage] = useState<Language>('es');
 
   const t = (key: string): string => {
     return translations[language]?.[key] || key;
