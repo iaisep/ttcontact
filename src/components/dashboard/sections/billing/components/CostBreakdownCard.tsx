@@ -12,20 +12,14 @@ interface CostBreakdownCardProps {
 const CostBreakdownCard = ({ usage }: CostBreakdownCardProps) => {
   const isMobile = useIsMobile();
 
-  // Calculate the voice cost directly from the minutes
-  const voiceCost = usage?.voice_minutes ? usage.voice_minutes * 0.075 : 0;
-  
-  // Calculate API calls cost
-  const apiCallsCost = usage?.api_calls ? usage.api_calls * 0.00001 : 0;
-  
-  // Calculate phone numbers cost
-  const phoneNumbersCost = usage?.phone_numbers ? usage.phone_numbers * 1.0 : 0;
-  
-  // Fixed subscription cost
-  const subscriptionCost = 49.99;
+  // Get values directly from API response
+  const voiceTotal = usage?.voice_total || 0;
+  const telephonyTotal = usage?.telephony_total || 0;
+  const llmTotal = usage?.llm_total || 0;
+  const kbExtraTotal = usage?.kb_extra_total || 0;
   
   // Calculate total (should match total_cost from API)
-  const totalCost = voiceCost + apiCallsCost + phoneNumbersCost + subscriptionCost;
+  const totalCost = usage?.total_cost || 0;
 
   return (
     <Card className="lg:col-span-2">
@@ -39,39 +33,39 @@ const CostBreakdownCard = ({ usage }: CostBreakdownCardProps) => {
         <div className="border rounded-md divide-y">
           <div className={`${isMobile ? 'flex flex-col space-y-2' : 'flex justify-between'} py-3 px-4`}>
             <div>
-              <p className="font-medium">Minutos de voz</p>
-              <p className="text-sm text-muted-foreground">{usage?.voice_minutes?.toLocaleString()} minutos a $0.075 por minuto</p>
+              <p className="font-medium">voice_total</p>
+              <p className="text-sm text-muted-foreground">Minutos de voz</p>
             </div>
-            <p className={`font-medium ${isMobile ? '' : 'text-right'}`}>{formatCurrency(voiceCost)}</p>
+            <p className={`font-medium ${isMobile ? '' : 'text-right'}`}>{formatCurrency(voiceTotal)}</p>
           </div>
           
           <div className={`${isMobile ? 'flex flex-col space-y-2' : 'flex justify-between'} py-3 px-4`}>
             <div>
-              <p className="font-medium">Números telefónicos</p>
-              <p className="text-sm text-muted-foreground">{usage?.phone_numbers} números a $1.00 por número</p>
+              <p className="font-medium">telephony_total</p>
+              <p className="text-sm text-muted-foreground">Números telefónicos</p>
             </div>
-            <p className={`font-medium ${isMobile ? '' : 'text-right'}`}>{formatCurrency(phoneNumbersCost)}</p>
+            <p className={`font-medium ${isMobile ? '' : 'text-right'}`}>{formatCurrency(telephonyTotal)}</p>
           </div>
           
           <div className={`${isMobile ? 'flex flex-col space-y-2' : 'flex justify-between'} py-3 px-4`}>
             <div>
-              <p className="font-medium">Llamadas a API</p>
-              <p className="text-sm text-muted-foreground">{usage?.api_calls?.toLocaleString()} llamadas ($0.01 por 1000 llamadas)</p>
+              <p className="font-medium">llm_total</p>
+              <p className="text-sm text-muted-foreground">Llamadas a API</p>
             </div>
-            <p className={`font-medium ${isMobile ? '' : 'text-right'}`}>{formatCurrency(apiCallsCost)}</p>
+            <p className={`font-medium ${isMobile ? '' : 'text-right'}`}>{formatCurrency(llmTotal)}</p>
           </div>
           
           <div className={`${isMobile ? 'flex flex-col space-y-2' : 'flex justify-between'} py-3 px-4`}>
             <div>
-              <p className="font-medium">Suscripción Plan Pro</p>
-              <p className="text-sm text-muted-foreground">Cuota de suscripción mensual</p>
+              <p className="font-medium">kb_extra_total</p>
+              <p className="text-sm text-muted-foreground">Base de conocimiento</p>
             </div>
-            <p className={`font-medium ${isMobile ? '' : 'text-right'}`}>{formatCurrency(subscriptionCost)}</p>
+            <p className={`font-medium ${isMobile ? '' : 'text-right'}`}>{formatCurrency(kbExtraTotal)}</p>
           </div>
           
           <div className={`${isMobile ? 'flex flex-col space-y-2' : 'flex justify-between'} py-3 px-4 bg-muted/50`}>
             <p className="font-medium">Total estimado</p>
-            <p className={`font-bold ${isMobile ? '' : 'text-right'}`}>{formatCurrency(usage?.total_cost ?? 0)}</p>
+            <p className={`font-bold ${isMobile ? '' : 'text-right'}`}>{formatCurrency(totalCost)}</p>
           </div>
         </div>
       </CardContent>
