@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApiContext } from '@/context/ApiContext';
@@ -8,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Agent } from '@/components/dashboard/sections/agents/types';
 import { toast } from 'sonner';
-import { Plus, Import } from 'lucide-react';
+import { Plus, Import, ArrowLeft } from 'lucide-react';
 
 const AgentsListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -79,12 +78,27 @@ const AgentsListPage: React.FC = () => {
     navigate('/agentes/new');
   };
 
+  const handleBackToDashboard = () => {
+    navigate('/dashboard');
+  };
+
   const filteredAgents = agents.filter(agent => 
     agent.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="container p-6">
+      <div className="flex items-center mb-4">
+        <Button 
+          variant="ghost" 
+          className="mr-2" 
+          onClick={handleBackToDashboard}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {t('back_to_dashboard')}
+        </Button>
+      </div>
+      
       <h1 className="text-2xl font-bold mb-6">{t('all_agents')}</h1>
       
       <div className="flex justify-between items-center mb-6">
