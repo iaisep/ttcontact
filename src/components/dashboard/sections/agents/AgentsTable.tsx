@@ -41,6 +41,11 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
     return type;
   };
 
+  const handleRowClick = (agent: Agent) => {
+    // Navigate to agent detail page
+    navigate(`/agentes/${agent.id}/edit`);
+  };
+
   const handleEditClick = (agent: Agent, e: React.MouseEvent) => {
     e.stopPropagation();
     onEditAgent(agent);
@@ -151,7 +156,7 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
       data={agents}
       columns={columns}
       emptyState={<div className="py-8 text-center">{t('no_agents_found')}</div>}
-      onRowClick={(agent) => handleEditClick(agent, {} as React.MouseEvent)}
+      onRowClick={handleRowClick}
       rowClassName="cursor-pointer"
       currentPage={currentPage}
       onPageChange={setCurrentPage}

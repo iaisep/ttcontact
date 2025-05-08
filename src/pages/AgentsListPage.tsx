@@ -50,7 +50,6 @@ const AgentsListPage: React.FC = () => {
   };
 
   const handleEditAgent = (agent: Agent) => {
-    const slug = agent.name.toLowerCase().replace(/\s+/g, '-');
     navigate(`/agentes/${agent.id}/edit`);
   };
 
