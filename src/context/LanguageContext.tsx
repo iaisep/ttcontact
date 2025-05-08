@@ -1,60 +1,146 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import translations from '@/utils/translations';
+import React, { createContext, useContext, useState } from 'react';
 
-// Define our supported languages
-export type Language = 'es' | 'en';
-
-// Interface for our context
-interface LanguageContextType {
-  language: Language;
-  setLanguage: (language: Language) => void;
+type LanguageContextType = {
+  language: string;
+  setLanguage: (lang: string) => void;
   t: (key: string) => string;
-}
+};
 
-// Create context with default values
-const LanguageContext = createContext<LanguageContextType>({
+const initialContext: LanguageContextType = {
   language: 'es',
   setLanguage: () => {},
-  t: (key: string) => key,
-});
+  t: (key) => key,
+};
 
-// Hook for using our language context
-export const useLanguage = () => useContext(LanguageContext);
+const translations: Record<string, Record<string, string>> = {
+  en: {
+    name: 'Name',
+    description: 'Description',
+    agent_type: 'Agent Type',
+    voice_id: 'Voice ID',
+    folder: 'Folder',
+    name_required: 'Name is required',
+    description_required: 'Description is required',
+    voice_id_required: 'Voice ID is required',
+    cancel: 'Cancel',
+    update_agent: 'Update Agent',
+    agent_name_placeholder: 'Enter agent name',
+    agent_description_placeholder: 'Enter agent description',
+    no_folder: 'No folder',
+    edit_agent: 'Edit Agent',
+    back_to_dashboard: 'Back to Dashboard',
+    loading: 'Loading...',
+    agent_not_found: 'Agent not found',
+    error_loading_agent: 'Error loading agent data',
+    error_updating_agent: 'Error updating agent',
+    agent_updated: 'Agent updated successfully',
+    llm: 'LLM',
+    voice: 'Voice',
+    language: 'Language',
+    selected_voice: 'Selected Voice',
+    functions: 'Functions',
+    call_settings: 'Call Settings',
+    webhook_settings: 'Webhook Settings',
+    audio_settings: 'Audio Settings',
+    volume: 'Volume',
+    listening: 'Listening...',
+    test_your_agent: 'Test your agent',
+    speak_now: 'Speak now',
+    test: 'Test',
+    audio: 'Audio',
+    end_the_call: 'End the call',
+    testing_audio: 'Testing audio...',
+    audio_test_complete: 'Audio test complete!',
+    testing_llm: 'Testing LLM...',
+    llm_test_complete: 'LLM test complete!',
+    testing_code: 'Testing code...',
+    code_test_complete: 'Code test complete!',
+    processing_test: 'Processing test...',
+    test_complete: 'Test complete!',
+    call_connected: 'Call connected!',
+    error_testing_audio: 'Error testing audio',
+    error_testing_llm: 'Error testing LLM',
+    error_starting_call: 'Error starting call',
+    no_agents_found: 'No agents found',
+    actions: 'Actions',
+    error_fetching_functions: 'Error fetching functions',
+    functions_updated_successfully: 'Functions updated successfully',
+    error_updating_functions: 'Error updating functions',
+    function_name_already_exists: 'A function with this name already exists'
+  },
+  es: {
+    name: 'Nombre',
+    description: 'Descripción',
+    agent_type: 'Tipo de Agente',
+    voice_id: 'ID de Voz',
+    folder: 'Carpeta',
+    name_required: 'El nombre es obligatorio',
+    description_required: 'La descripción es obligatoria',
+    voice_id_required: 'El ID de voz es obligatorio',
+    cancel: 'Cancelar',
+    update_agent: 'Actualizar Agente',
+    agent_name_placeholder: 'Ingrese nombre del agente',
+    agent_description_placeholder: 'Ingrese descripción del agente',
+    no_folder: 'Sin carpeta',
+    edit_agent: 'Editar Agente',
+    back_to_dashboard: 'Volver al Dashboard',
+    loading: 'Cargando...',
+    agent_not_found: 'Agente no encontrado',
+    error_loading_agent: 'Error al cargar datos del agente',
+    error_updating_agent: 'Error al actualizar el agente',
+    agent_updated: 'Agente actualizado exitosamente',
+    llm: 'LLM',
+    voice: 'Voz',
+    language: 'Idioma',
+    selected_voice: 'Voz Seleccionada',
+    functions: 'Funciones',
+    call_settings: 'Configuración de Llamada',
+    webhook_settings: 'Configuración de Webhook',
+    audio_settings: 'Configuración de Audio',
+    volume: 'Volumen',
+    listening: 'Escuchando...',
+    test_your_agent: 'Prueba tu agente',
+    speak_now: 'Habla ahora',
+    test: 'Probar',
+    audio: 'Audio',
+    end_the_call: 'Terminar la llamada',
+    testing_audio: 'Probando audio...',
+    audio_test_complete: '¡Prueba de audio completada!',
+    testing_llm: 'Probando LLM...',
+    llm_test_complete: '¡Prueba de LLM completada!',
+    testing_code: 'Probando código...',
+    code_test_complete: '¡Prueba de código completada!',
+    processing_test: 'Procesando prueba...',
+    test_complete: '¡Prueba completada!',
+    call_connected: '¡Llamada conectada!',
+    error_testing_audio: 'Error al probar el audio',
+    error_testing_llm: 'Error al probar el LLM',
+    error_starting_call: 'Error al iniciar la llamada',
+    no_agents_found: 'No se encontraron agentes',
+    actions: 'Acciones',
+    error_fetching_functions: 'Error al obtener las funciones',
+    functions_updated_successfully: 'Funciones actualizadas exitosamente',
+    error_updating_functions: 'Error al actualizar las funciones',
+    function_name_already_exists: 'Ya existe una función con este nombre'
+  },
+};
 
-interface LanguageProviderProps {
-  children: ReactNode;
-}
+export const LanguageContext = createContext<LanguageContextType>(initialContext);
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  // Get initial language from localStorage or default to Spanish
-  const [language, setLanguage] = useState<Language>(() => {
-    const storedLanguage = localStorage.getItem('language');
-    return (storedLanguage as Language) || 'es';
-  });
+export const useLanguage = (): LanguageContextType => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};
 
-  // Save language preference to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('language', language);
-    // Update HTML lang attribute
-    document.documentElement.lang = language;
-  }, [language]);
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = useState<string>('es');
 
-  // Function to get translation by key
   const t = (key: string): string => {
-    if (!key) return '';
-    
-    if (translations[language] && translations[language][key]) {
-      return translations[language][key];
-    }
-    
-    // Fallback to English if translation doesn't exist in current language
-    if (language !== 'en' && translations['en'] && translations['en'][key]) {
-      return translations['en'][key];
-    }
-    
-    // Return key as fallback if no translation found
-    return key;
+    return translations[language]?.[key] || key;
   };
 
   return (
@@ -64,5 +150,4 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   );
 };
 
-// Default export for the provider
 export default LanguageProvider;
