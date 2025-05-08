@@ -26,8 +26,9 @@ RUN apk update && apk add --no-cache bash curl
 # Copy the build output to replace the default nginx contents
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy custom nginx configuration if needed
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Create custom nginx configuration for SPA routing
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 80
 EXPOSE 80
