@@ -6,15 +6,7 @@ import { Edit, Trash } from 'lucide-react';
 import { Agent } from './types';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
-import { PaginationControls } from '@/components/ui/pagination';
+import { TableWithPagination } from '@/components/ui/table-with-pagination';
 
 interface AgentsTableProps {
   agents: Agent[];
@@ -44,14 +36,7 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
   const handleEditClick = (agent: Agent, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // Navigate to the detailed agent page
-    try {
-      const slug = getAgentSlug(agent);
-      navigate(`/agentes/${slug}`);
-    } catch (error) {
-      console.error('Navigation error:', error);
-      toast.error(t('error_navigating_to_agent'));
-    }
+    onEditAgent(agent);
   };
 
   const handleDeleteClick = (agentId: string, e: React.MouseEvent) => {
@@ -79,115 +64,91 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
       </div>
     );
   }
-  
-  // Calculate paginated data
-  const paginatedData = agents.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+
+  // Define columns for the TableWithPagination component
+  const columns = [
+    {
+      key: 'name',
+      header: t('name'),
+      cell: (agent: Agent) => (
+        <div className="flex items-center">
+          {agent.voice?.avatar_url && (
+            <div className="flex-shrink-0 h-10 w-10 mr-3">
+              <img 
+                className="h-10 w-10 rounded-full" 
+                src={agent.voice.avatar_url} 
+                alt={agent.name} 
+              />
+            </div>
+          )}
+          <div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white">
+              {agent.name}
+            </div>
+            {agent.description && (
+              <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                {agent.description}
+              </div>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'agent_type',
+      header: t('agent_type'),
+      cell: (agent: Agent) => (
+        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">
+          {agent.agent_type || t('standard')}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: <div className="text-right">{t('actions')}</div>,
+      cell: (agent: Agent) => (
+        <div className="flex justify-end space-x-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e: React.MouseEvent) => handleEditClick(agent, e)}
+          >
+            <Edit size={16} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e: React.MouseEvent) => handleDeleteClick(agent.id, e)}
+          >
+            <Trash size={16} />
+          </Button>
+        </div>
+      ),
+      className: "text-right",
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-        {agents.length === 0 ? (
+      <TableWithPagination
+        data={agents}
+        columns={columns}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+        initialPageSize={pageSize}
+        pageSizeOptions={pageSizeOptions}
+        onRowClick={handleRowClick}
+        emptyState={
           <div className="p-8 text-center">
             <h3 className="text-lg font-medium">{t('no_agents_found')}</h3>
             <p className="mt-2 text-gray-500 dark:text-gray-400">
               {t('no_agents_description')}
             </p>
           </div>
-        ) : (
-          <div className="w-full">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('name')}</TableHead>
-                  <TableHead>{t('agent_type')}</TableHead>
-                  <TableHead className="text-right">{t('actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedData.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                      {t('no_agents_found')}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  paginatedData.map((agent) => (
-                    <TableRow 
-                      key={agent.id} 
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-                      onClick={() => handleRowClick(agent)}
-                    >
-                      <TableCell>
-                        <div className="flex items-center">
-                          {agent.voice?.avatar_url && (
-                            <div className="flex-shrink-0 h-10 w-10 mr-3">
-                              <img 
-                                className="h-10 w-10 rounded-full" 
-                                src={agent.voice.avatar_url} 
-                                alt={agent.name} 
-                              />
-                            </div>
-                          )}
-                          <div>
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
-                              {agent.name}
-                            </div>
-                            {agent.description && (
-                              <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
-                                {agent.description}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">
-                          {agent.agent_type || t('standard')}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e: React.MouseEvent) => handleEditClick(agent, e)}
-                          >
-                            <Edit size={16} />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e: React.MouseEvent) => handleDeleteClick(agent.id, e)}
-                          >
-                            <Trash size={16} />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </div>
-      
-      {/* Separate pagination controls */}
-      {agents.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 mt-4">
-          <PaginationControls
-            totalItems={agents.length}
-            pageSize={pageSize}
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-            onPageSizeChange={setPageSize}
-            pageSizeOptions={pageSizeOptions}
-          />
-        </div>
-      )}
+        }
+        rowClassName="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+      />
     </div>
   );
 };
