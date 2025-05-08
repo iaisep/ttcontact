@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 
 // Define and export the Language type
@@ -93,6 +92,23 @@ const translations: Record<Language, Record<string, string>> = {
     examples_desc: 'See our solutions in action',
     login: 'Login',
     get_started: 'Get Started',
+    voice_agent_hub: 'Voice Agent Hub',
+    all_agents: 'All Agents',
+    create_an_agent: 'Create an Agent',
+    search_agents: 'Search agents...',
+    import: 'Import',
+    confirm_delete_agent: 'Are you sure you want to delete this agent?',
+    agent_deleted: 'Agent deleted successfully',
+    error_deleting_agent: 'Error deleting agent',
+    error_loading_agents: 'Error loading agents',
+    import_feature_coming_soon: 'Import feature coming soon',
+    agent_name: 'Agent Name',
+    agent_type: 'Agent Type',
+    voice: 'Voice',
+    phone: 'Phone',
+    edited_by: 'Edited by',
+    single_prompt: 'Single Prompt',
+    multi_prompt: 'Multi Prompt',
     voice_agent_hub: 'Voice Agent Hub'
   },
   es: {
@@ -171,6 +187,23 @@ const translations: Record<Language, Record<string, string>> = {
     examples_desc: 'Ve nuestras soluciones en acción',
     login: 'Iniciar sesión',
     get_started: 'Comenzar',
+    voice_agent_hub: 'Portal de Agentes de Voz',
+    all_agents: 'Todos los Agentes',
+    create_an_agent: 'Crear Agente',
+    search_agents: 'Buscar agentes...',
+    import: 'Importar',
+    confirm_delete_agent: '¿Estás seguro de que quieres eliminar este agente?',
+    agent_deleted: 'Agente eliminado exitosamente',
+    error_deleting_agent: 'Error al eliminar el agente',
+    error_loading_agents: 'Error al cargar los agentes',
+    import_feature_coming_soon: 'Función de importación próximamente',
+    agent_name: 'Nombre del Agente',
+    agent_type: 'Tipo de Agente',
+    voice: 'Voz',
+    phone: 'Teléfono',
+    edited_by: 'Editado por',
+    single_prompt: 'Prompt Único',
+    multi_prompt: 'Prompt Múltiple',
     voice_agent_hub: 'Portal de Agentes de Voz'
   },
 };

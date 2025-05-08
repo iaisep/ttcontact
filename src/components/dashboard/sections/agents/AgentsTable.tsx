@@ -5,8 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { Agent } from './types';
 import { Badge } from '@/components/ui/badge';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatDistanceToNow } from 'date-fns';
+import { es, enUS } from 'date-fns/locale';
 
 interface AgentsTableProps {
   agents: Agent[];
@@ -21,39 +23,61 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
   onDeleteAgent,
   isLoading
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
 
-  // Format the agent type display for better readability and replace retell with uisep
+  // Format agent type display
   const formatAgentType = (type: string | undefined) => {
     if (!type) return 'N/A';
     
-    // Replace retell-llm with uisep-llm
-    return type.replace('retell-llm', 'uisep-llm');
+    if (type.includes('retell-llm')) {
+      return t('single_prompt');
+    } else if (type.includes('uisep-llm')) {
+      return t('multi_prompt');
+    }
+    
+    return type;
   };
 
   const handleEditClick = (agent: Agent, e: React.MouseEvent) => {
     e.stopPropagation();
-    // Navigate to the edit page for the agent
-    const slug = agent.name.toLowerCase().replace(/\s+/g, '-');
-    navigate(`/agentes/${agent.id || slug}/edit`);
+    onEditAgent(agent);
+  };
+
+  // Format date to display like "05/08/2025, 05:07"
+  const formatTimestamp = (timestamp: number | undefined) => {
+    if (!timestamp) return '';
+    
+    const date = new Date(timestamp);
+    return new Intl.DateTimeFormat('default', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).format(date);
+  };
+
+  // Format phone numbers 
+  const formatPhone = (phone: string | undefined) => {
+    if (!phone) return '-';
+    return phone;
   };
 
   const columns = [
     {
       key: 'name',
-      header: t('name'),
+      header: t('agent_name'),
       cell: (agent: Agent) => (
         <div className="flex items-center gap-4">
-          {agent.voice?.avatar_url && (
-            <img 
-              src={agent.voice.avatar_url} 
-              alt={agent.name} 
-              className="w-8 h-8 rounded-full object-cover"
-            />
-          )}
+          <div className="bg-gray-200 p-2 rounded-md">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="currentColor"></path>
+            </svg>
+          </div>
           <div className="font-medium">{agent.name}</div>
         </div>
       ),
@@ -68,8 +92,36 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
       ),
     },
     {
+      key: 'voice',
+      header: t('voice'),
+      cell: (agent: Agent) => (
+        <div className="flex items-center gap-2">
+          {agent.voice?.avatar_url && (
+            <img src={agent.voice.avatar_url} alt={agent.voice.name} className="w-6 h-6 rounded-full" />
+          )}
+          <span>{agent.voice?.name || '-'}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'phone',
+      header: t('phone'),
+      cell: (agent: Agent) => (
+        <div className="text-blue-600">
+          {formatPhone(agent.phone)}
+        </div>
+      ),
+    },
+    {
+      key: 'edited',
+      header: t('edited_by'),
+      cell: (agent: Agent) => (
+        <div>{formatTimestamp(agent.last_modification_timestamp)}</div>
+      ),
+    },
+    {
       key: 'actions',
-      header: t('actions'),
+      header: '',
       cell: (agent: Agent) => (
         <div className="flex items-center gap-2 justify-end">
           <Button 
@@ -77,21 +129,11 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
             size="icon" 
             onClick={(e) => handleEditClick(agent, e)}
           >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={(e) => {
-              e.stopPropagation();
-              onDeleteAgent(agent);
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
+            <MoreVertical className="h-4 w-4" />
           </Button>
         </div>
       ),
-      className: "text-right",
+      className: "text-right w-10",
     },
   ];
 
