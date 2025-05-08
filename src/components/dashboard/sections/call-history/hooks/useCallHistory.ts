@@ -37,7 +37,7 @@ export const useCallHistory = () => {
   } = useColumnVisibility();
 
   // Fetch call data
-  const { isLoading, callHistory } = useCallData(
+  const { isLoading, callHistory, refreshData } = useCallData(
     currentPage,
     pageSize,
     searchQuery,
@@ -80,6 +80,7 @@ export const useCallHistory = () => {
     totalItems,
     selectedCall,
     fetchCallDetails,
-    closeCallDetails
+    closeCallDetails,
+    refreshData
   };
 };
