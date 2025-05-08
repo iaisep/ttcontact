@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -20,34 +19,46 @@ export const useCallData = (
   const fetchCallHistory = async () => {
     setIsLoading(true);
     try {
-      // Format date range for API request
-      const params = new URLSearchParams();
+      // Preparar los datos para la solicitud POST
+      const requestData: Record<string, any> = {
+        page: currentPage,
+        page_size: pageSize
+      };
+      
+      // Añadir rango de fechas si está definido
       if (dateRange.start) {
-        params.append('start_date', dateRange.start.toISOString());
+        requestData.start_date = dateRange.start.toISOString();
       }
       if (dateRange.end) {
-        params.append('end_date', dateRange.end.toISOString());
+        requestData.end_date = dateRange.end.toISOString();
       }
       
-      params.append('page', currentPage.toString());
-      params.append('page_size', pageSize.toString());
-      
-      // Add filters if any
-      filters.forEach(filter => {
-        if (filter.value !== null && filter.value !== '') {
-          params.append(`filter_${filter.field}`, String(filter.value));
-        }
-      });
+      // Añadir filtros si hay alguno
+      if (filters.length > 0) {
+        const filterData: Record<string, any> = {};
+        filters.forEach(filter => {
+          if (filter.value !== null && filter.value !== '') {
+            filterData[`filter_${filter.field}`] = String(filter.value);
+          }
+        });
+        requestData.filters = filterData;
+      }
 
+      // Añadir búsqueda si existe
       if (searchQuery) {
-        params.append('search', searchQuery);
+        requestData.search = searchQuery;
       }
 
-      // In a real app, we'd make the API call
-      const response = await fetchWithAuth(`/v2/list-calls?${params.toString()}`);
+      // En una app real, haríamos la llamada API usando POST
+      const response = await fetchWithAuth('/v2/list-calls', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
       
-      // For now, we'll use mock data since the API call might fail in development
-      // This is a fallback for development environment
+      // Para desarrollo, usamos datos simulados si la API falla
       const mockData = generateMockCallHistory();
       
       setCallHistory(response?.data || mockData);
@@ -56,7 +67,7 @@ export const useCallData = (
       console.error('Error fetching call history:', error);
       toast.error('Failed to fetch call history. Using mock data instead.');
       
-      // Fallback to mock data on error
+      // Fallback a datos simulados en caso de error
       const mockData = generateMockCallHistory();
       setCallHistory(mockData);
       setTotalItems(mockData.length);

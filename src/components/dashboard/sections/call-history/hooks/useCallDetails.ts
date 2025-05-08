@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -20,13 +21,26 @@ export const useCallDetails = () => {
       
       setSelectedCall({ ...callInfo, transcript: 'Loading transcript...' });
       
-      // Fetch detailed call info
-      const callDetails = await fetchWithAuth(`/v2/get-call-details/${callId}`);
+      // Fetch detailed call info using POST method
+      const callDetails = await fetchWithAuth(`/v2/get-call-details`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ callId })
+      });
       
       // Fetch agent details if we have an agent ID
       let agentDetails = null;
       if (callInfo.agentId) {
-        const agentResponse = await fetchWithAuth(`/list-agents?id=${callInfo.agentId}`);
+        const agentResponse = await fetchWithAuth(`/list-agents`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id: callInfo.agentId })
+        });
+        
         if (agentResponse && agentResponse.length > 0) {
           agentDetails = agentResponse[0];
         }
