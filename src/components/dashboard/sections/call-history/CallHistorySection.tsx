@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,7 @@ import DateRangePicker from './components/DateRangePicker';
 import FilterPopover from './components/FilterPopover';
 import CustomizeFieldsPopover from './components/CustomizeFieldsPopover';
 import CallDetailDrawer from './components/CallDetailDrawer';
-import { useCallHistory } from './hooks/useCallHistory';
+import { useCallHistory } from './hooks';
 
 const CallHistorySection: React.FC = () => {
   const { t } = useLanguage();
@@ -190,6 +190,7 @@ const CallHistorySection: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
         <h1 className="text-2xl font-bold">{t('call_history')}</h1>
         
