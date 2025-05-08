@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from 'react';
 
 // Define and export the Language type
@@ -103,13 +104,16 @@ const translations: Record<Language, Record<string, string>> = {
     error_loading_agents: 'Error loading agents',
     import_feature_coming_soon: 'Import feature coming soon',
     agent_name: 'Agent Name',
-    agent_type: 'Agent Type',
-    voice: 'Voice',
-    phone: 'Phone',
     edited_by: 'Edited by',
     single_prompt: 'Single Prompt',
     multi_prompt: 'Multi Prompt',
-    voice_agent_hub: 'Voice Agent Hub'
+    phone: 'Phone',
+    knowledge_base: 'Knowledge Base',
+    phone_numbers: 'Phone Numbers',
+    call_history: 'Call History',
+    analytics: 'Analytics',
+    billing: 'Billing',
+    agents: 'Agents'
   },
   es: {
     name: 'Nombre',
@@ -198,13 +202,16 @@ const translations: Record<Language, Record<string, string>> = {
     error_loading_agents: 'Error al cargar los agentes',
     import_feature_coming_soon: 'Función de importación próximamente',
     agent_name: 'Nombre del Agente',
-    agent_type: 'Tipo de Agente',
-    voice: 'Voz',
-    phone: 'Teléfono',
     edited_by: 'Editado por',
     single_prompt: 'Prompt Único',
     multi_prompt: 'Prompt Múltiple',
-    voice_agent_hub: 'Portal de Agentes de Voz'
+    phone: 'Teléfono',
+    knowledge_base: 'Base de Conocimiento',
+    phone_numbers: 'Números de Teléfono',
+    call_history: 'Historial de Llamadas',
+    analytics: 'Analíticas',
+    billing: 'Facturación',
+    agents: 'Agentes'
   },
 };
 
