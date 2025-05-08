@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
-import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { CallDetailInfo, CallHistoryItem } from '../types';
+import { useCallDetailsService } from '../services';
 
 export const useCallDetails = () => {
-  const { fetchWithAuth } = useApiContext();
+  const { fetchCallDetailsData, fetchAgentDetails } = useCallDetailsService();
   const [selectedCall, setSelectedCall] = useState<CallDetailInfo | null>(null);
 
   // Function to fetch call details when a call is selected
@@ -19,40 +18,26 @@ export const useCallDetails = () => {
         return;
       }
       
+      // Show loading state
       setSelectedCall({ ...callInfo, transcript: 'Loading transcript...' });
       
-      // Fetch detailed call info using POST method
-      const callDetails = await fetchWithAuth(`/v2/get-call-details`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ callId })
-      });
+      // Fetch detailed call information
+      const { data: callDetails, success: callSuccess } = await fetchCallDetailsData(callId);
       
       // Fetch agent details if we have an agent ID
       let agentDetails = null;
       if (callInfo.agentId) {
-        const agentResponse = await fetchWithAuth(`/list-agents`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ id: callInfo.agentId })
-        });
-        
-        if (agentResponse && agentResponse.length > 0) {
-          agentDetails = agentResponse[0];
-        }
+        const { data: agentData } = await fetchAgentDetails(callInfo.agentId);
+        agentDetails = agentData;
       }
       
       setSelectedCall({
         ...callInfo,
-        ...callDetails,
+        ...(callDetails || {}),
         agentDetails
       });
     } catch (error) {
-      console.error('Error fetching call details:', error);
+      console.error('Error in call details process:', error);
       toast.error('Failed to fetch call details');
       
       // Keep the basic info we have
