@@ -10,11 +10,11 @@ const AgentsSection = React.lazy(() => import('./sections/AgentsSection'));
 const KnowledgeBaseSection = React.lazy(() => import('./sections/knowledge-base'));
 const PhoneNumbersSection = React.lazy(() => import('./sections/PhoneNumbersSection'));
 const BatchCallSection = React.lazy(() => import('./sections/batch-call/BatchCallSection'));
-const AnalyticsSection = React.lazy(() => import('./sections/AnalyticsSection'));
+const AnalyticsSection = React.lazy(() => import('./sections/analytics'));
 const ApiKeysSection = React.lazy(() => import('./sections/api-keys'));
 const WebhooksSection = React.lazy(() => import('./sections/WebhooksSection'));
 const AccountInfoSection = React.lazy(() => import('./sections/AccountInfoSection'));
-// Remove the duplicated call history section import
+const CallHistorySection = React.lazy(() => import('./sections/CallHistorySection'));
 
 interface DashboardContentProps {
   activeSection: string;
@@ -63,6 +63,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection }) =>
         return <WebhooksSection key={refreshKey} />;
       case 'account-info':
         return <AccountInfoSection key={refreshKey} />;
+      case 'call-history':
+        return <CallHistorySection key={refreshKey} />;
       default:
         return <AgentsSection key={refreshKey} />;
     }
