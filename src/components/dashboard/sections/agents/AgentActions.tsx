@@ -18,7 +18,7 @@ import { Agent } from './types';
 interface AgentActionsProps {
   agent: Agent;
   onEdit: (agent: Agent) => void;
-  onDelete: (id: string) => void;
+  onDelete: (agent: Agent) => void;
 }
 
 const AgentActions: React.FC<AgentActionsProps> = ({ agent, onEdit, onDelete }) => {
@@ -44,7 +44,7 @@ const AgentActions: React.FC<AgentActionsProps> = ({ agent, onEdit, onDelete }) 
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction 
               className="bg-destructive text-destructive-foreground"
-              onClick={() => onDelete(agent.id)}
+              onClick={() => onDelete(agent)}
             >
               Delete
             </AlertDialogAction>

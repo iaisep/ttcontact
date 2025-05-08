@@ -26,16 +26,17 @@ export const useAgentActions = (
     setIsAgentFormOpen(true);
   };
 
-  const handleDeleteAgent = async (agentId: string) => {
+  // Update to accept Agent object instead of just the ID
+  const handleDeleteAgent = async (agent: Agent) => {
     setIsLoading(true);
     try {
-      // Call API to delete agent
-      await fetchWithAuth(`/delete-agent/${agentId}`, {
+      // Call API to delete agent using agent.id
+      await fetchWithAuth(`/delete-agent/${agent.id}`, {
         method: 'DELETE'
       });
       
       // Update local state after successful deletion
-      setAgents(agents.filter(agent => agent.id !== agentId));
+      setAgents(agents.filter(a => a.id !== agent.id));
       toast.success(t('agent_deleted'));
     } catch (error) {
       console.error('Error deleting agent:', error);
