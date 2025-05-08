@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/context/LanguageContext';
-import { FilterOption } from '../types';
+import { FilterOption, CallHistoryItem } from '../types';
 import { Agent } from '../../agents/types';
 import { useApiContext } from '@/context/ApiContext';
 
@@ -19,6 +19,13 @@ interface FilterPopoverProps {
   onRemoveFilter: (index: number) => void;
   onClearFilters: () => void;
 }
+
+// Define a type that maps filter IDs to CallHistoryItem keys
+type FilterOptionMapping = {
+  id: string;
+  field: keyof CallHistoryItem; // This ensures the field is a valid key of CallHistoryItem
+  label: string;
+};
 
 const FilterPopover: React.FC<FilterPopoverProps> = ({
   onAddFilter,
@@ -35,20 +42,20 @@ const FilterPopover: React.FC<FilterPopoverProps> = ({
   const [searchAgentQuery, setSearchAgentQuery] = useState('');
   const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
 
-  // Filter options
-  const filterOptions = [
-    { id: 'agent', label: t('agent') },
-    { id: 'callId', label: t('call_id') },
-    { id: 'batchCallId', label: t('batch_call_id') },
-    { id: 'type', label: t('type') },
-    { id: 'callDuration', label: t('call_duration') },
-    { id: 'from', label: t('from') },
-    { id: 'to', label: t('to') },
-    { id: 'userSentiment', label: t('user_sentiment') },
-    { id: 'disconnectionReason', label: t('disconnection_reason') },
-    { id: 'callSuccessful', label: t('call_successful') },
-    { id: 'callStatus', label: t('call_status') },
-    { id: 'endToEndLatency', label: t('end_to_end_latency') }
+  // Filter options with explicit field mappings
+  const filterOptions: FilterOptionMapping[] = [
+    { id: 'agent', field: 'agentId', label: t('agent') },
+    { id: 'callId', field: 'callId', label: t('call_id') },
+    { id: 'batchCallId', field: 'batchCallId', label: t('batch_call_id') },
+    { id: 'type', field: 'type', label: t('type') },
+    { id: 'callDuration', field: 'duration', label: t('call_duration') },
+    { id: 'from', field: 'from', label: t('from') },
+    { id: 'to', field: 'to', label: t('to') },
+    { id: 'userSentiment', field: 'userSentiment', label: t('user_sentiment') },
+    { id: 'disconnectionReason', field: 'disconnectionReason', label: t('disconnection_reason') },
+    { id: 'callSuccessful', field: 'callSuccessful', label: t('call_successful') },
+    { id: 'callStatus', field: 'status', label: t('call_status') },
+    { id: 'endToEndLatency', field: 'endToEndLatency', label: t('end_to_end_latency') }
   ];
 
   // Fetch agents for the agent filter
@@ -102,12 +109,17 @@ const FilterPopover: React.FC<FilterPopoverProps> = ({
   // Handle regular filter add
   const handleAddFilter = () => {
     if (filterValue) {
-      onAddFilter({
-        field: selectedFilter as keyof FilterOption['field'],
-        value: filterValue,
-        operator: 'contains'
-      });
-      setFilterValue('');
+      // Find the corresponding field mapping for the selected filter
+      const filterOption = filterOptions.find(option => option.id === selectedFilter);
+      
+      if (filterOption) {
+        onAddFilter({
+          field: filterOption.field,
+          value: filterValue,
+          operator: 'contains'
+        });
+        setFilterValue('');
+      }
     }
   };
 
@@ -174,20 +186,26 @@ const FilterPopover: React.FC<FilterPopoverProps> = ({
               <div className="space-y-2">
                 <div className="font-medium">{t('active_filters')}</div>
                 <div className="flex flex-wrap gap-2">
-                  {filters.map((filter, index) => (
-                    <div 
-                      key={index} 
-                      className="bg-muted px-3 py-1 rounded-full text-sm flex items-center gap-2"
-                    >
-                      <span>{filterOptions.find(opt => opt.id === filter.field)?.label || filter.field}: {filter.value}</span>
-                      <button 
-                        onClick={() => onRemoveFilter(index)}
-                        className="text-muted-foreground hover:text-foreground"
+                  {filters.map((filter, index) => {
+                    // Find the display label for this field
+                    const filterOption = filterOptions.find(opt => opt.field === filter.field);
+                    const displayLabel = filterOption ? filterOption.label : String(filter.field);
+                    
+                    return (
+                      <div 
+                        key={index} 
+                        className="bg-muted px-3 py-1 rounded-full text-sm flex items-center gap-2"
                       >
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                        <span>{displayLabel}: {filter.value}</span>
+                        <button 
+                          onClick={() => onRemoveFilter(index)}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    );
+                  })}
                   <Button 
                     variant="ghost" 
                     size="sm" 
