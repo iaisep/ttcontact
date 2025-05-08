@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { 
@@ -15,6 +14,7 @@ import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, Cartesia
 import { toast } from 'sonner';
 import BatchCallHistory from './batch-call/BatchCallHistory';
 import { Agent, BatchCall } from './batch-call/types';
+import { supabase } from '@/lib/supabase';
 
 const AnalyticsSection = () => {
   const { fetchWithAuth, apiKey } = useApiContext();
@@ -26,99 +26,212 @@ const AnalyticsSection = () => {
   const [batchAgents, setBatchAgents] = useState<Agent[]>([]);
   const [callCounts, setCallCounts] = useState<any | null>(null);
   const [callCountsLoading, setCallCountsLoading] = useState(true);
-
-  const mockAnalytics = {
-    overview: {
-      total_calls: 456,
-      total_minutes: 4328,
-      avg_call_duration: 9.5,
-      successful_calls: 432,
-      failed_calls: 24,
-      success_rate: 94.7,
-      inbound_calls: 215,
-      outbound_calls: 241,
-    },
-    daily_calls: [
-      { date: '05/01', calls: 35, minutes: 315 },
-      { date: '05/02', calls: 42, minutes: 378 },
-      { date: '05/03', calls: 58, minutes: 551 },
-      { date: '05/04', calls: 75, minutes: 712 },
-      { date: '05/05', calls: 81, minutes: 769 },
-      { date: '05/06', calls: 92, minutes: 874 },
-      { date: '05/07', calls: 73, minutes: 729 },
-    ],
-    call_duration: [
-      { range: '0-1 min', count: 24 },
-      { range: '1-3 min', count: 86 },
-      { range: '3-5 min', count: 124 },
-      { range: '5-10 min', count: 156 },
-      { range: '10+ min', count: 66 },
-    ],
-    agent_performance: [
-      { agent_id: 'agent_1', agent_name: 'Sales Agent', calls: 175, avg_duration: 8.2, success_rate: 96.0 },
-      { agent_id: 'agent_2', agent_name: 'Support Agent', calls: 142, avg_duration: 11.5, success_rate: 92.3 },
-      { agent_id: 'agent_3', agent_name: 'Appointment Scheduler', calls: 139, avg_duration: 8.9, success_rate: 95.7 },
-    ],
-    call_breakdown: [
-      { name: 'Inbound', value: 215 },
-      { name: 'Outbound', value: 241 },
-    ],
-    call_status: [
-      { name: 'Successful', value: 432 },
-      { name: 'Failed', value: 24 },
-    ],
-    busiest_hours: [
-      { hour: '9AM', calls: 45 },
-      { hour: '10AM', calls: 52 },
-      { hour: '11AM', calls: 49 },
-      { hour: '12PM', calls: 38 },
-      { hour: '1PM', calls: 41 },
-      { hour: '2PM', calls: 54 },
-      { hour: '3PM', calls: 62 },
-      { hour: '4PM', calls: 57 },
-      { hour: '5PM', calls: 43 },
-      { hour: '6PM', calls: 15 },
-    ],
-  };
+  
+  // Define types for the data from Supabase views
+  interface AnalyticsOverview {
+    total_calls: number;
+    total_minutes: number;
+    avg_call_duration: number;
+    successful_calls: number;
+    failed_calls: number;
+    success_rate: number;
+  }
+  
+  interface DailyCallVolume {
+    date: string;
+    calls: number;
+    minutes: number;
+  }
+  
+  interface CallDuration {
+    range: string;
+    count: number;
+  }
+  
+  interface CallDirection {
+    direction: string;
+    count: number;
+    percentage: number;
+  }
+  
+  interface CallStatus {
+    status: string;
+    count: number;
+    percentage: number;
+  }
+  
+  interface AgentPerformance {
+    agent_id: string;
+    agent_name: string;
+    calls: number;
+    avg_duration: number;
+    success_rate: number;
+  }
+  
+  interface BusiestHour {
+    hour: string;
+    calls: number;
+  }
 
   useEffect(() => {
+    fetchAnalyticsData();
+    fetchMockBatchData(); // Keep this for now until we have batch call data in DB
+  }, [timeRange]);
+
+  const fetchAnalyticsData = async () => {
+    setLoading(true);
+    try {
+      // Fetch data from all the views we created
+      const [
+        overviewResponse,
+        dailyCallsResponse,
+        callDurationResponse,
+        callDirectionResponse,
+        callStatusResponse,
+        agentPerformanceResponse,
+        busiestHoursResponse
+      ] = await Promise.all([
+        supabase.from('analytics_overview').select('*').single(),
+        supabase.from('daily_call_volume').select('*'),
+        supabase.from('call_duration_distribution').select('*'),
+        supabase.from('call_direction_breakdown').select('*'),
+        supabase.from('call_status_breakdown').select('*'),
+        supabase.from('agent_performance').select('*'),
+        supabase.from('busiest_hours').select('*')
+      ]);
+
+      // Check for errors in the responses
+      if (overviewResponse.error) throw overviewResponse.error;
+      if (dailyCallsResponse.error) throw dailyCallsResponse.error;
+      if (callDurationResponse.error) throw callDurationResponse.error;
+      if (callDirectionResponse.error) throw callDirectionResponse.error;
+      if (callStatusResponse.error) throw callStatusResponse.error;
+      if (agentPerformanceResponse.error) throw agentPerformanceResponse.error;
+      if (busiestHoursResponse.error) throw busiestHoursResponse.error;
+
+      // Process the data into the format expected by the charts
+      const overview = overviewResponse.data || {
+        total_calls: 0,
+        total_minutes: 0,
+        avg_call_duration: 0,
+        successful_calls: 0,
+        failed_calls: 0,
+        success_rate: 0
+      };
+      
+      const dailyCalls = dailyCallsResponse.data || [];
+      const callDurations = callDurationResponse.data || [];
+      const callDirections = callDirectionResponse.data || [];
+      const callStatuses = callStatusResponse.data || [];
+      const agentPerformances = agentPerformanceResponse.data || [];
+      const busiestHours = busiestHoursResponse.data || [];
+      
+      // Map direction data for pie chart
+      const callBreakdown = callDirections.map(item => ({
+        name: item.direction,
+        value: item.count
+      }));
+      
+      // Map status data for pie chart
+      const callStatusData = callStatuses.map(item => ({
+        name: item.status,
+        value: item.count
+      }));
+      
+      // Set the analytics state
+      setAnalytics({
+        overview,
+        daily_calls: dailyCalls,
+        call_duration: callDurations,
+        agent_performance: agentPerformances,
+        call_breakdown: callBreakdown,
+        call_status: callStatusData,
+        busiest_hours: busiestHours,
+      });
+      
+      // Set agents state for batch call history
+      setAgents(agentPerformances.map((a: AgentPerformance) => ({
+        id: a.agent_id,
+        name: a.agent_name,
+      })));
+      
+      // Also refresh dashboard data
+      fetchCallCountsData();
+    } catch (error) {
+      console.error('Failed to fetch analytics data:', error);
+      toast.error('Failed to load analytics data, using mock data instead');
+      
+      // Fall back to mock data if there's an error
+      useMockData();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mock data fallback function
+  const useMockData = () => {
+    const mockAnalytics = {
+      overview: {
+        total_calls: 456,
+        total_minutes: 4328,
+        avg_call_duration: 9.5,
+        successful_calls: 432,
+        failed_calls: 24,
+        success_rate: 94.7,
+        inbound_calls: 215,
+        outbound_calls: 241,
+      },
+      daily_calls: [
+        { date: '05/01', calls: 35, minutes: 315 },
+        { date: '05/02', calls: 42, minutes: 378 },
+        { date: '05/03', calls: 58, minutes: 551 },
+        { date: '05/04', calls: 75, minutes: 712 },
+        { date: '05/05', calls: 81, minutes: 769 },
+        { date: '05/06', calls: 92, minutes: 874 },
+        { date: '05/07', calls: 73, minutes: 729 },
+      ],
+      call_duration: [
+        { range: '0-1 min', count: 24 },
+        { range: '1-3 min', count: 86 },
+        { range: '3-5 min', count: 124 },
+        { range: '5-10 min', count: 156 },
+        { range: '10+ min', count: 66 },
+      ],
+      agent_performance: [
+        { agent_id: 'agent_1', agent_name: 'Sales Agent', calls: 175, avg_duration: 8.2, success_rate: 96.0 },
+        { agent_id: 'agent_2', agent_name: 'Support Agent', calls: 142, avg_duration: 11.5, success_rate: 92.3 },
+        { agent_id: 'agent_3', agent_name: 'Appointment Scheduler', calls: 139, avg_duration: 8.9, success_rate: 95.7 },
+      ],
+      call_breakdown: [
+        { name: 'Inbound', value: 215 },
+        { name: 'Outbound', value: 241 },
+      ],
+      call_status: [
+        { name: 'Successful', value: 432 },
+        { name: 'Failed', value: 24 },
+      ],
+      busiest_hours: [
+        { hour: '9AM', calls: 45 },
+        { hour: '10AM', calls: 52 },
+        { hour: '11AM', calls: 49 },
+        { hour: '12PM', calls: 38 },
+        { hour: '1PM', calls: 41 },
+        { hour: '2PM', calls: 54 },
+        { hour: '3PM', calls: 62 },
+        { hour: '4PM', calls: 57 },
+        { hour: '5PM', calls: 43 },
+        { hour: '6PM', calls: 15 },
+      ],
+    };
+
     setAnalytics(mockAnalytics);
     setAgents(mockAnalytics.agent_performance.map(a => ({
       id: a.agent_id,
       name: a.agent_name,
     })));
-    setBatches([
-      {
-        id: '1',
-        status: 'completed',
-        total_calls: 50,
-        completed_calls: 48,
-        failed_calls: 2,
-        agent_id: 'agent_1',
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        status: 'in-progress',
-        total_calls: 100,
-        completed_calls: 45,
-        failed_calls: 3,
-        agent_id: 'agent_2',
-        created_at: new Date().toISOString(),
-      },
-    ]);
-    
-    setBatchAgents([
-      { id: 'agent_1', name: 'Sales Agent', agent_id: 'agent_1', voice_id: 'voice_1', agent_type: 'sales', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
-      { id: 'agent_2', name: 'Support Agent', agent_id: 'agent_2', voice_id: 'voice_2', agent_type: 'support', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
-      { id: 'agent_3', name: 'Appointment Scheduler', agent_id: 'agent_3', voice_id: 'voice_3', agent_type: 'scheduler', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
-    ]);
-    setLoading(false);
-    
-    // Fetch dashboard call counts data
-    fetchCallCountsData();
-  }, []);
+  };
 
+  // Keep the fetchCallCountsData and fetchMockBatchData functions
   const fetchCallCountsData = async () => {
     setCallCountsLoading(true);
     try {
@@ -178,24 +291,33 @@ const AnalyticsSection = () => {
     }
   };
 
-  const fetchAnalytics = async () => {
-    setLoading(true);
-    try {
-      // In a real app, this would fetch from API
-      // const data = await fetchWithAuth(`/analytics?timeRange=${timeRange}`);
-      
-      // Simulate API call with mock data
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setAnalytics(mockAnalytics);
-      
-      // Also refresh dashboard data when changing time range
-      fetchCallCountsData();
-    } catch (error) {
-      console.error('Failed to fetch analytics:', error);
-      toast.error('Failed to load analytics data');
-    } finally {
-      setLoading(false);
-    }
+  const fetchMockBatchData = () => {
+    setBatches([
+      {
+        id: '1',
+        status: 'completed',
+        total_calls: 50,
+        completed_calls: 48,
+        failed_calls: 2,
+        agent_id: 'agent_1',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: '2',
+        status: 'in-progress',
+        total_calls: 100,
+        completed_calls: 45,
+        failed_calls: 3,
+        agent_id: 'agent_2',
+        created_at: new Date().toISOString(),
+      },
+    ]);
+    
+    setBatchAgents([
+      { id: 'agent_1', name: 'Sales Agent', agent_id: 'agent_1', voice_id: 'voice_1', agent_type: 'sales', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
+      { id: 'agent_2', name: 'Support Agent', agent_id: 'agent_2', voice_id: 'voice_2', agent_type: 'support', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
+      { id: 'agent_3', name: 'Appointment Scheduler', agent_id: 'agent_3', voice_id: 'voice_3', agent_type: 'scheduler', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
+    ]);
   };
 
   const handleTimeRangeChange = (range: string) => {
@@ -275,7 +397,7 @@ const AnalyticsSection = () => {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.overview.total_minutes}</div>
+            <div className="text-2xl font-bold">{analytics.overview.total_minutes?.toFixed(0) || 0}</div>
             <p className="text-xs text-muted-foreground">
               +{Math.floor(Math.random() * 15)}% from last period
             </p>
@@ -288,7 +410,7 @@ const AnalyticsSection = () => {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.overview.avg_call_duration} min</div>
+            <div className="text-2xl font-bold">{analytics.overview.avg_call_duration?.toFixed(1) || 0} min</div>
             <p className="text-xs text-muted-foreground">
               {Math.random() > 0.5 ? '+' : '-'}{Math.floor(Math.random() * 10)}% from last period
             </p>
@@ -301,7 +423,7 @@ const AnalyticsSection = () => {
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.overview.success_rate}%</div>
+            <div className="text-2xl font-bold">{analytics.overview.success_rate?.toFixed(1) || 0}%</div>
             <p className="text-xs text-muted-foreground">
               +{(Math.random() * 2).toFixed(1)}% from last period
             </p>
@@ -474,23 +596,23 @@ const AnalyticsSection = () => {
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-sm font-medium text-muted-foreground">Avg Duration:</dt>
-                      <dd className="text-sm font-medium">{agent.avg_duration} min</dd>
+                      <dd className="text-sm font-medium">{agent.avg_duration?.toFixed(1) || 0} min</dd>
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-sm font-medium text-muted-foreground">Success Rate:</dt>
-                      <dd className="text-sm font-medium">{agent.success_rate}%</dd>
+                      <dd className="text-sm font-medium">{agent.success_rate?.toFixed(1) || 0}%</dd>
                     </div>
                   </dl>
                   
                   <div className="mt-4 space-y-2">
                     <div className="flex justify-between text-xs">
                       <span>Success Rate</span>
-                      <span>{agent.success_rate}%</span>
+                      <span>{agent.success_rate?.toFixed(1) || 0}%</span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-primary" 
-                        style={{ width: `${agent.success_rate}%` }} 
+                        style={{ width: `${agent.success_rate || 0}%` }} 
                       />
                     </div>
                   </div>

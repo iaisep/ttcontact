@@ -366,6 +366,57 @@ export type Database = {
       }
     }
     Views: {
+      agent_performance: {
+        Row: {
+          agent_id: string | null
+          agent_name: unknown | null
+          avg_duration: number | null
+          calls: number | null
+          success_rate: number | null
+        }
+        Relationships: []
+      }
+      analytics_overview: {
+        Row: {
+          avg_call_duration: number | null
+          failed_calls: number | null
+          success_rate: number | null
+          successful_calls: number | null
+          total_calls: number | null
+          total_minutes: number | null
+        }
+        Relationships: []
+      }
+      busiest_hours: {
+        Row: {
+          calls: number | null
+          hour: string | null
+        }
+        Relationships: []
+      }
+      call_direction_breakdown: {
+        Row: {
+          count: number | null
+          direction: string | null
+          percentage: number | null
+        }
+        Relationships: []
+      }
+      call_duration_distribution: {
+        Row: {
+          count: number | null
+          range: string | null
+        }
+        Relationships: []
+      }
+      call_status_breakdown: {
+        Row: {
+          count: number | null
+          percentage: number | null
+          status: string | null
+        }
+        Relationships: []
+      }
       cost_calculation_view: {
         Row: {
           agent_id: string | null
@@ -384,6 +435,14 @@ export type Database = {
           total_cost: number | null
           user: string | null
           voice_cost: number | null
+        }
+        Relationships: []
+      }
+      daily_call_volume: {
+        Row: {
+          calls: number | null
+          date: string | null
+          minutes: number | null
         }
         Relationships: []
       }
