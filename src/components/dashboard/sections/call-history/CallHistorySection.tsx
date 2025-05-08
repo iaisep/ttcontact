@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { useLanguage } from '@/context/LanguageContext';
 import { useCallHistory } from './hooks';
 import {
   CallHistoryHeader,
@@ -10,7 +9,6 @@ import {
 } from './components';
 
 const CallHistorySection: React.FC = () => {
-  const { t } = useLanguage();
   const {
     isLoading,
     callHistory,
@@ -40,7 +38,7 @@ const CallHistorySection: React.FC = () => {
     // In a real application, this would trigger a download of the filtered call history data
     console.log('Exporting data:', { callHistory, filters, dateRange });
     // For now, just show a success message
-    alert(t('export_started'));
+    alert('Export started. You will receive a notification when it is ready.');
   };
 
   return (
