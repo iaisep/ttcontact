@@ -33,29 +33,32 @@ export const useBillingData = (): UseBillingDataReturn => {
   const fetchBillingData = async () => {
     setLoading(true);
     try {
-      // Using mock data instead of API calls
-      console.log('Setting mock API keys');
-      setApiKeys(mockApiKeys);
+      // Use the new endpoint
+      const response = await fetch('https://wf2iallamadas.universidadisep.com/webhook/billing/');
       
-      // For now, use mock data for other billing information
-      setInvoices(mockInvoices);
-      setUsage(mockUsage);
-      setUsageHistory(mockUsageHistory);
-      setPaymentMethods(mockPaymentMethods);
+      if (!response.ok) {
+        throw new Error(`Error fetching billing data: ${response.status}`);
+      }
       
-      // Simulate a delay to show loading state
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const data = await response.json();
+      
+      // Parse the received data
+      if (data.invoices) setInvoices(data.invoices);
+      if (data.usage) setUsage(data.usage);
+      if (data.usageHistory) setUsageHistory(data.usageHistory);
+      if (data.paymentMethods) setPaymentMethods(data.paymentMethods);
+      if (data.apiKeys) setApiKeys(data.apiKeys);
       
     } catch (error) {
       console.error('Failed to fetch billing data:', error);
       toast.error('Failed to load billing information');
       
-      // Still use mock data as fallback
-      setApiKeys(mockApiKeys);
+      // Fallback to mock data in case of error
       setInvoices(mockInvoices);
       setUsage(mockUsage);
       setUsageHistory(mockUsageHistory);
       setPaymentMethods(mockPaymentMethods);
+      setApiKeys(mockApiKeys);
     } finally {
       setLoading(false);
     }
