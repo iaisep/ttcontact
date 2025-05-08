@@ -52,14 +52,14 @@ export const useCallData = (
           return {
             ...call,
             id: call.id || call.callId || `call-${Math.random().toString(36).substring(2, 9)}`,
-            callId: call.callId || call.call_id || `call-${Math.random().toString(36).substring(2, 9)}`,
-            from: call.from || call.from_number || 'Unknown',
-            to: call.to || call.to_number || 'Unknown',
-            date: call.date || new Date(call.start_timestamp || Date.now()).toLocaleDateString(),
-            time: call.time || new Date(call.start_timestamp || Date.now()).toLocaleTimeString(),
-            status: call.status || call.call_status || 'ended',
-            duration: call.duration || call.duration_ms ? `${Math.floor(Number(call.duration_ms) / 1000)}s` : '0s',
-            type: call.type || call.call_type || 'unknown'
+            callId: call.callId || `call-${Math.random().toString(36).substring(2, 9)}`,
+            from: call.from || 'Unknown',
+            to: call.to || 'Unknown',
+            date: call.date || new Date().toLocaleDateString(),
+            time: call.time || new Date().toLocaleTimeString(),
+            status: call.status || 'ended',
+            duration: call.duration || '0s',
+            type: call.type || 'unknown'
           } as CallHistoryItem;
         });
       
