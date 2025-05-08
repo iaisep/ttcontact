@@ -1,3 +1,4 @@
+
 import React, { Suspense, useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
@@ -13,7 +14,7 @@ const AnalyticsSection = React.lazy(() => import('./sections/analytics'));
 const ApiKeysSection = React.lazy(() => import('./sections/api-keys'));
 const WebhooksSection = React.lazy(() => import('./sections/WebhooksSection'));
 const AccountInfoSection = React.lazy(() => import('./sections/AccountInfoSection'));
-const CallHistorySection = React.lazy(() => import('./sections/CallHistorySection'));
+const CallHistorySection = React.lazy(() => import('./sections/call-history'));
 
 interface DashboardContentProps {
   activeSection: string;
