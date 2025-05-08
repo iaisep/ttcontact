@@ -53,12 +53,13 @@ const AgentsListPage: React.FC = () => {
     navigate(`/agentes/${agent.id}/edit`);
   };
 
-  const handleDeleteAgent = async (agent: Agent) => {
+  // Updated to accept a string ID instead of an Agent object
+  const handleDeleteAgent = async (agentId: string) => {
     if (!window.confirm(t('confirm_delete_agent'))) return;
     
     setIsLoading(true);
     try {
-      await fetchWithAuth(`/delete-agent/${agent.id}`, {
+      await fetchWithAuth(`/delete-agent/${agentId}`, {
         method: 'DELETE'
       });
       toast.success(t('agent_deleted'));
