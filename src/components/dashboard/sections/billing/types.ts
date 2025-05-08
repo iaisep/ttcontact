@@ -13,6 +13,11 @@ export interface UsageData {
   phone_numbers: number;
   total_cost: number;
   current_period: string;
+  // Add the new API response fields
+  voice_total: number;
+  telephony_total: number;
+  llm_total: number;
+  kb_extra_total: number;
 }
 
 export interface UsageHistoryItem {

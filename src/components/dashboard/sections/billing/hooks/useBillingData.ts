@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -69,7 +70,12 @@ export const useBillingData = (): UseBillingDataReturn => {
           api_calls: billingData.call_count * 1000, // Approximation of API calls
           phone_numbers: Math.ceil(billingData.telephony_total / 1.0), // Estimating phone number count
           total_cost: billingData.grand_total,
-          current_period: `Mayo 1 - Mayo 31, 2025`
+          current_period: `Mayo 1 - Mayo 31, 2025`,
+          // Add the direct API values
+          voice_total: billingData.voice_total,
+          telephony_total: billingData.telephony_total,
+          llm_total: billingData.llm_total,
+          kb_extra_total: billingData.kb_extra_total
         };
         
         setUsage(usageData);
