@@ -16,12 +16,14 @@ interface DateRangePickerProps {
   startDate: Date | null;
   endDate: Date | null;
   onRangeChange: (start: Date | null, end: Date | null) => void;
+  className?: string;
 }
 
 const DateRangePicker: React.FC<DateRangePickerProps> = ({
   startDate,
   endDate,
   onRangeChange,
+  className
 }) => {
   const { t } = useLanguage();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -73,7 +75,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       <PopoverTrigger asChild>
         <Button 
           variant="outline" 
-          className="w-full justify-start text-left font-normal"
+          className={cn("w-full justify-start text-left font-normal", className)}
           onClick={() => setIsCalendarOpen(true)}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />

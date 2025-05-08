@@ -21,6 +21,22 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+// Add the formatDuration utility function
+export function formatDuration(duration: string | number): string {
+  const durationInSeconds = typeof duration === "string" 
+    ? parseInt(duration, 10) 
+    : duration;
+  
+  if (isNaN(durationInSeconds)) {
+    return "00:00";
+  }
+  
+  const minutes = Math.floor(durationInSeconds / 60);
+  const seconds = durationInSeconds % 60;
+  
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+}
+
 // Deep merge function for objects (used to combine translation files)
 export function mergeDeep(target: any, ...sources: any[]): any {
   if (!sources.length) return target;

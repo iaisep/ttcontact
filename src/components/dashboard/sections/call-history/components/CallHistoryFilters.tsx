@@ -5,10 +5,10 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FilterOption } from '../types';
-import { AgentFilterPopover } from './filter/AgentFilterPopover';
+import DateRangePicker from './DateRangePicker';
+import AgentFilterPopover from './filter/AgentFilterPopover';
 import FilterOptions from './filter/FilterOptions'; 
 import ActiveFilters from './filter/ActiveFilters';
 import { ColumnVisibilitySelector } from './ColumnVisibilitySelector';
@@ -79,8 +79,9 @@ const CallHistoryFilters: React.FC<CallHistoryFiltersProps> = ({
         </div>
         
         <DateRangePicker
-          value={dateRange}
-          onChange={updateDateRange}
+          startDate={dateRange.from || null}
+          endDate={dateRange.to || null}
+          onRangeChange={(start, end) => updateDateRange({ from: start, to: end })}
           className="ml-2"
         />
       </div>

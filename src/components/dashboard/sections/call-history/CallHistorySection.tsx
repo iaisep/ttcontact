@@ -54,8 +54,13 @@ const CallHistorySection: React.FC = () => {
         addFilter={addFilter}
         removeFilter={removeFilter}
         clearFilters={clearFilters}
-        dateRange={dateRange}
-        updateDateRange={updateDateRange}
+        dateRange={{
+          from: dateRange.start as Date, 
+          to: dateRange.end as Date
+        }}
+        updateDateRange={(range) => {
+          updateDateRange(range.from, range.to);
+        }}
         columnVisibility={columnVisibility}
         toggleColumnVisibility={toggleColumnVisibility}
         updateColumnVisibility={updateColumnVisibility}

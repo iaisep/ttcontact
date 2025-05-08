@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { 
@@ -46,11 +47,11 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
               <dl className="space-y-1">
                 <div className="flex justify-between">
                   <dt className="text-sm text-muted-foreground">{t('timestamp')}:</dt>
-                  <dd className="text-sm">{formatDate(call.timestamp)}</dd>
+                  <dd className="text-sm">{formatDate(new Date(call.date + ' ' + call.time))}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm text-muted-foreground">{t('agent')}:</dt>
-                  <dd className="text-sm">{call.agentName}</dd>
+                  <dd className="text-sm">{call.agentName || 'N/A'}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm text-muted-foreground">{t('type')}:</dt>
@@ -78,9 +79,9 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
                   <dt className="text-sm text-muted-foreground">{t('status')}:</dt>
                   <dd className="text-sm">
                     <span className={`px-2 py-1 rounded-full text-xs ${
-                      call.status === 'completed' 
+                      call.status === 'ended' 
                         ? 'bg-green-100 text-green-800' 
-                        : call.status === 'failed'
+                        : call.status === 'error'
                         ? 'bg-red-100 text-red-800'
                         : 'bg-yellow-100 text-yellow-800'
                     }`}>
@@ -96,7 +97,7 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
           <div className="mt-6">
             <h3 className="font-medium mb-2">{t('call_summary')}</h3>
             <p className="text-sm text-muted-foreground">
-              {call.summary || t('no_call_summary_available')}
+              {call.resumen_2da_llamada || t('no_call_summary_available')}
             </p>
           </div>
           
@@ -106,7 +107,7 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <div className="bg-muted rounded-lg p-3 text-center">
                 <p className="text-xs text-muted-foreground">{t('latency')}</p>
-                <p className="text-lg font-semibold">{call.latency || '150ms'}</p>
+                <p className="text-lg font-semibold">{call.endToEndLatency || '150ms'}</p>
               </div>
               <div className="bg-muted rounded-lg p-3 text-center">
                 <p className="text-xs text-muted-foreground">{t('user_sentiment')}</p>
@@ -114,7 +115,7 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
               </div>
               <div className="bg-muted rounded-lg p-3 text-center">
                 <p className="text-xs text-muted-foreground">{t('completion_rate')}</p>
-                <p className="text-lg font-semibold">{call.completionRate || '98%'}</p>
+                <p className="text-lg font-semibold">{call.callSuccessfulStatus || '98%'}</p>
               </div>
             </div>
           </div>

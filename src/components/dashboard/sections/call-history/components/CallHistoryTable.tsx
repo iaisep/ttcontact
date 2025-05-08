@@ -5,7 +5,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { PaginationControls } from '@/components/ui/pagination';
 import { CallHistoryItem } from '../types';
-import { formatDuration, formatDate } from '@/lib/utils';
+import { formatDate, formatDuration } from '@/lib/utils';
 
 interface CallHistoryTableProps {
   isLoading: boolean;
@@ -83,7 +83,7 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
                   className="cursor-pointer hover:bg-muted"
                 >
                   {columns.find(col => col.id === 'timestamp')?.visible && (
-                    <TableCell>{formatDate(call.timestamp)}</TableCell>
+                    <TableCell>{formatDate(new Date(call.date + ' ' + call.time))}</TableCell>
                   )}
                   {columns.find(col => col.id === 'agentName')?.visible && (
                     <TableCell>{call.agentName}</TableCell>
@@ -103,9 +103,9 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
                   {columns.find(col => col.id === 'status')?.visible && (
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${
-                        call.status === 'completed' 
+                        call.status === 'ended' 
                           ? 'bg-green-100 text-green-800' 
-                          : call.status === 'failed'
+                          : call.status === 'error'
                           ? 'bg-red-100 text-red-800'
                           : 'bg-yellow-100 text-yellow-800'
                       }`}>
