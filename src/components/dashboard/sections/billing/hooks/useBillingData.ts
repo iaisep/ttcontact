@@ -33,8 +33,14 @@ export const useBillingData = (): UseBillingDataReturn => {
   const fetchBillingData = async () => {
     setLoading(true);
     try {
-      // Use the new endpoint
-      const response = await fetch('https://wf2iallamadas.universidadisep.com/webhook/billing/');
+      // Make POST request with correct authorization header
+      const response = await fetch('https://wf2iallamadas.universidadisep.com/webhook/billing/', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'ak_1eae55876de478c7ef725fafbb202eb026cbe9eb1cddad495f67e687eadc03a7',
+          'Content-Type': 'application/json'
+        }
+      });
       
       if (!response.ok) {
         throw new Error(`Error fetching billing data: ${response.status}`);
