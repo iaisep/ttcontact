@@ -1,10 +1,10 @@
 
 import React from 'react';
-import CallHistorySectionComponent from './call-history/CallHistorySection';
+import CallHistorySection from './call-history';
 
 // This is just a wrapper component to maintain backwards compatibility
-const CallHistorySection: React.FC = () => {
-  return <CallHistorySectionComponent />;
+const CallHistorySectionWrapper: React.FC = () => {
+  return <CallHistorySection />;
 };
 
-export default CallHistorySection;
+export default CallHistorySectionWrapper;
