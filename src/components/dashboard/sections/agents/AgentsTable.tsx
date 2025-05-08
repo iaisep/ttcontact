@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 import { Agent } from './types';
 import { Badge } from '@/components/ui/badge';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
@@ -21,6 +22,7 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
   isLoading
 }) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
 
@@ -30,6 +32,13 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
     
     // Replace retell-llm with uisep-llm
     return type.replace('retell-llm', 'uisep-llm');
+  };
+
+  const handleEditClick = (agent: Agent, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Navigate to the edit page for the agent
+    const slug = agent.name.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/agentes/${agent.id || slug}/edit`);
   };
 
   const columns = [
@@ -66,10 +75,7 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={(e) => {
-              e.stopPropagation();  
-              onEditAgent(agent);
-            }}
+            onClick={(e) => handleEditClick(agent, e)}
           >
             <Edit className="h-4 w-4" />
           </Button>
@@ -103,7 +109,7 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
       data={agents}
       columns={columns}
       emptyState={<div className="py-8 text-center">{t('no_agents_found')}</div>}
-      onRowClick={onEditAgent}
+      onRowClick={(agent) => handleEditClick(agent, {} as React.MouseEvent)}
       rowClassName="cursor-pointer"
       currentPage={currentPage}
       onPageChange={setCurrentPage}

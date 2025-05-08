@@ -46,11 +46,13 @@ const AgentEditPage: React.FC = () => {
         // Fetch agent details
         const agentsData = await fetchWithAuth('/list-agents');
         
-        // Find the specific agent by slug (converted from name)
+        // Find the specific agent by slug (converted from name) or by ID
         const foundAgent = Array.isArray(agentsData) 
           ? agentsData.find(a => 
-              a.agent_name.toLowerCase().replace(/\s+/g, '-') === slug || 
-              a.agent_id === slug)
+              a.agent_id === slug || 
+              a.id === slug ||
+              a.agent_name?.toLowerCase().replace(/\s+/g, '-') === slug || 
+              a.name?.toLowerCase().replace(/\s+/g, '-') === slug)
           : null;
         
         if (!foundAgent) {

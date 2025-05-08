@@ -40,6 +40,7 @@ type FormValues = {
   description: string;
   voice_id: string;
   folder: string;
+  agent_type: string;
 };
 
 const AgentEditForm: React.FC<AgentEditFormProps> = ({ 
@@ -57,6 +58,7 @@ const AgentEditForm: React.FC<AgentEditFormProps> = ({
       description: initialAgent.description || '',
       voice_id: initialAgent.voice_id || 'eleven_labs_emily',
       folder: initialAgent.folder || '',
+      agent_type: initialAgent.agent_type || 'uisep-llm',
     }
   });
 
@@ -95,6 +97,19 @@ const AgentEditForm: React.FC<AgentEditFormProps> = ({
           {errors.description && (
             <p className="text-sm text-destructive">{errors.description.message}</p>
           )}
+        </div>
+        
+        <div className="grid gap-2">
+          <Label htmlFor="agent_type">{t('agent_type')}</Label>
+          <select
+            id="agent_type"
+            {...register('agent_type')}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+          >
+            <option value="uisep-llm">uisep-llm</option>
+            <option value="retell-llm">retell-llm</option>
+            <option value="custom">Custom</option>
+          </select>
         </div>
         
         <div className="grid gap-2">
