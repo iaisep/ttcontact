@@ -29,6 +29,8 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
   onRowClick
 }) => {
   const { t } = useLanguage();
+  
+  console.log('CallHistoryTable rendering with data:', { isLoading, callHistoryLength: callHistory?.length });
 
   // Define table columns with visibility control
   const columns = [
@@ -67,7 +69,7 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
                   ))}
                 </TableRow>
               ))
-            ) : callHistory.length === 0 ? (
+            ) : callHistory?.length === 0 ? (
               // No data state
               <TableRow>
                 <TableCell colSpan={visibleColumns.length} className="text-center py-8">
@@ -78,27 +80,27 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
               // Call history data
               callHistory.map(call => (
                 <TableRow 
-                  key={call.callId}
+                  key={call.callId || `call-${Math.random()}`}
                   onClick={() => onRowClick(call.callId)}
                   className="cursor-pointer hover:bg-muted"
                 >
                   {columns.find(col => col.id === 'timestamp')?.visible && (
-                    <TableCell>{formatDate(new Date(call.date + ' ' + call.time))}</TableCell>
+                    <TableCell>{call.date && call.time ? formatDate(new Date(`${call.date} ${call.time}`)) : 'Unknown'}</TableCell>
                   )}
                   {columns.find(col => col.id === 'agentName')?.visible && (
-                    <TableCell>{call.agentName}</TableCell>
+                    <TableCell>{call.agentName || 'Unknown'}</TableCell>
                   )}
                   {columns.find(col => col.id === 'type')?.visible && (
-                    <TableCell>{call.type}</TableCell>
+                    <TableCell>{call.type || 'Unknown'}</TableCell>
                   )}
                   {columns.find(col => col.id === 'duration')?.visible && (
-                    <TableCell>{formatDuration(call.duration)}</TableCell>
+                    <TableCell>{formatDuration(call.duration) || '0s'}</TableCell>
                   )}
                   {columns.find(col => col.id === 'from')?.visible && (
-                    <TableCell>{call.from}</TableCell>
+                    <TableCell>{call.from || 'Unknown'}</TableCell>
                   )}
                   {columns.find(col => col.id === 'to')?.visible && (
-                    <TableCell>{call.to}</TableCell>
+                    <TableCell>{call.to || 'Unknown'}</TableCell>
                   )}
                   {columns.find(col => col.id === 'status')?.visible && (
                     <TableCell>
@@ -109,7 +111,7 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
                           ? 'bg-red-100 text-red-800'
                           : 'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {call.status}
+                        {call.status || 'Unknown'}
                       </span>
                     </TableCell>
                   )}
@@ -121,7 +123,7 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
       </div>
 
       {/* Pagination controls */}
-      {!isLoading && callHistory.length > 0 && (
+      {!isLoading && callHistory?.length > 0 && (
         <PaginationControls
           totalItems={100} // This would come from an API in a real application
           currentPage={currentPage}

@@ -17,6 +17,8 @@ export const useCallHistoryService = () => {
    */
   const fetchCallHistory = async (requestData: Record<string, any>) => {
     try {
+      console.log('Fetching call history with data:', requestData);
+      
       const response = await fetchWithAuth('/v2/list-calls', {
         method: 'POST',
         headers: {
@@ -25,11 +27,25 @@ export const useCallHistoryService = () => {
         body: JSON.stringify(requestData)
       });
       
-      return {
-        data: response?.data || [],
-        total: response?.total || 0,
-        success: true
-      };
+      console.log('Call history API response:', response);
+      
+      // Check if we have valid response data
+      if (response && Array.isArray(response)) {
+        return {
+          data: response as CallHistoryItem[],
+          total: response.length,
+          success: true
+        };
+      } else {
+        console.warn('Unexpected API response format:', response);
+        // Fall back to mock data if response format is unexpected
+        const mockData = generateMockCallHistory();
+        return {
+          data: mockData,
+          total: mockData.length,
+          success: false
+        };
+      }
     } catch (error) {
       console.error('Error fetching call history:', error);
       toast.error('Failed to fetch call history. Using mock data instead.');
