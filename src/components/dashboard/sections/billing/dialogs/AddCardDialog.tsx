@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CreditCard } from 'lucide-react';
 import { PaymentMethod } from '../types';
 import CardForm from '../components/CardForm';
+import StripeWrapper from '../components/StripeWrapper';
 
 interface AddCardDialogProps {
   paymentMethods: PaymentMethod[];
@@ -29,10 +30,12 @@ const AddCardDialog = (props: AddCardDialogProps) => {
             Ingresa los detalles de tu tarjeta para agregarla como método de pago.
           </DialogDescription>
         </DialogHeader>
-        <CardForm 
-          {...props} 
-          closeDialog={() => setOpen(false)} 
-        />
+        <StripeWrapper>
+          <CardForm 
+            {...props} 
+            closeDialog={() => setOpen(false)} 
+          />
+        </StripeWrapper>
       </DialogContent>
     </Dialog>
   );
