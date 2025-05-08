@@ -1,10 +1,11 @@
 
 import React from 'react';
-import CallHistorySectionContent from './call-history/CallHistorySection';
+// Importar directamente desde la carpeta call-history
+import CallHistorySection from './call-history';
 
-// Este es solo un componente contenedor para mantener la compatibilidad con versiones anteriores
+// Componente simple que reexporta el componente principal
 const CallHistorySectionWrapper: React.FC = () => {
-  return <CallHistorySectionContent />;
+  return <CallHistorySection />;
 };
 
 export default CallHistorySectionWrapper;
