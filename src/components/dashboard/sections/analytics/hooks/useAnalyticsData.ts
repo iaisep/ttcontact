@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { AnalyticsData, AnalyticsOverview, CallCounts } from '../types';
 import { useApiContext } from '@/context/ApiContext';
-import { Agent } from '../../batch-call/types';
+import { Agent } from '../../agents/types';
 
 export const useAnalyticsData = () => {
   const { apiKey } = useApiContext();
@@ -89,10 +90,16 @@ export const useAnalyticsData = () => {
         busiest_hours: busiestHours,
       });
       
-      // Set agents state for batch call history
+      // Set agents state for batch call history - Fixed TypeScript error here
       setAgents(agentPerformances.map((a) => ({
         id: a.agent_id,
         name: a.agent_name,
+        agent_id: a.agent_id,
+        agent_name: a.agent_name,
+        agent_type: 'unknown',
+        voice_id: '',
+        last_modification_timestamp: Date.now(),
+        updated_at: new Date().toISOString()
       })));
       
       // Also refresh dashboard data
@@ -165,9 +172,17 @@ export const useAnalyticsData = () => {
     };
 
     setAnalytics(mockAnalyticsData);
+    
+    // Fixed TypeScript error here
     setAgents(mockAnalyticsData.agent_performance.map(a => ({
       id: a.agent_id,
       name: a.agent_name,
+      agent_id: a.agent_id,
+      agent_name: a.agent_name,
+      agent_type: 'unknown',
+      voice_id: '',
+      last_modification_timestamp: Date.now(),
+      updated_at: new Date().toISOString()
     })));
   };
 
