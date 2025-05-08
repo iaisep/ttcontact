@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 import AgentEditPage from './pages/AgentEditPage';
+import { useLanguage } from '@/context/LanguageContext';
 
 // Add additional imports as needed
 
