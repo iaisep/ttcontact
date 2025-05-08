@@ -14,6 +14,7 @@ const AnalyticsSection = React.lazy(() => import('./sections/AnalyticsSection'))
 const ApiKeysSection = React.lazy(() => import('./sections/api-keys'));
 const WebhooksSection = React.lazy(() => import('./sections/WebhooksSection'));
 const AccountInfoSection = React.lazy(() => import('./sections/AccountInfoSection'));
+// Remove the duplicated call history section import
 
 interface DashboardContentProps {
   activeSection: string;
