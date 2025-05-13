@@ -8,7 +8,13 @@ import { useFunctionForm } from './hooks/useFunctionForm';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 
-const AddFunctionModal: React.FC<AddFunctionModalProps> = ({ isOpen, onClose, onAdd, functionData }) => {
+const AddFunctionModal: React.FC<AddFunctionModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onAdd, 
+  functionData,
+  agent // Get the agent parameter
+}) => {
   const { formData, errors, handleChange, validate, buildFunctionObject, isCustomFunction, resetForm } = useFunctionForm(functionData, isOpen);
   const { fetchWithAuth } = useApiContext();
 
@@ -17,33 +23,44 @@ const AddFunctionModal: React.FC<AddFunctionModalProps> = ({ isOpen, onClose, on
       try {
         const newFunction = buildFunctionObject();
         
-        // If we're within an agent edit context, also update the agent's functions on the server
-        if (window.location.pathname.includes('/agentes/')) {
+        // Get llmId directly from the agent prop if available
+        let llmId;
+
+        if (agent && agent.response_engine?.llm_id) {
+          // Use the llm_id from the provided agent object
+          llmId = agent.response_engine.llm_id;
+        } else if (window.location.pathname.includes('/agentes/')) {
+          // Fallback to extracting from URL if agent prop is not provided
           const agentId = window.location.pathname.split('/').pop();
           if (agentId && agentId.startsWith('agent_')) {
-            const llmId = `llm_${agentId.substring(6)}`; // Convert agent_XXX to llm_XXX
-            
-            // Fetch current agent data to get all functions
-            const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
-            
-            // Get existing functions from the LLM (general_tools)
-            const currentFunctions = llmData.general_tools || [];
-            
-            // Add the new function to the existing functions
-            const updatedFunctions = [...currentFunctions, newFunction];
-            
-            // Update the LLM with the new functions array using the correct endpoint
-            await fetchWithAuth(`/update-retell-llm/${llmId}`, {
-              method: 'PATCH',
-              body: JSON.stringify({
-                general_tools: updatedFunctions
-              })
-            });
-            
-            toast.success('Function added successfully');
+            llmId = `llm_${agentId.substring(6)}`; // Convert agent_XXX to llm_XXX
           }
         }
         
+        // Ensure we have a valid LLM ID
+        if (!llmId) {
+          toast.error('Could not determine LLM ID');
+          return;
+        }
+        
+        // Fetch current LLM data to get all functions
+        const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
+        
+        // Get existing functions from the LLM (general_tools)
+        const currentFunctions = llmData.general_tools || [];
+        
+        // Add the new function to the existing functions
+        const updatedFunctions = [...currentFunctions, newFunction];
+        
+        // Update the LLM with the new functions array
+        await fetchWithAuth(`/update-retell-llm/${llmId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            general_tools: updatedFunctions
+          })
+        });
+        
+        toast.success('Function added successfully');
         onAdd(newFunction);
         resetForm();
         onClose();

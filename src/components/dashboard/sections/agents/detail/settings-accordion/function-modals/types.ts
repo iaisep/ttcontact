@@ -1,11 +1,13 @@
 
 import { AgentFunction } from '../functions/types';
+import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 
 export interface AddFunctionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (newFunction: AgentFunction) => void;
   functionData: AgentFunction | null;
+  agent?: RetellAgent; // Add agent prop to receive the agent object
 }
 
 export interface EditFunctionModalProps {

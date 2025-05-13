@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { FileText } from 'lucide-react';
@@ -114,6 +113,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
             onClose={handleCloseAddModal}
             onAdd={handleAddFunction}
             functionData={selectedFunction}
+            agent={agent} // Pass the agent to AddFunctionModal
           />
         )}
 
