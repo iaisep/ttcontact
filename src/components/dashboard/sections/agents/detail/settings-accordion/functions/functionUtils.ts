@@ -8,29 +8,14 @@ export const createFunctionFromTemplate = (type: string): AgentFunction => {
   switch (type) {
     case 'call_transfer':
       return {
-        name: '',
-        description: 'Transfer call to another agent or phone number',
-        type: 'custom',
-        url: 'https://api.example.com/transfer',
-        parameters: {
-          type: 'object',
-          description: 'Parameters for call transfer',
-          properties: {
-            destination: {
-              type: 'string',
-              description: 'Phone number or agent ID to transfer to'
-            },
-            reason: {
-              type: 'string',
-              description: 'Reason for transfer'
-            }
-          },
-          required: ['destination']
+        name: 'transfer_call',
+        description: 'Transfer the call to a human agent',
+        type: 'transfer_call',
+        transfer_destination: {
+          type: 'predefined',
+          number: '+14154154155'
         },
-        timeout_ms: 30000,
-        speak_during_execution: true,
-        speak_after_execution: false,
-        execution_message: 'Let me transfer you to the right person.'
+        show_transferee_as_caller: false
       };
       
     case 'calendar_booking':

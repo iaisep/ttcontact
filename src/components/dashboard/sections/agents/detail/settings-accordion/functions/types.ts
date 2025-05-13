@@ -16,6 +16,16 @@ export interface AgentFunction {
   speak_during_execution?: boolean;
   speak_after_execution?: boolean;
   execution_message?: string;
+  transfer_destination?: {
+    type: string;
+    number?: string;
+    routing_prompt?: string;
+  };
+  show_transferee_as_caller?: boolean;
+  handoff_message?: {
+    type: string;
+    content: string;
+  };
 }
 
 export interface FunctionsContextProps {

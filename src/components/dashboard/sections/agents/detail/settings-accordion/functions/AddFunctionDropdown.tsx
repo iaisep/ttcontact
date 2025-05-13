@@ -5,6 +5,7 @@ import { PlusCircle, Phone, CornerDownRight, Calendar, FileText, Sparkles } from
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useLanguage } from '@/context/LanguageContext';
 import EndCallFunctionModal from './EndCallFunctionModal';
+import CallTransferFunctionModal from './CallTransferFunctionModal';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface AddFunctionDropdownProps {
@@ -20,9 +21,14 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
 }) => {
   const { t } = useLanguage();
   const [showEndCallModal, setShowEndCallModal] = useState(false);
+  const [showCallTransferModal, setShowCallTransferModal] = useState(false);
   
   const handleEndCallClick = () => {
     setShowEndCallModal(true);
+  };
+
+  const handleCallTransferClick = () => {
+    setShowCallTransferModal(true);
   };
 
   const handleFunctionAdded = () => {
@@ -44,7 +50,7 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
             <Phone className="mr-2 h-4 w-4" />
             <span>End Call</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onAddTemplate('call_transfer')}>
+          <DropdownMenuItem onClick={handleCallTransferClick}>
             <CornerDownRight className="mr-2 h-4 w-4" />
             <span>Call Transfer</span>
           </DropdownMenuItem>
@@ -71,6 +77,15 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
         <EndCallFunctionModal 
           isOpen={showEndCallModal} 
           onClose={() => setShowEndCallModal(false)} 
+          agent={agent}
+          onSuccess={handleFunctionAdded}
+        />
+      )}
+
+      {showCallTransferModal && (
+        <CallTransferFunctionModal
+          isOpen={showCallTransferModal}
+          onClose={() => setShowCallTransferModal(false)}
           agent={agent}
           onSuccess={handleFunctionAdded}
         />
