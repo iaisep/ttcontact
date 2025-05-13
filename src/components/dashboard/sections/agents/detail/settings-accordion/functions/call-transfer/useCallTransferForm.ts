@@ -51,9 +51,10 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess }: UseCallTransf
           number: phoneNumber
         };
       } else {
+        // Use "inferred" type with "prompt" field for dynamic routing
         transferDestination = {
-          type: "dynamic",
-          routing_prompt: dynamicRouting
+          type: "inferred",
+          prompt: dynamicRouting
         };
       }
           
