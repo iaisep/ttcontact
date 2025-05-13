@@ -9,7 +9,7 @@ import AddFunctionModal from '../function-modals/AddFunctionModal';
 import { DeleteFunctionDialog } from '../function-modals/DeleteFunctionDialog';
 import { useFunctions } from './useFunctions';
 import { FunctionItem } from './FunctionItem';
-import { AddFunctionDropdown } from './AddFunctionDropdown';
+import AddFunctionDropdown from './AddFunctionDropdown';
 import { createFunctionFromTemplate } from './functionUtils';
 
 const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {

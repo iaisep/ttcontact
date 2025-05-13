@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { PlusIcon } from 'lucide-react';
 import { createFunctionFromTemplate } from './functionUtils';
-import { RetellAgent } from '../../types/retell-types'; 
+import { RetellAgent } from '../../../types/retell-types'; 
 import AddFunctionModal from '../function-modals/AddFunctionModal';
 import EndCallFunctionModal from './end-call';
 import CallTransferFunctionModal from './call-transfer';

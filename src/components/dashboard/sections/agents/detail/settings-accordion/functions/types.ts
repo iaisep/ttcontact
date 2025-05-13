@@ -33,6 +33,8 @@ export interface AgentFunction {
   timezone?: string;
   // Add missing property for IVR digit press
   digit?: string;
+  // Add missing property for pause detection delay
+  pause_detection_delay_ms?: number;
   // Add missing property for transfer call
   number?: string;
 }
