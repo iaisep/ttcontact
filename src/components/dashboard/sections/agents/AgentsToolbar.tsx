@@ -2,8 +2,15 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, Filter, RefreshCw } from 'lucide-react';
+import { Plus, Search, Filter, RefreshCw, Link, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import AgentTemplateDialog from './AgentTemplateDialog';
 
 interface AgentsToolbarProps {
   onAddAgent: () => void;
@@ -19,6 +26,7 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [folderFilter, setFolderFilter] = useState('');
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   
   // Mock folders for demonstration
   const folders = ['Personal', 'Business', 'Support'];
@@ -28,10 +36,36 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">{t('agents')}</h1>
         <div className="flex gap-2">
-          <Button onClick={onAddAgent}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t('create_agent')}
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                {t('create_agent')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuItem 
+                onClick={() => setShowTemplateDialog(true)}
+                className="flex items-center py-2"
+              >
+                <MessageSquare className="mr-2 h-4 w-4" />
+                <div>
+                  <p className="font-medium">Single Prompt Agent</p>
+                  <p className="text-xs text-muted-foreground">For short calls and straightforward tasks</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                disabled
+                className="flex items-center py-2 opacity-50"
+              >
+                <Link className="mr-2 h-4 w-4" />
+                <div>
+                  <p className="font-medium">Conversation Flow Agent</p>
+                  <p className="text-xs text-muted-foreground">For tasks with complex transitions</p>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button variant="outline" onClick={onImportAgents}>
             {t('import')}
           </Button>
@@ -68,6 +102,17 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
           </select>
         </div>
       </div>
+      
+      {showTemplateDialog && (
+        <AgentTemplateDialog 
+          open={showTemplateDialog} 
+          onClose={() => setShowTemplateDialog(false)}
+          onSelectTemplate={() => {
+            setShowTemplateDialog(false);
+            onAddAgent();
+          }}
+        />
+      )}
     </div>
   );
 };
