@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { useLanguage } from '@/context/LanguageContext';
 import EndCallFunctionModal from './EndCallFunctionModal';
 import CallTransferFunctionModal from './call-transfer';
+import CalendarAvailabilityModal from './calendar-availability';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface AddFunctionDropdownProps {
@@ -22,6 +23,7 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
   const { t } = useLanguage();
   const [showEndCallModal, setShowEndCallModal] = useState(false);
   const [showCallTransferModal, setShowCallTransferModal] = useState(false);
+  const [showCalendarAvailabilityModal, setShowCalendarAvailabilityModal] = useState(false);
   
   const handleEndCallClick = () => {
     setShowEndCallModal(true);
@@ -29,6 +31,10 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
 
   const handleCallTransferClick = () => {
     setShowCallTransferModal(true);
+  };
+
+  const handleCalendarAvailabilityClick = () => {
+    setShowCalendarAvailabilityModal(true);
   };
 
   const handleFunctionAdded = () => {
@@ -54,7 +60,7 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
             <CornerDownRight className="mr-2 h-4 w-4" />
             <span>Call Transfer</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onAddTemplate('calendar_check')}>
+          <DropdownMenuItem onClick={handleCalendarAvailabilityClick}>
             <Calendar className="mr-2 h-4 w-4" />
             <span>Check Calendar Availability</span>
           </DropdownMenuItem>
@@ -86,6 +92,15 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
         <CallTransferFunctionModal
           isOpen={showCallTransferModal}
           onClose={() => setShowCallTransferModal(false)}
+          agent={agent}
+          onSuccess={handleFunctionAdded}
+        />
+      )}
+
+      {showCalendarAvailabilityModal && (
+        <CalendarAvailabilityModal
+          isOpen={showCalendarAvailabilityModal}
+          onClose={() => setShowCalendarAvailabilityModal(false)}
           agent={agent}
           onSuccess={handleFunctionAdded}
         />
