@@ -86,7 +86,7 @@ const BookCalendarModal: React.FC<BookCalendarModalProps> = ({
         description: description || "When users ask to book an appointment, book it on the calendar.",
         event_type_id: parseInt(eventTypeId, 10),
         cal_api_key: apiKey,
-        type: "book_cal",
+        type: "book_appointment_cal", // FIXED: Changed from "book_cal" to "book_appointment_cal"
         timezone: timezone || "America/Los_Angeles"
       };
       
