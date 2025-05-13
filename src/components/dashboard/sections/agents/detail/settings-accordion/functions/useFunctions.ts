@@ -148,6 +148,7 @@ export const useFunctions = (agent: RetellAgent) => {
     handleDeleteFunction,
     handleUpdateFunction,
     handleAddFunction,
-    confirmDeleteFunction
+    confirmDeleteFunction,
+    fetchFunctions, // Expose fetchFunctions to allow refreshing
   };
 };

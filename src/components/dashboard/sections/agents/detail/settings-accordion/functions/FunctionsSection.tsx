@@ -30,6 +30,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
     handleUpdateFunction,
     handleAddFunction,
     confirmDeleteFunction,
+    fetchFunctions,
   } = useFunctions(agent);
 
   // Handle closing modals - implement as simple state setters without side effects
@@ -60,6 +61,11 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
         setAddModalOpen(true);
       }, 0);
     }
+  };
+
+  // Handle function added through End Call modal
+  const handleFunctionAdded = () => {
+    fetchFunctions();
   };
 
   return (
@@ -93,7 +99,11 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
           </div>
 
           <div className="flex justify-end">
-            <AddFunctionDropdown onAddTemplate={handleAddFunctionTemplate} />
+            <AddFunctionDropdown 
+              onAddTemplate={handleAddFunctionTemplate} 
+              agent={agent}
+              onFunctionAdded={handleFunctionAdded}
+            />
           </div>
         </div>
 
