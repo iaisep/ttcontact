@@ -24,7 +24,6 @@ const AddFunctionModal: React.FC<AddFunctionModalProps> = ({ isOpen, onClose, on
             const llmId = `llm_${agentId.substring(6)}`; // Convert agent_XXX to llm_XXX
             
             // Fetch current agent data to get all functions
-            const agentData = await fetchWithAuth(`/get-agent/${agentId}`);
             const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
             
             // Get existing functions from the LLM (general_tools)
@@ -33,8 +32,8 @@ const AddFunctionModal: React.FC<AddFunctionModalProps> = ({ isOpen, onClose, on
             // Add the new function to the existing functions
             const updatedFunctions = [...currentFunctions, newFunction];
             
-            // Update the agent with the new function - Changed to PATCH from POST
-            await fetchWithAuth(`/update-retell-llm/${llmId}?version=0`, {
+            // Update the LLM with the new functions array using the correct endpoint
+            await fetchWithAuth(`/update-retell-llm/${llmId}`, {
               method: 'PATCH',
               body: JSON.stringify({
                 general_tools: updatedFunctions
