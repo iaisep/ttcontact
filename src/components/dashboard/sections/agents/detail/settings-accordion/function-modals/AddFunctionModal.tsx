@@ -30,9 +30,9 @@ const AddFunctionModal: React.FC<AddFunctionModalProps> = ({ isOpen, onClose, on
             const currentFunctions = agentData.functions || [];
             const updatedFunctions = [...currentFunctions, newFunction];
             
-            // Update the agent with the new function
+            // Update the agent with the new function - Changed to PATCH from POST
             await fetchWithAuth(`/update-retell-llm/${llmId}?version=0`, {
-              method: 'POST',
+              method: 'PATCH',
               body: JSON.stringify({
                 general_tools: updatedFunctions
               })
