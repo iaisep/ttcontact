@@ -45,7 +45,7 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess }: UseCallTransf
     setError(null);
 
     try {
-      // First, fetch existing tools to check for name conflicts
+      // First, fetch existing tools to preserve them
       const llmResponse = await fetchWithAuth(`/get-retell-llm/${llmId}`);
       const existingTools = llmResponse.general_tools || [];
       
@@ -95,7 +95,7 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess }: UseCallTransf
       // Add the new function to existing tools
       const updatedTools = [...existingTools, functionData];
       
-      // Update the LLM with the new function
+      // Update the LLM with all functions
       const response = await fetchWithAuth(`/update-retell-llm/${llmId}`, {
         method: 'PATCH',
         body: JSON.stringify({ general_tools: updatedTools })

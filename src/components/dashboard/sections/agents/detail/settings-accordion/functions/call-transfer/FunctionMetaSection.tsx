@@ -1,50 +1,45 @@
 
 import React from 'react';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { useLanguage } from '@/context/LanguageContext';
+import { Textarea } from '@/components/ui/textarea';
 
-interface FunctionMetaSectionProps {
+export interface FunctionMetaSectionProps {
   functionName: string;
-  setFunctionName: (value: string) => void;
   description: string;
+  setFunctionName: (value: string) => void;
   setDescription: (value: string) => void;
 }
 
 const FunctionMetaSection: React.FC<FunctionMetaSectionProps> = ({
   functionName,
-  setFunctionName,
   description,
+  setFunctionName,
   setDescription
 }) => {
-  const { t } = useLanguage();
-  
   return (
-    <>
+    <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name">{t('name')}</Label>
+        <Label htmlFor="functionName">Name</Label>
         <Input
-          id="name"
+          id="functionName"
           value={functionName}
           onChange={(e) => setFunctionName(e.target.value)}
-          placeholder={t('function_name')}
         />
       </div>
       
       <div className="space-y-2">
         <Label htmlFor="description">
-          {t('description')} <span className="text-xs text-muted-foreground">({t('optional')})</span>
+          Description <span className="text-gray-400 text-xs">(Optional)</span>
         </Label>
         <Textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder={t('function_description')}
           rows={3}
         />
       </div>
-    </>
+    </div>
   );
 };
 

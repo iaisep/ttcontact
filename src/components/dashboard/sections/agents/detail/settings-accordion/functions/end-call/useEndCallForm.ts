@@ -35,7 +35,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess }: UseEndCallFormProp
     setError(null);
     
     try {
-      // First, fetch existing tools to check for name conflicts
+      // First, fetch existing tools to preserve them
       const llmResponse = await fetchWithAuth(`/get-retell-llm/${llmId}`);
       const existingTools = llmResponse.general_tools || [];
       
@@ -48,17 +48,21 @@ export const useEndCallForm = ({ agent, onClose, onSuccess }: UseEndCallFormProp
         return;
       }
       
-      const payload = {
-        general_tools: [
-          {
-            name: name,
-            description: description,
-            type: "end_call"
-          }
-        ]
+      // Create new end call function
+      const newFunction = {
+        name: name,
+        description: description,
+        type: "end_call"
       };
       
-      // Update the API with the new function
+      // Add new function to existing tools
+      const updatedTools = [...existingTools, newFunction];
+      
+      const payload = {
+        general_tools: updatedTools
+      };
+      
+      // Update the API with all tools
       const response = await fetchWithAuth(`/update-retell-llm/${llmId}`, {
         method: 'PATCH',
         body: JSON.stringify(payload)

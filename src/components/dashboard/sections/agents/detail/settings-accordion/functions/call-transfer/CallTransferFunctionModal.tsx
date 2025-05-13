@@ -38,7 +38,7 @@ const CallTransferFunctionModal: React.FC<CallTransferFunctionModalProps> = ({
           <DialogTitle>Add Call Transfer Function</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
+        <div className="space-y-6 py-4">
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />

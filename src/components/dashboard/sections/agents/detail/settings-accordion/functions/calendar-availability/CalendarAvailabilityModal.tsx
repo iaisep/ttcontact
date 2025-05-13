@@ -8,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
-import { X } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 interface CalendarAvailabilityModalProps {
   isOpen: boolean;
@@ -60,18 +61,41 @@ const CalendarAvailabilityModal: React.FC<CalendarAvailabilityModalProps> = ({
     setError(null);
     
     try {
-      // Prepare the payload
+      // First fetch all existing tools to preserve them
+      const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
+      
+      if (!llmData) {
+        throw new Error('Failed to fetch LLM data');
+      }
+      
+      // Extract existing tools
+      const existingTools = llmData.general_tools || [];
+      
+      // Check if a function with the same name already exists
+      const nameExists = existingTools.some((tool: any) => tool.name === functionName);
+      
+      if (nameExists) {
+        setError(`Tool name "${functionName}" already exists. Please use a different name.`);
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Prepare the new calendar availability function
+      const newFunction = {
+        name: functionName,
+        description: description || "When users ask for availability, check the calendar and provide available slots.",
+        event_type_id: parseInt(eventTypeId, 10),
+        cal_api_key: apiKey,
+        type: "check_availability_cal",
+        timezone: timezone || "America/Los_Angeles"
+      };
+      
+      // Combine existing tools with the new one
+      const updatedTools = [...existingTools, newFunction];
+      
+      // Prepare the payload with all tools
       const payload = {
-        general_tools: [
-          {
-            name: functionName,
-            event_type_id: eventTypeId,
-            cal_api_key: apiKey,
-            type: "check_availability_cal",
-            timezone: timezone || "America/Los_Angeles",
-            description: description || "When users ask for availability, check the calendar and provide available slots."
-          }
-        ]
+        general_tools: updatedTools
       };
       
       // Make the API call
@@ -80,7 +104,7 @@ const CalendarAvailabilityModal: React.FC<CalendarAvailabilityModalProps> = ({
         body: JSON.stringify(payload)
       });
       
-      if (response.status === 'error') {
+      if (response && response.status === 'error') {
         // Handle specific error for duplicate function name
         if (response.message && response.message.includes('Duplicate name found')) {
           setError('Tool name already exists. Please use a different name.');
@@ -123,9 +147,10 @@ const CalendarAvailabilityModal: React.FC<CalendarAvailabilityModalProps> = ({
         
         <div className="space-y-4 py-2">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-md text-sm">
-              {error}
-            </div>
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
           
           <div className="space-y-2">
