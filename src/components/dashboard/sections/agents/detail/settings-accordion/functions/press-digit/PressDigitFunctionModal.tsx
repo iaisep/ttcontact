@@ -75,7 +75,7 @@ const PressDigitFunctionModal: React.FC<PressDigitFunctionModalProps> = ({
       }
       
       // Prepare the new press digit function
-      const newFunction = {
+      const newFunction: any = {
         name: functionName,
         description: description || "Press a digit for IVR navigation.",
         digit: digit.trim(),

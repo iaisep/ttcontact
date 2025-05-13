@@ -58,3 +58,9 @@ export interface FunctionsSectionProps {
   agent: any; // Using 'any' for now, should be replaced with the proper type
   updateAgentField?: (fieldName: string, value: any) => void;
 }
+
+export interface AddFunctionDropdownProps {
+  onAddTemplate: (type: string) => void;
+  agent: any;
+  onFunctionAdded: () => void;
+}

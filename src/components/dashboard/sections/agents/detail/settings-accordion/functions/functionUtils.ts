@@ -13,6 +13,7 @@ export const createFunctionFromTemplate = (type: string): AgentFunction => {
       speak_after_execution: false,
       parameters: {
         type: 'object',
+        description: 'Parameters for the function',
         properties: {}
       }
     },

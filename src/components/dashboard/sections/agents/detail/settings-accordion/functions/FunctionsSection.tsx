@@ -121,7 +121,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
           <EditFunctionModal
             isOpen={editModalOpen}
             onClose={handleCloseEditModal}
-            onUpdate={handleUpdateFunction}
+            onSave={handleUpdateFunction}
             functionData={selectedFunction}
           />
         )}

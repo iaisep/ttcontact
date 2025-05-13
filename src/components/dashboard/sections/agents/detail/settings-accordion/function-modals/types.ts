@@ -15,6 +15,13 @@ export interface EditFunctionModalProps {
   functionData: AgentFunction | null;
 }
 
+export interface DeleteFunctionDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  functionName: string;
+}
+
 export interface FunctionFormProps {
   formData: {
     name: string;

@@ -6,7 +6,7 @@ import { FunctionForm } from './components';
 import { EditFunctionModalProps } from './types';
 import { useFunctionForm } from './hooks/useFunctionForm';
 
-const EditFunctionModal: React.FC<EditFunctionModalProps> = ({ isOpen, onClose, onUpdate, functionData }) => {
+const EditFunctionModal: React.FC<EditFunctionModalProps> = ({ isOpen, onClose, onSave, functionData }) => {
   const { formData, errors, handleChange, validate, buildFunctionObject, isCustomFunction } = useFunctionForm(functionData, isOpen);
 
   const handleUpdateFunction = () => {
@@ -18,7 +18,7 @@ const EditFunctionModal: React.FC<EditFunctionModalProps> = ({ isOpen, onClose, 
         updatedFunction.id = functionData.id;
       }
       
-      onUpdate(updatedFunction);
+      onSave(updatedFunction);
       onClose();
     }
   };
