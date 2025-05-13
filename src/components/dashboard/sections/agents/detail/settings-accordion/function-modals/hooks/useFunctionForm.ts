@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { AgentFunction } from '../../functions/types';
+import { FunctionFormErrors } from '../types';
 
 interface FunctionFormData {
   name: string;
@@ -20,14 +21,6 @@ interface FunctionFormData {
   event_type_id?: number;
   cal_api_key?: string;
   timezone?: string;
-}
-
-interface FunctionFormErrors {
-  name?: string;
-  description?: string;
-  url?: string;
-  parameters?: string;
-  digit?: string;
 }
 
 export const useFunctionForm = (initialData: AgentFunction | null, isOpen: boolean) => {
