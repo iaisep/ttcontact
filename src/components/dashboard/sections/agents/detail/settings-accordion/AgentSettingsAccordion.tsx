@@ -47,7 +47,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
         type="single" 
         collapsible 
         defaultValue=""
-        className="w-full"
+        className="w-full md:w-[calc(100%*2)]" // Doubled the width here
       >
         {/* Render all section components */}
         <FunctionsSection agent={agent} updateAgentField={updateAgentField} />
