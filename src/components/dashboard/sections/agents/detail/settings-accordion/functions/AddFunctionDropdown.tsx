@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import EndCallFunctionModal from './EndCallFunctionModal';
 import CallTransferFunctionModal from './call-transfer';
 import CalendarAvailabilityModal from './calendar-availability';
+import BookCalendarModal from './book-calendar';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface AddFunctionDropdownProps {
@@ -24,6 +25,7 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
   const [showEndCallModal, setShowEndCallModal] = useState(false);
   const [showCallTransferModal, setShowCallTransferModal] = useState(false);
   const [showCalendarAvailabilityModal, setShowCalendarAvailabilityModal] = useState(false);
+  const [showBookCalendarModal, setShowBookCalendarModal] = useState(false);
   
   const handleEndCallClick = () => {
     setShowEndCallModal(true);
@@ -35,6 +37,10 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
 
   const handleCalendarAvailabilityClick = () => {
     setShowCalendarAvailabilityModal(true);
+  };
+
+  const handleBookCalendarClick = () => {
+    setShowBookCalendarModal(true);
   };
 
   const handleFunctionAdded = () => {
@@ -64,7 +70,7 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
             <Calendar className="mr-2 h-4 w-4" />
             <span>Check Calendar Availability</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onAddTemplate('calendar_book')}>
+          <DropdownMenuItem onClick={handleBookCalendarClick}>
             <Calendar className="mr-2 h-4 w-4" />
             <span>Book on the Calendar</span>
           </DropdownMenuItem>
@@ -101,6 +107,15 @@ export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
         <CalendarAvailabilityModal
           isOpen={showCalendarAvailabilityModal}
           onClose={() => setShowCalendarAvailabilityModal(false)}
+          agent={agent}
+          onSuccess={handleFunctionAdded}
+        />
+      )}
+
+      {showBookCalendarModal && (
+        <BookCalendarModal
+          isOpen={showBookCalendarModal}
+          onClose={() => setShowBookCalendarModal(false)}
           agent={agent}
           onSuccess={handleFunctionAdded}
         />
