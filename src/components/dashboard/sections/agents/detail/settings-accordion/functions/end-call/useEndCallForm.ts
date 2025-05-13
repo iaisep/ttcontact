@@ -17,6 +17,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess }: UseEndCallFormProp
   const [name, setName] = useState("end_call");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!name.trim()) {
@@ -31,8 +32,22 @@ export const useEndCallForm = ({ agent, onClose, onSuccess }: UseEndCallFormProp
     }
 
     setIsSubmitting(true);
+    setError(null);
     
     try {
+      // First, fetch existing tools to check for name conflicts
+      const llmResponse = await fetchWithAuth(`/get-retell-llm/${llmId}`);
+      const existingTools = llmResponse.general_tools || [];
+      
+      // Check if function name already exists
+      const nameExists = existingTools.some((tool: any) => tool.name === name);
+      if (nameExists) {
+        setError(`Tool name must be unique across general tools + tools of the state + state transitions. Duplicate name found: ${name}`);
+        toast.error(`Function name "${name}" already exists`);
+        setIsSubmitting(false);
+        return;
+      }
+      
       const payload = {
         general_tools: [
           {
@@ -43,17 +58,34 @@ export const useEndCallForm = ({ agent, onClose, onSuccess }: UseEndCallFormProp
         ]
       };
       
-      await fetchWithAuth(`/update-retell-llm/${llmId}`, {
+      // Update the API with the new function
+      const response = await fetchWithAuth(`/update-retell-llm/${llmId}`, {
         method: 'PATCH',
         body: JSON.stringify(payload)
       });
       
+      // Check if there's an error response with a specific message pattern
+      if (response && response.status === 'error' && response.message && response.message.includes('Duplicate name found')) {
+        setError(response.message);
+        toast.error(`Function name "${name}" already exists`);
+        setIsSubmitting(false);
+        return;
+      }
+      
       toast.success(t('end_call_function_added'));
       if (onSuccess) onSuccess();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving End Call function:", error);
-      toast.error(t('error_adding_end_call_function'));
+      
+      // Check if the error is related to duplicate function name
+      if (error.message && typeof error.message === 'string' && error.message.includes('Duplicate name found')) {
+        setError(error.message);
+        toast.error(`Function name "${name}" already exists`);
+      } else {
+        toast.error(t('error_adding_end_call_function'));
+        setError(error.message || t('error_adding_end_call_function'));
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -69,6 +101,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess }: UseEndCallFormProp
       setDescription
     },
     isSubmitting,
+    error,
     handleSubmit
   };
 };

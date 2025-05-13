@@ -2,12 +2,11 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/context/LanguageContext';
-import { Phone } from 'lucide-react';
-import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
-
 import { useEndCallForm } from './useEndCallForm';
+import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import FunctionMetaSection from './FunctionMetaSection';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 interface EndCallFunctionModalProps {
   isOpen: boolean;
@@ -22,48 +21,48 @@ const EndCallFunctionModal: React.FC<EndCallFunctionModalProps> = ({
   agent,
   onSuccess
 }) => {
-  const { t } = useLanguage();
-  const { 
-    formState, 
-    setters, 
+  const {
+    formState,
+    setters,
     isSubmitting,
-    handleSubmit 
+    error,
+    handleSubmit
   } = useEndCallForm({ agent, onClose, onSuccess });
-
+  
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Phone className="h-5 w-5" />
-            {t('end_call')}
-          </DialogTitle>
+          <DialogTitle>Add End Call Function</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
           <FunctionMetaSection
             name={formState.name}
-            setName={setters.setName}
             description={formState.description}
+            setName={setters.setName}
             setDescription={setters.setDescription}
           />
         </div>
         
-        <DialogFooter className="sm:justify-end">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
-            {t('cancel')}
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+            Cancel
           </Button>
-          <Button
-            type="submit"
-            onClick={handleSubmit}
+          <Button 
+            type="button" 
+            onClick={handleSubmit} 
             disabled={isSubmitting}
-            className="bg-black text-white hover:bg-gray-800"
+            className={isSubmitting ? 'opacity-70' : ''}
           >
-            {isSubmitting ? t('saving') : t('save')}
+            {isSubmitting ? 'Saving...' : 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>

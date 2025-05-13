@@ -2,14 +2,13 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/context/LanguageContext';
-import { Phone } from 'lucide-react';
-import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
-
 import { useCallTransferForm } from './useCallTransferForm';
+import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import FunctionMetaSection from './FunctionMetaSection';
 import TransferMethodSection from './TransferMethodSection';
 import TransferTypeSection from './TransferTypeSection';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 interface CallTransferFunctionModalProps {
   isOpen: boolean;
@@ -24,68 +23,66 @@ const CallTransferFunctionModal: React.FC<CallTransferFunctionModalProps> = ({
   agent,
   onSuccess
 }) => {
-  const { t } = useLanguage();
-  const { 
-    formState, 
+  const {
+    formState,
     setters,
     isSubmitting,
-    handleSubmit 
+    error,
+    handleSubmit
   } = useCallTransferForm({ agent, onClose, onSuccess });
-
+  
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Phone className="h-5 w-5" />
-            {t('transfer_call')}
-          </DialogTitle>
+          <DialogTitle>Add Call Transfer Function</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
           <FunctionMetaSection
-            functionName={formState.functionName}
-            setFunctionName={setters.setFunctionName}
+            name={formState.functionName}
             description={formState.description}
+            setName={setters.setFunctionName}
             setDescription={setters.setDescription}
           />
           
-          <div className="space-y-2">
-            <TransferMethodSection
-              transferMethod={formState.transferMethod}
-              setTransferMethod={setters.setTransferMethod}
-              phoneNumber={formState.phoneNumber}
-              setPhoneNumber={setters.setPhoneNumber}
-              dynamicRouting={formState.dynamicRouting}
-              setDynamicRouting={setters.setDynamicRouting}
-            />
-          </div>
+          <TransferMethodSection
+            transferMethod={formState.transferMethod}
+            phoneNumber={formState.phoneNumber}
+            dynamicRouting={formState.dynamicRouting}
+            setTransferMethod={setters.setTransferMethod}
+            setPhoneNumber={setters.setPhoneNumber}
+            setDynamicRouting={setters.setDynamicRouting}
+          />
           
           <TransferTypeSection
             transferType={formState.transferType}
-            setTransferType={setters.setTransferType}
             messageType={formState.messageType}
-            setMessageType={setters.setMessageType}
             handoffMessage={formState.handoffMessage}
+            setTransferType={setters.setTransferType}
+            setMessageType={setters.setMessageType}
             setHandoffMessage={setters.setHandoffMessage}
           />
         </div>
         
-        <DialogFooter className="sm:justify-end">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
-            {t('cancel')}
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+            Cancel
           </Button>
-          <Button
-            type="submit"
-            onClick={handleSubmit}
+          <Button 
+            type="button" 
+            onClick={handleSubmit} 
             disabled={isSubmitting}
-            className="bg-black text-white hover:bg-gray-800"
+            className={isSubmitting ? 'opacity-70' : ''}
           >
-            {isSubmitting ? t('saving') : t('save')}
+            {isSubmitting ? 'Saving...' : 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>
