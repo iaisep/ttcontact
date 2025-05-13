@@ -45,5 +45,5 @@ export interface FunctionFormErrors {
   url?: string;
   parameters?: string;
   digit?: string;
-  [key: string]: string | undefined;
+  [key: string]: string | undefined; // Add index signature to allow for dynamic keys
 }
