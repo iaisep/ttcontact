@@ -1,123 +1,166 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { AgentFunction } from '../../functions/types';
-import { FunctionFormData, FunctionFormErrors } from '../types';
 
-const defaultFormData: FunctionFormData = {
-  name: '',
-  description: '',
-  url: '',
-  timeoutMs: '30000',
-  parameters: '{}',
-  speakDuring: false,
-  speakAfter: true,
-  type: 'custom',
-  executionMessage: ''
-};
+interface FunctionFormData {
+  name: string;
+  description: string;
+  url: string;
+  timeoutMs: string;
+  parameters: string;
+  speakDuring: boolean;
+  speakAfter: boolean;
+  executionMessage?: string;
+  // For other function types
+  digit?: string;
+  transfer_destination?: {
+    type: string;
+    number?: string;
+  };
+  event_type_id?: number;
+  cal_api_key?: string;
+  timezone?: string;
+}
 
-export const useFunctionForm = (functionData: AgentFunction | null, isOpen?: boolean) => {
-  const [formData, setFormData] = useState<FunctionFormData>(defaultFormData);
+interface FunctionFormErrors {
+  name?: string;
+  description?: string;
+  url?: string;
+  parameters?: string;
+  digit?: string;
+}
+
+export const useFunctionForm = (initialData: AgentFunction | null, isOpen: boolean) => {
+  const [formData, setFormData] = useState<FunctionFormData>({
+    name: '',
+    description: '',
+    url: '',
+    timeoutMs: '120000', // Default timeout
+    parameters: '{\n  "type": "object",\n  "properties": {}\n}',
+    speakDuring: false,
+    speakAfter: false,
+    executionMessage: '',
+  });
+
   const [errors, setErrors] = useState<FunctionFormErrors>({});
-  
-  // Reset form to default state or initialize with functionData
-  const resetForm = useCallback(() => {
-    if (functionData && functionData.name) {
-      setFormData({
-        name: functionData.name || '',
-        description: functionData.description || '',
-        url: functionData.url || '',
-        type: functionData.type || 'custom',
-        timeoutMs: functionData.timeout_ms?.toString() || '30000',
-        speakDuring: functionData.speak_during_execution || false,
-        speakAfter: functionData.speak_after_execution || true,
-        executionMessage: functionData.execution_message || '',
-        parameters: functionData.parameters 
-          ? JSON.stringify(functionData.parameters, null, 2) 
-          : '{}'
-      });
-    } else {
-      setFormData(defaultFormData);
-    }
-    
-    // Clear errors when resetting
-    setErrors({});
-  }, [functionData]);
-  
-  // Initialize form data when component mounts or functionData changes
+  const [isCustomFunction, setIsCustomFunction] = useState(true);
+
+  // Reset form when modal is opened with new data
   useEffect(() => {
-    resetForm();
-  }, [functionData, resetForm]);
-  
-  // Handle form field changes
-  const handleChange = useCallback((field: keyof FunctionFormData, value: any) => {
+    if (isOpen && initialData) {
+      setIsCustomFunction(initialData.type === 'custom');
+      
+      setFormData({
+        name: initialData.name || '',
+        description: initialData.description || '',
+        url: initialData.url || '',
+        timeoutMs: initialData.timeout_ms ? initialData.timeout_ms.toString() : '120000',
+        parameters: initialData.parameters ? JSON.stringify(initialData.parameters, null, 2) : '{\n  "type": "object",\n  "properties": {}\n}',
+        speakDuring: initialData.speak_during_execution || false,
+        speakAfter: initialData.speak_after_execution || false,
+        executionMessage: initialData.execution_message || '',
+        digit: initialData.digit || '',
+        transfer_destination: initialData.transfer_destination,
+        event_type_id: initialData.event_type_id,
+        cal_api_key: initialData.cal_api_key,
+        timezone: initialData.timezone,
+      });
+      
+      setErrors({});
+    } else if (isOpen) {
+      resetForm();
+    }
+  }, [isOpen, initialData]);
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      url: '',
+      timeoutMs: '120000',
+      parameters: '{\n  "type": "object",\n  "properties": {}\n}',
+      speakDuring: false,
+      speakAfter: false,
+      executionMessage: '',
+    });
+    setErrors({});
+    setIsCustomFunction(true);
+  };
+
+  const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  }, []);
-  
-  // Validate form fields
-  const validate = useCallback((): boolean => {
+    
+    // Clear validation errors for the field being changed
+    if (errors[field as keyof FunctionFormErrors]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field as keyof FunctionFormErrors];
+        return newErrors;
+      });
+    }
+  };
+
+  const validate = (): boolean => {
     const newErrors: FunctionFormErrors = {};
     
     if (!formData.name.trim()) {
-      newErrors.name = 'Function name is required';
+      newErrors.name = 'Got invalid tool name: "", Tool name must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64.';
     }
     
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
+    if (isCustomFunction && !formData.url.trim()) {
+      newErrors.url = 'Got empty url';
     }
     
-    if (formData.type === 'custom' && !formData.url.trim()) {
-      newErrors.url = 'URL is required for custom functions';
-    }
-    
-    try {
-      if (formData.parameters) {
+    if (isCustomFunction && formData.parameters) {
+      try {
         JSON.parse(formData.parameters);
+      } catch (e) {
+        newErrors.parameters = 'Invalid JSON format';
       }
-    } catch (e) {
-      newErrors.parameters = 'Invalid JSON format';
     }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData]);
-  
-  // Build AgentFunction object from form data
-  const buildFunctionObject = useCallback((): AgentFunction => {
-    let parsedParameters;
-    try {
-      parsedParameters = formData.parameters ? JSON.parse(formData.parameters) : undefined;
-    } catch (e) {
-      parsedParameters = {};
-    }
-    
-    const newFunction: AgentFunction = {
+  };
+
+  const buildFunctionObject = (): AgentFunction => {
+    const baseFunction = {
       name: formData.name,
       description: formData.description,
-      type: formData.type,
+      type: 'custom',
     };
-    
-    if (formData.type === 'custom') {
-      newFunction.url = formData.url;
-      newFunction.timeout_ms = parseInt(formData.timeoutMs, 10);
-      newFunction.parameters = parsedParameters;
-      newFunction.speak_during_execution = formData.speakDuring;
-      newFunction.speak_after_execution = formData.speakAfter;
-      
-      if (formData.speakDuring && formData.executionMessage) {
-        newFunction.execution_message = formData.executionMessage;
-      }
+
+    if (isCustomFunction) {
+      return {
+        ...baseFunction,
+        url: formData.url,
+        timeout_ms: parseInt(formData.timeoutMs),
+        speak_during_execution: formData.speakDuring,
+        speak_after_execution: formData.speakAfter,
+        ...(formData.speakDuring && formData.executionMessage ? { execution_message: formData.executionMessage } : {}),
+        ...(formData.parameters ? { parameters: JSON.parse(formData.parameters) } : {}),
+      };
     }
     
-    return newFunction;
-  }, [formData]);
-  
+    // This is for non-custom functions
+    return {
+      ...baseFunction,
+      // Add other function-specific fields based on type
+      ...(formData.digit ? { digit: formData.digit } : {}),
+      ...(formData.transfer_destination ? { transfer_destination: formData.transfer_destination } : {}),
+      ...(formData.event_type_id ? { event_type_id: formData.event_type_id } : {}),
+      ...(formData.cal_api_key ? { cal_api_key: formData.cal_api_key } : {}),
+      ...(formData.timezone ? { timezone: formData.timezone } : {}),
+    };
+  };
+
   return {
     formData,
     errors,
     handleChange,
     validate,
     buildFunctionObject,
-    isCustomFunction: formData.type === 'custom',
-    resetForm
+    isCustomFunction,
+    resetForm,
   };
 };
