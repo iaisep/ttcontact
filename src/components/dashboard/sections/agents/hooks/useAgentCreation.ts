@@ -1,13 +1,11 @@
 
 import { useState } from 'react';
 import { useApiContext } from '@/context/ApiContext';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export const useAgentCreation = () => {
   const [isCreating, setIsCreating] = useState(false);
   const { fetchWithAuth } = useApiContext();
-  const navigate = useNavigate();
 
   const createSinglePromptAgent = async (agentName = "Single-Prompt Agent") => {
     try {
@@ -48,9 +46,6 @@ export const useAgentCreation = () => {
       }
       
       toast.success('Agent created successfully');
-      
-      // Navigate to the agent detail page
-      navigate(`/agentes/${agentResponse.agent_id}`);
       
       return agentResponse;
     } catch (error) {

@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogClose } from '@
 import { Button } from '@/components/ui/button';
 import { Phone, X } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useAgentCreation } from './hooks/useAgentCreation';
+import { useNavigate } from 'react-router-dom';
 
 interface AgentTemplateDialogProps {
   open: boolean;
@@ -13,10 +15,23 @@ interface AgentTemplateDialogProps {
 
 const AgentTemplateDialog: React.FC<AgentTemplateDialogProps> = ({ 
   open, 
-  onClose,
-  onSelectTemplate 
+  onClose
 }) => {
   const { t } = useLanguage();
+  const { createSinglePromptAgent, isCreating } = useAgentCreation();
+  const navigate = useNavigate();
+
+  const handleSelectTemplate = async (templateType: string) => {
+    if (templateType === 'blank') {
+      // Create a single prompt agent and navigate to its detail page
+      const agentResponse = await createSinglePromptAgent();
+      
+      if (agentResponse?.agent_id) {
+        onClose();
+        navigate(`/agentes/${agentResponse.agent_id}`);
+      }
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -43,12 +58,17 @@ const AgentTemplateDialog: React.FC<AgentTemplateDialogProps> = ({
           <div className="col-span-2 grid grid-cols-3 gap-4">
             <div 
               className="p-4 border rounded-md flex flex-col items-center justify-center hover:border-primary cursor-pointer"
-              onClick={() => onSelectTemplate('blank')}
+              onClick={() => handleSelectTemplate('blank')}
             >
               <div className="w-16 h-16 flex items-center justify-center text-3xl text-muted-foreground">+</div>
               <div className="mt-4 text-center">
                 <p className="font-medium">Start from blank</p>
               </div>
+              {isCreating && (
+                <div className="mt-2">
+                  <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
+                </div>
+              )}
             </div>
             
             <div className="p-4 border rounded-md hover:border-primary cursor-pointer opacity-50">
