@@ -47,9 +47,9 @@ const CallTransferFunctionModal: React.FC<CallTransferFunctionModalProps> = ({
           )}
           
           <FunctionMetaSection
-            name={formState.functionName}
+            functionName={formState.functionName}
             description={formState.description}
-            setName={setters.setFunctionName}
+            setFunctionName={setters.setFunctionName}
             setDescription={setters.setDescription}
           />
           
