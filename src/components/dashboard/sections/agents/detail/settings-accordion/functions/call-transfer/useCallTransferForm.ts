@@ -58,12 +58,13 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess }: UseCallTransf
       }
           
       // Prepare handoff message configuration based on transfer type and message type
-      const handoffConfig = transferType === 'warm' 
-        ? {
-            type: messageType === 'prompt' ? 'prompt' : 'static',
-            content: handoffMessage
-          }
-        : undefined;
+      let handoffConfig = undefined;
+      if (transferType === 'warm') {
+        handoffConfig = {
+          type: messageType,
+          content: handoffMessage
+        };
+      }
 
       // Create the function payload
       const functionData = {
