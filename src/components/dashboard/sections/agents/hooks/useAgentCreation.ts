@@ -20,11 +20,18 @@ export const useAgentCreation = () => {
         })
       });
       
-      if (!llmResponse || !llmResponse.id) {
-        throw new Error('Failed to create LLM. No ID returned.');
+      // Make sure we have a valid LLM response with an ID before proceeding
+      if (!llmResponse) {
+        throw new Error('Failed to create LLM. No response received.');
       }
       
-      const llmId = llmResponse.id;
+      console.log('LLM creation response:', llmResponse);
+      
+      // Check if llm_id exists in the response
+      const llmId = llmResponse.llm_id;
+      if (!llmId) {
+        throw new Error('Failed to create LLM. No ID returned in response.');
+      }
       
       // Step 2: Create the Agent
       const agentResponse = await fetchWithAuth('/create-agent', {

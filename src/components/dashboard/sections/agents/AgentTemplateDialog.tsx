@@ -30,19 +30,22 @@ const AgentTemplateDialog: React.FC<AgentTemplateDialogProps> = ({
   };
 
   const handleSelectTemplate = async (templateType: string) => {
-    setSelectedTemplate(templateType);
-    
-    if (templateType === 'blank') {
-      try {
-        // Create a single prompt agent and navigate to its detail page
-        const agentResponse = await createSinglePromptAgent();
-        
-        if (agentResponse?.agent_id) {
-          onClose();
-          navigate(`/agentes/${agentResponse.agent_id}`);
+    // Only set selected template if we're not already creating
+    if (!isCreating) {
+      setSelectedTemplate(templateType);
+      
+      if (templateType === 'blank') {
+        try {
+          // Create a single prompt agent and navigate to its detail page
+          const agentResponse = await createSinglePromptAgent();
+          
+          if (agentResponse?.agent_id) {
+            onClose();
+            navigate(`/agentes/${agentResponse.agent_id}`);
+          }
+        } catch (error) {
+          console.error("Error creating agent:", error);
         }
-      } catch (error) {
-        console.error("Error creating agent:", error);
       }
     }
   };
@@ -87,19 +90,21 @@ const AgentTemplateDialog: React.FC<AgentTemplateDialogProps> = ({
           
           <div className="col-span-2 grid grid-cols-3 gap-4">
             <div 
-              className={`p-4 border rounded-md flex flex-col items-center justify-center hover:border-primary cursor-pointer ${selectedTemplate === 'blank' ? 'border-primary bg-primary/5' : ''}`}
-              onClick={() => handleSelectTemplate('blank')}
+              className={`p-4 border rounded-md flex flex-col items-center justify-center hover:border-primary cursor-pointer ${selectedTemplate === 'blank' ? 'border-primary bg-primary/5' : ''} ${isCreating ? 'cursor-wait opacity-75' : ''}`}
+              onClick={() => !isCreating && handleSelectTemplate('blank')}
             >
               <div className="w-16 h-16 flex items-center justify-center text-3xl text-muted-foreground">
-                <Plus className="h-8 w-8" />
+                {isCreating && selectedTemplate === 'blank' ? (
+                  <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
+                ) : (
+                  <Plus className="h-8 w-8" />
+                )}
               </div>
               <div className="mt-4 text-center">
                 <p className="font-medium">Start from blank</p>
               </div>
               {isCreating && selectedTemplate === 'blank' && (
-                <div className="mt-2">
-                  <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
-                </div>
+                <p className="text-xs text-muted-foreground mt-2">Creating agent...</p>
               )}
             </div>
             
