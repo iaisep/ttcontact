@@ -13,7 +13,7 @@ export const createFunctionFromTemplate = (type: string): AgentFunction => {
     case 'calendar_book':
       return {
         name: 'book_appointment',
-        type: 'book_cal',
+        type: 'book_appointment_cal',
         description: 'When users ask to book an appointment, book it on the calendar.',
         event_type_id: 0,
         cal_api_key: '',
@@ -47,7 +47,8 @@ export const createFunctionFromTemplate = (type: string): AgentFunction => {
         name: 'press_digit',
         type: 'press_digit',
         description: 'Press a digit for IVR navigation.',
-        digit: ''
+        digit: '',
+        pause_detection_delay_ms: 1000
       };
       
     case 'custom':

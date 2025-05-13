@@ -1,125 +1,166 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Phone, CornerDownRight, Calendar, FileText, Sparkles } from 'lucide-react';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { useLanguage } from '@/context/LanguageContext';
-import EndCallFunctionModal from './EndCallFunctionModal';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { PlusIcon } from 'lucide-react';
+import { createFunctionFromTemplate } from './functionUtils';
+import { RetellAgent } from '../../types/retell-types'; 
+import AddFunctionModal from '../function-modals/AddFunctionModal';
+import EndCallFunctionModal from './end-call';
 import CallTransferFunctionModal from './call-transfer';
-import CalendarAvailabilityModal from './calendar-availability';
 import BookCalendarModal from './book-calendar';
-import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
+import CalendarAvailabilityModal from './calendar-availability';
+import PressDigitFunctionModal from './press-digit';
+import { AgentFunction } from './types';
 
 interface AddFunctionDropdownProps {
-  onAddTemplate: (type: string) => void;
   agent: RetellAgent;
-  onFunctionAdded?: () => void;
+  onAddFunction?: (newFunction: AgentFunction) => void;
+  refreshFunctions?: () => void;
 }
 
-export const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({ 
-  onAddTemplate, 
+const AddFunctionDropdown: React.FC<AddFunctionDropdownProps> = ({
   agent,
-  onFunctionAdded
+  onAddFunction,
+  refreshFunctions,
 }) => {
-  const { t } = useLanguage();
+  const [functionType, setFunctionType] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [showEndCallModal, setShowEndCallModal] = useState(false);
-  const [showCallTransferModal, setShowCallTransferModal] = useState(false);
-  const [showCalendarAvailabilityModal, setShowCalendarAvailabilityModal] = useState(false);
+  const [showTransferCallModal, setShowTransferCallModal] = useState(false);
   const [showBookCalendarModal, setShowBookCalendarModal] = useState(false);
-  
-  const handleEndCallClick = () => {
-    setShowEndCallModal(true);
-  };
+  const [showCalendarAvailabilityModal, setShowCalendarAvailabilityModal] = useState(false);
+  const [showPressDigitModal, setShowPressDigitModal] = useState(false);
 
-  const handleCallTransferClick = () => {
-    setShowCallTransferModal(true);
-  };
-
-  const handleCalendarAvailabilityClick = () => {
-    setShowCalendarAvailabilityModal(true);
-  };
-
-  const handleBookCalendarClick = () => {
-    setShowBookCalendarModal(true);
-  };
-
-  const handleFunctionAdded = () => {
-    if (onFunctionAdded) {
-      onFunctionAdded();
+  const handleSelectType = (type: string) => {
+    setFunctionType(type);
+    
+    if (type === 'end_call') {
+      setShowEndCallModal(true);
+    } else if (type === 'transfer_call') {
+      setShowTransferCallModal(true);
+    } else if (type === 'calendar_book') {
+      setShowBookCalendarModal(true);
+    } else if (type === 'calendar_availability') {
+      setShowCalendarAvailabilityModal(true);
+    } else if (type === 'ivr_digit') {
+      setShowPressDigitModal(true);
+    } else {
+      // For custom functions
+      setShowAddModal(true);
     }
   };
-  
+
+  const handleAddFunction = (newFunction: AgentFunction) => {
+    if (onAddFunction) {
+      onAddFunction(newFunction);
+    }
+    
+    if (refreshFunctions) {
+      refreshFunctions();
+    }
+    
+    // Close modals and reset state
+    setShowAddModal(false);
+    setShowEndCallModal(false);
+    setShowTransferCallModal(false);
+    setShowBookCalendarModal(false);
+    setShowCalendarAvailabilityModal(false);
+    setShowPressDigitModal(false);
+    setFunctionType(null);
+  };
+
+  const handleClose = () => {
+    setShowAddModal(false);
+    setShowEndCallModal(false);
+    setShowTransferCallModal(false);
+    setShowBookCalendarModal(false);
+    setShowCalendarAvailabilityModal(false);
+    setShowPressDigitModal(false);
+    setFunctionType(null);
+  };
+
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="text-xs">
-            <PlusCircle className="h-3 w-3 mr-1" /> Add
+          <Button size="sm" className="h-8">
+            <PlusIcon className="h-4 w-4 mr-1" /> Add Function
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onClick={handleEndCallClick}>
-            <Phone className="mr-2 h-4 w-4" />
-            <span>End Call</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleCallTransferClick}>
-            <CornerDownRight className="mr-2 h-4 w-4" />
-            <span>Call Transfer</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleCalendarAvailabilityClick}>
-            <Calendar className="mr-2 h-4 w-4" />
-            <span>Check Calendar Availability</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleBookCalendarClick}>
-            <Calendar className="mr-2 h-4 w-4" />
-            <span>Book on the Calendar</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onAddTemplate('ivr_digit')}>
-            <FileText className="mr-2 h-4 w-4" />
-            <span>Press Digit (IVR Navigation)</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onAddTemplate('custom')}>
-            <Sparkles className="mr-2 h-4 w-4" />
-            <span>Custom Function</span>
-          </DropdownMenuItem>
+        <DropdownMenuContent align="end" className="w-[200px]">
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => handleSelectType('custom')}>
+              Custom Function
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleSelectType('end_call')}>
+              End Call
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleSelectType('transfer_call')}>
+              Transfer Call
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleSelectType('ivr_digit')}>
+              Press Digit (IVR Navigation)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleSelectType('calendar_book')}>
+              Book on the Calendar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleSelectType('calendar_availability')}>
+              Check Calendar Availability
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {showEndCallModal && (
-        <EndCallFunctionModal 
-          isOpen={showEndCallModal} 
-          onClose={() => setShowEndCallModal(false)} 
-          agent={agent}
-          onSuccess={handleFunctionAdded}
-        />
-      )}
+      {/* Custom Function Modal */}
+      <AddFunctionModal
+        isOpen={showAddModal}
+        onClose={handleClose}
+        onAdd={handleAddFunction}
+        functionData={functionType ? createFunctionFromTemplate(functionType) : null}
+      />
 
-      {showCallTransferModal && (
-        <CallTransferFunctionModal
-          isOpen={showCallTransferModal}
-          onClose={() => setShowCallTransferModal(false)}
-          agent={agent}
-          onSuccess={handleFunctionAdded}
-        />
-      )}
+      {/* End Call Modal */}
+      <EndCallFunctionModal
+        isOpen={showEndCallModal}
+        onClose={handleClose}
+        agent={agent}
+        onSuccess={refreshFunctions}
+      />
 
-      {showCalendarAvailabilityModal && (
-        <CalendarAvailabilityModal
-          isOpen={showCalendarAvailabilityModal}
-          onClose={() => setShowCalendarAvailabilityModal(false)}
-          agent={agent}
-          onSuccess={handleFunctionAdded}
-        />
-      )}
+      {/* Transfer Call Modal */}
+      <CallTransferFunctionModal
+        isOpen={showTransferCallModal}
+        onClose={handleClose}
+        agent={agent}
+        onSuccess={refreshFunctions}
+      />
 
-      {showBookCalendarModal && (
-        <BookCalendarModal
-          isOpen={showBookCalendarModal}
-          onClose={() => setShowBookCalendarModal(false)}
-          agent={agent}
-          onSuccess={handleFunctionAdded}
-        />
-      )}
+      {/* Book Calendar Modal */}
+      <BookCalendarModal
+        isOpen={showBookCalendarModal}
+        onClose={handleClose}
+        agent={agent}
+        onSuccess={refreshFunctions}
+      />
+
+      {/* Calendar Availability Modal */}
+      <CalendarAvailabilityModal
+        isOpen={showCalendarAvailabilityModal}
+        onClose={handleClose}
+        agent={agent}
+        onSuccess={refreshFunctions}
+      />
+
+      {/* Press Digit Modal */}
+      <PressDigitFunctionModal
+        isOpen={showPressDigitModal}
+        onClose={handleClose}
+        agent={agent}
+        onSuccess={refreshFunctions}
+      />
     </>
   );
 };
+
+export default AddFunctionDropdown;
