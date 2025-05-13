@@ -56,15 +56,18 @@ const CallTransferFunctionModal: React.FC<CallTransferFunctionModalProps> = ({
 
     try {
       // Prepare the function data based on transfer method
-      const transferDestination = transferMethod === 'static' 
-        ? {
-            type: "predefined",
-            number: phoneNumber
-          }
-        : {
-            type: "dynamic",
-            routing_prompt: dynamicRouting
-          };
+      let transferDestination;
+      if (transferMethod === 'static') {
+        transferDestination = {
+          type: "predefined",
+          number: phoneNumber
+        };
+      } else {
+        transferDestination = {
+          type: "dynamic",
+          routing_prompt: dynamicRouting
+        };
+      }
           
       // Prepare handoff message configuration based on transfer type and message type
       const handoffConfig = transferType === 'warm' 
