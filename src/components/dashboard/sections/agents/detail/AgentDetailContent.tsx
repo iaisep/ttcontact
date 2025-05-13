@@ -44,7 +44,7 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Left Column - Prompt Editor */}
-          <div className="md:col-span-6">
+          <div className="md:col-span-5">
             <AgentLeftColumn 
               agent={agent}
               llm={llm}
@@ -55,7 +55,7 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
           </div>
 
           {/* Middle Column - Accordion Settings */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             <AgentSettingsAccordion 
               agent={agent}
               knowledgeBases={knowledgeBases}
@@ -64,7 +64,7 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
           </div>
 
           {/* Right Column - Test Panel */}
-          <div className="md:col-span-3">
+          <div className="md:col-span-4 flex justify-end">
             <AgentRightColumn 
               agent={agent}
               voice={voice}
