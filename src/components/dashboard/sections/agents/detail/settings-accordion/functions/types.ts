@@ -27,6 +27,14 @@ export interface AgentFunction {
     type: string;
     content: string;
   };
+  // Add missing properties for calendar functions
+  event_type_id?: number;
+  cal_api_key?: string;
+  timezone?: string;
+  // Add missing property for IVR digit press
+  digit?: string;
+  // Add missing property for transfer call
+  number?: string;
 }
 
 export interface FunctionsContextProps {
