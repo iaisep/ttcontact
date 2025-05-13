@@ -14,7 +14,7 @@ import { Separator } from '@/components/ui/separator';
 
 interface TestPanelProps {
   agent: RetellAgent;
-  voice?: RetellVoice;
+  voice?: RetellVoice | null;
 }
 
 const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
@@ -56,7 +56,7 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4">
+    <div className="flex flex-col items-center justify-center space-y-4 w-full max-w-full">
       <TestButtons 
         isLoading={isLoading}
         isRecording={isRecording}
