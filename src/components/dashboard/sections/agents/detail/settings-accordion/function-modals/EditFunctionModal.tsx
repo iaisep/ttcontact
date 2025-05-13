@@ -12,9 +12,12 @@ const EditFunctionModal: React.FC<EditFunctionModalProps> = ({ isOpen, onClose, 
   const handleUpdateFunction = () => {
     if (validate()) {
       const updatedFunction = buildFunctionObject();
-      if (functionData?.id) {
+      
+      // Preserve the ID if it exists
+      if (functionData && functionData.id) {
         updatedFunction.id = functionData.id;
       }
+      
       onUpdate(updatedFunction);
       onClose();
     }

@@ -4,8 +4,8 @@ import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/
 import { FileText } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { FunctionsSectionProps } from './types';
-import { EditFunctionModal } from '../function-modals/EditFunctionModal';
-import { AddFunctionModal } from '../function-modals/AddFunctionModal';
+import EditFunctionModal from '../function-modals/EditFunctionModal';
+import AddFunctionModal from '../function-modals/AddFunctionModal';
 import { DeleteFunctionDialog } from '../function-modals/DeleteFunctionDialog';
 import { useFunctions } from './useFunctions';
 import { FunctionItem } from './FunctionItem';

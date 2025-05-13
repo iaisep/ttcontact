@@ -7,6 +7,7 @@ export interface FunctionParameter {
 }
 
 export interface AgentFunction {
+  id?: string; // Adding optional id property to fix the TypeScript errors
   name: string;
   description: string;
   type: string;
@@ -45,5 +46,5 @@ export interface FunctionItemProps {
 
 export interface FunctionsSectionProps {
   agent: any; // Using 'any' for now, should be replaced with the proper type
-  updateAgentField: (fieldName: string, value: any) => void;
+  updateAgentField?: (fieldName: string, value: any) => void;
 }

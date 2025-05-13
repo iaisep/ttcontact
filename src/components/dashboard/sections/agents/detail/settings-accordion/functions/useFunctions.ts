@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -27,7 +26,12 @@ export const useFunctions = (agent: RetellAgent) => {
     try {
       const response = await fetchWithAuth(`/get-retell-llm/${llmId}`);
       if (response && response.general_tools) {
-        setFunctions(response.general_tools);
+        // Make sure we assign IDs to functions for proper tracking
+        const functionsWithIds = response.general_tools.map((func: AgentFunction) => {
+          // Use name as ID if no ID exists
+          return { ...func, id: func.id || func.name };
+        });
+        setFunctions(functionsWithIds);
       }
     } catch (error) {
       console.error('Error fetching LLM functions:', error);
@@ -47,9 +51,12 @@ export const useFunctions = (agent: RetellAgent) => {
     
     setIsProcessing(true);
     try {
+      // Before sending to API, remove any IDs (they're only for our internal tracking)
+      const functionsForApi = updatedFunctions.map(({ id, ...rest }) => rest);
+      
       await fetchWithAuth(`/update-retell-llm/${llmId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ general_tools: updatedFunctions })
+        body: JSON.stringify({ general_tools: functionsForApi })
       });
       
       setFunctions(updatedFunctions);
