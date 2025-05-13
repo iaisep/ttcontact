@@ -126,6 +126,7 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
         isRecording={isRecording}
         isLoading={isLoading}
         onTest={handleFullTest}
+        agentId={agent?.agent_id || agent?.id}
       />
     </div>
   );
