@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -9,6 +9,15 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
   // Add the end_call_after_silence property to the agent type
   const typedAgent = agent as typeof agent & { end_call_after_silence?: boolean };
   
+  // Local state for the slider value
+  const [silenceDuration, setSilenceDuration] = useState(
+    agent.end_call_after_silence_ms ? agent.end_call_after_silence_ms / 1000 : 40
+  );
+  
+  useEffect(() => {
+    setSilenceDuration(agent.end_call_after_silence_ms ? agent.end_call_after_silence_ms / 1000 : 40);
+  }, [agent.end_call_after_silence_ms]);
+  
   const handleEndCallOnSilenceChange = (checked: boolean) => {
     // Only update the boolean value
     updateAgentField('end_call_after_silence', checked);
@@ -16,14 +25,12 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
 
   const handleSilenceDurationChange = (values: number[]) => {
     const duration = values[0];
-    updateAgentField('end_call_after_silence_ms', duration * 1000); // Convert to milliseconds
+    setSilenceDuration(duration);
+    // No need to call updateAgentField here as the Slider component will handle it
   };
 
   // Determine if the feature is enabled by checking the boolean value
   const isEnabled = typedAgent.end_call_after_silence === true;
-  
-  // Get the current value in seconds to display
-  const currentValueInSeconds = agent.end_call_after_silence_ms ? agent.end_call_after_silence_ms / 1000 : 40;
 
   return (
     <div className="space-y-2">
@@ -37,7 +44,7 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
             onCheckedChange={handleEndCallOnSilenceChange}
           />
           <span className="text-xs text-gray-500">
-            {currentValueInSeconds} s
+            {silenceDuration} s
           </span>
         </div>
       </div>
@@ -45,7 +52,7 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
       {/* Only show the slider if the feature is enabled */}
       {isEnabled && (
         <Slider 
-          defaultValue={[currentValueInSeconds]} 
+          value={[silenceDuration]} 
           min={0} 
           max={120} 
           step={1} 
@@ -53,7 +60,7 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
           onValueChange={handleSilenceDurationChange}
           agentId={agent.agent_id}
           fieldName="end_call_after_silence_ms"
-          debounceMs={300}
+          debounceMs={800} // Incrementado para dar más tiempo
         />
       )}
     </div>

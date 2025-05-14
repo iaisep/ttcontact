@@ -19,51 +19,80 @@ const Slider = React.forwardRef<
 >(({ className, onMouseEnter, onMouseLeave, agentId, fieldName, debounceMs = 500, ...props }, ref) => {
   const { fetchWithAuth } = useApiContext();
   const [isUpdating, setIsUpdating] = React.useState(false);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [pendingValue, setPendingValue] = React.useState<number[]>(props.defaultValue || [0]);
   const debounceTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  const handleValueChange = React.useCallback((values: number[]) => {
-    // Call the original onValueChange if it exists
-    props.onValueChange?.(values);
-
-    // If agent ID and field name are provided, update the agent
-    if (agentId && fieldName) {
-      // Clear any existing timer
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-
-      // Set a new timer for the API call
-      debounceTimerRef.current = setTimeout(async () => {
-        setIsUpdating(true);
-        try {
-          const payload = { [fieldName]: values[0] };
-          console.log(`Updating agent ${agentId} with payload:`, payload);
-          
-          await fetchWithAuth(`/update-agent/${agentId}`, {
-            method: 'PATCH',
-            body: JSON.stringify(payload)
-          });
-          
-          console.log(`Agent ${agentId} updated successfully`);
-        } catch (error) {
-          console.error(`Failed to update agent ${agentId}:`, error);
-          toast.error(`Failed to update agent setting: ${fieldName}`);
-        } finally {
-          setIsUpdating(false);
-          debounceTimerRef.current = null;
-        }
-      }, debounceMs);
-    }
-  }, [agentId, fieldName, fetchWithAuth, props.onValueChange, debounceMs]);
-
+  // Clean up function for the debounce timer
   React.useEffect(() => {
-    // Clean up the timer when the component unmounts
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
     };
   }, []);
+
+  // Handle local value change without triggering API calls immediately
+  const handleValueChange = React.useCallback((values: number[]) => {
+    setPendingValue(values);
+    
+    // Always call the original onValueChange with the current values
+    props.onValueChange?.(values);
+    
+    // Only setup debounce if not dragging (for keyboard navigation or programmatic changes)
+    if (!isDragging && agentId && fieldName) {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      
+      debounceTimerRef.current = setTimeout(() => {
+        updateServerValue(values);
+      }, debounceMs);
+    }
+  }, [isDragging, agentId, fieldName, props.onValueChange, debounceMs]);
+
+  // Function to update server value
+  const updateServerValue = React.useCallback(async (values: number[]) => {
+    if (!agentId || !fieldName) return;
+    
+    setIsUpdating(true);
+    try {
+      const payload = { [fieldName]: values[0] };
+      console.log(`Updating agent ${agentId} with payload:`, payload);
+      
+      await fetchWithAuth(`/update-agent/${agentId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload)
+      });
+      
+      console.log(`Agent ${agentId} updated successfully`);
+    } catch (error) {
+      console.error(`Failed to update agent ${agentId}:`, error);
+      toast.error(`Failed to update agent setting: ${fieldName}`);
+    } finally {
+      setIsUpdating(false);
+      debounceTimerRef.current = null;
+    }
+  }, [agentId, fieldName, fetchWithAuth]);
+
+  // When user starts dragging
+  const handleDragStart = React.useCallback(() => {
+    setIsDragging(true);
+    // Clear any pending update
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+  }, []);
+
+  // When user stops dragging
+  const handleDragEnd = React.useCallback(() => {
+    setIsDragging(false);
+    
+    // Now update the server with the final value
+    if (agentId && fieldName) {
+      updateServerValue(pendingValue);
+    }
+  }, [agentId, fieldName, pendingValue, updateServerValue]);
 
   return (
     <SliderPrimitive.Root
@@ -75,6 +104,9 @@ const Slider = React.forwardRef<
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onValueChange={handleValueChange}
+      onPointerDown={handleDragStart}
+      onPointerUp={handleDragEnd}
+      value={pendingValue}
       {...props}
     >
       <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20">

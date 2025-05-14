@@ -33,7 +33,7 @@ export const BackchannelSection: React.FC<BackchannelSectionProps> = ({
   const handleFrequencyChange = (values: number[]) => {
     const newValue = values[0];
     setLocalFrequency(newValue);
-    onUpdateFrequency(newValue);
+    // La actualización al servidor ocurrirá cuando el usuario suelte el control deslizante
   };
 
   return (
@@ -59,13 +59,13 @@ export const BackchannelSection: React.FC<BackchannelSectionProps> = ({
           <span className="text-xs text-gray-500">{localFrequency.toFixed(2)}</span>
         </div>
         <Slider 
-          defaultValue={[localFrequency]}
           value={[localFrequency]}
           max={1} 
           step={0.01} 
           className="w-full"
           agentId={agentId}
           fieldName="backchannel_frequency"
+          debounceMs={800}
           onValueChange={handleFrequencyChange}
         />
       </div>
