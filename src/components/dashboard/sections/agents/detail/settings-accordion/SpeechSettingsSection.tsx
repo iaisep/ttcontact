@@ -36,11 +36,11 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium text-amber-600">Responsiveness</Label>
-              <span className="text-xs text-gray-500">0.85</span>
+              <span className="text-xs text-gray-500">{agent?.responsiveness?.toFixed(2) || "0.85"}</span>
             </div>
             <p className="text-xs text-gray-500">Control how fast the agent responds after users finish speaking.</p>
             <Slider 
-              defaultValue={[0.85]} 
+              defaultValue={[agent?.responsiveness || 0.85]} 
               max={1} 
               step={0.01} 
               className="w-full"
@@ -53,11 +53,11 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium text-amber-600">Interruption Sensitivity</Label>
-              <span className="text-xs text-gray-500">0.8</span>
+              <span className="text-xs text-gray-500">{agent?.interruption_sensitivity?.toFixed(2) || "0.8"}</span>
             </div>
             <p className="text-xs text-gray-500">Control how sensitively AI can be interrupted by human speech.</p>
             <Slider 
-              defaultValue={[0.8]} 
+              defaultValue={[agent?.interruption_sensitivity || 0.8]} 
               max={1} 
               step={0.01} 
               className="w-full"
@@ -73,7 +73,7 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
                 <Label className="text-xs font-medium text-amber-600">Enable Backchanneling</Label>
                 <p className="text-xs text-gray-500">Enables the agent to use affirmatives like 'yeah' or 'uh-huh' during conversations, indicating active listening and engagement.</p>
               </div>
-              <Switch checked={true} />
+              <Switch checked={agent?.enable_backchannel || true} />
             </div>
           </div>
 
@@ -81,10 +81,10 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium text-amber-600">Backchannel Frequency</Label>
-              <span className="text-xs text-gray-500">0.8</span>
+              <span className="text-xs text-gray-500">{agent?.backchannel_frequency?.toFixed(2) || "0.8"}</span>
             </div>
             <Slider 
-              defaultValue={[0.8]} 
+              defaultValue={[agent?.backchannel_frequency || 0.8]} 
               max={1} 
               step={0.01} 
               className="w-full"
@@ -99,7 +99,7 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
             <p className="text-xs text-gray-500">A list of words that the agent would use for backchanneling</p>
             <Textarea 
               placeholder="Vale, entiendo, aja, comprendo, mmmm"
-              defaultValue="Vale, entiendo, aja, comprendo, mmmm"
+              defaultValue={agent?.backchannel_words?.join(", ") || "Vale, entiendo, aja, comprendo, mmmm"}
               className="w-full text-sm"
               rows={2}
             />
@@ -123,7 +123,7 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
                 <Label className="text-xs font-medium text-amber-600">Enable Speech Normalization</Label>
                 <p className="text-xs text-gray-500">It converts text elements like numbers, currency, and dates into human-like spoken expressions.</p>
               </div>
-              <Switch checked={false} />
+              <Switch checked={agent?.normalize_for_speech || false} />
             </div>
           </div>
 
