@@ -39,8 +39,10 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
     setError(null);
 
     try {
-      // Get LLM ID from the agent - this is crucial for making the correct API calls
+      // Extract the LLM ID directly from the agent object - this is critical
       const llmId = agent?.response_engine?.llm_id;
+      
+      console.log("Using LLM ID for operations:", llmId);
       
       if (!llmId) {
         toast.error(t('no_llm_id_found'));
