@@ -6,30 +6,23 @@ import { Slider } from '@/components/ui/slider';
 import { AccordionSectionProps } from '../types';
 
 const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updateAgentField }) => {
+  // Add the end_call_after_silence property to the agent type
+  const typedAgent = agent as typeof agent & { end_call_after_silence?: boolean };
+  
   const handleEndCallOnSilenceChange = (checked: boolean) => {
-    // Enviar valor booleano para end_call_after_silence
+    // Only update the boolean value
     updateAgentField('end_call_after_silence', checked);
-    
-    // También actualizar el valor en milisegundos
-    if (checked) {
-      // Si no hay un valor previo, usar 40 segundos (40000ms) como predeterminado
-      const currentMs = agent.end_call_after_silence_ms || 40000;
-      updateAgentField('end_call_after_silence_ms', currentMs);
-    } else {
-      // Si se desactiva, el valor en ms se mantiene para recordar la última configuración
-      // pero la función está desactivada por el campo booleano
-    }
   };
 
   const handleSilenceDurationChange = (values: number[]) => {
     const duration = values[0];
-    updateAgentField('end_call_after_silence_ms', duration * 1000); // Convertir a milisegundos
+    updateAgentField('end_call_after_silence_ms', duration * 1000); // Convert to milliseconds
   };
 
-  // Determinar si la función está habilitada verificando el valor booleano
-  const isEnabled = agent.end_call_after_silence === true;
+  // Determine if the feature is enabled by checking the boolean value
+  const isEnabled = typedAgent.end_call_after_silence === true;
   
-  // Obtener el valor actual en segundos para mostrar
+  // Get the current value in seconds to display
   const currentValueInSeconds = agent.end_call_after_silence_ms ? agent.end_call_after_silence_ms / 1000 : 40;
 
   return (
