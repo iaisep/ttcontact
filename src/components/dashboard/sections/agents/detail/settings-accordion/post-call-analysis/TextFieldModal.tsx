@@ -80,45 +80,48 @@ const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type
             />
           </div>
           
-          <div className="space-y-2">
-            <Label>Format Examples (Optional)</Label>
+          {/* Only show Format Examples section for text type, not for number type */}
+          {type === 'text' && (
             <div className="space-y-2">
-              {formatExamples.map((example, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input value={example} readOnly className="flex-1" />
+              <Label>Format Examples (Optional)</Label>
+              <div className="space-y-2">
+                {formatExamples.map((example, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Input value={example} readOnly className="flex-1" />
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => handleRemoveExample(index)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                
+                <div className="flex items-center gap-2">
+                  <Input 
+                    value={newExample} 
+                    onChange={(e) => setNewExample(e.target.value)} 
+                    placeholder="Add a format example"
+                    className="flex-1"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddExample();
+                      }
+                    }}
+                  />
                   <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => handleRemoveExample(index)}
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleAddExample}
                   >
-                    <Trash className="h-4 w-4" />
+                    + Add
                   </Button>
                 </div>
-              ))}
-              
-              <div className="flex items-center gap-2">
-                <Input 
-                  value={newExample} 
-                  onChange={(e) => setNewExample(e.target.value)} 
-                  placeholder="Add a format example"
-                  className="flex-1"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddExample();
-                    }
-                  }}
-                />
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleAddExample}
-                >
-                  + Add
-                </Button>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         <DialogFooter className="flex justify-end gap-2 sm:justify-end">
