@@ -44,6 +44,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
       
       if (!llmId) {
         toast.error(t('no_llm_id_found'));
+        setIsSubmitting(false);
         return;
       }
 
@@ -107,6 +108,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
         } else {
           setError(response.message || t('error_adding_end_call_function'));
         }
+        setIsSubmitting(false);
         return;
       }
 
@@ -130,7 +132,6 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
         setError(error.message || t('error_adding_end_call_function'));
         toast.error(t('error_adding_end_call_function'));
       }
-    } finally {
       setIsSubmitting(false);
     }
   };
