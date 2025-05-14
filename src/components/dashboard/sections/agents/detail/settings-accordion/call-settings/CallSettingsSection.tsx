@@ -46,7 +46,10 @@ const CallSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateAge
           />
 
           {/* Ring Duration */}
-          <RingDurationSection />
+          <RingDurationSection
+            agent={agent}
+            updateAgentField={updateAgentField}
+          />
         </div>
       </AccordionContent>
     </AccordionItem>

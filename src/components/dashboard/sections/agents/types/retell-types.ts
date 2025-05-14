@@ -27,12 +27,14 @@ export interface RetellAgent {
   opt_out_sensitive_data_storage?: boolean;
   normalize_for_speech?: boolean;
   end_call_after_silence_ms?: number;
+  end_call_after_silence?: boolean;
   enable_voicemail_detection?: boolean;
   voicemail_message?: string;
   post_call_analysis_data?: PostCallAnalysisItem[];
   max_call_duration_ms?: number;
   voicemail_detection_timeout_ms?: number;
   begin_message_delay_ms?: number;
+  ring_duration_ms?: number;
   post_call_analysis_model?: string;
   enable_transcription_formatting?: boolean;
   description?: string;
