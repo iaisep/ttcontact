@@ -10,6 +10,7 @@ export interface RetellAgent {
   volume?: number;
   enable_backchannel?: boolean;
   backchannel_words?: string[];
+  backchannel_frequency?: number;
   reminder_trigger_ms?: number;
   reminder_max_count?: number;
   interruption_sensitivity?: number;
