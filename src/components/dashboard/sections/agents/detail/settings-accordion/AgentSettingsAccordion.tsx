@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 
 // Import all section components
 import CallSettingsSection from './call-settings';
-import KnowledgeBaseSection from './KnowledgeBaseSection';
+import KnowledgeBaseSection from './knowledge-base';
 import SpeechSettingsSection from './SpeechSettingsSection';
 import FunctionsSection from './functions';
 import SecurityFallbackSection from './SecurityFallbackSection';
