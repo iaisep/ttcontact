@@ -2,7 +2,6 @@
 import React, { useState, useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useLanguage } from '@/context/LanguageContext';
 
 interface VoiceCloneTabProps {
@@ -17,7 +16,6 @@ const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
   const { t } = useLanguage();
   const [voiceName, setVoiceName] = useState<string>('');
   const [audioFile, setAudioFile] = useState<File | null>(null);
-  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +42,7 @@ const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
     fileInputRef.current?.click();
   };
 
-  const isFormValid = voiceName.trim() !== '' && audioFile !== null && termsAccepted;
+  const isFormValid = voiceName.trim() !== '' && audioFile !== null;
 
   const handleSubmit = () => {
     if (isFormValid && audioFile) {
@@ -118,19 +116,6 @@ const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
             </div>
           )}
         </div>
-      </div>
-
-      <div className="flex items-start space-x-2">
-        <Checkbox 
-          id="terms" 
-          checked={termsAccepted}
-          onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-          disabled={isLoading}
-        />
-        <Label htmlFor="terms" className="text-xs leading-tight max-w-[calc(100%-2rem)]">
-          {t('i_hereby_confirm_that_i_have_all_necessary_rights_or_consents_to_upload_and_clone_these_voice_samples_and_that_i_will_not_use_the_platform_generated_content_for_any_illegal_fraudulent_or_harmful_purpose') || 
-          'I hereby confirm that I have all necessary rights or consents\nto upload and clone these voice samples and that I will not\nuse the platform-generated content for any illegal, fraudulent,\nor harmful purpose.'}
-        </Label>
       </div>
     </div>
   );
