@@ -1,4 +1,3 @@
-
 // This file now imports from the modular implementation
 import PostCallAnalysisSection from './post-call-analysis/PostCallAnalysisSection';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -130,7 +129,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   };
 
   return (
-    <Accordion type="multiple" className="w-full" defaultValue={["call-settings"]}>
+    <Accordion type="multiple" className="w-full">
       {/* Voice section is now hidden */}
       
       <AccordionItem value="call-settings">
