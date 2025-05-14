@@ -210,34 +210,35 @@ const KnowledgeBaseSection: React.FC<AccordionSectionProps> = ({ agent, updateAg
                   No knowledge bases available. Create one first.
                 </div>
               ) : (
-                knowledgeBases.map((kb) => (
+                <>
+                  {knowledgeBases.map((kb) => (
+                    <div 
+                      key={kb.id} 
+                      className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer ${
+                        selectedKbs.includes(kb.id) ? 'bg-blue-50' : ''
+                      }`}
+                      onClick={() => toggleKnowledgeBase(kb.id)}
+                    >
+                      <div className="flex items-center">
+                        <FileText className="h-4 w-4 mr-2 text-gray-500" />
+                        <span className="text-sm">{kb.name}</span>
+                      </div>
+                      {selectedKbs.includes(kb.id) && (
+                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                      )}
+                    </div>
+                  ))}
                   <div 
-                    key={kb.id} 
-                    className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer ${
-                      selectedKbs.includes(kb.id) ? 'bg-blue-50' : ''
-                    }`}
-                    onClick={() => toggleKnowledgeBase(kb.id)}
+                    className="flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer bg-gray-50"
+                    onClick={handleOpenKnowledgeBaseManager}
                   >
                     <div className="flex items-center">
-                      <FileText className="h-4 w-4 mr-2 text-gray-500" />
-                      <span className="text-sm">{kb.name}</span>
+                      <Plus className="h-4 w-4 mr-2 text-gray-500" />
+                      <span className="text-sm">Add New Knowledge Base</span>
                     </div>
-                    {selectedKbs.includes(kb.id) && (
-                      <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                    )}
                   </div>
-                ))
+                </>
               )}
-              {/* Hidden "Add New Knowledge Base" UI element that can be toggled with display:none */}
-              <div 
-                className="hidden items-center justify-between p-3 hover:bg-gray-50 cursor-pointer bg-gray-50"
-                onClick={handleOpenKnowledgeBaseManager}
-              >
-                <div className="flex items-center">
-                  <Plus className="h-4 w-4 mr-2 text-gray-500" />
-                  <span className="text-sm">Add New Knowledge Base</span>
-                </div>
-              </div>
             </div>
           </div>
           
