@@ -93,15 +93,7 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader className="flex justify-between items-center">
           <DialogTitle className="text-lg">{t('add_custom_voice') || 'Add Custom Voice'}</DialogTitle>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onClose}
-            disabled={isLoading}
-            className="h-7 w-7"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          {/* Close button hidden as requested */}
         </DialogHeader>
         
         <Tabs 
