@@ -13,6 +13,7 @@ import { AccordionSectionProps } from './types';
 
 const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
   const { t } = useLanguage();
+  const agentId = agent?.agent_id || agent?.id;
 
   return (
     <AccordionItem value="speech-settings" className="mt-4 border rounded-md overflow-hidden">
@@ -38,7 +39,14 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
               <span className="text-xs text-gray-500">0.85</span>
             </div>
             <p className="text-xs text-gray-500">Control how fast the agent responds after users finish speaking.</p>
-            <Slider defaultValue={[0.85]} max={1} step={0.01} className="w-full" />
+            <Slider 
+              defaultValue={[0.85]} 
+              max={1} 
+              step={0.01} 
+              className="w-full"
+              agentId={agentId}
+              fieldName="responsiveness"
+            />
           </div>
 
           {/* Interruption Sensitivity */}
@@ -48,7 +56,14 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
               <span className="text-xs text-gray-500">0.8</span>
             </div>
             <p className="text-xs text-gray-500">Control how sensitively AI can be interrupted by human speech.</p>
-            <Slider defaultValue={[0.8]} max={1} step={0.01} className="w-full" />
+            <Slider 
+              defaultValue={[0.8]} 
+              max={1} 
+              step={0.01} 
+              className="w-full"
+              agentId={agentId}
+              fieldName="interruption_sensitivity"
+            />
           </div>
 
           {/* Enable Backchanneling */}
@@ -68,7 +83,14 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
               <Label className="text-xs font-medium text-amber-600">Backchannel Frequency</Label>
               <span className="text-xs text-gray-500">0.8</span>
             </div>
-            <Slider defaultValue={[0.8]} max={1} step={0.01} className="w-full" />
+            <Slider 
+              defaultValue={[0.8]} 
+              max={1} 
+              step={0.01} 
+              className="w-full"
+              agentId={agentId}
+              fieldName="backchannel_frequency"
+            />
           </div>
 
           {/* Backchannel Words */}
