@@ -41,17 +41,21 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
           </span>
         </div>
       </div>
-      <Slider 
-        defaultValue={[currentValueInSeconds]} 
-        min={0} 
-        max={120} 
-        step={1} 
-        className="w-full"
-        onValueChange={handleSilenceDurationChange}
-        agentId={agent.agent_id}
-        fieldName="end_call_after_silence_ms"
-        debounceMs={300}
-      />
+      
+      {/* Only show the slider if the feature is enabled */}
+      {isEnabled && (
+        <Slider 
+          defaultValue={[currentValueInSeconds]} 
+          min={0} 
+          max={120} 
+          step={1} 
+          className="w-full"
+          onValueChange={handleSilenceDurationChange}
+          agentId={agent.agent_id}
+          fieldName="end_call_after_silence_ms"
+          debounceMs={300}
+        />
+      )}
     </div>
   );
 };
