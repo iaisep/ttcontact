@@ -19,6 +19,24 @@ export const useCallData = (
   const [callHistory, setCallHistory] = useState<CallHistoryItem[]>([]);
   const { fetchCallHistory } = useCallHistoryService();
 
+  // Ensure date is valid or convert to a default value
+  const ensureValidDate = (dateStr: string | undefined): string => {
+    if (!dateStr) return new Date().toLocaleDateString();
+    
+    try {
+      const date = new Date(dateStr);
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date encountered:', dateStr);
+        return new Date().toLocaleDateString();
+      }
+      return dateStr;
+    } catch (e) {
+      console.warn('Error processing date:', dateStr, e);
+      return new Date().toLocaleDateString();
+    }
+  };
+
   // Fetch call history data
   const loadCallHistory = async () => {
     setIsLoading(true);
@@ -48,14 +66,14 @@ export const useCallData = (
             console.warn('Call data missing callId:', call);
           }
           
-          // Format as needed
+          // Format as needed and ensure we have valid dates
           return {
             ...call,
             id: call.id || call.callId || `call-${Math.random().toString(36).substring(2, 9)}`,
             callId: call.callId || `call-${Math.random().toString(36).substring(2, 9)}`,
             from: call.from || 'Unknown',
             to: call.to || 'Unknown',
-            date: call.date || new Date().toLocaleDateString(),
+            date: ensureValidDate(call.date),
             time: call.time || new Date().toLocaleTimeString(),
             status: call.status || 'ended',
             duration: call.duration || '0s',

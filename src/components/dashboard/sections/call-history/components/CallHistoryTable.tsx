@@ -46,6 +46,26 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
   // Filter visible columns
   const visibleColumns = columns.filter(column => column.visible);
 
+  // Safe date formatter that doesn't crash on invalid dates
+  const safeFormatDate = (dateString?: string, timeString?: string): string => {
+    if (!dateString) return 'Unknown';
+    
+    try {
+      // Check if the date string is valid
+      const dateValue = new Date(`${dateString} ${timeString || '00:00:00'}`);
+      
+      // Check if the date is valid (not NaN)
+      if (isNaN(dateValue.getTime())) {
+        return 'Invalid date';
+      }
+      
+      return formatDate(dateValue);
+    } catch (error) {
+      console.error('Error formatting date:', error, { dateString, timeString });
+      return 'Invalid date';
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="border rounded-md">
@@ -85,7 +105,7 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
                   className="cursor-pointer hover:bg-muted"
                 >
                   {columns.find(col => col.id === 'timestamp')?.visible && (
-                    <TableCell>{call.date && call.time ? formatDate(new Date(`${call.date} ${call.time}`)) : 'Unknown'}</TableCell>
+                    <TableCell>{safeFormatDate(call.date, call.time)}</TableCell>
                   )}
                   {columns.find(col => col.id === 'agentName')?.visible && (
                     <TableCell>{call.agentName || 'Unknown'}</TableCell>
