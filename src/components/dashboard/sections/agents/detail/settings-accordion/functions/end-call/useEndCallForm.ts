@@ -103,9 +103,12 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
       console.log("Updating LLM with ID:", llmId);
       console.log("Updated tools payload:", { general_tools: updatedTools });
       
-      // Update the LLM with the updated tools - using the correct llmId
+      // CRITICAL FIX: Explicitly define the method as PATCH and ensure proper request payload
       const response = await fetchWithAuth(`/update-retell-llm/${llmId}`, {
         method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ general_tools: updatedTools })
       });
       
