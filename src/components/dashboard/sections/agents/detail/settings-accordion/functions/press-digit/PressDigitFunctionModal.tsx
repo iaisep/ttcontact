@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,19 +10,22 @@ import { useApiContext } from '@/context/ApiContext';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { AgentFunction } from '../types';
 
 interface PressDigitFunctionModalProps {
   isOpen: boolean;
   onClose: () => void;
   agent: RetellAgent;
   onSuccess?: () => void;
+  initialData?: AgentFunction;
 }
 
 const PressDigitFunctionModal: React.FC<PressDigitFunctionModalProps> = ({
   isOpen,
   onClose,
   agent,
-  onSuccess
+  onSuccess,
+  initialData
 }) => {
   const { fetchWithAuth } = useApiContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,6 +34,17 @@ const PressDigitFunctionModal: React.FC<PressDigitFunctionModalProps> = ({
   const [digit, setDigit] = useState('');
   const [pauseDetectionDelay, setPauseDetectionDelay] = useState('1000');
   const [error, setError] = useState<string | null>(null);
+
+  // Initialize form with the initialData if provided (for editing mode)
+  useEffect(() => {
+    if (initialData && initialData.type === 'press_digit') {
+      setFunctionName(initialData.name || 'press_digit');
+      setDescription(initialData.description || '');
+      setDigit(initialData.digit || '');
+      setPauseDetectionDelay(initialData.pause_detection_delay_ms ? 
+        initialData.pause_detection_delay_ms.toString() : '1000');
+    }
+  }, [initialData]);
 
   // Get LLM ID from the agent
   const llmId = agent?.response_engine?.llm_id;
@@ -65,13 +79,22 @@ const PressDigitFunctionModal: React.FC<PressDigitFunctionModalProps> = ({
       // Extract existing tools
       const existingTools = llmData.general_tools || [];
       
-      // Check if a function with the same name already exists
-      const nameExists = existingTools.some((tool: any) => tool.name === functionName);
-      
-      if (nameExists) {
-        setError(`Tool name "${functionName}" already exists. Please use a different name.`);
-        setIsSubmitting(false);
-        return;
+      // Determine if we're updating an existing function or creating a new one
+      let updatedTools;
+      if (initialData) {
+        // Remove the existing function we're editing
+        updatedTools = existingTools.filter((tool: any) => tool.name !== initialData.name);
+      } else {
+        // Check if a function with the same name already exists
+        const nameExists = existingTools.some((tool: any) => tool.name === functionName);
+        
+        if (nameExists) {
+          setError(`Tool name "${functionName}" already exists. Please use a different name.`);
+          setIsSubmitting(false);
+          return;
+        }
+        
+        updatedTools = [...existingTools];
       }
       
       // Prepare the new press digit function
@@ -88,7 +111,7 @@ const PressDigitFunctionModal: React.FC<PressDigitFunctionModalProps> = ({
       }
       
       // Combine existing tools with the new one
-      const updatedTools = [...existingTools, newFunction];
+      updatedTools.push(newFunction);
       
       // Prepare the payload with all tools
       const payload = {
@@ -111,7 +134,7 @@ const PressDigitFunctionModal: React.FC<PressDigitFunctionModalProps> = ({
         return;
       }
       
-      toast.success('Press Digit function added successfully');
+      toast.success(initialData ? 'Press Digit function updated successfully' : 'Press Digit function added successfully');
       
       if (onSuccess) {
         onSuccess();
@@ -119,7 +142,7 @@ const PressDigitFunctionModal: React.FC<PressDigitFunctionModalProps> = ({
       
       onClose();
     } catch (error: any) {
-      console.error('Error adding press digit function:', error);
+      console.error('Error with press digit function:', error);
       
       // Check if the error is about duplicate function name
       if (error.message && error.message.includes('Duplicate name found')) {
@@ -205,7 +228,7 @@ const PressDigitFunctionModal: React.FC<PressDigitFunctionModalProps> = ({
             Cancel
           </Button>
           <Button type="button" onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? 'Saving...' : 'Save'}
+            {isSubmitting ? 'Saving...' : initialData ? 'Update' : 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -6,6 +6,7 @@ import EndCallFunctionModal from './end-call/EndCallFunctionModal';
 import CallTransferFunctionModal from './call-transfer/CallTransferFunctionModal';
 import BookCalendarModal from './book-calendar/BookCalendarModal';
 import CalendarAvailabilityModal from './calendar-availability/CalendarAvailabilityModal';
+import PressDigitFunctionModal from './press-digit/PressDigitFunctionModal';
 
 export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDelete }) => {
   const [showEditModal, setShowEditModal] = useState(false);
@@ -13,7 +14,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
   // Handler for edit button
   const handleEditClick = () => {
     // For special function types, show the specific modal
-    if (['transfer_call', 'end_call', 'calendar_availability', 'book_calendar'].includes(func.type)) {
+    if (['transfer_call', 'end_call', 'calendar_availability', 'book_calendar', 'press_digit'].includes(func.type)) {
       setShowEditModal(true);
     } else {
       // For other function types, use the default edit handler
@@ -57,8 +58,8 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
           agent={{
             agent_name: func.name,
             voice_id: "",
-            last_modification_timestamp: new Date().toISOString(),
-            response_engine: { llm_id: func.id }
+            last_modification_timestamp: new Date().getTime(),
+            response_engine: { type: "llm", llm_id: func.id || "" }
           }}
           onSuccess={handleSpecializedEditSuccess}
           initialData={func} // Pass the function data for editing
@@ -72,8 +73,8 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
           agent={{
             agent_name: func.name,
             voice_id: "",
-            last_modification_timestamp: new Date().toISOString(),
-            response_engine: { llm_id: func.id }
+            last_modification_timestamp: new Date().getTime(),
+            response_engine: { type: "llm", llm_id: func.id || "" }
           }}
           onSuccess={handleSpecializedEditSuccess}
           initialData={func} // Pass the function data for editing
@@ -87,8 +88,8 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
           agent={{
             agent_name: func.name,
             voice_id: "",
-            last_modification_timestamp: new Date().toISOString(),
-            response_engine: { llm_id: func.id }
+            last_modification_timestamp: new Date().getTime(),
+            response_engine: { type: "llm", llm_id: func.id || "" }
           }}
           onSuccess={handleSpecializedEditSuccess}
           initialData={func} // Pass the function data for editing
@@ -102,8 +103,23 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
           agent={{
             agent_name: func.name,
             voice_id: "",
-            last_modification_timestamp: new Date().toISOString(),
-            response_engine: { llm_id: func.id }
+            last_modification_timestamp: new Date().getTime(),
+            response_engine: { type: "llm", llm_id: func.id || "" }
+          }}
+          onSuccess={handleSpecializedEditSuccess}
+          initialData={func} // Pass the function data for editing
+        />
+      )}
+
+      {showEditModal && func.type === 'press_digit' && (
+        <PressDigitFunctionModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          agent={{
+            agent_name: func.name,
+            voice_id: "",
+            last_modification_timestamp: new Date().getTime(),
+            response_engine: { type: "llm", llm_id: func.id || "" }
           }}
           onSuccess={handleSpecializedEditSuccess}
           initialData={func} // Pass the function data for editing
@@ -117,6 +133,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
 export const getFunctionIcon = (func: AgentFunction) => {
   switch (func.type) {
     case 'end_call':
+    case 'press_digit':
       return <Phone className="h-4 w-4 mr-2 text-gray-500" />;
     case 'custom':
       return <Sparkles className="h-4 w-4 mr-2 text-amber-500" />;
