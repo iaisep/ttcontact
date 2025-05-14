@@ -5,7 +5,6 @@ import AgentDetailHeader from './AgentDetailHeader';
 import AgentLeftColumn from './AgentLeftColumn';
 import AgentRightColumn from './AgentRightColumn';
 import AgentSettingsAccordion from './AgentSettingsAccordion';
-import KnowledgeBaseSummary from './KnowledgeBaseSummary';
 
 interface KnowledgeBase {
   id: string;
@@ -45,8 +44,6 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
       />
 
       <div className="container py-6 px-4">
-        <KnowledgeBaseSummary knowledgeBases={knowledgeBases} />
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Left Column - Prompt Editor */}
           <div className="lg:col-span-5">
