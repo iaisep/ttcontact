@@ -46,13 +46,14 @@ const KnowledgeBaseSelectionDialog: React.FC<KnowledgeBaseSelectionDialogProps> 
   // Reset local selection when dialog opens
   React.useEffect(() => {
     if (dialogOpen) {
+      console.log('[KnowledgeBaseSelectionDialog] Dialog opened, resetting selection to:', selectedKbs);
       setLocalSelectedKbs([...selectedKbs]);
     }
   }, [dialogOpen, selectedKbs]);
 
   const handleSaveSelection = () => {
     // Update the agent's knowledge base IDs
-    console.log('Saving knowledge base selection:', localSelectedKbs);
+    console.log('[KnowledgeBaseSelectionDialog] Saving knowledge base selection:', localSelectedKbs);
     updateAgentField('knowledge_base_ids', localSelectedKbs);
     setDialogOpen(false);
     toast.success('Knowledge bases updated');
@@ -60,11 +61,11 @@ const KnowledgeBaseSelectionDialog: React.FC<KnowledgeBaseSelectionDialogProps> 
 
   const handleToggleKnowledgeBase = (kbId: string, checked: boolean) => {
     setLocalSelectedKbs(prev => {
-      if (checked) {
-        return [...prev, kbId];
-      } else {
-        return prev.filter(id => id !== kbId);
-      }
+      const updated = checked 
+        ? [...prev, kbId] 
+        : prev.filter(id => id !== kbId);
+      console.log(`[KnowledgeBaseSelectionDialog] Toggle KB ${kbId} to ${checked}, new selection:`, updated);
+      return updated;
     });
   };
 

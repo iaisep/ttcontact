@@ -23,10 +23,10 @@ const KnowledgeBaseSection: React.FC<KnowledgeBaseSectionProps> = ({ agent, upda
 
   // Add debug logs to track the knowledge base data
   useEffect(() => {
-    console.log('KnowledgeBaseSection - agent:', agent);
-    console.log('KnowledgeBaseSection - agent knowledge_base_ids:', agent?.knowledge_base_ids);
-    console.log('KnowledgeBaseSection - selectedKbs:', selectedKbs);
-    console.log('KnowledgeBaseSection - knowledgeBases:', knowledgeBases);
+    console.log('[KnowledgeBaseSection] Initial render with agent:', agent);
+    console.log('[KnowledgeBaseSection] agent knowledge_base_ids:', agent?.knowledge_base_ids);
+    console.log('[KnowledgeBaseSection] selectedKbs:', selectedKbs);
+    console.log('[KnowledgeBaseSection] Available knowledgeBases:', knowledgeBases);
   }, [agent, selectedKbs, knowledgeBases]);
 
   return (
