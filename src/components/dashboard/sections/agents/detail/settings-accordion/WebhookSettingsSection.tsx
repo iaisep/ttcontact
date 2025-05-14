@@ -72,17 +72,6 @@ const WebhookSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
       </AccordionTrigger>
       <AccordionContent className="p-4">
         <div className="space-y-6">
-          {/* Inbound Call Webhook URL */}
-          <div className="space-y-2">
-            <Label className="text-xs font-medium text-amber-600">Inbound Call Webhook URL</Label>
-            <p className="text-xs text-gray-500">The webhook has been migrated to phone level webhooks. (Learn more)</p>
-            <Input 
-              placeholder="Webhook URL"
-              className="w-full text-sm"
-              disabled
-            />
-          </div>
-
           {/* Agent Level Webhook URL */}
           <div className="space-y-2">
             <Label className="text-xs font-medium text-amber-600">Agent Level Webhook URL</Label>
