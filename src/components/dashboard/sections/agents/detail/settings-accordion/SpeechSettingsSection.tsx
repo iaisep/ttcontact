@@ -11,7 +11,7 @@ import { Settings2, Cog, Plus } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { AccordionSectionProps } from './types';
 
-const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
+const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateAgentField }) => {
   const { t } = useLanguage();
   const agentId = agent?.agent_id || agent?.id;
 
@@ -73,7 +73,10 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
                 <Label className="text-xs font-medium text-amber-600">Enable Backchanneling</Label>
                 <p className="text-xs text-gray-500">Enables the agent to use affirmatives like 'yeah' or 'uh-huh' during conversations, indicating active listening and engagement.</p>
               </div>
-              <Switch checked={agent?.enable_backchannel || true} />
+              <Switch 
+                checked={agent?.enable_backchannel || false} 
+                onCheckedChange={(value) => updateAgentField('enable_backchannel', value)}
+              />
             </div>
           </div>
 
@@ -102,6 +105,10 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
               defaultValue={agent?.backchannel_words?.join(", ") || "Vale, entiendo, aja, comprendo, mmmm"}
               className="w-full text-sm"
               rows={2}
+              onChange={(e) => {
+                const words = e.target.value.split(',').map(word => word.trim());
+                updateAgentField('backchannel_words', words);
+              }}
             />
           </div>
 
@@ -111,8 +118,12 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
             <p className="text-xs text-gray-500">Provide a customized list of keywords to expand our model's vocabulary.</p>
             <Input 
               placeholder="Keywords separated by commas"
-              defaultValue="información de mi cuenta"
+              defaultValue={agent?.boosted_keywords?.join(", ") || "información de mi cuenta"}
               className="w-full text-sm"
+              onChange={(e) => {
+                const keywords = e.target.value.split(',').map(keyword => keyword.trim());
+                updateAgentField('boosted_keywords', keywords);
+              }}
             />
           </div>
 
@@ -123,7 +134,10 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
                 <Label className="text-xs font-medium text-amber-600">Enable Speech Normalization</Label>
                 <p className="text-xs text-gray-500">It converts text elements like numbers, currency, and dates into human-like spoken expressions.</p>
               </div>
-              <Switch checked={agent?.normalize_for_speech || false} />
+              <Switch 
+                checked={agent?.normalize_for_speech || false} 
+                onCheckedChange={(value) => updateAgentField('normalize_for_speech', value)}
+              />
             </div>
           </div>
 
@@ -134,7 +148,10 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
                 <Label className="text-xs font-medium text-amber-600">Enable Transcript Formatting</Label>
                 <p className="text-xs text-gray-500">The agent writes like phone numbers being formatted as timestamps.</p>
               </div>
-              <Switch checked={false} />
+              <Switch 
+                checked={agent?.enable_transcription_formatting || false} 
+                onCheckedChange={(value) => updateAgentField('enable_transcription_formatting', value)}
+              />
             </div>
           </div>
 
@@ -145,14 +162,26 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent }) => {
             <div className="flex items-center space-x-2">
               <Input 
                 type="number"
-                defaultValue="5"
+                defaultValue={agent?.reminder_trigger_ms ? Math.round(agent.reminder_trigger_ms / 1000) : "5"}
                 className="w-16 text-sm"
+                onChange={(e) => {
+                  const seconds = parseInt(e.target.value);
+                  if (!isNaN(seconds)) {
+                    updateAgentField('reminder_trigger_ms', seconds * 1000);
+                  }
+                }}
               />
               <span className="text-xs text-gray-500">seconds</span>
               <Input 
                 type="number"
-                defaultValue="1"
+                defaultValue={agent?.reminder_max_count || "1"}
                 className="w-16 text-sm"
+                onChange={(e) => {
+                  const count = parseInt(e.target.value);
+                  if (!isNaN(count)) {
+                    updateAgentField('reminder_max_count', count);
+                  }
+                }}
               />
               <span className="text-xs text-gray-500">times</span>
             </div>
