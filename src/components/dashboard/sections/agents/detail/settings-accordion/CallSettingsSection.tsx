@@ -13,6 +13,7 @@ const CallSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateAge
   const { t } = useLanguage();
   
   const handleVoicemailDetectionChange = (checked: boolean) => {
+    // This will send a payload like { "enable_voicemail_detection": false } to the API
     updateAgentField('enable_voicemail_detection', checked);
   };
 
@@ -33,7 +34,7 @@ const CallSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateAge
   };
 
   const handleEndCallOnSilenceChange = (checked: boolean) => {
-    // If enabling end call on silence but no duration is set, provide a default
+    // This will send a payload like { "end_call_after_silence_ms": 40000 } or { "end_call_after_silence_ms": 0 }
     if (checked && !agent.end_call_after_silence_ms) {
       updateAgentField('end_call_after_silence_ms', 40000); // 40 seconds in milliseconds
     } else if (!checked) {
