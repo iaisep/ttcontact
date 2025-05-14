@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, Plus } from 'lucide-react';
+import { FileText, Plus, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import { toast } from 'sonner';
+import { useApiContext } from '@/context/ApiContext';
 
 interface KnowledgeBase {
   id: string;
@@ -41,22 +42,43 @@ const KnowledgeBaseSelectionDialog: React.FC<KnowledgeBaseSelectionDialogProps> 
   handleOpenKnowledgeBaseManager
 }) => {
   const { t } = useLanguage();
+  const { fetchWithAuth } = useApiContext();
   const [localSelectedKbs, setLocalSelectedKbs] = useState<string[]>([...selectedKbs]);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Reset local selection when dialog opens
-  React.useEffect(() => {
+  useEffect(() => {
     if (dialogOpen) {
       console.log('[KnowledgeBaseSelectionDialog] Dialog opened, resetting selection to:', selectedKbs);
       setLocalSelectedKbs([...selectedKbs]);
     }
   }, [dialogOpen, selectedKbs]);
 
-  const handleSaveSelection = () => {
-    // Update the agent's knowledge base IDs
-    console.log('[KnowledgeBaseSelectionDialog] Saving knowledge base selection:', localSelectedKbs);
-    updateAgentField('knowledge_base_ids', localSelectedKbs);
-    setDialogOpen(false);
-    toast.success('Knowledge bases updated');
+  const handleSaveSelection = async () => {
+    setIsUpdating(true);
+    try {
+      // Update the agent's knowledge base IDs
+      console.log('[KnowledgeBaseSelectionDialog] Saving knowledge base selection:', localSelectedKbs);
+      
+      // Update agent field
+      updateAgentField('knowledge_base_ids', localSelectedKbs);
+      
+      // Also update the LLM directly to ensure consistency
+      if (agent?.response_engine?.llm_id) {
+        await fetchWithAuth(`/update-retell-llm/${agent.response_engine.llm_id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ knowledge_base_ids: localSelectedKbs })
+        });
+      }
+      
+      setDialogOpen(false);
+      toast.success('Knowledge bases updated');
+    } catch (error) {
+      console.error('Error updating knowledge bases:', error);
+      toast.error('Failed to update knowledge bases');
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleToggleKnowledgeBase = (kbId: string, checked: boolean) => {
@@ -127,14 +149,23 @@ const KnowledgeBaseSelectionDialog: React.FC<KnowledgeBaseSelectionDialogProps> 
               variant="outline" 
               size="sm"
               onClick={() => setDialogOpen(false)}
+              disabled={isUpdating}
             >
               Cancel
             </Button>
             <Button 
               size="sm"
               onClick={handleSaveSelection}
+              disabled={isUpdating}
             >
-              Save
+              {isUpdating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save'
+              )}
             </Button>
           </div>
         </DialogFooter>
