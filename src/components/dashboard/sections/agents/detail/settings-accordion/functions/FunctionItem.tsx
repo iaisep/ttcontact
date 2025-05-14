@@ -14,7 +14,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
   // Handler for edit button
   const handleEditClick = () => {
     // For special function types, show the specific modal
-    if (['transfer_call', 'end_call', 'calendar_availability', 'book_calendar', 'press_digit', 'book_appointment_cal', 'check_calendar_availability'].includes(func.type)) {
+    if (['transfer_call', 'end_call', 'calendar_availability', 'book_calendar', 'press_digit', 'book_appointment_cal', 'check_calendar_availability', 'check_availability_cal'].includes(func.type)) {
       setShowEditModal(true);
     } else {
       // For other function types, use the default edit handler

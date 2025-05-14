@@ -44,12 +44,20 @@ const CalendarAvailabilityModal: React.FC<CalendarAvailabilityModalProps> = ({
     initialData
   });
 
+  // Determine modal title based on function type
+  const getModalTitle = () => {
+    if (initialData) {
+      return 'Edit Calendar Availability';
+    }
+    return 'Check Calendar Availability (Cal.com)';
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            {initialData ? 'Edit Calendar Availability' : 'Check Calendar Availability (Cal.com)'}
+            {getModalTitle()}
           </DialogTitle>
         </DialogHeader>
         
