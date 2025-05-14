@@ -90,7 +90,7 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[440px]">
+      <DialogContent className="sm:max-w-[420px]">
         <DialogHeader className="flex justify-between items-center">
           <DialogTitle className="text-lg">{t('add_custom_voice') || 'Add Custom Voice'}</DialogTitle>
           <Button 
@@ -111,8 +111,18 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
           className="mt-2"
         >
           <TabsList className="grid grid-cols-2 w-full">
-            <TabsTrigger value="voice-clone">{t('voice_clone') || 'Voice Clone'}</TabsTrigger>
-            <TabsTrigger value="community-voices">{t('community_voices') || 'Community Voices'}</TabsTrigger>
+            <TabsTrigger 
+              value="voice-clone" 
+              className="text-sm py-1.5 h-9 flex-1 data-[state=active]:font-medium"
+            >
+              {t('voice_clone') || 'Voice Clone'}
+            </TabsTrigger>
+            <TabsTrigger 
+              value="community-voices" 
+              className="text-sm py-1.5 h-9 flex-1 data-[state=active]:font-medium"
+            >
+              {t('community_voices') || 'Community Voices'}
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="voice-clone" className="mt-4">
