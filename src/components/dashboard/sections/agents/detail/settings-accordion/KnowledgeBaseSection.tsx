@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
@@ -41,37 +42,37 @@ const KnowledgeBaseSection: React.FC<KnowledgeBaseSectionProps> = ({ agent, upda
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchKnowledgeBases();
+    console.log('KnowledgeBaseSection - propKnowledgeBases:', propKnowledgeBases);
+    
+    // Use knowledge bases from props if provided
+    if (propKnowledgeBases && propKnowledgeBases.length > 0) {
+      setKnowledgeBases(propKnowledgeBases);
+    } else {
+      // If props don't have knowledge bases, fetch them
+      fetchKnowledgeBases();
+    }
     
     // If agent has knowledge_base_ids, set them as selected
     if (agent?.knowledge_base_ids && Array.isArray(agent.knowledge_base_ids)) {
       setSelectedKbs(agent.knowledge_base_ids);
+      console.log('Setting selected KBs from agent.knowledge_base_ids:', agent.knowledge_base_ids);
     } else if (agent?.knowledge_base && typeof agent.knowledge_base === 'string') {
       // For backward compatibility, if there's a single knowledge_base
       setSelectedKbs([agent.knowledge_base]);
+      console.log('Setting selected KBs from agent.knowledge_base:', [agent.knowledge_base]);
     }
-  }, [agent]);
-
-  // Use knowledge bases from props if provided
-  useEffect(() => {
-    if (propKnowledgeBases && propKnowledgeBases.length > 0) {
-      const formattedKbs = propKnowledgeBases.map(kb => ({
-        id: kb.knowledge_base_id || kb.id,
-        name: kb.knowledge_base_name || kb.name,
-        created_at: kb.created_at || new Date().toISOString()
-      }));
-      setKnowledgeBases(formattedKbs);
-    }
-  }, [propKnowledgeBases]);
+  }, [agent, propKnowledgeBases]);
 
   const fetchKnowledgeBases = async () => {
     // If we already have knowledge bases from props, don't fetch again
     if (propKnowledgeBases && propKnowledgeBases.length > 0) {
+      console.log('Using knowledge bases from props:', propKnowledgeBases);
       return;
     }
     
     try {
       setLoading(true);
+      console.log('Fetching knowledge bases...');
       const response = await fetchWithAuth('/list-knowledge-bases', {
         method: 'GET',
         headers: {
@@ -89,6 +90,7 @@ const KnowledgeBaseSection: React.FC<KnowledgeBaseSectionProps> = ({ agent, upda
           created_at: kb.created_at || new Date().toISOString()
         }));
         setKnowledgeBases(formattedKbs);
+        console.log('Knowledge bases set:', formattedKbs);
       } else {
         // Fallback to mock data for development
         const mockKbs: KnowledgeBase[] = [
@@ -97,6 +99,7 @@ const KnowledgeBaseSection: React.FC<KnowledgeBaseSectionProps> = ({ agent, upda
           { id: 'kb_789', name: 'Pricing Information', created_at: new Date().toISOString() }
         ];
         setKnowledgeBases(mockKbs);
+        console.log('Using mock knowledge bases:', mockKbs);
       }
     } catch (error) {
       console.error('Failed to fetch knowledge bases:', error);

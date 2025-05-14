@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RetellAgent, RetellVoice, RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
 import AgentDetailHeader from './AgentDetailHeader';
 import AgentLeftColumn from './AgentLeftColumn';
@@ -31,6 +31,11 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
   updateAgentField,
   refreshData
 }) => {
+  // Debug logs
+  useEffect(() => {
+    console.log('Agent Detail Content - knowledgeBases:', knowledgeBases);
+  }, [knowledgeBases]);
+
   return (
     <div className="min-h-screen bg-background">
       <AgentDetailHeader 

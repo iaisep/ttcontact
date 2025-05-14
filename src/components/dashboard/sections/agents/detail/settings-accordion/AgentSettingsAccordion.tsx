@@ -3,8 +3,10 @@
 import PostCallAnalysisSection from './post-call-analysis/PostCallAnalysisSection';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AgentSettingsAccordionProps } from './types';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useVoiceSettings } from '../hooks/useVoiceSettings';
+import { useApiContext } from '@/context/ApiContext';
+import { toast } from 'sonner';
 
 // Import all section components
 import CallSettingsSection from './call-settings';
@@ -24,6 +26,9 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
     initialVoice: agent?.voice?.name || 'Select a voice',
     updateAgentField
   });
+
+  // Log the incoming knowledge bases to check if they're properly received
+  console.log('Knowledge bases in AgentSettingsAccordion:', knowledgeBases);
 
   return (
     <Accordion type="multiple" className="w-full" defaultValue={["call-settings"]}>

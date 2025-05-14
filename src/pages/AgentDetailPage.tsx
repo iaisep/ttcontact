@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAgentDetails } from '@/components/dashboard/sections/agents/hooks/useAgentDetails';
 import AgentDetailLoading from '@/components/dashboard/sections/agents/detail/AgentDetailLoading';
@@ -20,6 +20,11 @@ const AgentDetailPage: React.FC = () => {
     refreshData,
     updateAgentField
   } = useAgentDetails(slug);
+
+  // Debug logs
+  useEffect(() => {
+    console.log('Agent Detail Page - knowledgeBases:', knowledgeBases);
+  }, [knowledgeBases]);
 
   if (isLoading) {
     return <AgentDetailLoading />;
