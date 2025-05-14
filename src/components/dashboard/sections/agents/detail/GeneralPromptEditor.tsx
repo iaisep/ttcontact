@@ -20,15 +20,17 @@ const GeneralPromptEditor: React.FC<GeneralPromptEditorProps> = ({
 }) => {
   const { t } = useLanguage();
   const { fetchWithAuth } = useApiContext();
-  const [value, setValue] = useState(generalPrompt);
-  const [originalValue, setOriginalValue] = useState(generalPrompt);
+  const [value, setValue] = useState(generalPrompt || '');
+  const [originalValue, setOriginalValue] = useState(generalPrompt || '');
   const [expanded, setExpanded] = useState(false);
   const [isEdited, setIsEdited] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   
   useEffect(() => {
-    setValue(generalPrompt);
-    setOriginalValue(generalPrompt);
+    // Update value when generalPrompt prop changes, but handle null/undefined cases
+    const newValue = generalPrompt || '';
+    setValue(newValue);
+    setOriginalValue(newValue);
   }, [generalPrompt]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

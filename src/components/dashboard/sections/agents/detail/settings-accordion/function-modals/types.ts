@@ -1,18 +1,20 @@
 
 import { AgentFunction } from '../functions/types';
+import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 
-export interface BaseFunctionModalProps {
+export interface AddFunctionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  functionData: AgentFunction | null;
-}
-
-export interface AddFunctionModalProps extends BaseFunctionModalProps {
   onAdd: (newFunction: AgentFunction) => void;
+  functionData: AgentFunction | null;
+  agent?: RetellAgent; // Add agent prop to receive the agent object
 }
 
-export interface EditFunctionModalProps extends BaseFunctionModalProps {
-  onUpdate: (updatedFunction: AgentFunction) => void;
+export interface EditFunctionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (updatedFunction: AgentFunction) => void;
+  functionData: AgentFunction | null;
 }
 
 export interface DeleteFunctionDialogProps {
@@ -22,16 +24,21 @@ export interface DeleteFunctionDialogProps {
   functionName: string;
 }
 
-export interface FunctionFormData {
-  name: string;
-  description: string;
-  url: string;
-  timeoutMs: string;
-  parameters: string;
-  speakDuring: boolean;
-  speakAfter: boolean;
-  type: string;
-  executionMessage?: string;
+export interface FunctionFormProps {
+  formData: {
+    name: string;
+    description: string;
+    url?: string;
+    timeoutMs?: string;
+    parameters?: string;
+    speakDuring?: boolean;
+    speakAfter?: boolean;
+    executionMessage?: string;
+    digit?: string;
+  };
+  errors: FunctionFormErrors;
+  onChange: (field: string, value: any) => void;
+  isCustomFunction: boolean;
 }
 
 export interface FunctionFormErrors {
@@ -39,11 +46,6 @@ export interface FunctionFormErrors {
   description?: string;
   url?: string;
   parameters?: string;
-}
-
-export interface FunctionFormProps {
-  formData: FunctionFormData;
-  errors: FunctionFormErrors;
-  onChange: (field: keyof FunctionFormData, value: any) => void;
-  isCustomFunction: boolean;
+  digit?: string;
+  [key: string]: string | undefined; // Add index signature to allow for dynamic keys
 }

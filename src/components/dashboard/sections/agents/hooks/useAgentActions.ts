@@ -4,6 +4,7 @@ import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
 import { Agent } from '../types';
+import { useAgentCreation } from './useAgentCreation';
 
 export const useAgentActions = (
   agents: Agent[],
@@ -15,10 +16,20 @@ export const useAgentActions = (
   const { t } = useLanguage();
   const [isAgentFormOpen, setIsAgentFormOpen] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const { createSinglePromptAgent, isCreating } = useAgentCreation();
 
   const handleAddAgent = () => {
+    // This will now be triggered from the template dialog
+    // when the user selects a template
     setSelectedAgent(null);
     setIsAgentFormOpen(true);
+  };
+
+  const handleCreateFromTemplate = async (templateType: string) => {
+    if (templateType === 'blank') {
+      await createSinglePromptAgent();
+    }
+    // In the future, add more template types here
   };
 
   const handleEditAgent = (agent: Agent) => {
@@ -101,11 +112,13 @@ export const useAgentActions = (
   return {
     isAgentFormOpen,
     selectedAgent,
+    isCreating,
     handleAddAgent,
     handleEditAgent,
     handleDeleteAgent,
     handleSubmitAgent,
     handleCancelAgentForm,
-    handleImportAgents
+    handleImportAgents,
+    handleCreateFromTemplate
   };
 };

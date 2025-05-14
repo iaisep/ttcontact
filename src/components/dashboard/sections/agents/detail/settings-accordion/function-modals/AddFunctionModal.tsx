@@ -1,75 +1,81 @@
 
-import React, { useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { FunctionForm } from './components';
 import { AddFunctionModalProps } from './types';
-import FunctionForm from './components/FunctionForm';
 import { useFunctionForm } from './hooks/useFunctionForm';
+import { useApiContext } from '@/context/ApiContext';
+import { toast } from 'sonner';
 
-export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({ 
+const AddFunctionModal: React.FC<AddFunctionModalProps> = ({ 
   isOpen, 
   onClose, 
   onAdd, 
-  functionData 
+  functionData,
+  agent // Get the agent parameter
 }) => {
-  // Use our custom hook to manage form state and validation
-  const {
-    formData,
-    errors,
-    handleChange,
-    validate,
-    buildFunctionObject,
-    isCustomFunction,
-    resetForm
-  } = useFunctionForm(functionData);
+  const { formData, errors, handleChange, validate, buildFunctionObject, isCustomFunction, resetForm } = useFunctionForm(functionData, isOpen);
+  const { fetchWithAuth } = useApiContext();
 
-  // Reset form data when modal opens or closes
-  useEffect(() => {
-    if (!isOpen) {
-      // Only reset when closed to prevent issues during unmounting
-      resetForm();
+  const handleAddFunction = async () => {
+    if (validate()) {
+      try {
+        const newFunction = buildFunctionObject();
+        
+        // Get llmId directly from the agent prop if available
+        let llmId;
+
+        if (agent && agent.response_engine?.llm_id) {
+          // Use the llm_id from the provided agent object
+          llmId = agent.response_engine.llm_id;
+        } else if (window.location.pathname.includes('/agentes/')) {
+          // Fallback to extracting from URL if agent prop is not provided
+          const agentId = window.location.pathname.split('/').pop();
+          if (agentId && agentId.startsWith('agent_')) {
+            llmId = `llm_${agentId.substring(6)}`; // Convert agent_XXX to llm_XXX
+          }
+        }
+        
+        // Ensure we have a valid LLM ID
+        if (!llmId) {
+          toast.error('Could not determine LLM ID');
+          return;
+        }
+        
+        // Fetch current LLM data to get all functions
+        const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
+        
+        // Get existing functions from the LLM (general_tools)
+        const currentFunctions = llmData.general_tools || [];
+        
+        // Add the new function to the existing functions
+        const updatedFunctions = [...currentFunctions, newFunction];
+        
+        // Update the LLM with the new functions array
+        await fetchWithAuth(`/update-retell-llm/${llmId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            general_tools: updatedFunctions
+          })
+        });
+        
+        toast.success('Function added successfully');
+        onAdd(newFunction);
+        resetForm();
+        onClose();
+      } catch (error) {
+        console.error('Error adding function:', error);
+        toast.error('Failed to add function');
+      }
     }
-  }, [isOpen, resetForm]);
-
-  // Handle form submission
-  const handleSubmit = () => {
-    if (!validate()) return;
-    
-    const newFunction = buildFunctionObject();
-    
-    // First close the modal
-    onClose();
-    
-    // Then add the function after a short delay
-    window.setTimeout(() => {
-      onAdd(newFunction);
-    }, 50);
-  };
-
-  // Handle close safely
-  const handleClose = () => {
-    onClose();
   };
 
   return (
-    <Dialog 
-      open={isOpen} 
-      onOpenChange={(open) => {
-        if (!open) {
-          handleClose();
-        }
-      }}
-    >
-      <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center">
-            <Plus className="h-5 w-5 mr-2" />
-            Add New Function
-          </DialogTitle>
-          <DialogDescription>
-            Create a new function or tool for your agent to use during conversations.
-          </DialogDescription>
+          <DialogTitle>{isCustomFunction ? 'Custom Function' : 'Add Function'}</DialogTitle>
         </DialogHeader>
         
         <FunctionForm 
@@ -80,21 +86,16 @@ export const AddFunctionModal: React.FC<AddFunctionModalProps> = ({
         />
         
         <DialogFooter>
-          <Button 
-            variant="outline" 
-            onClick={handleClose}
-            type="button"
-          >
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button 
-            onClick={handleSubmit}
-            type="button"
-          >
-            Add Function
+          <Button type="button" onClick={handleAddFunction}>
+            Save
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
+
+export default AddFunctionModal;

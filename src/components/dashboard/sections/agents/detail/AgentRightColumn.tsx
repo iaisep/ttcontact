@@ -15,7 +15,7 @@ const AgentRightColumn: React.FC<AgentRightColumnProps> = ({
   updateAgentField
 }) => {
   return (
-    <div className="bg-[hsl(var(--muted)/.3)] rounded-lg p-4 border shadow-sm">
+    <div className="bg-[hsl(var(--muted)/.3)] rounded-lg p-4 border shadow-sm w-full">
       {/* Test Agent Section */}
       <TestPanel agent={agent} voice={voice} />
     </div>

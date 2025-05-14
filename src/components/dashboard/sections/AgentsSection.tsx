@@ -1,10 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import AgentsTable from './agents/AgentsTable';
 import AgentsToolbar from './agents/AgentsToolbar';
 import AgentForm from './agents/AgentForm';
 import { useRetellData } from './agents/hooks/useRetellData';
 import { useAgentActions } from './agents/hooks/useAgentActions';
+import { useAgentCreation } from './agents/hooks/useAgentCreation';
+import AgentTemplateDialog from './agents/AgentTemplateDialog';
 
 const AgentsSection: React.FC = () => {
   // Use custom hooks to manage state and actions
@@ -30,10 +32,28 @@ const AgentsSection: React.FC = () => {
     handleImportAgents
   } = useAgentActions(agents, setAgents, setIsLoading, fetchRetellData);
 
+  const { createSinglePromptAgent, isCreating } = useAgentCreation();
+  
+  // State for the template selection dialog
+  const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+  
+  const handleOpenTemplateDialog = () => {
+    setIsTemplateDialogOpen(true);
+  };
+  
+  const handleCloseTemplateDialog = () => {
+    setIsTemplateDialogOpen(false);
+  };
+
+  const handleTemplateSelection = async (templateType: string) => {
+    console.log('Template selected:', templateType);
+    // The actual creation logic is now handled in the dialog component
+  };
+
   return (
     <div className="p-6 space-y-6">
       <AgentsToolbar 
-        onAddAgent={handleAddAgent} 
+        onAddAgent={handleOpenTemplateDialog}
         onImportAgents={handleImportAgents}
         onRefreshAgents={fetchRetellData}
       />
@@ -41,7 +61,7 @@ const AgentsSection: React.FC = () => {
         agents={agents} 
         onEditAgent={handleEditAgent} 
         onDeleteAgent={handleDeleteAgent}
-        isLoading={isLoading}
+        isLoading={isLoading || isCreating}
       />
       {isAgentFormOpen && (
         <AgentForm 
@@ -53,6 +73,12 @@ const AgentsSection: React.FC = () => {
           llms={llms}
         />
       )}
+      
+      <AgentTemplateDialog
+        open={isTemplateDialogOpen}
+        onClose={handleCloseTemplateDialog}
+        onSelectTemplate={handleTemplateSelection}
+      />
     </div>
   );
 };

@@ -2,6 +2,7 @@
 import React from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { BarChart3, Cog, Edit, Plus, Radio, Trash } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { AccordionSectionProps } from './types';
@@ -58,8 +59,5 @@ const PostCallAnalysisSection: React.FC<AccordionSectionProps> = ({ agent }) => 
     </AccordionItem>
   );
 };
-
-// Import the Label separately
-import { Label } from '@/components/ui/label';
 
 export default PostCallAnalysisSection;

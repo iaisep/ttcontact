@@ -60,11 +60,10 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
         defaultHeaders['Content-Type'] = 'application/json';
       }
       
-      console.log('Making API request to:', url);
-      
-      // Create fetch options without credentials mode by default
-      const fetchOptions = {
-        ...options,
+      // Create fetch options - CRITICAL: Ensure we include the method from options
+      const fetchOptions: RequestInit = {
+        method: options?.method || 'GET', // Default to GET if not specified
+        ...options, // Spread all other options
         headers: {
           ...defaultHeaders,
           ...options?.headers,
@@ -72,13 +71,16 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
         // Don't include credentials mode by default
       };
       
+      console.log('Making API request to:', url);
+      console.log('HTTP Method:', fetchOptions.method);
+      console.log('Request body:', options?.body ? 'Body exists' : 'No body');
+      console.log('Headers:', JSON.stringify(fetchOptions.headers, null, 2));
+      
       // For this demo app, let's use 'same-origin' instead of 'include' to avoid CORS issues
       // In a real-world app, the backend would need to be properly configured for CORS
       if (!fetchOptions.credentials) {
         fetchOptions.credentials = 'same-origin';
       }
-      
-      console.log('Fetch options:', fetchOptions);
       
       const response = await fetch(url, fetchOptions);
 

@@ -1,93 +1,86 @@
 
-import { AgentFunction } from "./types";
+import { AgentFunction } from './types';
 
-/**
- * Creates a function template based on the specified type
- */
 export const createFunctionFromTemplate = (type: string): AgentFunction => {
-  switch (type) {
-    case 'call_transfer':
-      return {
-        name: '',
-        description: 'Transfer call to another agent or phone number',
-        type: 'custom',
-        url: 'https://api.example.com/transfer',
-        parameters: {
-          type: 'object',
-          description: 'Parameters for call transfer',
-          properties: {
-            destination: {
-              type: 'string',
-              description: 'Phone number or agent ID to transfer to'
-            },
-            reason: {
-              type: 'string',
-              description: 'Reason for transfer'
-            }
-          },
-          required: ['destination']
-        },
-        timeout_ms: 30000,
-        speak_during_execution: true,
-        speak_after_execution: false,
-        execution_message: 'Let me transfer you to the right person.'
-      };
-      
-    case 'calendar_booking':
-      return {
-        name: '',
-        description: 'Book an appointment on a calendar',
-        type: 'custom',
-        url: 'https://api.example.com/calendar/book',
-        parameters: {
-          type: 'object',
-          description: 'Parameters for calendar booking',
-          properties: {
-            date: {
-              type: 'string',
-              description: 'Date for the appointment (YYYY-MM-DD)'
-            },
-            time: {
-              type: 'string',
-              description: 'Time for the appointment (HH:MM)'
-            },
-            duration: {
-              type: 'number',
-              description: 'Duration in minutes'
-            },
-            title: {
-              type: 'string',
-              description: 'Title of the appointment'
-            }
-          },
-          required: ['date', 'time', 'title']
-        },
-        timeout_ms: 30000,
-        speak_during_execution: true,
-        speak_after_execution: true,
-        execution_message: 'Let me check our calendar for availability.'
-      };
-      
-    case 'end_call':
-      return {
-        name: 'end_call',
-        description: 'End the current call',
-        type: 'end_call'
-      };
-      
-    default:
-      return {
-        name: '',
-        description: '',
-        type: 'custom',
-        url: '',
-        parameters: {
-          type: 'object',
-          description: 'Function parameters'
-        },
-        timeout_ms: 30000,
-        speak_during_execution: false,
-        speak_after_execution: true
-      };
-  }
+  const templates: Record<string, AgentFunction> = {
+    custom: {
+      name: '',
+      description: '',
+      type: 'custom',
+      url: '',
+      timeout_ms: 120000,
+      speak_during_execution: false,
+      speak_after_execution: false,
+      parameters: {
+        type: 'object',
+        description: 'Parameters for the function',
+        properties: {}
+      }
+    },
+    end_call: {
+      name: '',
+      description: '',
+      type: 'end_call'
+    },
+    transfer_call: {
+      name: '',
+      description: '',
+      type: 'transfer_call',
+      transfer_destination: {
+        type: 'predefined',
+        number: ''
+      },
+      show_transferee_as_caller: false
+    },
+    ivr_digit: {
+      name: '',
+      description: '',
+      type: 'ivr',
+      digit: '',
+      pause_detection_delay_ms: 1000
+    },
+    calendar_book: {
+      name: '',
+      description: 'When users ask to book an appointment, book it on the calendar.',
+      type: 'book_appointment_cal',
+      event_type_id: 0,
+      cal_api_key: '',
+      timezone: 'America/Los_Angeles'
+    },
+    calendar_availability: {
+      name: '',
+      description: 'When users ask for availability, check the calendar and provide available slots.',
+      type: 'check_availability_cal',
+      event_type_id: 0,
+      cal_api_key: '',
+      timezone: 'America/Los_Angeles'
+    }
+  };
+
+  return templates[type] || templates.custom;
+};
+
+export const formatFunctionName = (name: string): string => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9_\-]/g, '_') // Replace invalid chars with underscores
+    .slice(0, 64); // Max length 64
+};
+
+export const validateFunctionName = (name: string): boolean => {
+  const regex = /^[a-zA-Z0-9_\-]{1,64}$/;
+  return regex.test(name);
+};
+
+export const FUNCTION_TYPE_LABELS: Record<string, string> = {
+  'custom': 'Custom Function',
+  'end_call': 'End Call',
+  'transfer_call': 'Transfer Call',
+  'ivr': 'Press Digit (IVR)',
+  'book_appointment_cal': 'Book Calendar',
+  'check_availability_cal': 'Check Calendar Availability'
+};
+
+export const getFunctionTypeLabel = (type: string): string => {
+  return FUNCTION_TYPE_LABELS[type] || type;
 };

@@ -1,15 +1,14 @@
-
 import React from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { FileText } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { FunctionsSectionProps } from './types';
-import { EditFunctionModal } from '../function-modals/EditFunctionModal';
-import { AddFunctionModal } from '../function-modals/AddFunctionModal';
+import EditFunctionModal from '../function-modals/EditFunctionModal';
+import AddFunctionModal from '../function-modals/AddFunctionModal';
 import { DeleteFunctionDialog } from '../function-modals/DeleteFunctionDialog';
 import { useFunctions } from './useFunctions';
 import { FunctionItem } from './FunctionItem';
-import { AddFunctionDropdown } from './AddFunctionDropdown';
+import AddFunctionDropdown from './AddFunctionDropdown';
 import { createFunctionFromTemplate } from './functionUtils';
 
 const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
@@ -30,6 +29,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
     handleUpdateFunction,
     handleAddFunction,
     confirmDeleteFunction,
+    fetchFunctions,
   } = useFunctions(agent);
 
   // Handle closing modals - implement as simple state setters without side effects
@@ -60,6 +60,11 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
         setAddModalOpen(true);
       }, 0);
     }
+  };
+
+  // Handle function added through End Call modal
+  const handleFunctionAdded = () => {
+    fetchFunctions();
   };
 
   return (
@@ -93,7 +98,11 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
           </div>
 
           <div className="flex justify-end">
-            <AddFunctionDropdown onAddTemplate={handleAddFunctionTemplate} />
+            <AddFunctionDropdown 
+              onAddTemplate={handleAddFunctionTemplate} 
+              agent={agent}
+              onFunctionAdded={handleFunctionAdded}
+            />
           </div>
         </div>
 
@@ -104,6 +113,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
             onClose={handleCloseAddModal}
             onAdd={handleAddFunction}
             functionData={selectedFunction}
+            agent={agent} // Pass the agent to AddFunctionModal
           />
         )}
 
@@ -111,7 +121,7 @@ const FunctionsSection: React.FC<FunctionsSectionProps> = ({ agent }) => {
           <EditFunctionModal
             isOpen={editModalOpen}
             onClose={handleCloseEditModal}
-            onUpdate={handleUpdateFunction}
+            onSave={handleUpdateFunction}
             functionData={selectedFunction}
           />
         )}

@@ -1,4 +1,3 @@
-
 const dashboardTranslations = {
   en: {
     // Billing
@@ -53,7 +52,37 @@ const dashboardTranslations = {
     audio: "Audio",
     llm: "LLM",
     code: "Code",
-    test: "Test"
+    test: "Test",
+    
+    // Functions
+    "functions": "Functions",
+    "function_name": "Function Name",
+    "function_description": "Enter function description",
+    "function_name_required": "Function name is required",
+    "no_llm_id_found": "LLM ID not found",
+    "end_call": "End Call",
+    "transfer_call": "Transfer Call",
+    "call_transfer_function_added": "Call transfer function added successfully",
+    "error_adding_call_transfer_function": "Error adding call transfer function",
+    "end_call_function_added": "End call function added successfully",
+    "error_adding_end_call_function": "Error adding end call function",
+    "optional": "Optional",
+    "static_number": "Static Number",
+    "dynamic_routing": "Dynamic Routing",
+    "phone_number": "Phone Number",
+    "enter_a_static_phone_number_or_dynamic_variable": "Enter a static phone number or dynamic variable",
+    "dynamic_routing_instructions": "If the user wants to reach support, transfer to +1 (925) 222-2222; if the user wants to reach sales, transfer to +1 (925) 333-3333",
+    "use_a_prompt_to_handle_dynamic_call_transfer_routing": "Use a prompt to handle dynamic call transfer routing",
+    "cold_transfer": "Cold Transfer",
+    "warm_transfer": "Warm Transfer",
+    "handoff_message": "Handoff Message",
+    "prompt": "Prompt",
+    "static_sentence": "Static Sentence",
+    "handoff_prompt": "Say hello to the agent and summarize the user problem to him",
+    "enter_static_message": "Enter static message",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
   },
   es: {
     // Billing
@@ -108,7 +137,37 @@ const dashboardTranslations = {
     audio: "Audio",
     llm: "LLM",
     code: "Código",
-    test: "Probar"
+    test: "Probar",
+    
+    // Functions
+    "functions": "Funciones",
+    "function_name": "Nombre de la Función",
+    "function_description": "Ingrese descripción de la función",
+    "function_name_required": "El nombre de la función es obligatorio",
+    "no_llm_id_found": "No se encontró el ID del LLM",
+    "end_call": "Finalizar Llamada",
+    "transfer_call": "Transferir Llamada",
+    "call_transfer_function_added": "Función de transferencia de llamada agregada correctamente",
+    "error_adding_call_transfer_function": "Error al agregar función de transferencia de llamada",
+    "end_call_function_added": "Función de finalizar llamada agregada correctamente",
+    "error_adding_end_call_function": "Error al agregar función de finalizar llamada",
+    "optional": "Opcional",
+    "static_number": "Número Estático",
+    "dynamic_routing": "Enrutamiento Dinámico",
+    "phone_number": "Número de Teléfono",
+    "enter_a_static_phone_number_or_dynamic_variable": "Ingrese un número de teléfono estático o variable dinámica",
+    "dynamic_routing_instructions": "Si el usuario quiere contactar con soporte, transferir a +1 (925) 222-2222; si el usuario quiere contactar con ventas, transferir a +1 (925) 333-3333",
+    "use_a_prompt_to_handle_dynamic_call_transfer_routing": "Use un prompt para manejar el enrutamiento dinámico de transferencia de llamadas",
+    "cold_transfer": "Transferencia Fría",
+    "warm_transfer": "Transferencia Caliente",
+    "handoff_message": "Mensaje de Transferencia",
+    "prompt": "Prompt",
+    "static_sentence": "Frase Estática",
+    "handoff_prompt": "Salude al agente y resuma el problema del usuario",
+    "enter_static_message": "Ingrese mensaje estático",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando...",
   }
 };
 
