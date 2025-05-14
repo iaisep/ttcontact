@@ -1,3 +1,4 @@
 
 // This file now imports from the modular implementation
-export { default } from './settings-accordion';
+import AgentSettingsAccordion from './settings-accordion/AgentSettingsAccordion';
+export default AgentSettingsAccordion;
