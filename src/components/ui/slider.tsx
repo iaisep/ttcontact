@@ -40,7 +40,7 @@ const Slider = React.forwardRef<
           console.log(`Updating agent ${agentId} with payload:`, payload);
           
           await fetchWithAuth(`/update-agent/${agentId}`, {
-            method: 'PUT',
+            method: 'PATCH',
             body: JSON.stringify(payload)
           });
           
