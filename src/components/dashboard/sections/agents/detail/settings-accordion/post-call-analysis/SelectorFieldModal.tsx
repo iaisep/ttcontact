@@ -11,7 +11,7 @@ import { FieldModalProps } from './types';
 const SelectorFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, existingItem }) => {
   const [name, setName] = useState(existingItem?.name || '');
   const [description, setDescription] = useState(existingItem?.description || '');
-  const [choices, setChoices] = useState<string[]>(existingItem?.examples || []);
+  const [choices, setChoices] = useState<string[]>(existingItem?.choices || existingItem?.examples || []);
   const [newChoice, setNewChoice] = useState('');
 
   const handleAddChoice = () => {
@@ -27,12 +27,12 @@ const SelectorFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, 
   const handleSave = () => {
     if (!name.trim() || choices.length === 0) return;
     
-    // Updated to use "enum" for the type and changed property name from "examples" to "choices"
+    // Ensure we're using "enum" for the type and "choices" for the options
     const item = {
       type: 'enum',
       name: name.trim(),
       description: description.trim(),
-      choices: choices,  // Use "choices" instead of "examples"
+      choices: choices,  // This is the correct field name for enum types
     };
     
     onSave(item);
