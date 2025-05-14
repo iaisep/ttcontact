@@ -47,30 +47,52 @@ const KnowledgeBaseSection: React.FC<AccordionSectionProps> = ({ agent, updateAg
     // If agent has knowledge_base_ids, set them as selected
     if (agent?.knowledge_base_ids && Array.isArray(agent.knowledge_base_ids)) {
       setSelectedKbs(agent.knowledge_base_ids);
-
     } else if (agent?.knowledge_base && typeof agent.knowledge_base === 'string') {
       // For backward compatibility, if there's a single knowledge_base
       setSelectedKbs([agent.knowledge_base]);
-
     }
   }, [agent]);
 
   const fetchKnowledgeBases = async () => {
     try {
       setLoading(true);
-      // In a real implementation, this would fetch from the API
-      // const response = await fetchWithAuth('/list-knowledge-bases');
+      const response = await fetchWithAuth('/list-knowledge-bases', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       
-      // Mock data for development
+      console.log('Fetched knowledge bases:', response);
+      
+      if (Array.isArray(response)) {
+        // Transform API response to our KnowledgeBase format
+        const formattedKbs = response.map(kb => ({
+          id: kb.knowledge_base_id || kb.id,
+          name: kb.knowledge_base_name || kb.name,
+          created_at: kb.created_at || new Date().toISOString()
+        }));
+        setKnowledgeBases(formattedKbs);
+      } else {
+        // Fallback to mock data for development
+        const mockKbs: KnowledgeBase[] = [
+          { id: 'kb_123', name: 'Product Documentation', created_at: new Date().toISOString() },
+          { id: 'kb_456', name: 'Customer FAQs', created_at: new Date().toISOString() },
+          { id: 'kb_789', name: 'Pricing Information', created_at: new Date().toISOString() }
+        ];
+        setKnowledgeBases(mockKbs);
+      }
+    } catch (error) {
+      console.error('Failed to fetch knowledge bases:', error);
+      toast.error('Failed to load knowledge bases');
+      
+      // Use mock data as fallback
       const mockKbs: KnowledgeBase[] = [
         { id: 'kb_123', name: 'Product Documentation', created_at: new Date().toISOString() },
         { id: 'kb_456', name: 'Customer FAQs', created_at: new Date().toISOString() },
         { id: 'kb_789', name: 'Pricing Information', created_at: new Date().toISOString() }
       ];
       setKnowledgeBases(mockKbs);
-    } catch (error) {
-      console.error('Failed to fetch knowledge bases:', error);
-      toast.error('Failed to load knowledge bases');
     } finally {
       setLoading(false);
     }
@@ -89,11 +111,9 @@ const KnowledgeBaseSection: React.FC<AccordionSectionProps> = ({ agent, updateAg
   const saveKnowledgeBases = async () => {
     try {
       setLoading(true);
-      // In a real implementation, this would update the agent
-      // await fetchWithAuth(`/update-agent/${agent.agent_id}`, {
-      //   method: 'PUT',
-      //   body: JSON.stringify({ knowledge_base_ids: selectedKbs })
-      // });
+      
+      // Update agent with selected knowledge bases
+      await updateAgentField('knowledge_base_ids', selectedKbs);
       
       toast.success('Knowledge bases updated');
       setDialogOpen(false);
@@ -105,8 +125,22 @@ const KnowledgeBaseSection: React.FC<AccordionSectionProps> = ({ agent, updateAg
     }
   };
 
+  const handleDeleteKnowledgeBase = (kbId: string, event: React.MouseEvent) => {
+    // Stop propagation to prevent the parent from handling the click
+    event.stopPropagation();
+    
+    // Remove this KB from selected KBs
+    setSelectedKbs(prev => prev.filter(id => id !== kbId));
+    
+    // Update the agent right away
+    updateAgentField('knowledge_base_ids', selectedKbs.filter(id => id !== kbId));
+    
+    toast.success('Knowledge base removed');
+  };
+
   const handleOpenKnowledgeBaseManager = () => {
-    window.location.href = '/dashboard?section=knowledge-base';
+    // Open knowledge base management in a new tab/window
+    window.open('/dashboard?section=knowledge-base', '_blank');
   };
 
   const getKnowledgeBaseName = (kbId: string) => {
@@ -126,25 +160,23 @@ const KnowledgeBaseSection: React.FC<AccordionSectionProps> = ({ agent, updateAg
             Add knowledge base to provide context to the agent.
           </p>
 
+          {/* Selected Knowledge Bases */}
           <div className="space-y-2">
-            {/* Knowledge Base Items */}
             {selectedKbs.length === 0 ? (
               <p className="text-sm text-gray-500 italic">No knowledge bases selected</p>
             ) : (
               selectedKbs.map((kbId) => (
-                <div key={kbId} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md">
+                <div key={kbId} className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
                   <div className="flex items-center">
                     <FileText className="h-4 w-4 mr-2 text-gray-500" />
                     <span className="text-sm">{getKnowledgeBaseName(kbId)}</span>
                   </div>
-                  <div>
-                    <button 
-                      className="text-gray-400 hover:text-gray-600"
-                      onClick={() => toggleKnowledgeBase(kbId)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </button>
-                  </div>
+                  <button 
+                    className="text-gray-400 hover:text-gray-600"
+                    onClick={(e) => handleDeleteKnowledgeBase(kbId, e)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </button>
                 </div>
               ))
             )}
@@ -178,23 +210,34 @@ const KnowledgeBaseSection: React.FC<AccordionSectionProps> = ({ agent, updateAg
                   No knowledge bases available. Create one first.
                 </div>
               ) : (
-                knowledgeBases.map((kb) => (
+                <>
+                  {knowledgeBases.map((kb) => (
+                    <div 
+                      key={kb.id} 
+                      className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer ${
+                        selectedKbs.includes(kb.id) ? 'bg-blue-50' : ''
+                      }`}
+                      onClick={() => toggleKnowledgeBase(kb.id)}
+                    >
+                      <div className="flex items-center">
+                        <FileText className="h-4 w-4 mr-2 text-gray-500" />
+                        <span className="text-sm">{kb.name}</span>
+                      </div>
+                      {selectedKbs.includes(kb.id) && (
+                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                      )}
+                    </div>
+                  ))}
                   <div 
-                    key={kb.id} 
-                    className={`flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer ${
-                      selectedKbs.includes(kb.id) ? 'bg-blue-50' : ''
-                    }`}
-                    onClick={() => toggleKnowledgeBase(kb.id)}
+                    className="flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer bg-gray-50"
+                    onClick={handleOpenKnowledgeBaseManager}
                   >
                     <div className="flex items-center">
-                      <FileText className="h-4 w-4 mr-2 text-gray-500" />
-                      <span className="text-sm">{kb.name}</span>
+                      <Plus className="h-4 w-4 mr-2 text-gray-500" />
+                      <span className="text-sm">Add New Knowledge Base</span>
                     </div>
-                    {selectedKbs.includes(kb.id) && (
-                      <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                    )}
                   </div>
-                ))
+                </>
               )}
             </div>
           </div>
