@@ -1,4 +1,3 @@
-
 // This file now imports from the modular implementation
 import PostCallAnalysisSection from './post-call-analysis/PostCallAnalysisSection';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -27,8 +26,85 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
     updateAgentField
   });
 
+  const { fetchWithAuth } = useApiContext();
+  const [llmKnowledgeBaseIds, setLlmKnowledgeBaseIds] = useState<string[]>([]);
+  const [filteredKnowledgeBases, setFilteredKnowledgeBases] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Effect to fetch LLM data and associated knowledge base IDs
+  useEffect(() => {
+    if (!agent?.response_engine?.llm_id) return;
+
+    const fetchLlmData = async () => {
+      try {
+        setLoading(true);
+        console.log('Fetching LLM data for ID:', agent.response_engine.llm_id);
+        
+        const llmData = await fetchWithAuth(`/get-retell-llm/${agent.response_engine.llm_id}`);
+        console.log('LLM data retrieved:', llmData);
+        
+        if (llmData && llmData.knowledge_base_ids && Array.isArray(llmData.knowledge_base_ids)) {
+          setLlmKnowledgeBaseIds(llmData.knowledge_base_ids);
+          console.log('Knowledge base IDs from LLM:', llmData.knowledge_base_ids);
+
+          // If we already have the knowledge bases, filter them
+          if (knowledgeBases && knowledgeBases.length > 0) {
+            const filtered = knowledgeBases.filter(kb => 
+              llmData.knowledge_base_ids.includes(kb.id || kb.knowledge_base_id)
+            );
+            console.log('Filtered knowledge bases:', filtered);
+            setFilteredKnowledgeBases(filtered);
+          }
+          // Otherwise, fetch the knowledge bases
+          else {
+            fetchKnowledgeBases(llmData.knowledge_base_ids);
+          }
+        } else {
+          console.log('No knowledge_base_ids found in LLM data');
+          setLlmKnowledgeBaseIds([]);
+          setFilteredKnowledgeBases([]);
+        }
+      } catch (error) {
+        console.error('Error fetching LLM data:', error);
+        toast.error('Failed to load LLM data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLlmData();
+  }, [agent?.response_engine?.llm_id, fetchWithAuth]);
+
+  // Function to fetch knowledge bases if not provided
+  const fetchKnowledgeBases = async (kbIds: string[]) => {
+    if (!kbIds || kbIds.length === 0) return;
+
+    try {
+      setLoading(true);
+      console.log('Fetching all knowledge bases to filter by IDs:', kbIds);
+      
+      const allKnowledgeBases = await fetchWithAuth('/list-knowledge-bases');
+      console.log('All knowledge bases:', allKnowledgeBases);
+      
+      if (Array.isArray(allKnowledgeBases)) {
+        const filtered = allKnowledgeBases.filter(kb => 
+          kbIds.includes(kb.knowledge_base_id || kb.id)
+        );
+        console.log('Filtered knowledge bases:', filtered);
+        setFilteredKnowledgeBases(filtered);
+      }
+    } catch (error) {
+      console.error('Error fetching knowledge bases:', error);
+      toast.error('Failed to load knowledge bases');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Log the incoming knowledge bases to check if they're properly received
   console.log('Knowledge bases in AgentSettingsAccordion:', knowledgeBases);
+  console.log('LLM knowledge base IDs:', llmKnowledgeBaseIds);
+  console.log('Filtered knowledge bases:', filteredKnowledgeBases);
 
   return (
     <Accordion type="multiple" className="w-full" defaultValue={["call-settings"]}>
@@ -47,7 +123,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
           <KnowledgeBaseSection 
             agent={agent} 
             updateAgentField={updateAgentField} 
-            knowledgeBases={knowledgeBases} 
+            knowledgeBases={filteredKnowledgeBases.length > 0 ? filteredKnowledgeBases : knowledgeBases} 
           />
         </AccordionContent>
       </AccordionItem>
