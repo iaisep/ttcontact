@@ -72,6 +72,7 @@ export interface PostCallAnalysisItem {
   name: string;
   description: string;
   examples?: string[];
+  choices?: string[]; // Added for enum/selector type items
 }
 
 export interface RetellFunction {

@@ -27,11 +27,12 @@ const SelectorFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, 
   const handleSave = () => {
     if (!name.trim() || choices.length === 0) return;
     
+    // Updated to use "enum" for the type and changed property name from "examples" to "choices"
     const item = {
-      type: 'selector',
+      type: 'enum',
       name: name.trim(),
       description: description.trim(),
-      examples: choices,
+      choices: choices,  // Use "choices" instead of "examples"
     };
     
     onSave(item);

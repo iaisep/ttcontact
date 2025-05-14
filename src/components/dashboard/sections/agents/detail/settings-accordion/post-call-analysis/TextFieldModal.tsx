@@ -27,8 +27,9 @@ const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type
   const handleSave = () => {
     if (!name.trim()) return;
     
+    // Updated to use "string" or "number" based on the type prop
     const item = {
-      type: type,
+      type: type === 'text' ? 'string' : 'number',
       name: name.trim(),
       description: description.trim(),
       examples: formatExamples,

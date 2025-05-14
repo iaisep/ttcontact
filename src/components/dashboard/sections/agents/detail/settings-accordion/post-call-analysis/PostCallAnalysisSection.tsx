@@ -40,7 +40,12 @@ const PostCallAnalysisSection: React.FC<AccordionSectionProps> = ({ agent, updat
   };
   
   const handleEditItem = (item: PostCallAnalysisItem, index: number) => {
-    setModalType(item.type);
+    // Convert type from API format to UI format
+    let modalType = item.type;
+    if (item.type === 'string') modalType = 'text';
+    if (item.type === 'enum') modalType = 'selector';
+    
+    setModalType(modalType);
     setEditingItem(item);
     setEditingIndex(index);
   };
