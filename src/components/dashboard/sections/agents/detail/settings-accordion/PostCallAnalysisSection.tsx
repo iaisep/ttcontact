@@ -31,7 +31,18 @@ interface FieldModalProps {
 const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type, existingItem }) => {
   const [name, setName] = useState(existingItem?.name || '');
   const [description, setDescription] = useState(existingItem?.description || '');
-  const [formatExample, setFormatExample] = useState(existingItem?.examples?.[0] || '');
+  const [formatExamples, setFormatExamples] = useState<string[]>(existingItem?.examples || []);
+  const [newExample, setNewExample] = useState('');
+
+  const handleAddExample = () => {
+    if (!newExample.trim()) return;
+    setFormatExamples([...formatExamples, newExample.trim()]);
+    setNewExample('');
+  };
+
+  const handleRemoveExample = (index: number) => {
+    setFormatExamples(formatExamples.filter((_, i) => i !== index));
+  };
 
   const handleSave = () => {
     if (!name.trim()) return;
@@ -40,7 +51,7 @@ const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type
       type: type,
       name: name.trim(),
       description: description.trim(),
-      examples: formatExample.trim() ? [formatExample.trim()] : [],
+      examples: formatExamples,
     };
     
     onSave(item);
@@ -89,24 +100,42 @@ const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="format">Format Example (Optional)</Label>
-            <div className="flex gap-2">
-              <Input 
-                id="format" 
-                value={formatExample} 
-                onChange={(e) => setFormatExample(e.target.value)} 
-                placeholder="Example of expected format"
-                className="flex-1"
-              />
-              {formatExample && (
+            <Label>Format Examples (Optional)</Label>
+            <div className="space-y-2">
+              {formatExamples.map((example, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Input value={example} readOnly className="flex-1" />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => handleRemoveExample(index)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              
+              <div className="flex items-center gap-2">
+                <Input 
+                  value={newExample} 
+                  onChange={(e) => setNewExample(e.target.value)} 
+                  placeholder="Add a format example"
+                  className="flex-1"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddExample();
+                    }
+                  }}
+                />
                 <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setFormatExample('')}
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleAddExample}
                 >
-                  <Trash className="h-4 w-4" />
+                  + Add
                 </Button>
-              )}
+              </div>
             </div>
           </div>
         </div>
