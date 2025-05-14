@@ -1,94 +1,124 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
-import { useLanguage } from '@/context/LanguageContext';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
+import { useLanguage } from '@/context/LanguageContext';
+import { AgentFunction } from '../types';
 
 interface UseEndCallFormProps {
   agent: RetellAgent;
   onClose: () => void;
   onSuccess?: () => void;
+  initialData?: AgentFunction;
 }
 
-export const useEndCallForm = ({ agent, onClose, onSuccess }: UseEndCallFormProps) => {
+export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEndCallFormProps) => {
   const { t } = useLanguage();
   const { fetchWithAuth } = useApiContext();
-  const [name, setName] = useState("end_call");
-  const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [name, setName] = useState('end_call');
+  const [description, setDescription] = useState('End the call');
   const [error, setError] = useState<string | null>(null);
+
+  // Initialize form with initialData if provided
+  useEffect(() => {
+    if (initialData && initialData.type === 'end_call') {
+      setName(initialData.name || 'end_call');
+      setDescription(initialData.description || '');
+    }
+  }, [initialData]);
 
   const handleSubmit = async () => {
     if (!name.trim()) {
-      toast.error(t('function_name_required'));
-      return;
-    }
-
-    const llmId = agent?.response_engine?.llm_id;
-    if (!llmId) {
-      toast.error(t('no_llm_id_found'));
+      setError(t('function_name_required'));
       return;
     }
 
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
-      // First, fetch existing tools to preserve them
-      const llmResponse = await fetchWithAuth(`/get-retell-llm/${llmId}`);
-      const existingTools = llmResponse.general_tools || [];
+      // Get LLM ID from the agent
+      const llmId = agent?.response_engine?.llm_id;
       
-      // Check if function name already exists
-      const nameExists = existingTools.some((tool: any) => tool.name === name);
-      if (nameExists) {
-        setError(`Tool name must be unique across general tools + tools of the state + state transitions. Duplicate name found: ${name}`);
-        toast.error(`Function name "${name}" already exists`);
-        setIsSubmitting(false);
+      if (!llmId) {
+        toast.error(t('no_llm_id_found'));
         return;
       }
+
+      // First fetch all existing tools to preserve them
+      const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
       
-      // Create new end call function
-      const newFunction = {
-        name: name,
-        description: description,
+      if (!llmData) {
+        throw new Error(t('failed_to_fetch_llm_data'));
+      }
+      
+      // Extract existing tools
+      const existingTools = llmData.general_tools || [];
+      
+      // Handle editing vs creating new
+      let updatedTools;
+      if (initialData) {
+        // Filter out the function we're editing
+        updatedTools = existingTools.filter((tool: any) => tool.name !== initialData.name);
+      } else {
+        // Check if a function with the same name already exists
+        const nameExists = existingTools.some((tool: any) => tool.name === name);
+        
+        if (nameExists) {
+          setError(t('tool_name_exists').replace('{name}', name));
+          setIsSubmitting(false);
+          return;
+        }
+        updatedTools = [...existingTools];
+      }
+      
+      // Prepare the function
+      const endCallFunction = {
+        name,
+        description,
         type: "end_call"
       };
-      
-      // Add new function to existing tools
-      const updatedTools = [...existingTools, newFunction];
-      
-      const payload = {
-        general_tools: updatedTools
-      };
-      
-      // Update the API with all tools
+
+      // Add to tools
+      updatedTools.push(endCallFunction);
+
+      // Update the LLM with the new tools
       const response = await fetchWithAuth(`/update-retell-llm/${llmId}`, {
         method: 'PATCH',
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ general_tools: updatedTools })
       });
-      
-      // Check if there's an error response with a specific message pattern
-      if (response && response.status === 'error' && response.message && response.message.includes('Duplicate name found')) {
-        setError(response.message);
-        toast.error(`Function name "${name}" already exists`);
-        setIsSubmitting(false);
+
+      // Check for error response
+      if (response && response.status === 'error') {
+        if (response.message && response.message.includes('Duplicate name found')) {
+          setError(t('tool_name_exists').replace('{name}', name));
+        } else {
+          setError(response.message || t('error_adding_end_call_function'));
+        }
         return;
       }
+
+      // Show success message
+      toast.success(initialData ? t('end_call_function_updated') : t('end_call_function_added'));
       
-      toast.success(t('end_call_function_added'));
-      if (onSuccess) onSuccess();
+      // Call onSuccess if provided
+      if (onSuccess) {
+        onSuccess();
+      }
+      
+      // Close the modal
       onClose();
     } catch (error: any) {
-      console.error("Error saving End Call function:", error);
+      console.error('Error adding end call function:', error);
       
-      // Check if the error is related to duplicate function name
-      if (error.message && typeof error.message === 'string' && error.message.includes('Duplicate name found')) {
-        setError(error.message);
-        toast.error(`Function name "${name}" already exists`);
+      // Format error message
+      if (error.message && error.message.includes('Duplicate name found')) {
+        setError(t('tool_name_exists').replace('{name}', name));
       } else {
-        toast.error(t('error_adding_end_call_function'));
         setError(error.message || t('error_adding_end_call_function'));
+        toast.error(t('error_adding_end_call_function'));
       }
     } finally {
       setIsSubmitting(false);

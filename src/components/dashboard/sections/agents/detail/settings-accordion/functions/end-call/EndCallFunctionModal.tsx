@@ -7,19 +7,22 @@ import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell
 import FunctionMetaSection from './FunctionMetaSection';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { AgentFunction } from '../types';
 
 interface EndCallFunctionModalProps {
   isOpen: boolean;
   onClose: () => void;
   agent: RetellAgent;
   onSuccess?: () => void;
+  initialData?: AgentFunction;
 }
 
 const EndCallFunctionModal: React.FC<EndCallFunctionModalProps> = ({
   isOpen,
   onClose,
   agent,
-  onSuccess
+  onSuccess,
+  initialData
 }) => {
   const {
     formState,
@@ -27,13 +30,13 @@ const EndCallFunctionModal: React.FC<EndCallFunctionModalProps> = ({
     isSubmitting,
     error,
     handleSubmit
-  } = useEndCallForm({ agent, onClose, onSuccess });
+  } = useEndCallForm({ agent, onClose, onSuccess, initialData });
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add End Call Function</DialogTitle>
+          <DialogTitle>{initialData ? 'Edit End Call Function' : 'Add End Call Function'}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
@@ -62,7 +65,7 @@ const EndCallFunctionModal: React.FC<EndCallFunctionModalProps> = ({
             disabled={isSubmitting}
             className={isSubmitting ? 'opacity-70' : ''}
           >
-            {isSubmitting ? 'Saving...' : 'Save'}
+            {isSubmitting ? 'Saving...' : initialData ? 'Update' : 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>

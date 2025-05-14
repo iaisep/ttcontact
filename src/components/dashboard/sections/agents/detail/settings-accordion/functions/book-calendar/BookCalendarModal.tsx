@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -10,19 +9,22 @@ import { useApiContext } from '@/context/ApiContext';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { AgentFunction } from '../types';
 
 interface BookCalendarModalProps {
   isOpen: boolean;
   onClose: () => void;
   agent: RetellAgent;
   onSuccess?: () => void;
+  initialData?: AgentFunction;
 }
 
 const BookCalendarModal: React.FC<BookCalendarModalProps> = ({ 
   isOpen, 
   onClose, 
   agent,
-  onSuccess 
+  onSuccess,
+  initialData
 }) => {
   const { fetchWithAuth } = useApiContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,6 +37,17 @@ const BookCalendarModal: React.FC<BookCalendarModalProps> = ({
 
   // Get LLM ID from the agent
   const llmId = agent?.response_engine?.llm_id;
+
+  // Initialize form with initialData if provided
+  useEffect(() => {
+    if (initialData && initialData.type === 'book_appointment_cal') {
+      setFunctionName(initialData.name || 'book_appointment');
+      setDescription(initialData.description || '');
+      setApiKey(initialData.cal_api_key || '');
+      setEventTypeId(initialData.event_type_id ? initialData.event_type_id.toString() : '');
+      setTimezone(initialData.timezone || 'America/Los_Angeles');
+    }
+  }, [initialData]);
 
   const handleSubmit = async () => {
     if (!functionName.trim()) {
@@ -71,13 +84,21 @@ const BookCalendarModal: React.FC<BookCalendarModalProps> = ({
       // Extract existing tools
       const existingTools = llmData.general_tools || [];
       
-      // Check if a function with the same name already exists
-      const nameExists = existingTools.some((tool: any) => tool.name === functionName);
-      
-      if (nameExists) {
-        setError(`Tool name "${functionName}" already exists. Please use a different name.`);
-        setIsSubmitting(false);
-        return;
+      // Handle editing vs creating new
+      let updatedTools;
+      if (initialData) {
+        // Filter out the function we're editing
+        updatedTools = existingTools.filter((tool: any) => tool.name !== initialData.name);
+      } else {
+        // Check if a function with the same name already exists
+        const nameExists = existingTools.some((tool: any) => tool.name === functionName);
+        
+        if (nameExists) {
+          setError(`Tool name "${functionName}" already exists. Please use a different name.`);
+          setIsSubmitting(false);
+          return;
+        }
+        updatedTools = [...existingTools];
       }
       
       // Prepare the new calendar booking function
@@ -86,12 +107,12 @@ const BookCalendarModal: React.FC<BookCalendarModalProps> = ({
         description: description || "When users ask to book an appointment, book it on the calendar.",
         event_type_id: parseInt(eventTypeId, 10),
         cal_api_key: apiKey,
-        type: "book_appointment_cal", // FIXED: Changed from "book_cal" to "book_appointment_cal"
+        type: "book_appointment_cal",
         timezone: timezone || "America/Los_Angeles"
       };
       
-      // Combine existing tools with the new one
-      const updatedTools = [...existingTools, newFunction];
+      // Add the new or updated function
+      updatedTools.push(newFunction);
       
       // Prepare the payload with all tools
       const payload = {
@@ -114,7 +135,7 @@ const BookCalendarModal: React.FC<BookCalendarModalProps> = ({
         return;
       }
       
-      toast.success('Calendar booking function added successfully');
+      toast.success(initialData ? 'Calendar booking function updated successfully' : 'Calendar booking function added successfully');
       
       if (onSuccess) {
         onSuccess();
@@ -141,7 +162,7 @@ const BookCalendarModal: React.FC<BookCalendarModalProps> = ({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            Book on the Calendar (Cal.com)
+            {initialData ? 'Edit Booking Function' : 'Book on the Calendar (Cal.com)'}
           </DialogTitle>
         </DialogHeader>
         
@@ -212,7 +233,7 @@ const BookCalendarModal: React.FC<BookCalendarModalProps> = ({
             Cancel
           </Button>
           <Button type="button" onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? 'Saving...' : 'Save'}
+            {isSubmitting ? 'Saving...' : initialData ? 'Update' : 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>
