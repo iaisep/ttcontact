@@ -67,7 +67,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
     <>
       {/* URL Source Modal */}
       <AddUrlSourceModal
-        open={currentSourceType === 'url'}
+        isOpen={currentSourceType === 'url'}
         onCancel={() => {
           handleCloseSourceModal();
           handleSourceAdded();
@@ -83,7 +83,6 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           await onAddUrlSource(urls[0], autoSync, webPages);
         }}
         knowledgeBaseName={knowledgeBaseName}
-        currentKnowledgeBase={effectiveKnowledgeBase}
       />
 
       {/* File Source Modal */}
