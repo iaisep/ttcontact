@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
@@ -14,6 +13,18 @@ import { AccordionSectionProps } from './types';
 const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateAgentField }) => {
   const { t } = useLanguage();
   const agentId = agent?.agent_id || agent?.id;
+  
+  // Local state to track slider values for immediate UI updates
+  const [responsiveness, setResponsiveness] = useState(agent?.responsiveness || 0.85);
+  const [interruptionSensitivity, setInterruptionSensitivity] = useState(agent?.interruption_sensitivity || 0.8);
+  const [backchannelFrequency, setBackchannelFrequency] = useState(agent?.backchannel_frequency || 0.8);
+
+  // Update local state when agent props change
+  useEffect(() => {
+    setResponsiveness(agent?.responsiveness || 0.85);
+    setInterruptionSensitivity(agent?.interruption_sensitivity || 0.8);
+    setBackchannelFrequency(agent?.backchannel_frequency || 0.8);
+  }, [agent?.responsiveness, agent?.interruption_sensitivity, agent?.backchannel_frequency]);
 
   return (
     <AccordionItem value="speech-settings" className="mt-4 border rounded-md overflow-hidden">
@@ -36,16 +47,20 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateA
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium text-amber-600">Responsiveness</Label>
-              <span className="text-xs text-gray-500">{agent?.responsiveness?.toFixed(2) || "0.85"}</span>
+              <span className="text-xs text-gray-500">{responsiveness.toFixed(2)}</span>
             </div>
             <p className="text-xs text-gray-500">Control how fast the agent responds after users finish speaking.</p>
             <Slider 
-              defaultValue={[agent?.responsiveness || 0.85]} 
+              defaultValue={[responsiveness]} 
+              value={[responsiveness]}
               max={1} 
               step={0.01} 
               className="w-full"
               agentId={agentId}
               fieldName="responsiveness"
+              onValueChange={(values) => {
+                setResponsiveness(values[0]); // Update local state immediately
+              }}
             />
           </div>
 
@@ -53,16 +68,20 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateA
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium text-amber-600">Interruption Sensitivity</Label>
-              <span className="text-xs text-gray-500">{agent?.interruption_sensitivity?.toFixed(2) || "0.8"}</span>
+              <span className="text-xs text-gray-500">{interruptionSensitivity.toFixed(2)}</span>
             </div>
             <p className="text-xs text-gray-500">Control how sensitively AI can be interrupted by human speech.</p>
             <Slider 
-              defaultValue={[agent?.interruption_sensitivity || 0.8]} 
+              defaultValue={[interruptionSensitivity]} 
+              value={[interruptionSensitivity]}
               max={1} 
               step={0.01} 
               className="w-full"
               agentId={agentId}
               fieldName="interruption_sensitivity"
+              onValueChange={(values) => {
+                setInterruptionSensitivity(values[0]); // Update local state immediately
+              }}
             />
           </div>
 
@@ -84,15 +103,19 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateA
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium text-amber-600">Backchannel Frequency</Label>
-              <span className="text-xs text-gray-500">{agent?.backchannel_frequency?.toFixed(2) || "0.8"}</span>
+              <span className="text-xs text-gray-500">{backchannelFrequency.toFixed(2)}</span>
             </div>
             <Slider 
-              defaultValue={[agent?.backchannel_frequency || 0.8]} 
+              defaultValue={[backchannelFrequency]}
+              value={[backchannelFrequency]}
               max={1} 
               step={0.01} 
               className="w-full"
               agentId={agentId}
               fieldName="backchannel_frequency"
+              onValueChange={(values) => {
+                setBackchannelFrequency(values[0]); // Update local state immediately
+              }}
             />
           </div>
 
