@@ -9,19 +9,22 @@ import TransferMethodSection from './TransferMethodSection';
 import TransferTypeSection from './TransferTypeSection';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { AgentFunction } from '../types';
 
 interface CallTransferFunctionModalProps {
   isOpen: boolean;
   onClose: () => void;
   agent: RetellAgent;
   onSuccess?: () => void;
+  initialData?: AgentFunction; // Add initialData prop for editing mode
 }
 
 const CallTransferFunctionModal: React.FC<CallTransferFunctionModalProps> = ({
   isOpen,
   onClose,
   agent,
-  onSuccess
+  onSuccess,
+  initialData
 }) => {
   const {
     formState,
@@ -29,13 +32,15 @@ const CallTransferFunctionModal: React.FC<CallTransferFunctionModalProps> = ({
     isSubmitting,
     error,
     handleSubmit
-  } = useCallTransferForm({ agent, onClose, onSuccess });
+  } = useCallTransferForm({ agent, onClose, onSuccess, initialData });
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Add Call Transfer Function</DialogTitle>
+          <DialogTitle>
+            {initialData ? 'Edit Call Transfer Function' : 'Add Call Transfer Function'}
+          </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6 py-4">
@@ -82,7 +87,7 @@ const CallTransferFunctionModal: React.FC<CallTransferFunctionModalProps> = ({
             disabled={isSubmitting}
             className={isSubmitting ? 'opacity-70' : ''}
           >
-            {isSubmitting ? 'Saving...' : 'Save'}
+            {isSubmitting ? 'Saving...' : initialData ? 'Update' : 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>

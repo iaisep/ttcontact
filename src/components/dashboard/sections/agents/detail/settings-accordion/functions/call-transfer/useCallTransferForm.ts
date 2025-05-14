@@ -1,22 +1,24 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { useLanguage } from '@/context/LanguageContext';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
+import { AgentFunction } from '../types';
 
 interface UseCallTransferFormProps {
   agent: RetellAgent;
   onClose: () => void;
   onSuccess?: () => void;
+  initialData?: AgentFunction; // Add initialData prop for editing mode
 }
 
-export const useCallTransferForm = ({ agent, onClose, onSuccess }: UseCallTransferFormProps) => {
+export const useCallTransferForm = ({ agent, onClose, onSuccess, initialData }: UseCallTransferFormProps) => {
   const { t } = useLanguage();
   const { fetchWithAuth } = useApiContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Form state
+  // Default form state
   const [functionName, setFunctionName] = useState('transfer_call');
   const [description, setDescription] = useState('Transfer the call to a human agent');
   const [transferMethod, setTransferMethod] = useState('static');
@@ -28,6 +30,36 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess }: UseCallTransf
   const [messageType, setMessageType] = useState('prompt');
   const [handoffMessage, setHandoffMessage] = useState('Say hello to the agent and summarize the user problem to him');
   const [error, setError] = useState<string | null>(null);
+
+  // Initialize form with the initialData if provided
+  useEffect(() => {
+    if (initialData && initialData.type === 'transfer_call') {
+      // Set basic function properties
+      setFunctionName(initialData.name || 'transfer_call');
+      setDescription(initialData.description || '');
+
+      // Set transfer destination properties
+      if (initialData.transfer_destination) {
+        // Determine transfer method
+        if (initialData.transfer_destination.type === 'predefined') {
+          setTransferMethod('static');
+          setPhoneNumber(initialData.transfer_destination.number || '');
+        } else if (initialData.transfer_destination.type === 'inferred') {
+          setTransferMethod('dynamic');
+          setDynamicRouting(initialData.transfer_destination.prompt || '');
+        }
+      }
+
+      // Set handoff message properties
+      if (initialData.handoff_message) {
+        setTransferType('warm');
+        setMessageType(initialData.handoff_message.type || 'prompt');
+        setHandoffMessage(initialData.handoff_message.content || '');
+      } else {
+        setTransferType('cold');
+      }
+    }
+  }, [initialData]);
 
   const handleSubmit = async () => {
     if (!functionName.trim()) {
@@ -49,13 +81,21 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess }: UseCallTransf
       const llmResponse = await fetchWithAuth(`/get-retell-llm/${llmId}`);
       const existingTools = llmResponse.general_tools || [];
       
-      // Check if function name already exists
-      const nameExists = existingTools.some((tool: any) => tool.name === functionName);
-      if (nameExists) {
-        setError(`Tool name must be unique across general tools + tools of the state + state transitions. Duplicate name found: ${functionName}`);
-        toast.error(`Function name "${functionName}" already exists`);
-        setIsSubmitting(false);
-        return;
+      // Check if we're updating an existing function
+      let updatedTools;
+      if (initialData) {
+        // Filter out the function we're editing and add the updated one
+        updatedTools = existingTools.filter((tool: any) => tool.name !== initialData.name);
+      } else {
+        // Check if function name already exists
+        const nameExists = existingTools.some((tool: any) => tool.name === functionName);
+        if (nameExists) {
+          setError(`Tool name must be unique across general tools + tools of the state + state transitions. Duplicate name found: ${functionName}`);
+          toast.error(`Function name "${functionName}" already exists`);
+          setIsSubmitting(false);
+          return;
+        }
+        updatedTools = [...existingTools];
       }
 
       // Prepare the function data based on transfer method
@@ -92,8 +132,8 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess }: UseCallTransf
         ...(handoffConfig && { handoff_message: handoffConfig })
       };
       
-      // Add the new function to existing tools
-      const updatedTools = [...existingTools, functionData];
+      // Add the new or updated function to tools array
+      updatedTools.push(functionData);
       
       // Update the LLM with all functions
       const response = await fetchWithAuth(`/update-retell-llm/${llmId}`, {
@@ -109,7 +149,7 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess }: UseCallTransf
         return;
       }
 
-      toast.success(t('call_transfer_function_added'));
+      toast.success(initialData ? t('call_transfer_function_updated') : t('call_transfer_function_added'));
       
       if (onSuccess) {
         onSuccess();
@@ -117,15 +157,15 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess }: UseCallTransf
       
       onClose();
     } catch (error: any) {
-      console.error('Error adding call transfer function:', error);
+      console.error('Error handling call transfer function:', error);
       
       // Check if the error is related to duplicate function name
       if (error.message && typeof error.message === 'string' && error.message.includes('Duplicate name found')) {
         setError(error.message);
         toast.error(`Function name "${functionName}" already exists`);
       } else {
-        toast.error(t('error_adding_call_transfer_function'));
-        setError(error.message || t('error_adding_call_transfer_function'));
+        toast.error(initialData ? t('error_updating_call_transfer_function') : t('error_adding_call_transfer_function'));
+        setError(error.message || (initialData ? t('error_updating_call_transfer_function') : t('error_adding_call_transfer_function')));
       }
     } finally {
       setIsSubmitting(false);

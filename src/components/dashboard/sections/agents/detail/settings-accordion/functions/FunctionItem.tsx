@@ -1,29 +1,115 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Edit, Trash2, Phone, Sparkles, Calendar, FileText } from 'lucide-react';
 import { AgentFunction, FunctionItemProps } from './types';
+import EndCallFunctionModal from './end-call/EndCallFunctionModal';
+import CallTransferFunctionModal from './call-transfer/CallTransferFunctionModal';
+import BookCalendarModal from './book-calendar/BookCalendarModal';
+import CalendarAvailabilityModal from './calendar-availability/CalendarAvailabilityModal';
 
 export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDelete }) => {
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  // Handler for edit button
+  const handleEditClick = () => {
+    // For special function types, show the specific modal
+    if (['transfer_call', 'end_call', 'calendar_availability', 'book_calendar'].includes(func.type)) {
+      setShowEditModal(true);
+    } else {
+      // For other function types, use the default edit handler
+      onEdit(func);
+    }
+  };
+
+  // Handler for when a specialized edit completes
+  const handleSpecializedEditSuccess = () => {
+    setShowEditModal(false);
+  };
+
   return (
-    <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md">
-      <div className="flex items-center">
-        {getFunctionIcon(func)}
-        <span className="text-sm">{func.name}</span>
+    <>
+      <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md">
+        <div className="flex items-center">
+          {getFunctionIcon(func)}
+          <span className="text-sm">{func.name}</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button 
+            className="text-gray-400 hover:text-gray-600"
+            onClick={handleEditClick}
+          >
+            <Edit className="h-4 w-4" />
+          </button>
+          <button 
+            className="text-gray-400 hover:text-gray-600"
+            onClick={() => onDelete(func)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
       </div>
-      <div className="flex items-center space-x-2">
-        <button 
-          className="text-gray-400 hover:text-gray-600"
-          onClick={() => onEdit(func)}
-        >
-          <Edit className="h-4 w-4" />
-        </button>
-        <button 
-          className="text-gray-400 hover:text-gray-600"
-          onClick={() => onDelete(func)}
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
-      </div>
-    </div>
+
+      {/* Specialized Edit Modals */}
+      {showEditModal && func.type === 'end_call' && (
+        <EndCallFunctionModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          agent={{
+            agent_name: func.name,
+            voice_id: "",
+            last_modification_timestamp: new Date().toISOString(),
+            response_engine: { llm_id: func.id }
+          }}
+          onSuccess={handleSpecializedEditSuccess}
+          initialData={func} // Pass the function data for editing
+        />
+      )}
+
+      {showEditModal && func.type === 'transfer_call' && (
+        <CallTransferFunctionModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          agent={{
+            agent_name: func.name,
+            voice_id: "",
+            last_modification_timestamp: new Date().toISOString(),
+            response_engine: { llm_id: func.id }
+          }}
+          onSuccess={handleSpecializedEditSuccess}
+          initialData={func} // Pass the function data for editing
+        />
+      )}
+
+      {showEditModal && func.type === 'calendar_availability' && (
+        <CalendarAvailabilityModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          agent={{
+            agent_name: func.name,
+            voice_id: "",
+            last_modification_timestamp: new Date().toISOString(),
+            response_engine: { llm_id: func.id }
+          }}
+          onSuccess={handleSpecializedEditSuccess}
+          initialData={func} // Pass the function data for editing
+        />
+      )}
+
+      {showEditModal && func.type === 'book_calendar' && (
+        <BookCalendarModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          agent={{
+            agent_name: func.name,
+            voice_id: "",
+            last_modification_timestamp: new Date().toISOString(),
+            response_engine: { llm_id: func.id }
+          }}
+          onSuccess={handleSpecializedEditSuccess}
+          initialData={func} // Pass the function data for editing
+        />
+      )}
+    </>
   );
 };
 
@@ -35,8 +121,12 @@ export const getFunctionIcon = (func: AgentFunction) => {
     case 'custom':
       return <Sparkles className="h-4 w-4 mr-2 text-amber-500" />;
     case 'calendar':
+    case 'book_calendar':
+    case 'calendar_availability':
       return <Calendar className="h-4 w-4 mr-2 text-blue-500" />;
     default:
       return <FileText className="h-4 w-4 mr-2 text-gray-500" />;
   }
 };
+
+export default FunctionItem;
