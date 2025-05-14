@@ -23,6 +23,7 @@ const Slider = React.forwardRef<
   const [isDragging, setIsDragging] = React.useState(false);
   const [pendingValue, setPendingValue] = React.useState<number[]>(props.defaultValue || props.value || [0]);
   const debounceTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const initialDragValueRef = React.useRef<number[]>([]);
   
   // Clean up function for the debounce timer
   React.useEffect(() => {
@@ -43,6 +44,7 @@ const Slider = React.forwardRef<
   // Function to update server value - only called when dragging is complete
   const updateServerValue = React.useCallback(async (values: number[]) => {
     if (!agentId || !fieldName) return;
+    if (isUpdating) return; // Prevent multiple simultaneous updates
     
     setIsUpdating(true);
     try {
@@ -67,16 +69,18 @@ const Slider = React.forwardRef<
     } finally {
       setIsUpdating(false);
     }
-  }, [agentId, fieldName, fetchWithAuth, valueTransform]);
+  }, [agentId, fieldName, fetchWithAuth, valueTransform, isUpdating]);
 
-  // Handle local value change without triggering API calls during drag
+  // Handle local value change without API calls during drag
   const handleValueChange = React.useCallback((values: number[]) => {
+    // Update local state regardless of drag state
     setPendingValue(values);
     
     // Always call the original onValueChange with the current values
     props.onValueChange?.(values);
     
-    // Only setup debounce if not dragging (for keyboard navigation or programmatic changes)
+    // Only setup debounce if NOT dragging AND we have agent/field info
+    // This handles programmatic changes or keyboard navigation
     if (!isDragging && agentId && fieldName) {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
@@ -91,22 +95,36 @@ const Slider = React.forwardRef<
   // When user starts dragging
   const handleDragStart = React.useCallback(() => {
     setIsDragging(true);
-    // Clear any pending update
+    initialDragValueRef.current = pendingValue;
+    
+    // Clear any pending update timer
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
       debounceTimerRef.current = null;
     }
-  }, []);
+  }, [pendingValue]);
 
   // When user stops dragging
   const handleDragEnd = React.useCallback(() => {
+    if (!isDragging) return; // Safety check
+    
     setIsDragging(false);
     
-    // Now update the server with the final value
-    if (agentId && fieldName) {
+    // Only send API update if value actually changed during drag
+    if (agentId && fieldName && 
+        JSON.stringify(initialDragValueRef.current) !== JSON.stringify(pendingValue)) {
       updateServerValue(pendingValue);
     }
-  }, [agentId, fieldName, pendingValue, updateServerValue]);
+  }, [agentId, fieldName, pendingValue, isDragging, updateServerValue]);
+
+  // Touch event handlers for mobile
+  const handleTouchStart = React.useCallback(() => {
+    handleDragStart();
+  }, [handleDragStart]);
+  
+  const handleTouchEnd = React.useCallback(() => {
+    handleDragEnd();
+  }, [handleDragEnd]);
 
   return (
     <SliderPrimitive.Root
@@ -115,21 +133,29 @@ const Slider = React.forwardRef<
         "relative flex w-full touch-none select-none items-center",
         className
       )}
+      onValueChange={handleValueChange}
+      value={pendingValue}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      onValueChange={handleValueChange}
       onPointerDown={handleDragStart}
       onPointerUp={handleDragEnd}
-      value={pendingValue}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      // If pointer leaves the slider and comes back, treat as new drag
+      onPointerLeave={handleDragEnd}
+      // If pointer is canceled (like when browser shows a context menu)
+      onPointerCancel={handleDragEnd}
       {...props}
     >
       <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20">
         <SliderPrimitive.Range className="absolute h-full bg-primary" />
       </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb className={cn(
-        "block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
-        isUpdating && "opacity-50"
-      )} />
+      <SliderPrimitive.Thumb 
+        className={cn(
+          "block h-4 w-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+          isUpdating && "opacity-50"
+        )} 
+      />
     </SliderPrimitive.Root>
   )
 })
