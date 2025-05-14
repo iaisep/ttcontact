@@ -27,6 +27,15 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
     setShowEditModal(false);
   };
 
+  // Create a mock agent object that satisfies the RetellAgent type requirements
+  const mockAgent = {
+    agent_id: func.id || 'temp-agent-id',
+    agent_name: func.name,
+    voice_id: "",
+    last_modification_timestamp: new Date().getTime(),
+    response_engine: { type: "llm", llm_id: func.id || "" }
+  };
+
   return (
     <>
       <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md">
@@ -55,12 +64,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
         <EndCallFunctionModal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
-          agent={{
-            agent_name: func.name,
-            voice_id: "",
-            last_modification_timestamp: new Date().getTime(),
-            response_engine: { type: "llm", llm_id: func.id || "" }
-          }}
+          agent={mockAgent}
           onSuccess={handleSpecializedEditSuccess}
           initialData={func} // Pass the function data for editing
         />
@@ -70,12 +74,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
         <CallTransferFunctionModal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
-          agent={{
-            agent_name: func.name,
-            voice_id: "",
-            last_modification_timestamp: new Date().getTime(),
-            response_engine: { type: "llm", llm_id: func.id || "" }
-          }}
+          agent={mockAgent}
           onSuccess={handleSpecializedEditSuccess}
           initialData={func} // Pass the function data for editing
         />
@@ -85,12 +84,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
         <CalendarAvailabilityModal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
-          agent={{
-            agent_name: func.name,
-            voice_id: "",
-            last_modification_timestamp: new Date().getTime(),
-            response_engine: { type: "llm", llm_id: func.id || "" }
-          }}
+          agent={mockAgent}
           onSuccess={handleSpecializedEditSuccess}
           initialData={func} // Pass the function data for editing
         />
@@ -100,12 +94,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
         <BookCalendarModal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
-          agent={{
-            agent_name: func.name,
-            voice_id: "",
-            last_modification_timestamp: new Date().getTime(),
-            response_engine: { type: "llm", llm_id: func.id || "" }
-          }}
+          agent={mockAgent}
           onSuccess={handleSpecializedEditSuccess}
           initialData={func} // Pass the function data for editing
         />
@@ -115,12 +104,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
         <PressDigitFunctionModal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
-          agent={{
-            agent_name: func.name,
-            voice_id: "",
-            last_modification_timestamp: new Date().getTime(),
-            response_engine: { type: "llm", llm_id: func.id || "" }
-          }}
+          agent={mockAgent}
           onSuccess={handleSpecializedEditSuccess}
           initialData={func} // Pass the function data for editing
         />

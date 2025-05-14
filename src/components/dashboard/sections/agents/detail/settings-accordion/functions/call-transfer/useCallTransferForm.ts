@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -46,7 +45,8 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess, initialData }: 
           setPhoneNumber(initialData.transfer_destination.number || '');
         } else if (initialData.transfer_destination.type === 'inferred') {
           setTransferMethod('dynamic');
-          setDynamicRouting(initialData.transfer_destination.prompt || '');
+          // Use routing_prompt instead of prompt
+          setDynamicRouting(initialData.transfer_destination.routing_prompt || '');
         }
       }
 
@@ -106,10 +106,10 @@ export const useCallTransferForm = ({ agent, onClose, onSuccess, initialData }: 
           number: phoneNumber
         };
       } else {
-        // Use "inferred" type with "prompt" field for dynamic routing
+        // Use "inferred" type with "routing_prompt" field for dynamic routing
         transferDestination = {
           type: "inferred",
-          prompt: dynamicRouting
+          routing_prompt: dynamicRouting
         };
       }
           
