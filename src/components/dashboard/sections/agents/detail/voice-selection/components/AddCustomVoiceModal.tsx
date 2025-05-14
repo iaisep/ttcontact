@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, X } from "lucide-react";
+import { Loader2, X, Save } from "lucide-react";
 import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
@@ -36,10 +36,18 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
   const [activeTab, setActiveTab] = useState<string>("voice-clone");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
+  const [selectedVoice, setSelectedVoice] = useState<CommunityVoice | null>(null);
+  const [voiceName, setVoiceName] = useState<string>('');
+  const [audioFile, setAudioFile] = useState<File | null>(null);
 
-  const handleAddCommunityVoice = async (voice: CommunityVoice) => {
+  const handleAddCommunityVoice = async () => {
     if (!termsAccepted) {
       toast.error(t('please_accept_terms') || 'Please accept the terms to continue');
+      return;
+    }
+    
+    if (!selectedVoice) {
+      toast.error(t('please_select_voice') || 'Please select a voice first');
       return;
     }
     
@@ -48,9 +56,9 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
       const response = await fetchWithAuth('/add-community-voice', {
         method: 'POST',
         body: JSON.stringify({
-          provider_voice_id: voice.provider_voice_id,
-          public_user_id: voice.public_user_id,
-          voice_name: voice.name
+          provider_voice_id: selectedVoice.provider_voice_id,
+          public_user_id: selectedVoice.public_user_id,
+          voice_name: selectedVoice.name
         })
       });
       
@@ -67,9 +75,14 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
     }
   };
 
-  const handleAddClonedVoice = async (name: string, audioFile: File) => {
+  const handleAddClonedVoice = async () => {
     if (!termsAccepted) {
       toast.error(t('please_accept_terms') || 'Please accept the terms to continue');
+      return;
+    }
+    
+    if (!voiceName || !audioFile) {
+      toast.error(t('please_provide_name_and_file') || 'Please provide a name and an audio file');
       return;
     }
     
@@ -77,7 +90,7 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
     try {
       // Create a FormData object to send the file
       const formData = new FormData();
-      formData.append('name', name);
+      formData.append('name', voiceName);
       formData.append('audio_file', audioFile);
       
       const response = await fetchWithAuth('/add-cloned-voice', {
@@ -97,6 +110,32 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
       toast.error(t('error_cloning_voice') || 'Error cloning voice');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle voice selection from the CommunityVoicesTab
+  const onSelectCommunityVoice = (voice: CommunityVoice) => {
+    setSelectedVoice(voice);
+  };
+
+  // Handle form input from VoiceCloneTab
+  const onVoiceCloneInput = (name: string, file: File) => {
+    setVoiceName(name);
+    setAudioFile(file);
+  };
+
+  // Determine if save button should be enabled
+  const isSaveEnabled = termsAccepted && (
+    (activeTab === "community-voices" && selectedVoice !== null) ||
+    (activeTab === "voice-clone" && voiceName !== '' && audioFile !== null)
+  );
+
+  // Handle save button click
+  const handleSave = () => {
+    if (activeTab === "community-voices") {
+      handleAddCommunityVoice();
+    } else {
+      handleAddClonedVoice();
     }
   };
 
@@ -131,14 +170,14 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
           
           <TabsContent value="voice-clone" className="mt-4">
             <VoiceCloneTab 
-              onAddVoice={handleAddClonedVoice} 
+              onAddVoice={onVoiceCloneInput} 
               isLoading={isLoading} 
             />
           </TabsContent>
           
           <TabsContent value="community-voices" className="mt-4">
             <CommunityVoicesTab 
-              onSelectVoice={handleAddCommunityVoice} 
+              onSelectVoice={onSelectCommunityVoice}
               isLoading={isLoading} 
             />
           </TabsContent>
@@ -163,10 +202,20 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
           <Button variant="outline" onClick={onClose} disabled={isLoading} className="h-8 px-3 text-sm">
             {t('cancel') || 'Cancel'}
           </Button>
-          {isLoading && (
+          {isLoading ? (
             <Button disabled className="h-8 px-3 text-sm">
               <Loader2 className="mr-2 h-3 w-3 animate-spin" />
               {t('saving') || 'Saving...'}
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleSave} 
+              disabled={!isSaveEnabled}
+              className="h-8 px-3 text-sm"
+              variant="default"
+            >
+              <Save className="mr-2 h-3 w-3" />
+              {t('save') || 'Save'}
             </Button>
           )}
         </div>

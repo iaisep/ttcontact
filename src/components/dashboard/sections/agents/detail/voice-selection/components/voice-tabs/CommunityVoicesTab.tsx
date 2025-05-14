@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { CommunityVoice } from '../AddCustomVoiceModal';
 
 interface CommunityVoicesTabProps {
-  onSelectVoice: (voice: CommunityVoice) => Promise<void>;
+  onSelectVoice: (voice: CommunityVoice) => void;
   isLoading: boolean;
 }
 
@@ -63,16 +63,11 @@ const CommunityVoicesTab: React.FC<CommunityVoicesTabProps> = ({
 
   const handleVoiceSelect = (voice: CommunityVoice) => {
     setSelectedVoice(voice);
+    onSelectVoice(voice);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-  };
-
-  const handleAddSelectedVoice = () => {
-    if (selectedVoice) {
-      onSelectVoice(selectedVoice);
-    }
   };
 
   return (

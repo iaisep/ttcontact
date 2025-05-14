@@ -1,52 +1,48 @@
 
 import React, { useState, useRef } from 'react';
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from '@/context/LanguageContext';
+import { Upload } from 'lucide-react';
 
 interface VoiceCloneTabProps {
-  onAddVoice: (name: string, audioFile: File) => Promise<void>;
+  onAddVoice: (name: string, audioFile: File) => void;
   isLoading: boolean;
 }
 
-const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({ 
+const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
   onAddVoice,
   isLoading
 }) => {
   const { t } = useLanguage();
   const [voiceName, setVoiceName] = useState<string>('');
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [fileName, setFileName] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setAudioFile(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      setAudioFile(file);
+      setFileName(file.name);
+      // Update parent component with current values
+      onAddVoice(voiceName, file);
     }
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setAudioFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleClick = () => {
+  // Handle browse button click
+  const handleBrowseClick = () => {
     fileInputRef.current?.click();
   };
 
-  const isFormValid = voiceName.trim() !== '' && audioFile !== null;
-
-  const handleSubmit = () => {
-    if (isFormValid && audioFile) {
-      onAddVoice(voiceName, audioFile);
+  // Handle voice name change
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVoiceName(e.target.value);
+    // Update parent component if we already have a file
+    if (audioFile) {
+      onAddVoice(e.target.value, audioFile);
     }
   };
 
@@ -58,64 +54,50 @@ const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
         </Label>
         <Input
           id="voice-name"
-          placeholder={t('enter_a_voice_name') || 'Enter a voice name'}
+          placeholder={t('enter_voice_name') || 'Enter voice name'}
           value={voiceName}
-          onChange={(e) => setVoiceName(e.target.value)}
+          onChange={handleNameChange}
           disabled={isLoading}
           className="mt-1"
         />
       </div>
 
       <div>
-        <Label>
-          {t('upload_audio_clip') || 'Upload audio clip'}
+        <Label htmlFor="audio-file">
+          {t('audio_file') || 'Audio File'}
         </Label>
-        <div
-          className="border-2 border-dashed rounded-md p-8 mt-1 flex flex-col items-center justify-center cursor-pointer"
-          onClick={handleClick}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-        >
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="audio/*,video/*"
-            className="hidden"
+        <div className="mt-1 flex items-center gap-2">
+          <Input
+            id="audio-display"
+            value={fileName}
+            readOnly
+            placeholder={t('no_file_selected') || 'No file selected'}
+            className="flex-1"
             disabled={isLoading}
           />
-          
-          {audioFile ? (
-            <div className="text-center">
-              <p className="font-medium">{audioFile.name}</p>
-              <p className="text-sm text-muted-foreground">
-                {(audioFile.size / (1024 * 1024)).toFixed(2)} MB
-              </p>
-            </div>
-          ) : (
-            <div className="text-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="mx-auto mb-2"
-              >
-                <path d="m21 15-9-9-9 9" />
-                <path d="M3 10.5V19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8.5" />
-              </svg>
-              <p className="text-sm text-muted-foreground">{t('choose_a_file_or_drag_drop_it_here') || 'Choose a file or drag & drop it here'}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {t('audio_and_video_formats_up_to_10_mb') || 'Audio and video formats, up to 10 MB'}
-              </p>
-            </div>
-          )}
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={handleBrowseClick}
+            disabled={isLoading}
+            className="flex-shrink-0"
+          >
+            <Upload className="h-4 w-4 mr-1" />
+            {t('browse') || 'Browse'}
+          </Button>
+          <input
+            ref={fileInputRef}
+            id="audio-file"
+            type="file"
+            accept="audio/*"
+            onChange={handleFileChange}
+            disabled={isLoading}
+            className="hidden"
+          />
         </div>
+        <p className="text-xs text-muted-foreground mt-1">
+          {t('supported_formats') || 'Supported formats'}: MP3, WAV, M4A (1-2 minutes in length)
+        </p>
       </div>
     </div>
   );
