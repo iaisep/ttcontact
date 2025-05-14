@@ -9,7 +9,7 @@ import { AgentSettingsAccordionProps } from './types';
 import FunctionsSection from './FunctionsSection';
 import KnowledgeBaseSection from './KnowledgeBaseSection';
 import SpeechSettingsSection from './SpeechSettingsSection';
-import CallSettingsSection from './CallSettingsSection';
+import CallSettingsSection from './call-settings';
 import PostCallAnalysisSection from './PostCallAnalysisSection';
 import SecurityFallbackSection from './SecurityFallbackSection';
 import WebhookSettingsSection from './WebhookSettingsSection';
