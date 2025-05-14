@@ -119,13 +119,6 @@ const AgentDetailHeader: React.FC<AgentDetailHeaderProps> = ({
             <span>Auto saved at 07:51</span>
           </div>
         </div>
-        
-        <div className="flex space-x-2 items-center">
-          <div className="flex space-x-2">
-            <Button variant="outline">Create</Button>
-            <Button variant="outline">Simulation</Button>
-          </div>
-        </div>
       </div>
     </div>
   );
