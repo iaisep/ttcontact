@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { CommunityVoice } from '../AddCustomVoiceModal';
+import { CommunityVoice } from '../../types';
 
 interface VoiceModalContextProps {
   isLoading: boolean;
