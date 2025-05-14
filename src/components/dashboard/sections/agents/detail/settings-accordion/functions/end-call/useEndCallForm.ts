@@ -39,7 +39,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
     setError(null);
 
     try {
-      // Get LLM ID from the agent
+      // Get LLM ID from the agent - this is crucial for making the correct API calls
       const llmId = agent?.response_engine?.llm_id;
       
       if (!llmId) {
@@ -101,7 +101,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
       console.log("Updating LLM with ID:", llmId);
       console.log("Updated tools payload:", { general_tools: updatedTools });
       
-      // Update the LLM with the updated tools
+      // Update the LLM with the updated tools - using the correct llmId
       const response = await fetchWithAuth(`/update-retell-llm/${llmId}`, {
         method: 'PATCH',
         body: JSON.stringify({ general_tools: updatedTools })
