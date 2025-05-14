@@ -48,7 +48,8 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
         return;
       }
 
-      // First fetch all existing tools to preserve them
+      // First fetch all existing tools using the correct llmId
+      console.log("Fetching LLM data with ID:", llmId);
       const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
       
       if (!llmData) {
@@ -57,11 +58,13 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
       
       // Extract existing tools
       const existingTools = llmData.general_tools || [];
+      console.log("Existing tools:", existingTools);
       
       // Handle editing vs creating new
       let updatedTools;
       if (initialData) {
-        // If we're updating, remove the original function and add the updated one
+        console.log("Updating existing function:", initialData.name);
+        // Remove the original function and add the updated one
         updatedTools = existingTools.filter((tool: any) => tool.name !== initialData.name);
 
         // Prepare the updated function
@@ -73,7 +76,6 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
 
         // Add the updated function to tools
         updatedTools.push(updatedFunction);
-
       } else {
         // Check if a function with the same name already exists
         const nameExists = existingTools.some((tool: any) => tool.name === name);
@@ -84,6 +86,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
           return;
         }
 
+        console.log("Creating new function:", name);
         // Prepare the new function
         const endCallFunction = {
           name,
@@ -95,11 +98,16 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
         updatedTools = [...existingTools, endCallFunction];
       }
 
+      console.log("Updating LLM with ID:", llmId);
+      console.log("Updated tools payload:", { general_tools: updatedTools });
+      
       // Update the LLM with the updated tools
       const response = await fetchWithAuth(`/update-retell-llm/${llmId}`, {
         method: 'PATCH',
         body: JSON.stringify({ general_tools: updatedTools })
       });
+      
+      console.log("Update response:", response);
 
       // Check for error response
       if (response && response.status === 'error') {
@@ -123,7 +131,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
       // Close the modal
       onClose();
     } catch (error: any) {
-      console.error('Error adding end call function:', error);
+      console.error('Error updating end call function:', error);
       
       // Format error message
       if (error.message && error.message.includes('Duplicate name found')) {
@@ -132,6 +140,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
         setError(error.message || t('error_adding_end_call_function'));
         toast.error(t('error_adding_end_call_function'));
       }
+    } finally {
       setIsSubmitting(false);
     }
   };
