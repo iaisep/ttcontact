@@ -7,11 +7,19 @@ import { AccordionSectionProps } from '../types';
 
 const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updateAgentField }) => {
   const handleEndCallOnSilenceChange = (checked: boolean) => {
-    // This will send a payload like { "end_call_after_silence_ms": 40000 } or { "end_call_after_silence_ms": 0 }
-    if (checked && !agent.end_call_after_silence_ms) {
-      updateAgentField('end_call_after_silence_ms', 40000); // 40 seconds in milliseconds
-    } else if (!checked) {
-      updateAgentField('end_call_after_silence_ms', 0); // Disable the feature
+    // Match the format of voicemail detection - send a boolean directly
+    // When enabled, we'll use either the current value or a default of 40 seconds
+    if (checked) {
+      updateAgentField('end_call_after_silence', true);
+      // Only set the ms value if it's not already set or is zero
+      if (!agent.end_call_after_silence_ms) {
+        updateAgentField('end_call_after_silence_ms', 40000); // 40 seconds in milliseconds
+      }
+    } else {
+      // When disabled, explicitly set to false
+      updateAgentField('end_call_after_silence', false);
+      // We can also set the ms value to 0 to disable
+      updateAgentField('end_call_after_silence_ms', 0);
     }
   };
 
@@ -19,6 +27,9 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
     const duration = values[0];
     updateAgentField('end_call_after_silence_ms', duration * 1000); // Convert to milliseconds
   };
+
+  // Determine if the feature is enabled by checking for a non-zero ms value
+  const isEnabled = !!agent.end_call_after_silence_ms;
 
   return (
     <div className="space-y-2">
@@ -28,7 +39,7 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
         </div>
         <div className="flex items-center space-x-2">
           <Switch 
-            checked={!!agent.end_call_after_silence_ms} 
+            checked={isEnabled} 
             onCheckedChange={handleEndCallOnSilenceChange}
           />
           <span className="text-xs text-gray-500">

@@ -37,7 +37,7 @@ const VoicemailDetectionSection: React.FC<AccordionSectionProps> = ({ agent, upd
             <p className="text-xs text-gray-500">Hang up or leave a voicemail if a voicemail is detected.</p>
           </div>
           <Switch 
-            checked={agent.enable_voicemail_detection || false} 
+            checked={!!agent.enable_voicemail_detection} 
             onCheckedChange={handleVoicemailDetectionChange}
           />
         </div>
