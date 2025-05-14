@@ -50,15 +50,22 @@ export const PronunciationSection: React.FC<PronunciationSectionProps> = ({
 
   const handleSubmit = async (values: PronunciationEntry) => {
     try {
+      // Create a new dictionary by adding the new entry to the existing dictionary
       const newDictionary = [...pronunciationDictionary, values];
       
-      // If we have an agent ID and update callback, update the agent
+      // If we have an agent ID, update the agent
       if (agentId) {
+        // Create the payload object with the updated dictionary
+        const payload = {
+          pronunciation_dictionary: newDictionary
+        };
+        
+        console.log('Updating pronunciation dictionary with payload:', payload);
+        
+        // Send the request with the properly structured payload
         await fetchWithAuth(`/update-agent/${agentId}`, {
           method: 'PATCH',
-          body: JSON.stringify({
-            pronunciation_dictionary: newDictionary
-          })
+          body: JSON.stringify(payload)
         });
         
         toast.success('Pronunciation added successfully');
