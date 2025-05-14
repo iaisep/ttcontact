@@ -5,6 +5,7 @@ import { Square } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
+import { RetellWebClient } from 'retell-client-js-sdk';
 
 // Definimos la interfaz para la respuesta del registro de llamada
 interface RegisterCallResponse {
@@ -19,6 +20,8 @@ interface TestControlButtonProps {
   agentId?: string;
 }
 
+const retellWebClient = new RetellWebClient();
+
 const TestControlButton: React.FC<TestControlButtonProps> = ({
   isRecording,
   isLoading,
@@ -29,42 +32,69 @@ const TestControlButton: React.FC<TestControlButtonProps> = ({
   const { fetchWithAuth } = useApiContext();
   const [endingCall, setEndingCall] = useState(false);
   
+  // Initialize the SDK
+  useEffect(() => {
+    retellWebClient.on("call_started", () => {
+      console.log("call started");
+    });
+    
+    retellWebClient.on("call_ended", () => {
+      console.log("call ended");
+      onTest(); // Notify parent component that call has ended
+    });
+    
+    retellWebClient.on("agent_start_talking", () => {
+      console.log("agent_start_talking");
+    });
+    
+    retellWebClient.on("agent_stop_talking", () => {
+      console.log("agent_stop_talking");
+    });
+    
+    retellWebClient.on("error", (error) => {
+      console.error("An error occurred:", error);
+      toast.error(t('error_in_call') || 'Error in call');
+      retellWebClient.stopCall();
+    });
+    
+    // Cleanup function to remove event listeners
+    return () => {
+      retellWebClient.removeAllListeners();
+    };
+  }, [onTest, t]);
+  
   const handleClick = async () => {
     if (isRecording) {
-      // End the call functionality
+      // End the call directly using the SDK
       setEndingCall(true);
       try {
-        // Call the specified endpoint to end the call
-        const response = await fetch('https://api.retellai.com/end-call/call_b66795a356cb2effb219b9598ad', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Error ending call: ${response.status}`);
-        }
-        
+        retellWebClient.stopCall();
         console.log('Call ended successfully');
-        // After ending the call successfully, trigger the original onTest function
-        onTest();
+        // onTest will be called via the call_ended event listener
       } catch (error) {
         console.error('Error ending call:', error);
         toast.error(t('error_ending_call') || 'Error ending call');
+        onTest(); // Ensure we still notify parent even if error
       } finally {
         setEndingCall(false);
       }
     } else {
       try {
-        // Registrar la llamada con la API usando el mismo endpoint que en el código proporcionado
+        // Registrar la llamada con la API
         const registerCallResponse = await registerCall(agentId || '');
         
-        // Si obtenemos un token de acceso, la llamada se ha registrado correctamente
+        // Si obtenemos un token de acceso, iniciamos la llamada con el SDK
         if (registerCallResponse.access_token) {
           console.log('Web call created with access token:', registerCallResponse.access_token);
           
-          // Después de registrar la llamada con éxito, activamos la función onTest original
+          // Iniciar la llamada con el SDK
+          retellWebClient
+            .startCall({
+              accessToken: registerCallResponse.access_token,
+            })
+            .catch(console.error);
+            
+          // Notificar al componente padre que la llamada ha comenzado
           onTest();
         }
       } catch (error) {
@@ -74,7 +104,7 @@ const TestControlButton: React.FC<TestControlButtonProps> = ({
     }
   };
   
-  // Función para registrar la llamada, siguiendo el mismo patrón del código proporcionado
+  // Función para registrar la llamada
   async function registerCall(agentId: string): Promise<RegisterCallResponse> {
     try {
       const response = await fetch('https://iallamadas.universidadisep.com/create-web-call', {
