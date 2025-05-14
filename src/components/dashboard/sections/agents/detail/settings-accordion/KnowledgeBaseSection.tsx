@@ -228,8 +228,9 @@ const KnowledgeBaseSection: React.FC<AccordionSectionProps> = ({ agent, updateAg
                   </div>
                 ))
               )}
+              {/* Hidden "Add New Knowledge Base" UI element that can be toggled with display:none */}
               <div 
-                className="flex items-center justify-between p-3 hover:bg-gray-50 cursor-pointer bg-gray-50"
+                className="hidden items-center justify-between p-3 hover:bg-gray-50 cursor-pointer bg-gray-50"
                 onClick={handleOpenKnowledgeBaseManager}
               >
                 <div className="flex items-center">
