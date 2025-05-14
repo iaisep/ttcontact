@@ -90,35 +90,37 @@ const VoicemailDetectionSection: React.FC<AccordionSectionProps> = ({ agent, upd
           </div>
         )}
 
-        <div className={`ml-0 mt-2 space-y-2 bg-blue-50 p-3 rounded-md ${!agent.enable_voicemail_detection ? 'opacity-50' : ''}`}>
-          <RadioGroup 
-            value={voicemailAction} 
-            onValueChange={handleVoicemailActionChange}
-            disabled={!agent.enable_voicemail_detection}
-            className="space-y-2"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="hangup" id="hangup" />
-              <Label htmlFor="hangup" className="text-xs">Hang up if reaching voicemail</Label>
-            </div>
-            
-            <div className="flex items-start space-x-2">
-              <div className="pt-1">
-                <RadioGroupItem value="message" id="leaveMessage" />
+        {/* Only show the radio button options if voicemail detection is enabled */}
+        {agent.enable_voicemail_detection && (
+          <div className="ml-0 mt-2 space-y-2 bg-blue-50 p-3 rounded-md">
+            <RadioGroup 
+              value={voicemailAction} 
+              onValueChange={handleVoicemailActionChange}
+              className="space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="hangup" id="hangup" />
+                <Label htmlFor="hangup" className="text-xs">Hang up if reaching voicemail</Label>
               </div>
-              <div className="flex-1">
-                <Label htmlFor="leaveMessage" className="text-xs">Leave a message if reaching voicemail</Label>
-                <Textarea
-                  placeholder="Message content, use [[]] to add variable"
-                  className="mt-2 w-full text-xs"
-                  disabled={!agent.enable_voicemail_detection || voicemailAction === 'hangup'}
-                  value={agent.voicemail_message || ''}
-                  onChange={(e) => handleVoicemailMessageChange(e.target.value)}
-                />
+              
+              <div className="flex items-start space-x-2">
+                <div className="pt-1">
+                  <RadioGroupItem value="message" id="leaveMessage" />
+                </div>
+                <div className="flex-1">
+                  <Label htmlFor="leaveMessage" className="text-xs">Leave a message if reaching voicemail</Label>
+                  <Textarea
+                    placeholder="Message content, use [[]] to add variable"
+                    className="mt-2 w-full text-xs"
+                    disabled={voicemailAction === 'hangup'}
+                    value={agent.voicemail_message || ''}
+                    onChange={(e) => handleVoicemailMessageChange(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
-          </RadioGroup>
-        </div>
+            </RadioGroup>
+          </div>
+        )}
       </div>
     </>
   );
