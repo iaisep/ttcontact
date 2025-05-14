@@ -7,29 +7,25 @@ import { AccordionSectionProps } from '../types';
 
 const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updateAgentField }) => {
   const handleEndCallOnSilenceChange = (checked: boolean) => {
-    // Match the format of voicemail detection - send a boolean directly
-    // When enabled, we'll use either the current value or a default of 40 seconds
+    // Control directamente el valor numérico del tiempo de silencio
     if (checked) {
-      updateAgentField('end_call_after_silence', true);
-      // Only set the ms value if it's not already set or is zero
-      if (!agent.end_call_after_silence_ms) {
-        updateAgentField('end_call_after_silence_ms', 40000); // 40 seconds in milliseconds
-      }
+      // Si se activa, establecer un valor predeterminado de 40 segundos
+      updateAgentField('end_call_after_silence_ms', 40000); // 40 segundos en milisegundos
     } else {
-      // When disabled, explicitly set to false
-      updateAgentField('end_call_after_silence', false);
-      // We can also set the ms value to 0 to disable
+      // Si se desactiva, establecer a 0 (que también desactiva la funcionalidad)
       updateAgentField('end_call_after_silence_ms', 0);
     }
   };
 
   const handleSilenceDurationChange = (values: number[]) => {
     const duration = values[0];
-    updateAgentField('end_call_after_silence_ms', duration * 1000); // Convert to milliseconds
+    updateAgentField('end_call_after_silence_ms', duration * 1000); // Convertir a milisegundos
   };
 
-  // Determine if the feature is enabled by checking for a non-zero ms value
+  // Determinar si la función está habilitada comprobando el valor numérico
   const isEnabled = !!agent.end_call_after_silence_ms;
+  // Obtener el valor actual en segundos para mostrar
+  const currentValueInSeconds = agent.end_call_after_silence_ms ? agent.end_call_after_silence_ms / 1000 : 40;
 
   return (
     <div className="space-y-2">
@@ -43,12 +39,12 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
             onCheckedChange={handleEndCallOnSilenceChange}
           />
           <span className="text-xs text-gray-500">
-            {agent.end_call_after_silence_ms ? (agent.end_call_after_silence_ms / 1000) : 40} s
+            {currentValueInSeconds} s
           </span>
         </div>
       </div>
       <Slider 
-        defaultValue={[agent.end_call_after_silence_ms ? (agent.end_call_after_silence_ms / 1000) : 40]} 
+        defaultValue={[currentValueInSeconds]} 
         min={0} 
         max={120} 
         step={1} 
