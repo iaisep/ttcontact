@@ -93,18 +93,29 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
       formData.append('name', voiceName);
       formData.append('audio_file', audioFile);
       
-      // Updated endpoint from /add-cloned-voice to /clone-voice
-      const response = await fetchWithAuth('/clone-voice', {
+      // Use the clone-voice endpoint and handle 201 Created response
+      // Don't expect an immediate response with data
+      const response = await fetch(`${fetchWithAuth.baseURL}/clone-voice`, {
         method: 'POST',
         body: formData,
-        // Don't set Content-Type header when sending FormData
-        headers: {}
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`
+        }
       });
       
-      if (response) {
-        toast.success(t('voice_cloned_successfully') || 'Voice cloned successfully');
-        onVoiceAdded(response);
+      if (response.status === 201 || response.ok) {
+        toast.success(t('voice_cloning_started') || 'Voice cloning started successfully');
+        // Since we don't expect a response object immediately, we can close the modal
+        // The voice will be available after processing
         onClose();
+        
+        // Inform the user that the voice will be available after processing
+        toast.info(
+          t('voice_processing_info') || 
+          'Your voice is being processed and will be available shortly'
+        );
+      } else {
+        throw new Error(`Unexpected response status: ${response.status}`);
       }
     } catch (error) {
       console.error('Error cloning voice:', error);
