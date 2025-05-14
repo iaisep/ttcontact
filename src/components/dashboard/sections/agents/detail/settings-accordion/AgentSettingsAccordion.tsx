@@ -3,7 +3,8 @@
 import PostCallAnalysisSection from './post-call-analysis/PostCallAnalysisSection';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AgentSettingsAccordionProps } from './types';
-import React from 'react';
+import React, { useState } from 'react';
+import { useVoiceSettings } from '../hooks/useVoiceSettings';
 
 // Import all section components
 import VoiceSection from './VoiceSection';
@@ -19,12 +20,23 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   knowledgeBases,
   updateAgentField
 }) => {
+  // Use the voice settings hook to get voice-related functionality
+  const voiceSettings = useVoiceSettings({
+    initialVoice: agent?.voice_name || 'Select a voice',
+    updateAgentField
+  });
+
   return (
     <Accordion type="multiple" className="w-full" defaultValue={["voice"]}>
       <AccordionItem value="voice">
         <AccordionTrigger className="hover:no-underline">Voice Settings</AccordionTrigger>
         <AccordionContent>
-          <VoiceSection agent={agent} updateAgentField={updateAgentField} />
+          <VoiceSection 
+            agent={agent} 
+            updateAgentField={updateAgentField}
+            selectedVoice={voiceSettings.selectedVoice}
+            openVoiceModal={voiceSettings.openVoiceModal}
+          />
         </AccordionContent>
       </AccordionItem>
 
@@ -38,7 +50,11 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
       <AccordionItem value="knowledge-base">
         <AccordionTrigger className="hover:no-underline">Knowledge Base</AccordionTrigger>
         <AccordionContent>
-          <KnowledgeBaseSection agent={agent} updateAgentField={updateAgentField} knowledgeBases={knowledgeBases} />
+          <KnowledgeBaseSection 
+            agent={agent} 
+            updateAgentField={updateAgentField} 
+            knowledgeBases={knowledgeBases} 
+          />
         </AccordionContent>
       </AccordionItem>
 

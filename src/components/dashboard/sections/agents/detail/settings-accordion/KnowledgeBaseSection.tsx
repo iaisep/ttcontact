@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, Trash, X, UploadCloud, Globe, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { AccordionSectionProps } from './types';
+import { AccordionSectionProps, KnowledgeBaseSectionProps } from './types';
 import { useApiContext } from '@/context/ApiContext';
 import { 
   Dialog, 
@@ -33,7 +32,7 @@ interface KnowledgeBase {
   created_at: string;
 }
 
-const KnowledgeBaseSection: React.FC<AccordionSectionProps> = ({ agent, updateAgentField }) => {
+const KnowledgeBaseSection: React.FC<KnowledgeBaseSectionProps> = ({ agent, updateAgentField, knowledgeBases: propKnowledgeBases }) => {
   const { t } = useLanguage();
   const { fetchWithAuth } = useApiContext();
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([]);
@@ -53,7 +52,24 @@ const KnowledgeBaseSection: React.FC<AccordionSectionProps> = ({ agent, updateAg
     }
   }, [agent]);
 
+  // Use knowledge bases from props if provided
+  useEffect(() => {
+    if (propKnowledgeBases && propKnowledgeBases.length > 0) {
+      const formattedKbs = propKnowledgeBases.map(kb => ({
+        id: kb.knowledge_base_id || kb.id,
+        name: kb.knowledge_base_name || kb.name,
+        created_at: kb.created_at || new Date().toISOString()
+      }));
+      setKnowledgeBases(formattedKbs);
+    }
+  }, [propKnowledgeBases]);
+
   const fetchKnowledgeBases = async () => {
+    // If we already have knowledge bases from props, don't fetch again
+    if (propKnowledgeBases && propKnowledgeBases.length > 0) {
+      return;
+    }
+    
     try {
       setLoading(true);
       const response = await fetchWithAuth('/list-knowledge-bases', {
