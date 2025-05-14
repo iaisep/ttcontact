@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, Plus } from 'lucide-react';
+import { FileText, Plus, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { RetellAgent } from '@/components/dashboard/sections/agents/types/retell-types';
 import { toast } from 'sonner';
@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 interface KnowledgeBase {
   id: string;
   name: string;
-  created_at: string;
+  created_at?: string;
 }
 
 interface KnowledgeBaseSelectionDialogProps {
@@ -29,6 +29,7 @@ interface KnowledgeBaseSelectionDialogProps {
   agent: RetellAgent;
   updateAgentField: (field: string, value: any) => void;
   handleOpenKnowledgeBaseManager: () => void;
+  isLoading?: boolean;
 }
 
 const KnowledgeBaseSelectionDialog: React.FC<KnowledgeBaseSelectionDialogProps> = ({
@@ -38,13 +39,14 @@ const KnowledgeBaseSelectionDialog: React.FC<KnowledgeBaseSelectionDialogProps> 
   selectedKbs,
   agent,
   updateAgentField,
-  handleOpenKnowledgeBaseManager
+  handleOpenKnowledgeBaseManager,
+  isLoading = false
 }) => {
   const { t } = useLanguage();
   const [localSelectedKbs, setLocalSelectedKbs] = useState<string[]>([...selectedKbs]);
 
-  // Reset local selection when dialog opens
-  React.useEffect(() => {
+  // Reset local selection when dialog opens or selected KBs change
+  useEffect(() => {
     if (dialogOpen) {
       console.log('[KnowledgeBaseSelectionDialog] Dialog opened, resetting selection to:', selectedKbs);
       setLocalSelectedKbs([...selectedKbs]);
@@ -80,7 +82,11 @@ const KnowledgeBaseSelectionDialog: React.FC<KnowledgeBaseSelectionDialogProps> 
         </DialogHeader>
 
         <div className="space-y-4 my-4 max-h-[300px] overflow-y-auto">
-          {knowledgeBases.length === 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center p-4">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : knowledgeBases.length === 0 ? (
             <div className="text-center p-4 text-gray-500">
               <p>No knowledge bases available.</p>
               <Button 
@@ -133,6 +139,7 @@ const KnowledgeBaseSelectionDialog: React.FC<KnowledgeBaseSelectionDialogProps> 
             <Button 
               size="sm"
               onClick={handleSaveSelection}
+              disabled={isLoading}
             >
               Save
             </Button>

@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
-import { FileText, Plus } from 'lucide-react';
+import { FileText, Plus, Database } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { KnowledgeBaseSectionProps } from '../types';
 import { useKnowledgeBaseSettings } from './hooks/useKnowledgeBaseSettings';
@@ -16,6 +16,7 @@ const KnowledgeBaseSection: React.FC<KnowledgeBaseSectionProps> = ({ agent, upda
     selectedKbs, 
     dialogOpen, 
     setDialogOpen,
+    isLoading,
     getKnowledgeBaseName,
     handleDeleteKnowledgeBase,
     handleOpenKnowledgeBaseManager,
@@ -32,7 +33,7 @@ const KnowledgeBaseSection: React.FC<KnowledgeBaseSectionProps> = ({ agent, upda
   return (
     <AccordionItem value="knowledge-base" className="mt-4 border rounded-md overflow-hidden">
       <AccordionTrigger className="px-4 py-2 text-sm font-medium bg-gray-50 hover:bg-gray-100 flex items-center">
-        <FileText className="h-4 w-4 mr-2" />
+        <Database className="h-4 w-4 mr-2" />
         {t('knowledge_base')}
       </AccordionTrigger>
       <AccordionContent className="p-4">
@@ -68,6 +69,7 @@ const KnowledgeBaseSection: React.FC<KnowledgeBaseSectionProps> = ({ agent, upda
         agent={agent}
         updateAgentField={updateAgentField}
         handleOpenKnowledgeBaseManager={handleOpenKnowledgeBaseManager}
+        isLoading={isLoading}
       />
     </AccordionItem>
   );
