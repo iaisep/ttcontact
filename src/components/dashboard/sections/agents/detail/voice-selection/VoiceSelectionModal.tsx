@@ -84,6 +84,11 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
     fetchVoices();
   };
 
+  const handleVoiceAdded = (newVoice: RetellVoice) => {
+    setVoices(prevVoices => [...prevVoices, newVoice]);
+    toast.success(t('voice_added_successfully') || 'Voice added successfully');
+  };
+
   const filteredVoices = getFilteredVoices(voices);
 
   const handleSelectVoice = (voice: RetellVoice) => {
@@ -132,6 +137,7 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
             filteredVoices={filteredVoices}
             onSelectVoice={handleSelectVoice}
             selectedVoice={selectedVoice}
+            onVoiceAdded={handleVoiceAdded}
           />
         )}
       </DialogContent>

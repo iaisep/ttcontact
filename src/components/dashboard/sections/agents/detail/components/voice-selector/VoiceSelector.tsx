@@ -1,11 +1,13 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useVoiceSettings } from '../../hooks/useVoiceSettings';
 import VoiceSettingsModal from '../VoiceSettingsModal';
 import VoiceTooltip from './VoiceTooltip';
+import { toast } from 'sonner';
+import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface VoiceSelectorProps {
   selectedVoice: string;
@@ -25,7 +27,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
     return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const [isVoiceSettingsModalOpen, setIsVoiceSettingsModalOpen] = React.useState(false);
+  const [isVoiceSettingsModalOpen, setIsVoiceSettingsModalOpen] = useState(false);
   
   // We'll use the context hook to access the agent's voice settings
   const { 
@@ -47,6 +49,12 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
   const handleSettingsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsVoiceSettingsModalOpen(true);
+  };
+
+  // Handle newly added custom voice
+  const handleCustomVoiceAdded = (voice: RetellVoice) => {
+    toast.success(`Voice ${voice.voice_name} added successfully`);
+    // Any additional logic needed when a voice is added
   };
 
   return (
@@ -90,6 +98,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
         voiceVolume={voiceVolume}
         setVoiceVolume={setVoiceVolume}
         onSettingsUpdated={handleSaveVoiceSettings}
+        onVoiceAdded={handleCustomVoiceAdded}
       />
     </>
   );

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -11,6 +11,8 @@ import {
 } from '@/components/ui/select';
 import { Plus, Search, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import AddCustomVoiceModal from './components/AddCustomVoiceModal';
+import { RetellVoice } from './types';
 
 interface VoiceFilterBarProps {
   searchTerm: string;
@@ -21,6 +23,7 @@ interface VoiceFilterBarProps {
   setAccentFilter: (filter: string) => void;
   typeFilter: string;
   setTypeFilter: (filter: string) => void;
+  onVoiceAdded?: (voice: RetellVoice) => void;
 }
 
 const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
@@ -31,9 +34,11 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
   accentFilter,
   setAccentFilter,
   typeFilter,
-  setTypeFilter
+  setTypeFilter,
+  onVoiceAdded
 }) => {
   const { t } = useLanguage();
+  const [isCustomVoiceModalOpen, setIsCustomVoiceModalOpen] = useState(false);
 
   const resetFilters = () => {
     // Reset filters to default values without reloading the page
@@ -43,12 +48,27 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
     setTypeFilter('all');
   };
 
+  const handleOpenCustomVoiceModal = () => {
+    setIsCustomVoiceModalOpen(true);
+  };
+
+  const handleCloseCustomVoiceModal = () => {
+    setIsCustomVoiceModalOpen(false);
+  };
+
+  const handleVoiceAdded = (voice: RetellVoice) => {
+    if (onVoiceAdded) {
+      onVoiceAdded(voice);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <Button 
           variant="outline" 
           className="h-9 gap-2 bg-white hover:bg-gray-50 text-gray-700 border-gray-200 rounded-full"
+          onClick={handleOpenCustomVoiceModal}
         >
           <Plus className="h-4 w-4" />
           {t('add_custom_voice') || 'Add custom voice'}
@@ -115,6 +135,12 @@ const VoiceFilterBar: React.FC<VoiceFilterBarProps> = ({
           </SelectContent>
         </Select>
       </div>
+
+      <AddCustomVoiceModal
+        open={isCustomVoiceModalOpen}
+        onClose={handleCloseCustomVoiceModal}
+        onVoiceAdded={handleVoiceAdded}
+      />
     </div>
   );
 };

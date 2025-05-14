@@ -19,6 +19,7 @@ interface VoiceSelectionContentProps {
   filteredVoices: RetellVoice[];
   onSelectVoice: (voice: RetellVoice) => void;
   selectedVoice?: string;
+  onVoiceAdded?: (voice: RetellVoice) => void;
 }
 
 const VoiceSelectionContent: React.FC<VoiceSelectionContentProps> = ({
@@ -34,7 +35,8 @@ const VoiceSelectionContent: React.FC<VoiceSelectionContentProps> = ({
   setTypeFilter,
   filteredVoices,
   onSelectVoice,
-  selectedVoice
+  selectedVoice,
+  onVoiceAdded
 }) => {
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -51,6 +53,7 @@ const VoiceSelectionContent: React.FC<VoiceSelectionContentProps> = ({
           setAccentFilter={setAccentFilter}
           typeFilter={typeFilter}
           setTypeFilter={setTypeFilter}
+          onVoiceAdded={onVoiceAdded}
         />
         
         <VoiceTable 
