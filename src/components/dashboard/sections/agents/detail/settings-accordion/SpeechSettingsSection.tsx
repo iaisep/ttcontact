@@ -25,13 +25,17 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateA
   const [responsiveness, setResponsiveness] = useState(agent?.responsiveness || 0.85);
   const [interruptionSensitivity, setInterruptionSensitivity] = useState(agent?.interruption_sensitivity || 0.8);
   const [backchannelFrequency, setBackchannelFrequency] = useState(agent?.backchannel_frequency || 0.8);
+  const [backgroundSound, setBackgroundSound] = useState(agent?.ambient_sound || 'summer-outdoor');
+  const [backgroundSoundVolume, setBackgroundSoundVolume] = useState(agent?.ambient_sound_volume || 1);
 
   // Update local state when agent props change
   useEffect(() => {
     setResponsiveness(agent?.responsiveness || 0.85);
     setInterruptionSensitivity(agent?.interruption_sensitivity || 0.8);
     setBackchannelFrequency(agent?.backchannel_frequency || 0.8);
-  }, [agent?.responsiveness, agent?.interruption_sensitivity, agent?.backchannel_frequency]);
+    setBackgroundSound(agent?.ambient_sound || 'summer-outdoor');
+    setBackgroundSoundVolume(agent?.ambient_sound_volume || 1);
+  }, [agent?.responsiveness, agent?.interruption_sensitivity, agent?.backchannel_frequency, agent?.ambient_sound, agent?.ambient_sound_volume]);
 
   return (
     <AccordionItem value="speech-settings" className="mt-4 border rounded-md overflow-hidden">
@@ -42,7 +46,19 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateA
       <AccordionContent className="p-4">
         <div className="space-y-6">
           {/* Background Sound Setting */}
-          <BackgroundSoundSection />
+          <BackgroundSoundSection 
+            sound={backgroundSound}
+            volume={backgroundSoundVolume}
+            agentId={agentId}
+            onUpdateSound={(value) => {
+              setBackgroundSound(value);
+              updateAgentField('ambient_sound', value);
+            }}
+            onUpdateVolume={(value) => {
+              setBackgroundSoundVolume(value);
+              updateAgentField('ambient_sound_volume', value);
+            }}
+          />
 
           {/* Responsiveness Setting */}
           <ResponsivenessSection 
