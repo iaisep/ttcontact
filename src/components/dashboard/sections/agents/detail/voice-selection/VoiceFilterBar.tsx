@@ -12,7 +12,7 @@ import {
 import { Plus, Search, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import AddCustomVoiceModal from './components/AddCustomVoiceModal';
-import { RetellVoice } from './types';
+import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface VoiceFilterBarProps {
   searchTerm: string;

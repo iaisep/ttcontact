@@ -85,7 +85,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
         <VoiceTooltip onSettingsClick={handleSettingsClick} />
       </Button>
 
-      {/* Voice Settings Modal */}
+      {/* Voice Settings Modal with the onVoiceAdded prop */}
       <VoiceSettingsModal
         open={isVoiceSettingsModalOpen}
         onClose={() => setIsVoiceSettingsModalOpen(false)}

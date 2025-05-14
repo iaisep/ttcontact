@@ -7,6 +7,7 @@ import { useApiContext } from '@/context/ApiContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useParams } from 'react-router-dom';
 import { VoiceModelSelector, VoiceSliderControl } from './';
+import { RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 
 interface VoiceSettingsModalProps {
   open: boolean;
@@ -20,6 +21,7 @@ interface VoiceSettingsModalProps {
   voiceVolume: number;
   setVoiceVolume: (value: number) => void;
   onSettingsUpdated?: () => void;
+  onVoiceAdded?: (voice: RetellVoice) => void; // Made this prop optional with ?
 }
 
 const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
@@ -33,7 +35,8 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   setVoiceTemperature,
   voiceVolume,
   setVoiceVolume,
-  onSettingsUpdated
+  onSettingsUpdated,
+  onVoiceAdded // Add this prop to the destructured props
 }) => {
   const { t } = useLanguage();
   const { fetchWithAuth } = useApiContext();
@@ -98,6 +101,13 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
       toast.error('Failed to update voice settings');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Handle custom voice added if the prop is provided
+  const handleCustomVoiceAdded = (voice: RetellVoice) => {
+    if (onVoiceAdded) {
+      onVoiceAdded(voice);
     }
   };
 
