@@ -60,8 +60,19 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
       // Handle editing vs creating new
       let updatedTools;
       if (initialData) {
-        // Filter out the function we're editing
+        // If we're updating, remove the original function and add the updated one
         updatedTools = existingTools.filter((tool: any) => tool.name !== initialData.name);
+
+        // Prepare the updated function
+        const updatedFunction = {
+          name,
+          description,
+          type: "end_call"
+        };
+
+        // Add the updated function to tools
+        updatedTools.push(updatedFunction);
+
       } else {
         // Check if a function with the same name already exists
         const nameExists = existingTools.some((tool: any) => tool.name === name);
@@ -71,20 +82,19 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
           setIsSubmitting(false);
           return;
         }
-        updatedTools = [...existingTools];
+
+        // Prepare the new function
+        const endCallFunction = {
+          name,
+          description,
+          type: "end_call"
+        };
+
+        // Add to tools
+        updatedTools = [...existingTools, endCallFunction];
       }
-      
-      // Prepare the function
-      const endCallFunction = {
-        name,
-        description,
-        type: "end_call"
-      };
 
-      // Add to tools
-      updatedTools.push(endCallFunction);
-
-      // Update the LLM with the new tools
+      // Update the LLM with the updated tools
       const response = await fetchWithAuth(`/update-retell-llm/${llmId}`, {
         method: 'PATCH',
         body: JSON.stringify({ general_tools: updatedTools })
