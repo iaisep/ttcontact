@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 
@@ -15,7 +15,6 @@ interface VoiceSliderControlProps {
   rightLabel: string;
   agentId?: string;
   fieldName?: string;
-  valueTransform?: (value: number) => number;
 }
 
 const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
@@ -30,14 +29,9 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
   rightLabel,
   agentId,
   fieldName,
-  valueTransform,
 }) => {
   const [localValue, setLocalValue] = useState(value);
   const [isActive, setIsActive] = useState(false);
-  
-  useEffect(() => {
-    setLocalValue(value);
-  }, [value]);
   
   const handleValueChange = (values: number[]) => {
     const newValue = values[0];
@@ -74,7 +68,6 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
         agentId={agentId}
         fieldName={fieldName}
         debounceMs={800}
-        valueTransform={valueTransform}
       />
     </div>
   );

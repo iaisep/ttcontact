@@ -43,7 +43,7 @@ export const InterruptionSection: React.FC<InterruptionSectionProps> = ({
         className="w-full"
         agentId={agentId}
         fieldName="interruption_sensitivity"
-        debounceMs={800}
+        debounceMs={800} // Incrementado para dar más tiempo
         onValueChange={handleValueChange}
       />
     </div>

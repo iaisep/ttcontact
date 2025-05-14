@@ -11,13 +11,12 @@ interface ExtendedSliderProps extends React.ComponentPropsWithoutRef<typeof Slid
   agentId?: string;       // Optional agent ID for auto-updating
   fieldName?: string;     // Field name to update (e.g., "responsiveness")
   debounceMs?: number;    // Debounce delay in milliseconds
-  valueTransform?: (value: number) => number; // Optional function to transform value before sending to server
 }
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   ExtendedSliderProps
->(({ className, onMouseEnter, onMouseLeave, agentId, fieldName, debounceMs = 500, valueTransform, ...props }, ref) => {
+>(({ className, onMouseEnter, onMouseLeave, agentId, fieldName, debounceMs = 500, ...props }, ref) => {
   const { fetchWithAuth } = useApiContext();
   const [isUpdating, setIsUpdating] = React.useState(false);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -58,12 +57,8 @@ const Slider = React.forwardRef<
     
     setIsUpdating(true);
     try {
-      // Apply value transformation if provided
-      const value = values[0];
-      const transformedValue = valueTransform ? valueTransform(value) : value;
-      
-      const payload = { [fieldName]: transformedValue };
-      console.log(`Updating agent ${agentId} field ${fieldName} with value: ${value} -> transformed to: ${transformedValue}`);
+      const payload = { [fieldName]: values[0] };
+      console.log(`Updating agent ${agentId} with payload:`, payload);
       
       await fetchWithAuth(`/update-agent/${agentId}`, {
         method: 'PATCH',
@@ -78,7 +73,7 @@ const Slider = React.forwardRef<
       setIsUpdating(false);
       debounceTimerRef.current = null;
     }
-  }, [agentId, fieldName, fetchWithAuth, valueTransform]);
+  }, [agentId, fieldName, fetchWithAuth]);
 
   // When user starts dragging
   const handleDragStart = React.useCallback(() => {

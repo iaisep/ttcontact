@@ -43,7 +43,7 @@ export const ResponsivenessSection: React.FC<ResponsivenessSectionProps> = ({
         className="w-full"
         agentId={agentId}
         fieldName="responsiveness"
-        debounceMs={800}
+        debounceMs={800} // Incrementado para dar más tiempo
         onValueChange={handleValueChange}
       />
     </div>

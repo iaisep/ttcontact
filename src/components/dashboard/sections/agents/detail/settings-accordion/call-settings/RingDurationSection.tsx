@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { AccordionSectionProps } from '../types';
@@ -8,15 +8,11 @@ const RingDurationSection: React.FC<AccordionSectionProps> = ({ agent, updateAge
   const [ringDuration, setRingDuration] = useState(
     agent.ring_duration_ms ? agent.ring_duration_ms / 1000 : 30
   );
-  
-  useEffect(() => {
-    setRingDuration(agent.ring_duration_ms ? agent.ring_duration_ms / 1000 : 30);
-  }, [agent.ring_duration_ms]);
 
   const handleRingDurationChange = (values: number[]) => {
     const duration = values[0];
     setRingDuration(duration);
-    // Don't call updateAgentField here as the Slider component will handle it with debounce
+    updateAgentField('ring_duration_ms', duration * 1000); // Convert seconds to milliseconds
   };
 
   return (
@@ -29,7 +25,7 @@ const RingDurationSection: React.FC<AccordionSectionProps> = ({ agent, updateAge
         <span className="text-xs text-gray-500">{ringDuration} s</span>
       </div>
       <Slider 
-        value={[ringDuration]} 
+        defaultValue={[ringDuration]} 
         min={0} 
         max={60} 
         step={1} 
@@ -37,8 +33,6 @@ const RingDurationSection: React.FC<AccordionSectionProps> = ({ agent, updateAge
         onValueChange={handleRingDurationChange}
         agentId={agent.agent_id}
         fieldName="ring_duration_ms"
-        debounceMs={800}
-        valueTransform={(value) => value * 1000} // Convert seconds to milliseconds
       />
     </div>
   );

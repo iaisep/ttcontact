@@ -26,7 +26,7 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
   const handleSilenceDurationChange = (values: number[]) => {
     const duration = values[0];
     setSilenceDuration(duration);
-    // Don't call updateAgentField here as the Slider component will handle it with debounce
+    // No need to call updateAgentField here as the Slider component will handle it
   };
 
   // Determine if the feature is enabled by checking the boolean value
@@ -60,8 +60,7 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
           onValueChange={handleSilenceDurationChange}
           agentId={agent.agent_id}
           fieldName="end_call_after_silence_ms"
-          debounceMs={800}
-          valueTransform={(value) => value * 1000} // Convert seconds to milliseconds
+          debounceMs={800} // Incrementado para dar más tiempo
         />
       )}
     </div>
