@@ -10,6 +10,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
 import VoiceCloneTab from './voice-tabs/VoiceCloneTab';
 import CommunityVoicesTab from './voice-tabs/CommunityVoicesTab';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export interface CommunityVoice {
   id: string;
@@ -34,8 +35,14 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
   const { fetchWithAuth } = useApiContext();
   const [activeTab, setActiveTab] = useState<string>("voice-clone");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
 
   const handleAddCommunityVoice = async (voice: CommunityVoice) => {
+    if (!termsAccepted) {
+      toast.error(t('please_accept_terms') || 'Please accept the terms to continue');
+      return;
+    }
+    
     setIsLoading(true);
     try {
       const response = await fetchWithAuth('/add-community-voice', {
@@ -61,6 +68,11 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
   };
 
   const handleAddClonedVoice = async (name: string, audioFile: File) => {
+    if (!termsAccepted) {
+      toast.error(t('please_accept_terms') || 'Please accept the terms to continue');
+      return;
+    }
+    
     setIsLoading(true);
     try {
       // Create a FormData object to send the file
@@ -131,6 +143,21 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
             />
           </TabsContent>
         </Tabs>
+        
+        <div className="flex items-start space-x-2 mb-2">
+          <Checkbox 
+            id="terms" 
+            checked={termsAccepted} 
+            onCheckedChange={(checked) => setTermsAccepted(!!checked)}
+            className="mt-1"
+          />
+          <div className="max-w-[360px] overflow-hidden">
+            <label htmlFor="terms" className="text-xs leading-tight inline-block cursor-pointer">
+              {t('i_hereby_confirm_that_i_have_all_necessary_rights_or_consents_to_upload_and_clone_these_voice_samples_and_that_i_will_not_use_the_platform_generated_content_for_any_illegal_fraudulent_or_harmful_purpose') || 
+              'I hereby confirm that I have all necessary rights or consents to upload and clone these voice samples and that I will not use the platform-generated content for any illegal, fraudulent, or harmful purpose.'}
+            </label>
+          </div>
+        </div>
         
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={onClose} disabled={isLoading} className="h-8 px-3 text-sm">
