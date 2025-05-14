@@ -27,11 +27,13 @@ const VoicemailDetectionSection: React.FC<AccordionSectionProps> = ({ agent, upd
     const action = value as 'hangup' | 'message';
     setVoicemailAction(action);
     
-    if (action === 'message' && !agent.voicemail_message) {
-      // Set a default message when switching to message option
-      updateAgentField('voicemail_message', 'Hello, I\'m not able to take your call right now. Please leave a message and I\'ll get back to you.');
+    if (action === 'message') {
+      // Always set the default message when switching to message option
+      updateAgentField('enable_voicemail_detection', true);
+      updateAgentField('voicemail_message', 'Message content, use [[]] to add variable');
     } else if (action === 'hangup') {
       // Clear the message when switching to hangup option
+      updateAgentField('enable_voicemail_detection', true);
       updateAgentField('voicemail_message', '');
     }
   };
