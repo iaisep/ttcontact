@@ -93,7 +93,8 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
       formData.append('name', voiceName);
       formData.append('audio_file', audioFile);
       
-      const response = await fetchWithAuth('/add-cloned-voice', {
+      // Updated endpoint from /add-cloned-voice to /clone-voice
+      const response = await fetchWithAuth('/clone-voice', {
         method: 'POST',
         body: formData,
         // Don't set Content-Type header when sending FormData
