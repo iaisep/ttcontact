@@ -23,7 +23,7 @@ const Slider = React.forwardRef<
   const [isDragging, setIsDragging] = React.useState(false);
   const [pendingValue, setPendingValue] = React.useState<number[]>(props.defaultValue || props.value || [0]);
   const debounceTimerRef = React.useRef<NodeJS.Timeout | null>(null);
-
+  
   // Clean up function for the debounce timer
   React.useEffect(() => {
     return () => {
@@ -40,26 +40,7 @@ const Slider = React.forwardRef<
     }
   }, [props.value]);
 
-  // Handle local value change without triggering API calls immediately
-  const handleValueChange = React.useCallback((values: number[]) => {
-    setPendingValue(values);
-    
-    // Always call the original onValueChange with the current values
-    props.onValueChange?.(values);
-    
-    // Only setup debounce if not dragging (for keyboard navigation or programmatic changes)
-    if (!isDragging && agentId && fieldName) {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-      
-      debounceTimerRef.current = setTimeout(() => {
-        updateServerValue(values);
-      }, debounceMs);
-    }
-  }, [isDragging, agentId, fieldName, props.onValueChange, debounceMs]);
-
-  // Function to update server value
+  // Function to update server value - only called when dragging is complete
   const updateServerValue = React.useCallback(async (values: number[]) => {
     if (!agentId || !fieldName) return;
     
@@ -85,9 +66,27 @@ const Slider = React.forwardRef<
       toast.error(`Failed to update agent setting: ${fieldName}`);
     } finally {
       setIsUpdating(false);
-      debounceTimerRef.current = null;
     }
   }, [agentId, fieldName, fetchWithAuth, valueTransform]);
+
+  // Handle local value change without triggering API calls during drag
+  const handleValueChange = React.useCallback((values: number[]) => {
+    setPendingValue(values);
+    
+    // Always call the original onValueChange with the current values
+    props.onValueChange?.(values);
+    
+    // Only setup debounce if not dragging (for keyboard navigation or programmatic changes)
+    if (!isDragging && agentId && fieldName) {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      
+      debounceTimerRef.current = setTimeout(() => {
+        updateServerValue(values);
+      }, debounceMs);
+    }
+  }, [isDragging, agentId, fieldName, props.onValueChange, debounceMs, updateServerValue]);
 
   // When user starts dragging
   const handleDragStart = React.useCallback(() => {
