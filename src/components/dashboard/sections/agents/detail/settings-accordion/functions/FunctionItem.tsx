@@ -80,7 +80,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
         />
       )}
 
-      {showEditModal && (func.type === 'calendar_availability' || func.type === 'check_calendar_availability') && (
+      {showEditModal && (func.type === 'calendar_availability' || func.type === 'check_availability_cal' || func.type === 'check_calendar_availability') && (
         <CalendarAvailabilityModal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
@@ -126,6 +126,7 @@ export const getFunctionIcon = (func: AgentFunction) => {
     case 'calendar_availability':
     case 'book_appointment_cal':
     case 'check_calendar_availability':
+    case 'check_availability_cal':
       return <Calendar className="h-4 w-4 mr-2 text-blue-500" />;
     default:
       return <FileText className="h-4 w-4 mr-2 text-gray-500" />;

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -40,7 +41,7 @@ const CalendarAvailabilityModal: React.FC<CalendarAvailabilityModalProps> = ({
 
   // Initialize form with initialData if provided
   useEffect(() => {
-    if (initialData && initialData.type === 'calendar_availability') {
+    if (initialData && (initialData.type === 'calendar_availability' || initialData.type === 'check_calendar_availability' || initialData.type === 'check_availability_cal')) {
       setFunctionName(initialData.name || 'check_calendar_availability');
       setDescription(initialData.description || '');
       setApiKey(initialData.cal_api_key || '');
@@ -101,13 +102,16 @@ const CalendarAvailabilityModal: React.FC<CalendarAvailabilityModalProps> = ({
         updatedTools = [...existingTools];
       }
       
+      // Determine the function type - preserve original if editing
+      const functionType = initialData ? initialData.type : "check_availability_cal";
+      
       // Prepare the new calendar availability function
       const newFunction = {
         name: functionName,
         description: description || "When users ask for availability, check the calendar and provide available slots.",
         event_type_id: parseInt(eventTypeId, 10),
         cal_api_key: apiKey,
-        type: "check_availability_cal",
+        type: functionType,
         timezone: timezone || "America/Los_Angeles"
       };
       
