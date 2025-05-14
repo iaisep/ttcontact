@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogFooter } from '@/components/ui/dialog';
 import { FieldModalProps } from './types';
 
-const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type, existingItem }) => {
+const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type = 'text', existingItem }) => {
   const [name, setName] = useState(existingItem?.name || '');
   const [description, setDescription] = useState(existingItem?.description || '');
   const [formatExamples, setFormatExamples] = useState<string[]>(existingItem?.examples || []);
@@ -27,12 +27,15 @@ const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type
   const handleSave = () => {
     if (!name.trim()) return;
     
-    // Updated to use "string" or "number" based on the type prop
+    // Set the type based on the modal type prop
+    const itemType = type === 'number' ? 'number' : 'string';
+    
+    // Create the item with the proper structure
     const item = {
-      type: type === 'text' ? 'string' : 'number',
+      type: itemType,
       name: name.trim(),
       description: description.trim(),
-      examples: formatExamples,
+      examples: formatExamples.length > 0 ? formatExamples : undefined
     };
     
     onSave(item);
@@ -44,9 +47,17 @@ const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="flex items-center">
           <DialogTitle className="flex items-center gap-2">
-            {type === 'text' && <TextIcon className="h-4 w-4" />}
-            {type === 'number' && <Hash className="h-4 w-4" />}
-            {type === 'text' ? 'Text' : 'Number'}
+            {type === 'number' ? (
+              <>
+                <Hash className="h-4 w-4" />
+                Number Field
+              </>
+            ) : (
+              <>
+                <TextIcon className="h-4 w-4" />
+                Text Field
+              </>
+            )}
           </DialogTitle>
           <Button 
             variant="ghost" 
@@ -65,7 +76,7 @@ const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type
               id="name" 
               value={name} 
               onChange={(e) => setName(e.target.value)} 
-              placeholder="e.g., detailed_call_summary"
+              placeholder={type === 'number' ? "e.g., age" : "e.g., customer_name"}
             />
           </div>
           
@@ -75,7 +86,7 @@ const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type
               id="description" 
               value={description} 
               onChange={(e) => setDescription(e.target.value)} 
-              placeholder="Describe what information should be extracted"
+              placeholder={`Describe what ${type === 'number' ? 'numerical value' : 'information'} should be extracted`}
               rows={3}
             />
           </div>
@@ -126,7 +137,13 @@ const TextFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, type
 
         <DialogFooter className="flex justify-end gap-2 sm:justify-end">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button type="submit" onClick={handleSave}>Save</Button>
+          <Button 
+            type="submit" 
+            onClick={handleSave}
+            disabled={!name.trim()}
+          >
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

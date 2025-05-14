@@ -11,7 +11,7 @@ import { FieldModalProps } from './types';
 const SelectorFieldModal: React.FC<FieldModalProps> = ({ open, onClose, onSave, existingItem }) => {
   const [name, setName] = useState(existingItem?.name || '');
   const [description, setDescription] = useState(existingItem?.description || '');
-  const [choices, setChoices] = useState<string[]>(existingItem?.choices || existingItem?.examples || []);
+  const [choices, setChoices] = useState<string[]>(existingItem?.choices || []);
   const [newChoice, setNewChoice] = useState('');
 
   const handleAddChoice = () => {
