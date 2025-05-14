@@ -29,14 +29,13 @@ const TestControlButton: React.FC<TestControlButtonProps> = ({
     } else {
       try {
         // Call the specified endpoint with the required payload
-        const response = await fetch('https://llm.developuisep.online/create-web-call/', {
+        const response = await fetch('https://iallamadas.universidadisep.com/create-web-call', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            agent_id: agentId || '',
-            prompt_id: 'prompt_1'  // This is a constant as specified
+            agent_id: agentId || ''
           })
         });
         
