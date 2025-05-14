@@ -11,16 +11,17 @@ interface ExtendedSliderProps extends React.ComponentPropsWithoutRef<typeof Slid
   agentId?: string;       // Optional agent ID for auto-updating
   fieldName?: string;     // Field name to update (e.g., "responsiveness")
   debounceMs?: number;    // Debounce delay in milliseconds
+  valueTransform?: (value: number) => number; // Transform value before sending to API
 }
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   ExtendedSliderProps
->(({ className, onMouseEnter, onMouseLeave, agentId, fieldName, debounceMs = 500, ...props }, ref) => {
+>(({ className, onMouseEnter, onMouseLeave, agentId, fieldName, debounceMs = 500, valueTransform, ...props }, ref) => {
   const { fetchWithAuth } = useApiContext();
   const [isUpdating, setIsUpdating] = React.useState(false);
   const [isDragging, setIsDragging] = React.useState(false);
-  const [pendingValue, setPendingValue] = React.useState<number[]>(props.defaultValue || [0]);
+  const [pendingValue, setPendingValue] = React.useState<number[]>(props.defaultValue || props.value || [0]);
   const debounceTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // Clean up function for the debounce timer
@@ -31,6 +32,13 @@ const Slider = React.forwardRef<
       }
     };
   }, []);
+
+  // Handle value change when component receives new values from parent
+  React.useEffect(() => {
+    if (props.value && JSON.stringify(props.value) !== JSON.stringify(pendingValue)) {
+      setPendingValue(props.value);
+    }
+  }, [props.value]);
 
   // Handle local value change without triggering API calls immediately
   const handleValueChange = React.useCallback((values: number[]) => {
@@ -57,7 +65,13 @@ const Slider = React.forwardRef<
     
     setIsUpdating(true);
     try {
-      const payload = { [fieldName]: values[0] };
+      // Apply value transformation if provided (e.g., converting seconds to milliseconds)
+      let valueToSend = values[0];
+      if (valueTransform) {
+        valueToSend = valueTransform(valueToSend);
+      }
+      
+      const payload = { [fieldName]: valueToSend };
       console.log(`Updating agent ${agentId} with payload:`, payload);
       
       await fetchWithAuth(`/update-agent/${agentId}`, {
@@ -73,7 +87,7 @@ const Slider = React.forwardRef<
       setIsUpdating(false);
       debounceTimerRef.current = null;
     }
-  }, [agentId, fieldName, fetchWithAuth]);
+  }, [agentId, fieldName, fetchWithAuth, valueTransform]);
 
   // When user starts dragging
   const handleDragStart = React.useCallback(() => {
@@ -81,6 +95,7 @@ const Slider = React.forwardRef<
     // Clear any pending update
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
     }
   }, []);
 
