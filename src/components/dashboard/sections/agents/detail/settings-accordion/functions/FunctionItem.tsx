@@ -14,7 +14,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
   // Handler for edit button
   const handleEditClick = () => {
     // For special function types, show the specific modal
-    if (['transfer_call', 'end_call', 'calendar_availability', 'book_calendar', 'press_digit'].includes(func.type)) {
+    if (['transfer_call', 'end_call', 'calendar_availability', 'book_calendar', 'press_digit', 'book_appointment_cal'].includes(func.type)) {
       setShowEditModal(true);
     } else {
       // For other function types, use the default edit handler
@@ -90,7 +90,7 @@ export const FunctionItem: React.FC<FunctionItemProps> = ({ func, onEdit, onDele
         />
       )}
 
-      {showEditModal && func.type === 'book_calendar' && (
+      {showEditModal && (func.type === 'book_calendar' || func.type === 'book_appointment_cal') && (
         <BookCalendarModal
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
@@ -124,6 +124,7 @@ export const getFunctionIcon = (func: AgentFunction) => {
     case 'calendar':
     case 'book_calendar':
     case 'calendar_availability':
+    case 'book_appointment_cal':
       return <Calendar className="h-4 w-4 mr-2 text-blue-500" />;
     default:
       return <FileText className="h-4 w-4 mr-2 text-gray-500" />;
