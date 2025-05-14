@@ -33,11 +33,11 @@ export const useKnowledgeBaseSettings = ({
     if (!agent) return [];
     
     if (agent.knowledge_base_ids && Array.isArray(agent.knowledge_base_ids)) {
-      console.log('Using knowledge_base_ids from agent:', agent.knowledge_base_ids);
+      console.log('[useKnowledgeBaseSettings] Using knowledge_base_ids from agent:', agent.knowledge_base_ids);
       return agent.knowledge_base_ids;
     } else if (agent.knowledge_base) {
       // Backward compatibility
-      console.log('Using legacy knowledge_base from agent:', agent.knowledge_base);
+      console.log('[useKnowledgeBaseSettings] Using legacy knowledge_base from agent:', agent.knowledge_base);
       return [agent.knowledge_base];
     }
     return [];

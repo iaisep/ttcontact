@@ -2,7 +2,7 @@
 import PostCallAnalysisSection from './post-call-analysis/PostCallAnalysisSection';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AgentSettingsAccordionProps } from './types';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useVoiceSettings } from '../hooks/useVoiceSettings';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
@@ -33,62 +33,60 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   const [loading, setLoading] = useState(true); // Start with loading=true to show loading state
   const [loadingError, setLoadingError] = useState<string | null>(null);
 
-  // Effect to fetch LLM data and associated knowledge base IDs when the component mounts
-  // or when the agent's LLM ID changes
-  useEffect(() => {
+  // Function to fetch LLM data to get knowledge base IDs
+  const fetchLlmData = useCallback(async () => {
     if (!agent?.response_engine?.llm_id) {
       console.log('[AgentSettingsAccordion] No LLM ID found in agent data', agent);
       setLoading(false);
       return;
     }
 
-    const fetchLlmData = async () => {
-      try {
-        setLoading(true);
-        setLoadingError(null);
-        const llmId = agent.response_engine.llm_id;
-        console.log('[AgentSettingsAccordion] Fetching LLM data for ID:', llmId);
-        
-        const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
-        console.log('[AgentSettingsAccordion] LLM data retrieved:', llmData);
-        
-        if (llmData && llmData.knowledge_base_ids && Array.isArray(llmData.knowledge_base_ids)) {
-          setLlmKnowledgeBaseIds(llmData.knowledge_base_ids);
-          console.log('[AgentSettingsAccordion] Knowledge base IDs from LLM:', llmData.knowledge_base_ids);
+    try {
+      setLoading(true);
+      setLoadingError(null);
+      const llmId = agent.response_engine.llm_id;
+      console.log('[AgentSettingsAccordion] Fetching LLM data for ID:', llmId);
+      
+      const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
+      console.log('[AgentSettingsAccordion] LLM data retrieved:', llmData);
+      
+      if (llmData && llmData.knowledge_base_ids && Array.isArray(llmData.knowledge_base_ids)) {
+        setLlmKnowledgeBaseIds(llmData.knowledge_base_ids);
+        console.log('[AgentSettingsAccordion] Knowledge base IDs from LLM:', llmData.knowledge_base_ids);
 
-          // If we already have the knowledge bases, filter them
-          if (knowledgeBases && knowledgeBases.length > 0) {
-            console.log('[AgentSettingsAccordion] Filtering from provided knowledge bases');
-            // No filtering needed - show all knowledge bases
-            setFilteredKnowledgeBases(knowledgeBases);
-          }
-          // Otherwise, fetch the knowledge bases
-          else {
-            console.log('[AgentSettingsAccordion] No knowledge bases provided, fetching them');
-            await fetchKnowledgeBases();
-          }
-        } else {
-          console.log('[AgentSettingsAccordion] No knowledge_base_ids found in LLM data');
-          setLlmKnowledgeBaseIds([]);
-          // Still set the knowledge bases to show all available ones
-          if (knowledgeBases && knowledgeBases.length > 0) {
-            setFilteredKnowledgeBases(knowledgeBases);
-          } else {
-            await fetchKnowledgeBases();
-          }
+        // If we already have the knowledge bases, use them
+        if (knowledgeBases && knowledgeBases.length > 0) {
+          console.log('[AgentSettingsAccordion] Using provided knowledge bases');
+          setFilteredKnowledgeBases(knowledgeBases);
         }
-      } catch (error) {
-        console.error('[AgentSettingsAccordion] Error fetching LLM data:', error);
-        setLoadingError('Failed to load LLM data');
-        toast.error('Failed to load LLM data');
-      } finally {
-        setLoading(false);
+        // Otherwise, fetch the knowledge bases
+        else {
+          console.log('[AgentSettingsAccordion] No knowledge bases provided, fetching them');
+          await fetchKnowledgeBases();
+        }
+      } else {
+        console.log('[AgentSettingsAccordion] No knowledge_base_ids found in LLM data');
+        setLlmKnowledgeBaseIds([]);
+        // Still set the knowledge bases to show all available ones
+        if (knowledgeBases && knowledgeBases.length > 0) {
+          setFilteredKnowledgeBases(knowledgeBases);
+        } else {
+          await fetchKnowledgeBases();
+        }
       }
-    };
+    } catch (error) {
+      console.error('[AgentSettingsAccordion] Error fetching LLM data:', error);
+      setLoadingError('Failed to load LLM data');
+      toast.error('Failed to load LLM data');
+    } finally {
+      setLoading(false);
+    }
+  }, [agent?.response_engine?.llm_id, fetchWithAuth, knowledgeBases]);
 
-    // Force immediate execution of the fetch function
+  // Effect to fetch LLM data when agent is loaded or LLM ID changes
+  useEffect(() => {
     fetchLlmData();
-  }, [agent?.response_engine?.llm_id, fetchWithAuth]);
+  }, [fetchLlmData]);
 
   // Secondary effect to update filtered knowledge bases when knowledgeBases prop changes
   useEffect(() => {
@@ -126,10 +124,18 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
     }
   };
 
-  // Log the incoming knowledge bases to check if they're properly received
-  console.log('[AgentSettingsAccordion] Knowledge bases in AgentSettingsAccordion:', knowledgeBases);
-  console.log('[AgentSettingsAccordion] LLM knowledge base IDs:', llmKnowledgeBaseIds);
-  console.log('[AgentSettingsAccordion] Filtered knowledge bases:', filteredKnowledgeBases);
+  // Debug logs
+  useEffect(() => {
+    console.log('[AgentSettingsAccordion] Knowledge bases in AgentSettingsAccordion:', knowledgeBases);
+    console.log('[AgentSettingsAccordion] LLM knowledge base IDs:', llmKnowledgeBaseIds);
+    console.log('[AgentSettingsAccordion] Filtered knowledge bases:', filteredKnowledgeBases);
+    
+    // Update agent with LLM knowledge base IDs if they don't exist already
+    if (llmKnowledgeBaseIds.length > 0 && (!agent.knowledge_base_ids || agent.knowledge_base_ids.length === 0)) {
+      console.log('[AgentSettingsAccordion] Setting agent knowledge_base_ids from LLM:', llmKnowledgeBaseIds);
+      updateAgentField('knowledge_base_ids', llmKnowledgeBaseIds);
+    }
+  }, [llmKnowledgeBaseIds, knowledgeBases, filteredKnowledgeBases, agent, updateAgentField]);
 
   // Render a loader while loading data
   const renderKnowledgeBaseContent = () => {
@@ -151,7 +157,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
               // Re-fetch data on button click
               if (agent?.response_engine?.llm_id) {
                 setLoading(true);
-                fetchKnowledgeBases();
+                fetchLlmData();
               }
             }}
           >
