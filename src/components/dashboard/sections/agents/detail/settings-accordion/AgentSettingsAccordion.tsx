@@ -1,3 +1,4 @@
+
 // This file now imports from the modular implementation
 import PostCallAnalysisSection from './post-call-analysis/PostCallAnalysisSection';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -30,11 +31,14 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   const { fetchWithAuth } = useApiContext();
   const [llmKnowledgeBaseIds, setLlmKnowledgeBaseIds] = useState<string[]>([]);
   const [filteredKnowledgeBases, setFilteredKnowledgeBases] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true); // Iniciar con loading=true para mostrar el estado de carga
+  const [loading, setLoading] = useState(true); // Start with loading=true to show loading state
+  const [loadingError, setLoadingError] = useState<string | null>(null);
 
-  // Effect to fetch LLM data and associated knowledge base IDs
+  // Effect to fetch LLM data and associated knowledge base IDs when the component mounts
+  // or when the agent's LLM ID changes
   useEffect(() => {
     if (!agent?.response_engine?.llm_id) {
+      console.log('No LLM ID found in agent data', agent);
       setLoading(false);
       return;
     }
@@ -42,9 +46,11 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
     const fetchLlmData = async () => {
       try {
         setLoading(true);
-        console.log('Fetching LLM data for ID:', agent.response_engine.llm_id);
+        setLoadingError(null);
+        const llmId = agent.response_engine.llm_id;
+        console.log('Fetching LLM data for ID:', llmId);
         
-        const llmData = await fetchWithAuth(`/get-retell-llm/${agent.response_engine.llm_id}`);
+        const llmData = await fetchWithAuth(`/get-retell-llm/${llmId}`);
         console.log('LLM data retrieved:', llmData);
         
         if (llmData && llmData.knowledge_base_ids && Array.isArray(llmData.knowledge_base_ids)) {
@@ -70,14 +76,27 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
         }
       } catch (error) {
         console.error('Error fetching LLM data:', error);
+        setLoadingError('Failed to load LLM data');
         toast.error('Failed to load LLM data');
       } finally {
         setLoading(false);
       }
     };
 
+    // Force immediate execution of the fetch function
     fetchLlmData();
-  }, [agent?.response_engine?.llm_id, fetchWithAuth, knowledgeBases]);
+  }, [agent?.response_engine?.llm_id, fetchWithAuth]);
+
+  // Secondary effect to update filtered knowledge bases when knowledgeBases prop changes
+  useEffect(() => {
+    if (llmKnowledgeBaseIds.length > 0 && knowledgeBases && knowledgeBases.length > 0) {
+      const filtered = knowledgeBases.filter(kb => 
+        llmKnowledgeBaseIds.includes(kb.id || kb.knowledge_base_id)
+      );
+      console.log('Updated filtered knowledge bases after knowledgeBases change:', filtered);
+      setFilteredKnowledgeBases(filtered);
+    }
+  }, [knowledgeBases, llmKnowledgeBaseIds]);
 
   // Function to fetch knowledge bases if not provided
   const fetchKnowledgeBases = async (kbIds: string[]) => {
@@ -109,12 +128,32 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   console.log('LLM knowledge base IDs:', llmKnowledgeBaseIds);
   console.log('Filtered knowledge bases:', filteredKnowledgeBases);
 
-  // Renderizar un loader mientras se cargan los datos
+  // Render a loader while loading data
   const renderKnowledgeBaseContent = () => {
     if (loading) {
       return (
         <div className="flex justify-center items-center py-6">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      );
+    }
+    
+    if (loadingError) {
+      return (
+        <div className="p-4 text-center">
+          <p className="text-red-500">{loadingError}</p>
+          <button 
+            className="mt-2 px-4 py-2 bg-primary text-white rounded"
+            onClick={() => {
+              // Re-fetch data on button click
+              if (agent?.response_engine?.llm_id) {
+                setLoading(true);
+                fetchKnowledgeBases(llmKnowledgeBaseIds);
+              }
+            }}
+          >
+            Retry
+          </button>
         </div>
       );
     }
