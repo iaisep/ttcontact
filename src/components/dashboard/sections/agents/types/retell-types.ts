@@ -48,6 +48,11 @@ export interface RetellAgent {
   };
   functions?: RetellFunction[];
   folder?: string;
+  pronunciation_dictionary?: {
+    word: string;
+    alphabet: string;
+    phoneme: string;
+  }[];
   
   // Additional properties for backward compatibility
   name?: string;

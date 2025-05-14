@@ -108,7 +108,11 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateA
           />
 
           {/* Pronunciation */}
-          <PronunciationSection />
+          <PronunciationSection 
+            agentId={agentId}
+            pronunciationDictionary={agent?.pronunciation_dictionary || []}
+            onUpdate={(dictionary) => updateAgentField('pronunciation_dictionary', dictionary)}
+          />
         </div>
       </AccordionContent>
     </AccordionItem>
