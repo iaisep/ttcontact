@@ -75,12 +75,13 @@ export const useVoiceSettings = ({ initialVoice, updateAgentField }: UseVoiceSet
       }
       
       // Update local state with voice name
-      const voiceName = voice.voice_name || voice.name || voiceId;
+      // Use name rather than voice_name since it's in the interface
+      const voiceName = voice.name || voiceId;
       setSelectedVoice(voiceName);
       
       // Update the agent field in the parent component without triggering a full page refresh
       updateAgentField('voice_id', voiceId);
-      updateAgentField('voice', voiceName);
+      updateAgentField('voice', { name: voiceName, avatar_url: voice.avatar_url });
       
       setIsVoiceModalOpen(false);
       

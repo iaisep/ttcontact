@@ -22,7 +22,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
 }) => {
   // Use the voice settings hook to get voice-related functionality
   const voiceSettings = useVoiceSettings({
-    initialVoice: agent?.voice_name || 'Select a voice',
+    initialVoice: agent?.voice?.name || 'Select a voice',
     updateAgentField
   });
 

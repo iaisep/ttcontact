@@ -21,7 +21,7 @@ const VoiceSection: React.FC<VoiceSectionProps> = ({
   
   // Use the voice settings hook to get voice-related functionality
   const voiceSettings = useVoiceSettings({
-    initialVoice: externalSelectedVoice || agent?.voice_name || 'Select a voice',
+    initialVoice: externalSelectedVoice || (agent?.voice?.name) || 'Select a voice',
     updateAgentField
   });
 
