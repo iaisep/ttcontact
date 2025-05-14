@@ -38,6 +38,7 @@ const PauseBeforeSpeakingSection: React.FC<AccordionSectionProps> = ({ agent, up
         agentId={agent.agent_id}
         fieldName="begin_message_delay_ms"
         debounceMs={800}
+        valueTransform={(value) => value * 1000} // Convert seconds to milliseconds
       />
     </div>
   );

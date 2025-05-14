@@ -83,7 +83,7 @@ const VoicemailDetectionSection: React.FC<AccordionSectionProps> = ({ agent, upd
             </div>
             <Slider 
               value={[detectionDuration]}
-              min={0} 
+              min={5} 
               max={30} 
               step={1} 
               className="w-full"
@@ -91,6 +91,7 @@ const VoicemailDetectionSection: React.FC<AccordionSectionProps> = ({ agent, upd
               agentId={agent.agent_id}
               fieldName="voicemail_detection_timeout_ms"
               debounceMs={800}
+              valueTransform={(value) => value * 1000} // Convert seconds to milliseconds
             />
           </div>
         )}

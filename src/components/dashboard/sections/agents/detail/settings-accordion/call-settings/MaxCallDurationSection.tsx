@@ -37,6 +37,7 @@ const MaxCallDurationSection: React.FC<AccordionSectionProps> = ({ agent, update
         agentId={agent.agent_id}
         fieldName="max_call_duration_ms"
         debounceMs={800}
+        valueTransform={(value) => value * 60 * 1000} // Convert minutes to milliseconds
       />
     </div>
   );

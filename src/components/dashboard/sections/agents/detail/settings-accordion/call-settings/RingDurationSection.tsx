@@ -38,6 +38,7 @@ const RingDurationSection: React.FC<AccordionSectionProps> = ({ agent, updateAge
         agentId={agent.agent_id}
         fieldName="ring_duration_ms"
         debounceMs={800}
+        valueTransform={(value) => value * 1000} // Convert seconds to milliseconds
       />
     </div>
   );

@@ -61,6 +61,7 @@ const EndCallOnSilenceSection: React.FC<AccordionSectionProps> = ({ agent, updat
           agentId={agent.agent_id}
           fieldName="end_call_after_silence_ms"
           debounceMs={800}
+          valueTransform={(value) => value * 1000} // Convert seconds to milliseconds
         />
       )}
     </div>

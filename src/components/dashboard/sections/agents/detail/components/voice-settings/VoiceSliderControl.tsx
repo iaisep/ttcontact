@@ -15,6 +15,7 @@ interface VoiceSliderControlProps {
   rightLabel: string;
   agentId?: string;
   fieldName?: string;
+  valueTransform?: (value: number) => number;
 }
 
 const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
@@ -29,6 +30,7 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
   rightLabel,
   agentId,
   fieldName,
+  valueTransform,
 }) => {
   const [localValue, setLocalValue] = useState(value);
   const [isActive, setIsActive] = useState(false);
@@ -72,6 +74,7 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
         agentId={agentId}
         fieldName={fieldName}
         debounceMs={800}
+        valueTransform={valueTransform}
       />
     </div>
   );
