@@ -90,14 +90,15 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[440px]">
         <DialogHeader className="flex justify-between items-center">
-          <DialogTitle>{t('add_custom_voice') || 'Add Custom Voice'}</DialogTitle>
+          <DialogTitle className="text-lg">{t('add_custom_voice') || 'Add Custom Voice'}</DialogTitle>
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={onClose}
             disabled={isLoading}
+            className="h-7 w-7"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -107,7 +108,7 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
           defaultValue="voice-clone" 
           value={activeTab} 
           onValueChange={setActiveTab}
-          className="mt-4"
+          className="mt-2"
         >
           <TabsList className="grid grid-cols-2 w-full">
             <TabsTrigger value="voice-clone">{t('voice_clone') || 'Voice Clone'}</TabsTrigger>
@@ -130,12 +131,12 @@ const AddCustomVoiceModal: React.FC<AddCustomVoiceModalProps> = ({
         </Tabs>
         
         <div className="flex justify-end gap-2 mt-4">
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+          <Button variant="outline" onClick={onClose} disabled={isLoading} className="h-8 px-3 text-sm">
             {t('cancel') || 'Cancel'}
           </Button>
           {isLoading && (
-            <Button disabled>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Button disabled className="h-8 px-3 text-sm">
+              <Loader2 className="mr-2 h-3 w-3 animate-spin" />
               {t('saving') || 'Saving...'}
             </Button>
           )}

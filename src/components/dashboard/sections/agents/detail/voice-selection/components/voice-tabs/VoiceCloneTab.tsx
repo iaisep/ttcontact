@@ -111,8 +111,8 @@ const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
                 <path d="m21 15-9-9-9 9" />
                 <path d="M3 10.5V19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8.5" />
               </svg>
-              <p>{t('choose_a_file_or_drag_drop_it_here') || 'Choose a file or drag & drop it here'}</p>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground">{t('choose_a_file_or_drag_drop_it_here') || 'Choose a file or drag & drop it here'}</p>
+              <p className="text-xs text-muted-foreground mt-1">
                 {t('audio_and_video_formats_up_to_10_mb') || 'Audio and video formats, up to 10 MB'}
               </p>
             </div>
@@ -127,7 +127,7 @@ const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
           onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
           disabled={isLoading}
         />
-        <Label htmlFor="terms" className="text-sm">
+        <Label htmlFor="terms" className="text-xs">
           {t('i_hereby_confirm_that_i_have_all_necessary_rights_or_consents_to_upload_and_clone_these_voice_samples_and_that_i_will_not_use_the_platform_generated_content_for_any_illegal_fraudulent_or_harmful_purpose') || 
           'I hereby confirm that I have all necessary rights or consents to upload and clone these voice samples and that I will not use the platform-generated content for any illegal, fraudulent, or harmful purpose.'}
         </Label>
