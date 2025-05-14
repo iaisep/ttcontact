@@ -7,7 +7,6 @@ import React, { useState } from 'react';
 import { useVoiceSettings } from '../hooks/useVoiceSettings';
 
 // Import all section components
-import VoiceSection from './VoiceSection';
 import CallSettingsSection from './call-settings';
 import KnowledgeBaseSection from './KnowledgeBaseSection';
 import SpeechSettingsSection from './SpeechSettingsSection';
@@ -27,19 +26,9 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   });
 
   return (
-    <Accordion type="multiple" className="w-full" defaultValue={["voice"]}>
-      <AccordionItem value="voice">
-        <AccordionTrigger className="hover:no-underline">Voice Settings</AccordionTrigger>
-        <AccordionContent>
-          <VoiceSection 
-            agent={agent} 
-            updateAgentField={updateAgentField}
-            selectedVoice={voiceSettings.selectedVoice}
-            openVoiceModal={voiceSettings.openVoiceModal}
-          />
-        </AccordionContent>
-      </AccordionItem>
-
+    <Accordion type="multiple" className="w-full" defaultValue={["call-settings"]}>
+      {/* Voice section is now hidden */}
+      
       <AccordionItem value="call-settings">
         <AccordionTrigger className="hover:no-underline">Call Settings</AccordionTrigger>
         <AccordionContent>
