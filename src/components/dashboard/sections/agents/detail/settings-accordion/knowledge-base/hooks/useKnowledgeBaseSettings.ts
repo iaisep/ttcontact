@@ -28,7 +28,12 @@ export const useKnowledgeBaseSettings = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log('KnowledgeBaseSettings - propKnowledgeBases:', propKnowledgeBases);
+    console.log('useKnowledgeBaseSettings - agent:', agent);
+    
+    // Debug logs
+    console.log('useKnowledgeBaseSettings - propKnowledgeBases:', propKnowledgeBases);
+    console.log('useKnowledgeBaseSettings - agent.knowledge_base_ids:', agent?.knowledge_base_ids);
+    console.log('useKnowledgeBaseSettings - agent.knowledge_base:', agent?.knowledge_base);
     
     // Use knowledge bases from props if provided
     if (propKnowledgeBases && propKnowledgeBases.length > 0) {
@@ -38,14 +43,24 @@ export const useKnowledgeBaseSettings = ({
       fetchKnowledgeBases();
     }
     
-    // If agent has knowledge_base_ids, set them as selected
+    // Get selected knowledge bases from agent data
+    const selectedIds: string[] = [];
+    
+    // Check for knowledge_base_ids array first (preferred)
     if (agent?.knowledge_base_ids && Array.isArray(agent.knowledge_base_ids)) {
-      setSelectedKbs(agent.knowledge_base_ids);
-      console.log('Setting selected KBs from agent.knowledge_base_ids:', agent.knowledge_base_ids);
-    } else if (agent?.knowledge_base && typeof agent.knowledge_base === 'string') {
-      // For backward compatibility, if there's a single knowledge_base
-      setSelectedKbs([agent.knowledge_base]);
-      console.log('Setting selected KBs from agent.knowledge_base:', [agent.knowledge_base]);
+      selectedIds.push(...agent.knowledge_base_ids);
+      console.log('Setting selected KBs from knowledge_base_ids:', agent.knowledge_base_ids);
+    } 
+    // Then check for single knowledge_base field (legacy)
+    else if (agent?.knowledge_base && typeof agent.knowledge_base === 'string') {
+      selectedIds.push(agent.knowledge_base);
+      console.log('Setting selected KBs from knowledge_base:', agent.knowledge_base);
+    }
+    
+    // Update selected knowledge bases
+    if (selectedIds.length > 0) {
+      setSelectedKbs(selectedIds);
+      console.log('Setting selectedKbs to:', selectedIds);
     }
   }, [agent, propKnowledgeBases]);
 
@@ -108,10 +123,11 @@ export const useKnowledgeBaseSettings = ({
     event.stopPropagation();
     
     // Remove this KB from selected KBs
-    setSelectedKbs(prev => prev.filter(id => id !== kbId));
+    const updatedKbs = selectedKbs.filter(id => id !== kbId);
+    setSelectedKbs(updatedKbs);
     
     // Update the agent right away
-    updateAgentField('knowledge_base_ids', selectedKbs.filter(id => id !== kbId));
+    updateAgentField('knowledge_base_ids', updatedKbs);
     
     toast.success('Knowledge base removed');
   };

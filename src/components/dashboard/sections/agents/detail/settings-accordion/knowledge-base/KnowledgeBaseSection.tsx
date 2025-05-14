@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
 import { FileText, Plus } from 'lucide-react';
@@ -20,6 +20,14 @@ const KnowledgeBaseSection: React.FC<KnowledgeBaseSectionProps> = ({ agent, upda
     handleDeleteKnowledgeBase,
     handleOpenKnowledgeBaseManager,
   } = useKnowledgeBaseSettings({ agent, updateAgentField, propKnowledgeBases });
+
+  // Add debug logs to track the knowledge base data
+  useEffect(() => {
+    console.log('KnowledgeBaseSection - agent:', agent);
+    console.log('KnowledgeBaseSection - agent knowledge_base_ids:', agent?.knowledge_base_ids);
+    console.log('KnowledgeBaseSection - selectedKbs:', selectedKbs);
+    console.log('KnowledgeBaseSection - knowledgeBases:', knowledgeBases);
+  }, [agent, selectedKbs, knowledgeBases]);
 
   return (
     <AccordionItem value="knowledge-base" className="mt-4 border rounded-md overflow-hidden">
