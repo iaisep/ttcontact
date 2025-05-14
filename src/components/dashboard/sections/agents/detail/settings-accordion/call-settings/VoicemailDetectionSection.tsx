@@ -65,26 +65,28 @@ const VoicemailDetectionSection: React.FC<AccordionSectionProps> = ({ agent, upd
           />
         </div>
 
-        {/* Voicemail Detection Duration - Now inside the main section but always visible */}
-        <div className="space-y-2 mt-2 px-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-xs font-medium text-amber-600">Voicemail Detection Duration</Label>
-              <p className="text-xs text-gray-500">Duration for which voicemail detection will be active during the call</p>
+        {/* Voicemail Detection Duration - Only visible when voicemail detection is enabled */}
+        {agent.enable_voicemail_detection && (
+          <div className="space-y-2 mt-2 px-0">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-xs font-medium text-amber-600">Voicemail Detection Duration</Label>
+                <p className="text-xs text-gray-500">Duration for which voicemail detection will be active during the call</p>
+              </div>
+              <span className="text-xs text-gray-500">{detectionDuration} s</span>
             </div>
-            <span className="text-xs text-gray-500">{detectionDuration} s</span>
+            <Slider 
+              value={[detectionDuration]}
+              min={0} 
+              max={30} 
+              step={1} 
+              className="w-full"
+              onValueChange={handleVoicemailDetectionDurationChange}
+              agentId={agent.agent_id}
+              fieldName="voicemail_detection_timeout_ms"
+            />
           </div>
-          <Slider 
-            value={[detectionDuration]}
-            min={0} 
-            max={30} 
-            step={1} 
-            className="w-full"
-            onValueChange={handleVoicemailDetectionDurationChange}
-            agentId={agent.agent_id}
-            fieldName="voicemail_detection_timeout_ms"
-          />
-        </div>
+        )}
 
         <div className={`ml-0 mt-2 space-y-2 bg-blue-50 p-3 rounded-md ${!agent.enable_voicemail_detection ? 'opacity-50' : ''}`}>
           <RadioGroup 
