@@ -67,21 +67,21 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
     <>
       {/* URL Source Modal */}
       <AddUrlSourceModal
-        open={currentSourceType === 'url'}
-        onClose={() => {
+        isOpen={currentSourceType === 'url'}
+        onCancel={() => {
           handleCloseSourceModal();
           handleSourceAdded();
         }}
-        onAddSource={(kbId, sourceType, sourceData) => {
-          // Make sure knowledgeBaseName is passed through in sourceData
-          return onAddUrlSource(
-            sourceData.url,
-            sourceData.autoSync,
-            sourceData.webPages || []
-          );
+        onSave={async (urls, autoSync, knowledgeBaseName) => {
+          // Create dummy WebPage objects from URLs
+          const webPages: WebPage[] = urls.map(url => ({
+            url,
+            title: url,
+            selected: true
+          }));
+          
+          await onAddUrlSource(urls[0], autoSync, webPages);
         }}
-        onFetchSitemap={onFetchSitemap}
-        currentKnowledgeBase={effectiveKnowledgeBase}
         knowledgeBaseName={knowledgeBaseName}
       />
 
@@ -114,8 +114,6 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
         currentKnowledgeBase={effectiveKnowledgeBase}
         knowledgeBaseName={knowledgeBaseName}
       />
-
-      {/* Note: SourceDeleteDialog has been removed as requested */}
     </>
   );
 };

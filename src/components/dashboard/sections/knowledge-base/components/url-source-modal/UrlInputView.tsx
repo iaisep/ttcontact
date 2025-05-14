@@ -25,7 +25,7 @@ const UrlInputView: React.FC<UrlInputViewProps> = ({
   knowledgeBaseName
 }) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-6">
       {knowledgeBaseName && (
         <div className="flex items-center gap-2 p-2 bg-blue-50 text-blue-700 rounded-md mb-2">
           <Info className="h-4 w-4" />

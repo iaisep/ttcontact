@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Info, RefreshCw } from 'lucide-react';
@@ -40,14 +40,8 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   
   const displayName = knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name);
 
-  const handleConfirm = () => {
-    if (canProceed && !isLoading) {
-      onConfirm();
-    }
-  };
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-6">
       {displayName && (
         <div className="flex items-center gap-2 p-2 bg-blue-50 text-blue-700 rounded-md mb-2">
           <Info className="h-4 w-4" />
@@ -109,7 +103,7 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
             Back
           </Button>
           <Button
-            onClick={handleConfirm}
+            onClick={onConfirm}
             disabled={!canProceed || isLoading}
             className={isLoading ? 'opacity-70 cursor-not-allowed' : ''}
           >

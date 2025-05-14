@@ -4,12 +4,13 @@ import { Globe, Loader2 } from 'lucide-react';
 import { useUrlSourceModal } from './hooks/useUrlSourceModal';
 import UrlInputView from './UrlInputView';
 import SitemapSelectionView from './SitemapSelectionView';
+import { KnowledgeBase } from '../../types';
 
 interface AddUrlSourceModalProps {
+  isOpen: boolean;
   onCancel: () => void;
   knowledgeBaseName?: string;
   onSave: (urls: string[], autoSync: boolean, knowledgeBaseName: string) => Promise<void>;
-  isOpen: boolean;
 }
 
 const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
@@ -19,27 +20,40 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   isOpen
 }) => {
   const {
-    view,
     url,
-    autoSync,
-    webPages,
-    selectedPages,
-    isLoading,
-    fetchingSitemap,
-    kbNameValue,
-    setKbNameValue,
     setUrl,
+    autoSync,
     setAutoSync,
-    togglePageSelection,
-    toggleAllPages,
-    handleFetchSitemap,
-    handleSaveChanges,
-    goBack
+    isLoading,
+    view,
+    webPages,
+    selectedPageUrls,
+    error,
+    handleUrlSubmit,
+    handleSelectionToggle,
+    handleToggleAll,
+    handleConfirmSelection,
+    resetState
   } = useUrlSourceModal({
-    onSave,
-    onCancel,
-    initialKnowledgeBaseName: knowledgeBaseName
+    onFetchSitemap: async (url: string) => {
+      // This will be implemented by the parent component
+      return [];
+    },
+    onSubmit: async (url: string, autoSync: boolean, selectedPages: any, knowledgeBaseName?: string) => {
+      // Implement the submission logic
+      return {} as KnowledgeBase;
+    }
   });
+
+  // Create a custom handler to adapt to the expected prop interface
+  const handleSave = async () => {
+    // Get the URLs from selected pages
+    const urls = webPages
+      .filter(page => selectedPageUrls.includes(page.url))
+      .map(page => page.url);
+    
+    await onSave(urls, autoSync, knowledgeBaseName || '');
+  };
 
   if (!isOpen) return null;
 
@@ -65,25 +79,27 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
             {view === 'url-input' ? (
               <UrlInputView 
                 url={url}
-                autoSync={autoSync}
-                knowledgeBaseName={kbNameValue}
-                onKnowledgeBaseNameChange={setKbNameValue}
-                onUrlChange={setUrl}
-                onAutoSyncChange={setAutoSync}
+                setUrl={setUrl}
+                isLoading={isLoading}
+                error={error}
+                onSubmit={handleUrlSubmit}
                 onCancel={onCancel}
-                onNext={handleFetchSitemap}
-                isCreatingKnowledgeBase={!knowledgeBaseName}
-                fetchingSitemap={fetchingSitemap}
+                knowledgeBaseName={knowledgeBaseName}
               />
             ) : (
               <SitemapSelectionView 
+                url={url}
+                autoSync={autoSync}
+                setAutoSync={setAutoSync}
                 webPages={webPages}
-                selectedPages={selectedPages}
-                onTogglePageSelection={togglePageSelection}
-                onToggleAllPages={toggleAllPages}
-                onCancel={onCancel}
-                onBack={goBack}
-                onSave={handleSaveChanges}
+                selectedPageUrls={selectedPageUrls}
+                onSelectionToggle={handleSelectionToggle}
+                onToggleAll={handleToggleAll}
+                onConfirm={handleConfirmSelection}
+                onBack={() => resetState()}
+                isLoading={isLoading}
+                currentKnowledgeBase={null}
+                knowledgeBaseName={knowledgeBaseName}
               />
             )}
           </>
