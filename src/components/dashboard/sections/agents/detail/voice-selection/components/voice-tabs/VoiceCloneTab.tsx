@@ -5,19 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from '@/context/LanguageContext';
 import { Upload } from 'lucide-react';
+import { useVoiceModal } from '../voice-modal/VoiceModalContext';
 
 interface VoiceCloneTabProps {
-  onAddVoice: (name: string, audioFile: File) => void;
   isLoading: boolean;
 }
 
 const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
-  onAddVoice,
   isLoading
 }) => {
   const { t } = useLanguage();
-  const [voiceName, setVoiceName] = useState<string>('');
-  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const { voiceName, setVoiceName, audioFile, setAudioFile } = useVoiceModal();
   const [fileName, setFileName] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -27,8 +25,6 @@ const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
     if (file) {
       setAudioFile(file);
       setFileName(file.name);
-      // Update parent component with current values
-      onAddVoice(voiceName, file);
     }
   };
 
@@ -40,10 +36,6 @@ const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
   // Handle voice name change
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVoiceName(e.target.value);
-    // Update parent component if we already have a file
-    if (audioFile) {
-      onAddVoice(e.target.value, audioFile);
-    }
   };
 
   return (

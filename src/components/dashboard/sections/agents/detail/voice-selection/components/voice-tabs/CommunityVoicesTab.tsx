@@ -7,15 +7,14 @@ import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { CommunityVoice } from '../AddCustomVoiceModal';
+import { CommunityVoice } from '../../types';
+import { useVoiceModal } from '../voice-modal/VoiceModalContext';
 
 interface CommunityVoicesTabProps {
-  onSelectVoice: (voice: CommunityVoice) => void;
   isLoading: boolean;
 }
 
 const CommunityVoicesTab: React.FC<CommunityVoicesTabProps> = ({
-  onSelectVoice,
   isLoading
 }) => {
   const { t } = useLanguage();
@@ -23,7 +22,8 @@ const CommunityVoicesTab: React.FC<CommunityVoicesTabProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [voices, setVoices] = useState<CommunityVoice[]>([]);
   const [searching, setSearching] = useState<boolean>(false);
-  const [selectedVoice, setSelectedVoice] = useState<CommunityVoice | null>(null);
+  
+  const { selectedVoice, setSelectedVoice } = useVoiceModal();
 
   useEffect(() => {
     if (searchQuery.length >= 2) {
@@ -63,7 +63,6 @@ const CommunityVoicesTab: React.FC<CommunityVoicesTabProps> = ({
 
   const handleVoiceSelect = (voice: CommunityVoice) => {
     setSelectedVoice(voice);
-    onSelectVoice(voice);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
