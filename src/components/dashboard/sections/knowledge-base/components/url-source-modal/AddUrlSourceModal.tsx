@@ -1,60 +1,74 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter
 } from "@/components/ui/dialog";
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Loader2, Plus } from 'lucide-react';
 import { useUrlSourceModal } from './hooks/useUrlSourceModal';
 import UrlSourceInputView from './UrlSourceInputView';
 import SitemapSelectionView from './SitemapSelectionView';
+import { WebPage, KnowledgeBase } from '../../types';
 
 interface AddUrlSourceModalProps {
   open: boolean;
-  onClose: () => void;
-  onAddSource: (kbId: string, sourceType: 'url', sourceData: any) => Promise<any>;
-  knowledgeBaseId: string;
+  onCancel: () => void;
+  onSave: (urls: string[], autoSync: boolean, knowledgeBaseName?: string) => Promise<any>;
+  knowledgeBaseName?: string;
+  currentKnowledgeBase?: KnowledgeBase | null;
 }
 
 const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   open,
-  onClose,
-  onAddSource,
-  knowledgeBaseId
+  onCancel,
+  onSave,
+  knowledgeBaseName,
+  currentKnowledgeBase
 }) => {
   const {
-    currentView,
-    setCurrentView,
     url,
     setUrl,
-    isLoading,
-    setIsLoading,
-    webPages,
-    setWebPages,
-    selectedPages,
-    setSelectedPages,
     autoSync,
     setAutoSync,
-    knowledgeBaseName,
-    setKnowledgeBaseName,
-    fetchSitemapData,
-    handleAddUrl,
-    handleCancel,
-    validateUrl
+    isLoading,
+    view,
+    webPages,
+    selectedPageUrls,
+    error,
+    handleUrlSubmit,
+    handleSelectionToggle,
+    handleToggleAll,
+    handleConfirmSelection,
+    resetState
   } = useUrlSourceModal({
-    onClose,
-    onAddSource,
-    knowledgeBaseId
+    onFetchSitemap: async (url: string) => {
+      // Mock implementation for sitemap fetching
+      console.log('Fetching sitemap for URL:', url);
+      // Return a simple array with the URL as a page
+      return [
+        { url, title: url, selected: true }
+      ];
+    },
+    onSubmit: async (url: string, autoSync: boolean, selectedPages: WebPage[], knowledgeBaseName?: string) => {
+      // Extract URLs from selected pages
+      const urls = selectedPages.map(page => page.url);
+      return onSave(urls, autoSync, knowledgeBaseName);
+    },
+    currentKnowledgeBase,
+    knowledgeBaseName
   });
 
+  // Reset the state when the modal closes
+  React.useEffect(() => {
+    if (!open) {
+      resetState();
+    }
+  }, [open, resetState]);
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onCancel}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add URL Source</DialogTitle>
@@ -63,31 +77,36 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        {currentView === 'url-input' && (
+        {view === 'url-input' && (
           <UrlSourceInputView 
             url={url}
             setUrl={setUrl}
             autoSync={autoSync}
             setAutoSync={setAutoSync}
             knowledgeBaseName={knowledgeBaseName}
-            setKnowledgeBaseName={setKnowledgeBaseName}
-            isNewKnowledgeBase={knowledgeBaseId.startsWith('temp_')}
-            onFetchSitemap={fetchSitemapData}
-            onAddUrl={handleAddUrl}
-            onCancel={handleCancel}
+            isNewKnowledgeBase={currentKnowledgeBase?.id?.startsWith('temp_') || false}
+            onFetchSitemap={handleUrlSubmit}
+            onAddUrl={handleConfirmSelection}
+            onCancel={onCancel}
             isLoading={isLoading}
-            validateUrl={validateUrl}
+            error={error}
           />
         )}
 
-        {currentView === 'sitemap-selection' && (
+        {view === 'sitemap-selection' && (
           <SitemapSelectionView
+            url={url}
+            autoSync={autoSync}
+            setAutoSync={setAutoSync}
             webPages={webPages}
-            selectedPages={selectedPages}
-            setSelectedPages={setSelectedPages}
-            onAddSelected={handleAddUrl}
-            onBack={() => setCurrentView('url-input')}
+            selectedPageUrls={selectedPageUrls}
+            onSelectionToggle={handleSelectionToggle}
+            onToggleAll={handleToggleAll}
+            onConfirm={handleConfirmSelection}
+            onBack={() => resetState()}
             isLoading={isLoading}
+            currentKnowledgeBase={currentKnowledgeBase}
+            knowledgeBaseName={knowledgeBaseName}
           />
         )}
       </DialogContent>

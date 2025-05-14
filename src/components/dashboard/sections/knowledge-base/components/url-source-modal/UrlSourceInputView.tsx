@@ -1,88 +1,88 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Link, AlertCircle, Info } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface UrlSourceInputViewProps {
   url: string;
   setUrl: (url: string) => void;
-  isLoading: boolean;
-  error: string | null;
-  onSubmit: () => Promise<void>;
-  onCancel: () => void;
+  autoSync: boolean;
+  setAutoSync: (autoSync: boolean) => void;
   knowledgeBaseName?: string;
+  isNewKnowledgeBase: boolean;
+  onFetchSitemap: () => void;
+  onAddUrl: () => void;
+  onCancel: () => void;
+  isLoading: boolean;
+  error?: string | null;
 }
 
 const UrlSourceInputView: React.FC<UrlSourceInputViewProps> = ({
   url,
   setUrl,
-  isLoading,
-  error,
-  onSubmit,
+  autoSync,
+  setAutoSync,
+  knowledgeBaseName,
+  isNewKnowledgeBase,
+  onFetchSitemap,
+  onAddUrl,
   onCancel,
-  knowledgeBaseName
+  isLoading,
+  error
 }) => {
   return (
-    <div className="space-y-4">
-      {knowledgeBaseName && (
-        <div className="flex items-center gap-2 p-2 bg-blue-50 text-blue-700 rounded-md mb-2">
-          <Info className="h-4 w-4" />
-          <span className="text-sm">Adding to knowledge base: <strong>{knowledgeBaseName}</strong></span>
+    <div className="space-y-4 py-4">
+      {isNewKnowledgeBase && knowledgeBaseName && (
+        <div className="bg-blue-50 p-3 rounded-md text-blue-800 text-sm mb-4">
+          Adding to new knowledge base: <strong>{knowledgeBaseName}</strong>
         </div>
       )}
       
-      <div>
-        <h3 className="text-base font-medium mb-2">URL Address</h3>
-        <div className="flex gap-2 items-center">
-          <div className="flex-grow flex rounded-md border border-input focus-within:ring-1 focus-within:ring-offset-1 focus-within:ring-ring">
-            <div className="px-3 py-2 flex items-center bg-gray-50 border-r text-gray-500">
-              <Link className="h-4 w-4" />
-            </div>
-            <Input
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="example.com"
-              className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-transparent"
-            />
-          </div>
-        </div>
-        <p className="text-xs text-gray-500 mt-1">
-          Enter a website URL to fetch its pages
-        </p>
-      </div>
-      
-      {error && (
-        <Alert variant="destructive" className="py-2">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription className="text-sm ml-2">
-            {error}
-          </AlertDescription>
-        </Alert>
-      )}
-      
-      <div className="flex justify-end gap-2 mt-4">
-        <Button 
-          variant="outline" 
-          onClick={onCancel} 
+      <div className="space-y-2">
+        <label htmlFor="url" className="text-sm font-medium">
+          Enter website URL
+        </label>
+        <Input
+          id="url"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://example.com"
           disabled={isLoading}
-          className="w-20"
+        />
+        {error && (
+          <p className="text-sm text-red-500">{error}</p>
+        )}
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="auto-sync"
+          checked={autoSync}
+          onCheckedChange={setAutoSync}
+          disabled={isLoading}
+        />
+        <label
+          htmlFor="auto-sync"
+          className="text-sm font-medium leading-none cursor-pointer"
         >
+          Automatically sync content (daily)
+        </label>
+      </div>
+
+      <div className="flex justify-between pt-4">
+        <Button variant="outline" onClick={onCancel} disabled={isLoading}>
           Cancel
         </Button>
-        <Button 
-          onClick={() => onSubmit()} 
-          disabled={isLoading || !url.trim()}
-          className="w-20 bg-black text-white hover:bg-black/80"
-        >
+        <Button onClick={onFetchSitemap} disabled={isLoading || !url}>
           {isLoading ? (
-            <span className="flex items-center">
-              <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-              Loading
-            </span>
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading...
+            </>
           ) : (
-            'Next'
+            'Find Pages'
           )}
         </Button>
       </div>
