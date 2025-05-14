@@ -1,3 +1,4 @@
+
 // This file now imports from the modular implementation
 import PostCallAnalysisSection from './post-call-analysis/PostCallAnalysisSection';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -6,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useVoiceSettings } from '../hooks/useVoiceSettings';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
 // Import all section components
 import CallSettingsSection from './call-settings';
@@ -29,11 +31,14 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   const { fetchWithAuth } = useApiContext();
   const [llmKnowledgeBaseIds, setLlmKnowledgeBaseIds] = useState<string[]>([]);
   const [filteredKnowledgeBases, setFilteredKnowledgeBases] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Iniciar con loading=true para mostrar el estado de carga
 
   // Effect to fetch LLM data and associated knowledge base IDs
   useEffect(() => {
-    if (!agent?.response_engine?.llm_id) return;
+    if (!agent?.response_engine?.llm_id) {
+      setLoading(false);
+      return;
+    }
 
     const fetchLlmData = async () => {
       try {
@@ -57,7 +62,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
           }
           // Otherwise, fetch the knowledge bases
           else {
-            fetchKnowledgeBases(llmData.knowledge_base_ids);
+            await fetchKnowledgeBases(llmData.knowledge_base_ids);
           }
         } else {
           console.log('No knowledge_base_ids found in LLM data');
@@ -73,14 +78,15 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
     };
 
     fetchLlmData();
-  }, [agent?.response_engine?.llm_id, fetchWithAuth]);
+  }, [agent?.response_engine?.llm_id, fetchWithAuth, knowledgeBases]);
 
   // Function to fetch knowledge bases if not provided
   const fetchKnowledgeBases = async (kbIds: string[]) => {
-    if (!kbIds || kbIds.length === 0) return;
+    if (!kbIds || kbIds.length === 0) {
+      return;
+    }
 
     try {
-      setLoading(true);
       console.log('Fetching all knowledge bases to filter by IDs:', kbIds);
       
       const allKnowledgeBases = await fetchWithAuth('/list-knowledge-bases');
@@ -96,8 +102,6 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
     } catch (error) {
       console.error('Error fetching knowledge bases:', error);
       toast.error('Failed to load knowledge bases');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -105,6 +109,25 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
   console.log('Knowledge bases in AgentSettingsAccordion:', knowledgeBases);
   console.log('LLM knowledge base IDs:', llmKnowledgeBaseIds);
   console.log('Filtered knowledge bases:', filteredKnowledgeBases);
+
+  // Renderizar un loader mientras se cargan los datos
+  const renderKnowledgeBaseContent = () => {
+    if (loading) {
+      return (
+        <div className="flex justify-center items-center py-6">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      );
+    }
+    
+    return (
+      <KnowledgeBaseSection 
+        agent={agent} 
+        updateAgentField={updateAgentField} 
+        knowledgeBases={filteredKnowledgeBases.length > 0 ? filteredKnowledgeBases : knowledgeBases} 
+      />
+    );
+  };
 
   return (
     <Accordion type="multiple" className="w-full" defaultValue={["call-settings"]}>
@@ -120,11 +143,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
       <AccordionItem value="knowledge-base">
         <AccordionTrigger className="hover:no-underline">Knowledge Base</AccordionTrigger>
         <AccordionContent>
-          <KnowledgeBaseSection 
-            agent={agent} 
-            updateAgentField={updateAgentField} 
-            knowledgeBases={filteredKnowledgeBases.length > 0 ? filteredKnowledgeBases : knowledgeBases} 
-          />
+          {renderKnowledgeBaseContent()}
         </AccordionContent>
       </AccordionItem>
 
