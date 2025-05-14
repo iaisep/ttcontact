@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 
@@ -32,6 +32,10 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
 }) => {
   const [localValue, setLocalValue] = useState(value);
   const [isActive, setIsActive] = useState(false);
+  
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
   
   const handleValueChange = (values: number[]) => {
     const newValue = values[0];

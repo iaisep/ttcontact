@@ -17,6 +17,10 @@ const VoicemailDetectionSection: React.FC<AccordionSectionProps> = ({ agent, upd
     agent.voicemail_detection_timeout_ms ? (agent.voicemail_detection_timeout_ms / 1000) : 10
   );
 
+  useEffect(() => {
+    setDetectionDuration(agent.voicemail_detection_timeout_ms ? (agent.voicemail_detection_timeout_ms / 1000) : 10);
+  }, [agent.voicemail_detection_timeout_ms]);
+
   // Handle voicemail detection toggle
   const handleVoicemailDetectionChange = (checked: boolean) => {
     updateAgentField('enable_voicemail_detection', checked);
@@ -47,7 +51,7 @@ const VoicemailDetectionSection: React.FC<AccordionSectionProps> = ({ agent, upd
   const handleVoicemailDetectionDurationChange = (values: number[]) => {
     const duration = values[0];
     setDetectionDuration(duration);
-    updateAgentField('voicemail_detection_timeout_ms', duration * 1000); // Convert to milliseconds
+    // Don't call updateAgentField here as the Slider component will handle it with debounce
   };
 
   return (
@@ -86,6 +90,7 @@ const VoicemailDetectionSection: React.FC<AccordionSectionProps> = ({ agent, upd
               onValueChange={handleVoicemailDetectionDurationChange}
               agentId={agent.agent_id}
               fieldName="voicemail_detection_timeout_ms"
+              debounceMs={800}
             />
           </div>
         )}
