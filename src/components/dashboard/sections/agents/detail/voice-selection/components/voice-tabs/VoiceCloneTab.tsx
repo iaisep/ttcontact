@@ -127,7 +127,7 @@ const VoiceCloneTab: React.FC<VoiceCloneTabProps> = ({
           onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
           disabled={isLoading}
         />
-        <Label htmlFor="terms" className="text-xs">
+        <Label htmlFor="terms" className="text-xs leading-tight max-w-[calc(100%-2rem)]">
           {t('i_hereby_confirm_that_i_have_all_necessary_rights_or_consents_to_upload_and_clone_these_voice_samples_and_that_i_will_not_use_the_platform_generated_content_for_any_illegal_fraudulent_or_harmful_purpose') || 
           'I hereby confirm that I have all necessary rights or consents to upload and clone these voice samples and that I will not use the platform-generated content for any illegal, fraudulent, or harmful purpose.'}
         </Label>
