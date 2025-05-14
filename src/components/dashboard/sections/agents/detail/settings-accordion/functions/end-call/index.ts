@@ -1,2 +1,3 @@
 
-export { default } from './EndCallFunctionModal';
+import EndCallFunctionModal from './EndCallFunctionModal';
+export default EndCallFunctionModal;

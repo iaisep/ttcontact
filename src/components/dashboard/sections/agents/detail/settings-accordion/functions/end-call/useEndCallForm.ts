@@ -42,6 +42,7 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
       // Extract the LLM ID directly from the agent object - this is critical
       const llmId = agent?.response_engine?.llm_id;
       
+      console.log("Agent object:", JSON.stringify(agent, null, 2));
       console.log("Using LLM ID for operations:", llmId);
       
       if (!llmId) {
@@ -104,12 +105,15 @@ export const useEndCallForm = ({ agent, onClose, onSuccess, initialData }: UseEn
       console.log("Updated tools payload:", { general_tools: updatedTools });
       
       // CRITICAL FIX: Explicitly define the method as PATCH and ensure proper request payload
+      const requestPayload = { general_tools: updatedTools };
+      console.log("Request payload:", JSON.stringify(requestPayload, null, 2));
+      
       const response = await fetchWithAuth(`/update-retell-llm/${llmId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ general_tools: updatedTools })
+        body: JSON.stringify(requestPayload)
       });
       
       console.log("Update response:", response);

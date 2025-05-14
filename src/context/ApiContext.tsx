@@ -73,7 +73,8 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
       
       console.log('Making API request to:', url);
       console.log('HTTP Method:', fetchOptions.method);
-      console.log('Fetch options:', fetchOptions);
+      console.log('Request body:', options?.body ? 'Body exists' : 'No body');
+      console.log('Headers:', JSON.stringify(fetchOptions.headers, null, 2));
       
       // For this demo app, let's use 'same-origin' instead of 'include' to avoid CORS issues
       // In a real-world app, the backend would need to be properly configured for CORS

@@ -24,6 +24,7 @@ const EndCallFunctionModal: React.FC<EndCallFunctionModalProps> = ({
   onSuccess,
   initialData
 }) => {
+  // Ensure the agent prop is passed to the useEndCallForm hook
   const {
     formState,
     setters,
