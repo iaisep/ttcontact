@@ -13,6 +13,8 @@ interface VoiceSliderControlProps {
   onValueChange: (value: number) => void;
   leftLabel: string;
   rightLabel: string;
+  agentId?: string;
+  fieldName?: string;
 }
 
 const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
@@ -25,6 +27,8 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
   onValueChange,
   leftLabel,
   rightLabel,
+  agentId,
+  fieldName,
 }) => {
   const [isActive, setIsActive] = useState(false);
   
@@ -54,6 +58,8 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
         onMouseEnter={() => setIsActive(true)}
         onMouseLeave={() => setIsActive(false)}
         className={isActive ? "cursor-pointer" : ""}
+        agentId={agentId}
+        fieldName={fieldName}
       />
     </div>
   );
