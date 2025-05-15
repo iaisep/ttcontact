@@ -6,12 +6,10 @@ import { Shield, Plus, Cog } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Label } from '@/components/ui/label';
 import { AccordionSectionProps } from './types';
-import DynamicVariablesModal from '../components/test-panel/DynamicVariablesModal';
 import { toast } from 'sonner';
 
 const SecurityFallbackSection: React.FC<AccordionSectionProps> = ({ agent }) => {
   const { t } = useLanguage();
-  const [isDynamicModalOpen, setIsDynamicModalOpen] = useState(false);
 
   const handleSetUpDefaultVariables = () => {
     // Check if any dynamic variables exist in localStorage
@@ -24,12 +22,8 @@ const SecurityFallbackSection: React.FC<AccordionSectionProps> = ({ agent }) => 
       return;
     }
     
-    // Open the modal if variables exist
-    setIsDynamicModalOpen(true);
-  };
-  
-  const handleModalClose = () => {
-    setIsDynamicModalOpen(false);
+    // Open some other handling here if needed in the future
+    toast.info("Variables de entorno detectadas");
   };
 
   return (
@@ -70,13 +64,6 @@ const SecurityFallbackSection: React.FC<AccordionSectionProps> = ({ agent }) => 
           </div>
         </div>
       </AccordionContent>
-      
-      {/* Dynamic Variables Modal */}
-      <DynamicVariablesModal 
-        open={isDynamicModalOpen} 
-        onClose={handleModalClose}
-        agentId={agent?.agent_id || agent?.id}
-      />
     </AccordionItem>
   );
 };
