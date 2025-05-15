@@ -8,7 +8,7 @@ export const useKnowledgeBaseCreateApi = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const createKnowledgeBase = async (
-    data: { 
+    nameOrData: string | { 
       name: string; 
       urls?: string[]; 
       autoSync?: boolean;
@@ -16,6 +16,12 @@ export const useKnowledgeBaseCreateApi = () => {
   ): Promise<KnowledgeBase> => {
     try {
       setIsLoading(true);
+      
+      // Convert string parameter to object format
+      const data = typeof nameOrData === 'string' 
+        ? { name: nameOrData } 
+        : nameOrData;
+      
       console.log('Creating knowledge base with data:', data);
 
       // Create FormData for the API call
