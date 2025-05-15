@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { AccordionSectionProps } from '../types';
@@ -9,10 +8,20 @@ const RingDurationSection: React.FC<AccordionSectionProps> = ({ agent, updateAge
     agent.ring_duration_ms ? agent.ring_duration_ms / 1000 : 30
   );
 
+  // Sincroniza el estado local si cambia agent.ring_duration_ms
+  useEffect(() => {
+    setRingDuration(agent.ring_duration_ms ? agent.ring_duration_ms / 1000 : 30);
+  }, [agent.ring_duration_ms]);
+
+  // Actualiza el estado local en tiempo real
   const handleRingDurationChange = (values: number[]) => {
+    setRingDuration(values[0]);
+  };
+
+  // Solo actualiza el servidor cuando el usuario suelta el slider
+  const handleRingDurationCommit = (values: number[]) => {
     const duration = values[0];
-    setRingDuration(duration);
-    updateAgentField('ring_duration_ms', duration * 1000); // Convert seconds to milliseconds
+    updateAgentField('ring_duration_ms', duration * 1000); // Siempre en milisegundos
   };
 
   return (
@@ -25,14 +34,13 @@ const RingDurationSection: React.FC<AccordionSectionProps> = ({ agent, updateAge
         <span className="text-xs text-gray-500">{ringDuration} s</span>
       </div>
       <Slider 
-        defaultValue={[ringDuration]} 
+        value={[ringDuration]}
         min={0} 
         max={60} 
         step={1} 
         className="w-full"
         onValueChange={handleRingDurationChange}
-        agentId={agent.agent_id}
-        fieldName="ring_duration_ms"
+        onValueCommit={handleRingDurationCommit}
       />
     </div>
   );
