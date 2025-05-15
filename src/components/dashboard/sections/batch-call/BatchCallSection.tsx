@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Agent } from './types';
@@ -7,6 +7,7 @@ import FileUploadStep from './FileUploadStep';
 import AgentSelectionStep from './AgentSelectionStep';
 import BatchCallHistory from './BatchCallHistory';
 import BatchCallGuide from './BatchCallGuide';
+import { useBatchCallData } from '../analytics/hooks/useBatchCallData';
 
 const BatchCallSection = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -15,6 +16,9 @@ const BatchCallSection = () => {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  
+  // Get batch call data using the hook
+  const { batches, batchAgents } = useBatchCallData();
   
   // Reset the form
   const resetForm = () => {
@@ -79,7 +83,10 @@ const BatchCallSection = () => {
           
           {currentStep === 'history' && (
             <div className="space-y-4">
-              <BatchCallHistory />
+              <BatchCallHistory 
+                batches={batches}
+                agents={batchAgents}
+              />
               <div className="flex justify-end">
                 <Button onClick={() => setCurrentStep('upload')}>
                   Start New Batch Call
