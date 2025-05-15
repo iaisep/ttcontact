@@ -30,6 +30,11 @@ const UrlInputView: React.FC<UrlInputViewProps> = ({
   const { fetchWithAuth } = useApiContext();
   
   const handleFetchSitemap = async () => {
+    if (!url.trim()) {
+      toast.error('Please enter a URL');
+      return;
+    }
+    
     try {
       // Format URL if needed
       let formattedUrl = url.trim();
@@ -57,7 +62,11 @@ const UrlInputView: React.FC<UrlInputViewProps> = ({
       
     } catch (error) {
       console.error('Failed to fetch sitemap:', error);
-      toast.error('Failed to fetch sitemap. Please try again.');
+      toast.error('Failed to fetch sitemap. You can still proceed to create a knowledge base.');
+      
+      // Even if there's an error, we still proceed to the next step
+      // This allows users to create a knowledge base even when sitemap fetch fails
+      onSubmit();
     }
   };
 

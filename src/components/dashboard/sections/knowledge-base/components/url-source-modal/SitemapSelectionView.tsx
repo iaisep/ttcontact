@@ -34,9 +34,13 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   currentKnowledgeBase,
   knowledgeBaseName
 }) => {
+  // Modified logic to allow proceeding even if no pages are selected, as long as a Knowledge Base exists
   const hasSelectedPages = selectedPageUrls.length > 0;
   const hasKnowledgeBase = !!currentKnowledgeBase?.id || !!knowledgeBaseName;
-  const canProceed = hasSelectedPages && hasKnowledgeBase;
+  
+  // Changed condition: If we have at least some web pages available, require a selection
+  // But if no web pages are found (error or empty response), we can proceed with just a KB name
+  const canProceed = (webPages.length === 0 || hasSelectedPages) && hasKnowledgeBase;
   
   const displayName = knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name);
 
@@ -64,35 +68,43 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
           </label>
         </div>
         
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm font-medium">Select pages to include:</div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleAll}
-            className="text-xs"
-          >
-            {selectedPageUrls.length === webPages.length ? 'Deselect all' : 'Select all'}
-          </Button>
-        </div>
-        
-        <div className="border rounded-md max-h-60 overflow-y-auto">
-          {webPages.map((page) => (
-            <div 
-              key={page.url}
-              className="flex items-center px-3 py-2 hover:bg-gray-50 border-b last:border-b-0"
-            >
-              <Checkbox
-                id={`page-${page.url}`}
-                checked={selectedPageUrls.includes(page.url)}
-                onCheckedChange={() => onSelectionToggle(page.url)}
-              />
-              <label htmlFor={`page-${page.url}`} className="ml-2 text-sm truncate flex-grow cursor-pointer">
-                {page.title || page.url}
-              </label>
+        {webPages.length > 0 ? (
+          <>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm font-medium">Select pages to include:</div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onToggleAll}
+                className="text-xs"
+              >
+                {selectedPageUrls.length === webPages.length ? 'Deselect all' : 'Select all'}
+              </Button>
             </div>
-          ))}
-        </div>
+            
+            <div className="border rounded-md max-h-60 overflow-y-auto">
+              {webPages.map((page) => (
+                <div 
+                  key={page.url}
+                  className="flex items-center px-3 py-2 hover:bg-gray-50 border-b last:border-b-0"
+                >
+                  <Checkbox
+                    id={`page-${page.url}`}
+                    checked={selectedPageUrls.includes(page.url)}
+                    onCheckedChange={() => onSelectionToggle(page.url)}
+                  />
+                  <label htmlFor={`page-${page.url}`} className="ml-2 text-sm truncate flex-grow cursor-pointer">
+                    {page.title || page.url}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="p-4 bg-amber-50 text-amber-700 rounded-md">
+            <p className="text-sm">No pages were found or there was an error retrieving the sitemap. You can still create a knowledge base for this URL.</p>
+          </div>
+        )}
 
         <div className="flex justify-between mt-4 pt-4 border-t">
           <Button

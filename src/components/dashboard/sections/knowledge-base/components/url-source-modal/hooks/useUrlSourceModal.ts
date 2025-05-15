@@ -83,6 +83,18 @@ export const useUrlSourceModal = ({
       console.error('Failed to fetch sitemap:', error);
       toast.error('Failed to fetch sitemap from URL');
       setError('Could not retrieve sitemap from this URL');
+      
+      // Even after error, proceed to next step with at least one fallback page
+      // This allows users to continue even when the sitemap fetch fails
+      const fallbackPage: WebPage = {
+        url: formatUrl(url),
+        title: 'Main Page',
+        selected: false
+      };
+      
+      setWebPages([fallbackPage]);
+      setSelectedPageUrls([fallbackPage.url]);
+      setView('sitemap-selection');
     } finally {
       setIsLoading(false);
     }
@@ -109,12 +121,9 @@ export const useUrlSourceModal = ({
   };
 
   const handleConfirmSelection = async () => {
-    if (selectedPageUrls.length === 0) {
-      console.warn('No pages selected, cannot proceed');
-      toast.error('Please select at least one page');
-      return;
-    }
-
+    // Changed logic: Allow submitting even with no selected pages
+    // This is useful when the sitemap API fails but we still want to create a KB
+    
     // Validate that we have a knowledge base before proceeding
     const hasKnowledgeBase = (!!currentKnowledgeBase && !!currentKnowledgeBase.id) || !!knowledgeBaseName;
     
@@ -131,6 +140,17 @@ export const useUrlSourceModal = ({
       const selectedPages = webPages.filter(page => 
         selectedPageUrls.includes(page.url)
       );
+      
+      // If no pages are selected but we have web pages, create a fallback
+      if (selectedPages.length === 0 && webPages.length > 0) {
+        toast.warning('No pages selected. Using main URL as fallback.');
+        const fallbackPage: WebPage = {
+          url,
+          title: 'Main Page',
+          selected: true
+        };
+        selectedPages.push(fallbackPage);
+      }
       
       console.log('Confirming selection for URL:', url);
       console.log('Submitting selected pages:', {

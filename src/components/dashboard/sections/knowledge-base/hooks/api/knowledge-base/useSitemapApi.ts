@@ -37,7 +37,15 @@ export const useSitemapApi = () => {
       
       let pages: WebPage[] = [];
       
-      if (response.results && Array.isArray(response.results)) {
+      // Handle different possible response formats
+      if (Array.isArray(response)) {
+        // If response is already an array of URLs
+        pages = response.map((url: string) => ({
+          url: url,
+          title: url.split('/').pop() || 'Page', // Extract page name from URL
+          selected: false
+        }));
+      } else if (response.results && Array.isArray(response.results)) {
         pages = response.results.map((page: any) => ({
           url: page.url || '',
           title: page.title || 'Untitled Page',
