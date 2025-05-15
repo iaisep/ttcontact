@@ -39,13 +39,14 @@ const AgentSelectionStep = ({
     startBatchCall
   } = useBatchCall(onStartBatch);
 
+  // Cargar los contactos desde localStorage solo una vez al iniciar
   useEffect(() => {
-    fetchPhoneNumbers();
-    
     const storedContacts = localStorage.getItem('batch_call_contacts');
     if (storedContacts) {
       try {
-        setContacts(JSON.parse(storedContacts));
+        const parsedContacts = JSON.parse(storedContacts);
+        setContacts(parsedContacts);
+        console.log('Loaded contacts from localStorage:', parsedContacts.length);
       } catch (error) {
         console.error('Failed to parse contacts from localStorage:', error);
       }
@@ -53,10 +54,12 @@ const AgentSelectionStep = ({
   }, []);
 
   const handlePhoneNumberChange = (phoneNumber: string) => {
-    const selectedPhone = phoneNumbers.find(phone => phone.phone_number === phoneNumber);
+    console.log('Phone number selected:', phoneNumber);
     setSelectedPhoneNumber(phoneNumber);
     
+    const selectedPhone = phoneNumbers.find(phone => phone.phone_number === phoneNumber);
     if (selectedPhone) {
+      console.log('Setting selected agent to:', selectedPhone.outbound_agent_id);
       setSelectedAgent(selectedPhone.outbound_agent_id);
     }
   };

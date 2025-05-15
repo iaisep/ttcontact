@@ -2,6 +2,7 @@
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface PhoneNumberSelectProps {
   fetchingPhoneNumbers: boolean;
@@ -20,6 +21,15 @@ const PhoneNumberSelect = ({
   onRefresh,
   phoneNumberError
 }: PhoneNumberSelectProps) => {
+  // Registrar los cambios en las props para debug
+  useEffect(() => {
+    console.log('PhoneNumberSelect received props:', {
+      fetchingPhoneNumbers,
+      phoneNumbersLength: phoneNumbers?.length,
+      selectedPhoneNumber
+    });
+  }, [fetchingPhoneNumbers, phoneNumbers, selectedPhoneNumber]);
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">

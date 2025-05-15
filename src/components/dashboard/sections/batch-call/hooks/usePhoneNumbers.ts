@@ -9,8 +9,12 @@ export const usePhoneNumbers = (selectedPhoneNumber: string, setSelectedAgent: (
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumberData[]>([]);
   const [fetchingPhoneNumbers, setFetchingPhoneNumbers] = useState<boolean>(true);
   const [phoneNumberError, setPhoneNumberError] = useState<string | null>(null);
+  const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
 
   const fetchPhoneNumbers = async () => {
+    // Evitamos múltiples llamadas durante el mismo ciclo de vida
+    if (fetchingPhoneNumbers) return;
+    
     setFetchingPhoneNumbers(true);
     setPhoneNumberError(null);
     try {
@@ -35,8 +39,16 @@ export const usePhoneNumbers = (selectedPhoneNumber: string, setSelectedAgent: (
       toast.error('Failed to load phone numbers');
     } finally {
       setFetchingPhoneNumbers(false);
+      setFetchAttempted(true);
     }
   };
+
+  // Realizar la llamada inicial solo una vez
+  useEffect(() => {
+    if (!fetchAttempted) {
+      fetchPhoneNumbers();
+    }
+  }, [fetchAttempted]);
 
   return {
     phoneNumbers,
