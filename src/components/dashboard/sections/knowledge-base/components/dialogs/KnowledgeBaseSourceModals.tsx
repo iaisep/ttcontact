@@ -85,11 +85,14 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
             selected: true
           }));
           
-          // Pass the knowledgeBaseName to ensure it's used 
-          await onAddUrlSource(urls[0], autoSync, webPages, knowledgeBaseName);
+          // Pass the specified knowledgeBaseName or fallback to the current KB name
+          const finalKbName = knowledgeBaseName || effectiveKnowledgeBase?.name || 'New Knowledge Base';
+          console.log('Using knowledge base name for URL source:', finalKbName);
+          
+          await onAddUrlSource(urls[0], autoSync, webPages, finalKbName);
           handleSourceAdded();
         }}
-        knowledgeBaseName={knowledgeBaseName}
+        knowledgeBaseName={effectiveKnowledgeBase?.name || knowledgeBaseName}
       />
 
       {/* File Source Modal */}

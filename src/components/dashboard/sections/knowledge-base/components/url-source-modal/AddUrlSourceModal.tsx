@@ -92,8 +92,9 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
         // Get the URLs from selected pages
         const urls = selectedPages.map(page => page.url);
         
+        // Make sure we pass the knowledgeBaseName to onSave
         console.log('Submitting URLs:', urls, 'autoSync:', autoSync, 'knowledgeBaseName:', knowledgeBaseName);
-        await onSave(urls, autoSync, knowledgeBaseName);
+        await onSave(urls, autoSync, knowledgeBaseName || 'New Knowledge Base');
         
         return {} as KnowledgeBase; // Just to satisfy the interface
       } catch (error) {
