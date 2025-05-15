@@ -95,6 +95,9 @@ export const useBatchCall = (onStartBatch: () => void) => {
 
       console.log('Batch call created:', response);
       toast.success(`Batch call successfully created with ${tasks.length} contacts`);
+      if (csvKey) {
+        localStorage.removeItem(csvKey);
+      }
       onStartBatch();
     } catch (error) {
       console.error('Failed to create batch call:', error);
