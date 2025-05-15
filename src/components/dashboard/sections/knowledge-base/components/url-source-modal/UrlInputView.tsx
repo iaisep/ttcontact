@@ -46,7 +46,7 @@ const UrlInputView: React.FC<UrlInputViewProps> = ({
         duration: 3000
       });
       
-      // Make the request to the list-sitemap endpoint
+      // Make only ONE request to the list-sitemap endpoint
       const response = await fetchWithAuth('/list-sitemap', {
         method: 'POST',
         headers: {
@@ -55,7 +55,12 @@ const UrlInputView: React.FC<UrlInputViewProps> = ({
         body: JSON.stringify({ website_url: formattedUrl }),
       });
       
-      console.log('Sitemap API response:', response);
+      console.log('Sitemap API response received:', response);
+      
+      // Store the response data in localStorage so we can use it in the next step
+      if (response && Array.isArray(response)) {
+        localStorage.setItem('sitemap_pages', JSON.stringify(response));
+      }
       
       // After getting the response, proceed with the regular flow
       onSubmit();
