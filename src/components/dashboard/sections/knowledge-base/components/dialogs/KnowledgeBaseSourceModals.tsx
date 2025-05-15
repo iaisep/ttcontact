@@ -2,9 +2,9 @@
 import React from 'react';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 import AddUrlSourceModal from '../url-source-modal';
-import AddFileSourceModal from '../file-source-modal';
-import AddTextSourceModal from '../text-source-modal';
-import DeleteSourceDialog from '../DeleteSourceDialog';
+import AddFileSourceModal from '../../components/AddFileSourceModal';
+import AddTextSourceModal from '../../components/AddTextSourceModal';
+import DeleteSourceDialog from '../../components/KnowledgeBaseDeleteDialog';
 
 interface KnowledgeBaseSourceModalsProps {
   currentSourceType: 'url' | 'file' | 'text' | null;
@@ -128,9 +128,13 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       {/* File Source Modal */}
       {currentSourceType === 'file' && (
         <AddFileSourceModal
-          isOpen={true}
-          onCancel={handleFileCancel}
-          onSave={(file) => onAddFileSource(file, currentKnowledgeBase, knowledgeBaseName)}
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) handleFileCancel();
+          }}
+          onClose={handleFileCancel}
+          onSubmit={(file) => onAddFileSource(file, currentKnowledgeBase, knowledgeBaseName)}
+          currentKnowledgeBase={currentKnowledgeBase}
           knowledgeBaseName={knowledgeBaseName}
         />
       )}
@@ -138,10 +142,14 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       {/* Text Source Modal */}
       {currentSourceType === 'text' && (
         <AddTextSourceModal
-          isOpen={true}
-          onCancel={handleTextCancel}
-          onSave={(fileName, content) => 
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) handleTextCancel();
+          }}
+          onClose={handleTextCancel}
+          onSubmit={(fileName, content) => 
             onAddTextSource(fileName, content, currentKnowledgeBase, knowledgeBaseName)}
+          currentKnowledgeBase={currentKnowledgeBase}
           knowledgeBaseName={knowledgeBaseName}
         />
       )}
