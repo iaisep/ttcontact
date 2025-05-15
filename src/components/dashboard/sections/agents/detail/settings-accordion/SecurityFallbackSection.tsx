@@ -1,14 +1,36 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Shield, Plus, Cog } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Label } from '@/components/ui/label';
 import { AccordionSectionProps } from './types';
+import DynamicVariablesModal from '../components/test-panel/DynamicVariablesModal';
+import { toast } from 'sonner';
 
 const SecurityFallbackSection: React.FC<AccordionSectionProps> = ({ agent }) => {
   const { t } = useLanguage();
+  const [isDynamicModalOpen, setIsDynamicModalOpen] = useState(false);
+
+  const handleSetUpDefaultVariables = () => {
+    // Check if any dynamic variables exist in localStorage
+    const agentId = agent?.agent_id || agent?.id;
+    const dynamicVars = agentId ? localStorage.getItem(`dynamicvariables_agent_${agentId}`) : null;
+    
+    if (!dynamicVars) {
+      // Show toast message if no variables exist
+      toast.error("Primero debe crear al menos una variable de entorno de test {} code");
+      return;
+    }
+    
+    // Open the modal if variables exist
+    setIsDynamicModalOpen(true);
+  };
+  
+  const handleModalClose = () => {
+    setIsDynamicModalOpen(false);
+  };
 
   return (
     <AccordionItem value="security-fallback" className="mt-4 border rounded-md overflow-hidden">
@@ -37,12 +59,24 @@ const SecurityFallbackSection: React.FC<AccordionSectionProps> = ({ agent }) => 
           <div className="space-y-2">
             <Label className="text-xs font-medium text-amber-600">Default Dynamic Variables</Label>
             <p className="text-xs text-gray-500">Set fallback values for dynamic variables across all endpoints if they are not provided.</p>
-            <Button variant="outline" size="sm" className="text-xs">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-xs"
+              onClick={handleSetUpDefaultVariables}
+            >
               <Cog className="h-3 w-3 mr-1" /> Set Up
             </Button>
           </div>
         </div>
       </AccordionContent>
+      
+      {/* Dynamic Variables Modal */}
+      <DynamicVariablesModal 
+        open={isDynamicModalOpen} 
+        onClose={handleModalClose}
+        agentId={agent?.agent_id || agent?.id}
+      />
     </AccordionItem>
   );
 };

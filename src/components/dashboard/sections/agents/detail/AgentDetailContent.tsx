@@ -4,7 +4,8 @@ import { RetellAgent, RetellVoice, RetellLLM } from '@/components/dashboard/sect
 import AgentDetailHeader from './AgentDetailHeader';
 import AgentLeftColumn from './AgentLeftColumn';
 import AgentRightColumn from './AgentRightColumn';
-import AgentSettingsAccordion from './AgentSettingsAccordion';
+import AgentSettingsAccordion from './settings-accordion';
+import { Toaster } from '@/components/ui/sonner';
 
 interface KnowledgeBase {
   id: string;
@@ -75,6 +76,9 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
           </div>
         </div>
       </div>
+      
+      {/* Add Sonner Toaster for toast notifications */}
+      <Toaster />
     </div>
   );
 };

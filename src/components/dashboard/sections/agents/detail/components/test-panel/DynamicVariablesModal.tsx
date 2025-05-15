@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useLanguage } from '@/context/LanguageContext';
 import { X, Plus, Copy } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface DynamicVariable {
   name: string;
@@ -63,15 +64,17 @@ const DynamicVariablesModal: React.FC<DynamicVariablesModalProps> = ({
   const handleSave = () => {
     if (agentId) {
       localStorage.setItem(`dynamicvariables_agent_${agentId}`, JSON.stringify(variables));
+      toast.success("Variables saved successfully");
     }
     onClose();
   };
 
   const handleCopyValue = (value: string) => {
     navigator.clipboard.writeText(value);
+    toast.success("Copied to clipboard");
   };
   
-  // New handler for auto-saving variable values when leaving the textbox
+  // Handler for auto-saving variable values when leaving the textbox
   const handleVariableValueChange = (index: number, value: string) => {
     const updatedVars = [...variables];
     updatedVars[index].value = value;
@@ -87,18 +90,18 @@ const DynamicVariablesModal: React.FC<DynamicVariablesModalProps> = ({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Dynamic Variables</DialogTitle>
+          <DialogTitle>Default Dynamic Variables</DialogTitle>
         </DialogHeader>
         
         <div className="py-4">
           <p className="text-sm text-muted-foreground mb-4">
-            Set dynamic variables for dashboard audio and llm tests
+            Set default values for dynamic variables
           </p>
           
           <div className="bg-muted/50 p-2 rounded-md mb-4">
             <div className="flex justify-between py-2 px-2 bg-muted rounded-sm">
               <div className="w-1/2 font-medium text-sm">Variable Name</div>
-              <div className="w-1/2 font-medium text-sm">Test Value</div>
+              <div className="w-1/2 font-medium text-sm">Default Value</div>
             </div>
             
             {variables.map((variable, index) => (
