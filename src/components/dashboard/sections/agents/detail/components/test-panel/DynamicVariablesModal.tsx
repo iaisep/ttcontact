@@ -70,6 +70,18 @@ const DynamicVariablesModal: React.FC<DynamicVariablesModalProps> = ({
   const handleCopyValue = (value: string) => {
     navigator.clipboard.writeText(value);
   };
+  
+  // New handler for auto-saving variable values when leaving the textbox
+  const handleVariableValueChange = (index: number, value: string) => {
+    const updatedVars = [...variables];
+    updatedVars[index].value = value;
+    setVariables(updatedVars);
+    
+    // Save to localStorage whenever a value is updated
+    if (agentId) {
+      localStorage.setItem(`dynamicvariables_agent_${agentId}`, JSON.stringify(updatedVars));
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -97,9 +109,17 @@ const DynamicVariablesModal: React.FC<DynamicVariablesModalProps> = ({
                   </div>
                 </div>
                 <div className="w-1/2 pr-2">
-                  <div className="p-2 bg-background border rounded-md text-sm overflow-hidden text-ellipsis">
-                    {variable.value}
-                  </div>
+                  <input
+                    type="text"
+                    value={variable.value}
+                    onChange={(e) => {
+                      const updatedVars = [...variables];
+                      updatedVars[index].value = e.target.value;
+                      setVariables(updatedVars);
+                    }}
+                    onBlur={(e) => handleVariableValueChange(index, e.target.value)}
+                    className="p-2 bg-background border rounded-md text-sm w-full"
+                  />
                 </div>
                 <button 
                   onClick={() => handleRemoveVariable(index)}
