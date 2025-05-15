@@ -48,7 +48,7 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
             <DropdownMenuTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
-                {t('create_agent')}
+                {t('create agent')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">

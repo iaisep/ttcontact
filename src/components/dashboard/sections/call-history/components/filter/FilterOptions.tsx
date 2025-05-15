@@ -85,7 +85,7 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
                 className="w-full"
                 onClick={onOpenAgentFilter}
               >
-                {t('select_agents')}
+                {t('select agents')}
               </Button>
             ) : (
               <Input
@@ -99,7 +99,7 @@ const FilterOptions: React.FC<FilterOptionsProps> = ({
         </div>
         
         <Button onClick={handleAddFilter}>
-          {t('add_filter')}
+          {t('add filter')}
         </Button>
       </div>
     </div>

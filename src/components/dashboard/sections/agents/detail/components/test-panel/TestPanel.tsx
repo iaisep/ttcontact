@@ -71,6 +71,7 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
       />
       
       <div className="w-full flex justify-between items-center px-2 mb-1">
+        {/*}
         <Popover>
           <PopoverTrigger asChild>
             <button className="flex items-center text-gray-500 hover:text-gray-700">
@@ -105,7 +106,7 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
             <ClockIcon className="h-3 w-3 text-red-500 mr-1" />
             <span className="text-xs text-red-500">{formatTime(recordingDuration)}</span>
           </div>
-        )}
+        )}*/}
       </div>
       
       <div className={`mb-3 rounded-full bg-gray-100 p-5 flex items-center justify-center ${isRecording ? 'bg-red-100 animate-pulse' : ''}`}>

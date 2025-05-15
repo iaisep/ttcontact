@@ -79,7 +79,7 @@ const PostCallAnalysisSection: React.FC<AccordionSectionProps> = ({ agent, updat
     <AccordionItem value="post-call-analysis" className="mt-4 border rounded-md overflow-hidden">
       <AccordionTrigger className="px-4 py-2 text-sm font-medium bg-gray-50 hover:bg-gray-100 flex items-center">
         <BarChart3 className="h-4 w-4 mr-2" />
-        {t('post_call_analysis')}
+        {t('post call analysis')}
       </AccordionTrigger>
       <AccordionContent className="p-4">
         <div className="space-y-4">

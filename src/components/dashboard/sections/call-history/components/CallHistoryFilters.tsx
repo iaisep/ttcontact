@@ -71,7 +71,7 @@ const CallHistoryFilters: React.FC<CallHistoryFiltersProps> = ({
           <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder={t('search_calls')}
+            placeholder={t('search calls')}
             className="pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -91,7 +91,7 @@ const CallHistoryFilters: React.FC<CallHistoryFiltersProps> = ({
         {/* Filter by agent button */}
         <Popover open={isAgentFilterOpen} onOpenChange={setIsAgentFilterOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline">{t('filter_by_agent')}</Button>
+            <Button variant="outline">{t('filter by agent')}</Button>
           </PopoverTrigger>
           <AgentFilterPopover
             isOpen={isAgentFilterOpen}
@@ -104,7 +104,7 @@ const CallHistoryFilters: React.FC<CallHistoryFiltersProps> = ({
         {/* Add filter button */}
         <Popover open={isFilterPopoverOpen} onOpenChange={setIsFilterPopoverOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline">{t('add_filter')}</Button>
+            <Button variant="outline">{t('add filter')}</Button>
           </PopoverTrigger>
           <PopoverContent className="w-80">
             <FilterOptions

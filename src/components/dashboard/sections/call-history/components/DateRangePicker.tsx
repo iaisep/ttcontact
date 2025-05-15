@@ -67,7 +67,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     if (startDate) {
       return `${format(startDate, 'MMM dd, yyyy')} - ${t('select_end_date')}`;
     }
-    return t('date_range');
+    return t('date range');
   };
 
   return (

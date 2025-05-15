@@ -41,7 +41,7 @@ const SpeechSettingsSection: React.FC<AccordionSectionProps> = ({ agent, updateA
     <AccordionItem value="speech-settings" className="mt-4 border rounded-md overflow-hidden">
       <AccordionTrigger className="px-4 py-2 text-sm font-medium bg-gray-50 hover:bg-gray-100 flex items-center">
         <Settings2 className="h-4 w-4 mr-2" />
-        {t('speech_settings')}
+        {t('Speech settings')}
       </AccordionTrigger>
       <AccordionContent className="p-4">
         <div className="space-y-6">
