@@ -105,6 +105,8 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
     knowledgeBaseName: knowledgeBaseName
   });
 
+  console.log('AddUrlSourceModal - knowledgeBaseName received:', knowledgeBaseName);
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (!open) {

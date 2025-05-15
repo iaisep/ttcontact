@@ -39,7 +39,9 @@ export const useSourceOperations = ({
       // Determine if this is a new KB or existing one
       const isNewKB = !currentKb.id || currentKb.id.startsWith('temp_');
       const kbId = isNewKB ? 'create_new' : currentKb.id;
+      
       // Use the provided knowledgeBaseName or fall back to the KB name
+      // This is important - ensure we always have a KB name
       const kbName = knowledgeBaseName || currentKb.name || '';
       
       console.log("Adding URL source with params:", { 

@@ -45,7 +45,12 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   // 2. No web pages were found (empty response or error)
   const canProceed = hasKnowledgeBase && (hasSelectedPages || webPages.length === 0);
   
+  // Determine the name to display - prioritize knowledgeBaseName prop over currentKnowledgeBase.name
   const displayName = knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name);
+
+  console.log('SitemapSelectionView - knowledgeBaseName:', knowledgeBaseName);
+  console.log('SitemapSelectionView - currentKnowledgeBase:', currentKnowledgeBase);
+  console.log('SitemapSelectionView - displayName:', displayName);
 
   return (
     <div className="space-y-4 p-6">

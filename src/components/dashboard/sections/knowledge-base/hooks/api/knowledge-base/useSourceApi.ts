@@ -21,11 +21,17 @@ export const useSourceApi = () => {
       let sourceName = ""; // Default name for the source
 
       if (sourceType === 'url') {
+        // Get knowledge base name from sourceData
         const knowledgeBaseName = sourceData.knowledgeBaseName || `KB with URLs`;
         sourceName = knowledgeBaseName; // Store for later use
         
-        formData.append('knowledge_base_id', kbId);
+        // Always include knowledge_base_name in the form data
         formData.append('knowledge_base_name', knowledgeBaseName);
+        
+        // If not creating a new KB, include the KB ID
+        if (kbId && !kbId.startsWith('temp_') && kbId !== 'create_new') {
+          formData.append('knowledge_base_id', kbId);
+        }
         
         formData.append('knowledge_base_texts', JSON.stringify([]));
         

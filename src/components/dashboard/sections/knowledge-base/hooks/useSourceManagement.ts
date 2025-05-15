@@ -43,16 +43,28 @@ export const useSourceManagement = (
       // Check if we're creating a new KB or adding to an existing one
       const isNewKB = kbId === 'create_new' || kbId.startsWith('temp_');
       
-      // If creating a new KB, add a knowledge base name to the data
-      if (isNewKB && sourceData.fileName && sourceType === 'text') {
-        sourceData.knowledgeBaseName = sourceData.fileName;
-      } else if (isNewKB && sourceData.file && sourceType === 'file') {
-        const fileName = sourceData.file.name;
-        const fileExtension = fileName.lastIndexOf('.') > -1 ? fileName.slice(fileName.lastIndexOf('.')) : '';
-        sourceData.knowledgeBaseName = fileName.replace(fileExtension, ''); // Use filename without extension
+      // Always ensure knowledge base name is set
+      // This is now a key part of passing the knowledgeBaseName correctly
+      if (isNewKB) {
+        console.log('Creating new knowledge base with name:', sourceData.knowledgeBaseName);
+        
+        // Ensure knowledgeBaseName is set
+        if (!sourceData.knowledgeBaseName) {
+          if (sourceData.fileName && sourceType === 'text') {
+            sourceData.knowledgeBaseName = sourceData.fileName;
+          } else if (sourceData.file && sourceType === 'file') {
+            const fileName = sourceData.file.name;
+            const fileExtension = fileName.lastIndexOf('.') > -1 ? fileName.slice(fileName.lastIndexOf('.')) : '';
+            sourceData.knowledgeBaseName = fileName.replace(fileExtension, '');
+          } else if (sourceType === 'url') {
+            sourceData.knowledgeBaseName = "URL Knowledge Base";
+          }
+        }
+        
+        console.log('Final knowledge base name:', sourceData.knowledgeBaseName);
       }
       
-      // Call the API endpoint
+      // Call the API endpoint with the properly set knowledgeBaseName
       const response = await addSourceToKnowledgeBaseApi(kbId, sourceType, sourceData);
       
       console.log(`API response for adding ${sourceType} source:`, response);
@@ -84,7 +96,7 @@ export const useSourceManagement = (
             updatedKb.auto_sync = true;
           }
         } else {
-          // For new KB, create a mock KB
+          // For new KB, create a mock KB with the provided name
           updatedKb = {
             id: kbId.startsWith('temp_') ? kbId : `kb_${Date.now()}`,
             name: sourceData.knowledgeBaseName || "New Knowledge Base",
