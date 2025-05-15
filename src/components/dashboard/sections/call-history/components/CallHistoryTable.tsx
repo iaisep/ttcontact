@@ -45,24 +45,26 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
 
   // Filter visible columns
   const visibleColumns = columns.filter(column => column.visible);
-
-  // Safe date formatter that doesn't crash on invalid dates
-  const safeFormatDate = (dateString?: string, timeString?: string): string => {
-    if (!dateString) return 'Unknown';
+  
+  // Helper function to format date and time together
+  const formatDateTime = (dateStr?: string, timeStr?: string): string => {
+    if (!dateStr) return 'Unknown';
     
     try {
-      // Check if the date string is valid
-      const dateValue = new Date(`${dateString} ${timeString || '00:00:00'}`);
-      
-      // Check if the date is valid (not NaN)
-      if (isNaN(dateValue.getTime())) {
-        return 'Invalid date';
+      if (dateStr === 'Invalid date') {
+        console.warn('Invalid date string received', { dateStr, timeStr });
+        return 'Unknown';
       }
       
-      return formatDate(dateValue);
+      // If we just have dates, display them directly
+      if (!timeStr) {
+        return dateStr;
+      }
+      
+      return `${dateStr} ${timeStr}`;
     } catch (error) {
-      console.error('Error formatting date:', error, { dateString, timeString });
-      return 'Invalid date';
+      console.error('Error formatting date/time:', error, { dateStr, timeStr });
+      return 'Unknown';
     }
   };
 
@@ -105,7 +107,7 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
                   className="cursor-pointer hover:bg-muted"
                 >
                   {columns.find(col => col.id === 'timestamp')?.visible && (
-                    <TableCell>{safeFormatDate(call.date, call.time)}</TableCell>
+                    <TableCell>{formatDateTime(call.date, call.time)}</TableCell>
                   )}
                   {columns.find(col => col.id === 'agentName')?.visible && (
                     <TableCell>{call.agentName || 'Unknown'}</TableCell>

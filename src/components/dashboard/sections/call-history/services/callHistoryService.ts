@@ -1,8 +1,8 @@
-
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { CallHistoryItem } from '../types';
 import { generateMockCallHistory } from '../utils/mockCallData';
+import { formatTimestamp } from '@/lib/utils';
 
 /**
  * Service for handling call history API requests
@@ -33,6 +33,45 @@ export const useCallHistoryService = () => {
   };
 
   /**
+   * Process timestamp from API data
+   * @param timestamp Timestamp in milliseconds or ISO string
+   * @returns Formatted date and time
+   */
+  const processTimestamp = (timestamp: string | number | undefined): { date: string, time: string } => {
+    // If no timestamp, return current date/time
+    if (!timestamp) {
+      console.log('Missing timestamp, using current date/time');
+      return formatTimestamp(Date.now());
+    }
+    
+    console.log('Processing timestamp:', timestamp, typeof timestamp);
+    
+    try {
+      // If it's a number as string (typical API response)
+      if (typeof timestamp === 'string' && /^\d+$/.test(timestamp)) {
+        return formatTimestamp(parseInt(timestamp, 10));
+      }
+      
+      // If it's already a number
+      if (typeof timestamp === 'number') {
+        return formatTimestamp(timestamp);
+      }
+      
+      // Otherwise try to parse as a date string
+      const dateObj = new Date(timestamp);
+      if (!isNaN(dateObj.getTime())) {
+        return formatTimestamp(dateObj.getTime());
+      }
+      
+      console.warn('Could not parse timestamp:', timestamp);
+      return { date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
+    } catch (e) {
+      console.error('Error processing timestamp:', e, timestamp);
+      return { date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
+    }
+  };
+
+  /**
    * Fetch call history data from API
    * @param requestData Request data for API call
    * @returns API response or mock data on failure
@@ -56,19 +95,11 @@ export const useCallHistoryService = () => {
         // Transform API response to match CallHistoryItem type
         const transformedData = response.map(item => {
           // Get date from timestamp or use current date as fallback
-          let dateStr = new Date().toLocaleDateString();
-          let timeStr = new Date().toLocaleTimeString();
+          let dateInfo = { date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
           
           if (item.start_timestamp) {
-            try {
-              const date = new Date(item.start_timestamp);
-              if (!isNaN(date.getTime())) {
-                dateStr = date.toLocaleDateString();
-                timeStr = date.toLocaleTimeString();
-              }
-            } catch (e) {
-              console.warn('Error parsing timestamp:', item.start_timestamp);
-            }
+            console.log('Processing start_timestamp:', item.start_timestamp, typeof item.start_timestamp);
+            dateInfo = processTimestamp(item.start_timestamp);
           }
 
           return {
@@ -80,8 +111,8 @@ export const useCallHistoryService = () => {
             phoneNumber: item.phoneNumber || item.phone_number || '',
             from: item.from || item.from_number || 'Unknown',
             to: item.to || item.to_number || 'Unknown',
-            date: item.date || dateStr,
-            time: item.time || timeStr,
+            date: dateInfo.date,
+            time: dateInfo.time,
             duration: item.duration || (item.duration_ms ? `${Math.floor(Number(item.duration_ms) / 1000)}s` : '0s'),
             type: item.type || item.call_type || 'unknown',
             cost: item.cost || '0.00',

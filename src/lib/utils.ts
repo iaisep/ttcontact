@@ -1,4 +1,3 @@
-
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -6,12 +5,83 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
+/**
+ * Format a date to a string representation based on locale
+ * @param date Date to format
+ * @returns Formatted date string
+ */
+export function formatDate(date: Date | number | string): string {
+  // Handle different input types
+  let dateObj: Date;
+  
+  try {
+    if (typeof date === "number") {
+      // Handle timestamp in milliseconds
+      dateObj = new Date(date);
+    } else if (typeof date === "string") {
+      // Try to parse the string as a date
+      if (date.match(/^\d+$/)) {
+        // If it's just a numeric string, treat as timestamp
+        dateObj = new Date(parseInt(date, 10));
+      } else {
+        // Otherwise parse as date string
+        dateObj = new Date(date);
+      }
+    } else {
+      dateObj = date;
+    }
+    
+    // Check if date is valid
+    if (isNaN(dateObj.getTime())) {
+      console.warn("Invalid date format:", date);
+      return "Invalid date";
+    }
+    
+    // Format the date based on locale
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(dateObj);
+  } catch (error) {
+    console.error("Error formatting date:", error, date);
+    return "Invalid date";
+  }
+}
+
+/**
+ * Format a timestamp to a date and time string
+ * @param timestamp Timestamp in milliseconds
+ * @returns Object with formatted date and time strings
+ */
+export function formatTimestamp(timestamp: number | string): { date: string; time: string } {
+  try {
+    // Convert string to number if needed
+    const ts = typeof timestamp === "string" ? parseInt(timestamp, 10) : timestamp;
+    const date = new Date(ts);
+    
+    // Validate date
+    if (isNaN(date.getTime())) {
+      console.warn("Invalid timestamp:", timestamp);
+      return { date: "Invalid date", time: "00:00" };
+    }
+
+    return {
+      date: new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric"
+      }).format(date),
+      time: new Intl.DateTimeFormat("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).format(date)
+    };
+  } catch (error) {
+    console.error("Error formatting timestamp:", error, timestamp);
+    return { date: "Invalid date", time: "00:00" };
+  }
 }
 
 export function formatCurrency(amount: number): string {
