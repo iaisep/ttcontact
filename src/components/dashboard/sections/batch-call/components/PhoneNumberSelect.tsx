@@ -26,9 +26,15 @@ const PhoneNumberSelect = ({
     console.log('PhoneNumberSelect received props:', {
       fetchingPhoneNumbers,
       phoneNumbersLength: phoneNumbers?.length,
+      phoneNumbersData: phoneNumbers,
       selectedPhoneNumber
     });
   }, [fetchingPhoneNumbers, phoneNumbers, selectedPhoneNumber]);
+
+  const handleRefreshClick = () => {
+    console.log('Manual refresh requested');
+    onRefresh();
+  };
 
   return (
     <div className="space-y-2">
@@ -37,7 +43,7 @@ const PhoneNumberSelect = ({
         <Button 
           variant="ghost" 
           size="sm" 
-          onClick={onRefresh}
+          onClick={handleRefreshClick}
           disabled={fetchingPhoneNumbers}
         >
           {fetchingPhoneNumbers ? (
