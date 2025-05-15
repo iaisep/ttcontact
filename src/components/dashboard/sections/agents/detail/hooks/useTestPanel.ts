@@ -54,9 +54,20 @@ export const useTestPanel = (agent: RetellAgent) => {
   };
   
   const handleCodeTest = async () => {
+    // Get dynamic variables from localStorage
+    const agentId = agent?.agent_id || agent?.id;
+    const dynamicVars = agentId ? 
+      localStorage.getItem(`dynamicvariables_agent_${agentId}`) : null;
+    
     setIsLoading(true);
     try {
       toast.info(t('testing_code'));
+      
+      // Log the dynamic variables if they exist
+      if (dynamicVars) {
+        console.log('Dynamic variables:', JSON.parse(dynamicVars));
+      }
+      
       await new Promise(resolve => setTimeout(resolve, 1500));
       toast.success(t('code_test_complete'));
     } finally {
@@ -89,11 +100,31 @@ export const useTestPanel = (agent: RetellAgent) => {
       // Start a new call
       setIsLoading(true);
       try {
+        // Get dynamic variables from localStorage
+        const agentId = agent?.agent_id || agent?.id;
+        const dynamicVars = agentId ? 
+          localStorage.getItem(`dynamicvariables_agent_${agentId}`) : null;
+        
+        let dynamicVariables = {};
+        if (dynamicVars) {
+          try {
+            const parsedVars = JSON.parse(dynamicVars);
+            // Transform the array to the expected format
+            dynamicVariables = parsedVars.reduce((acc: Record<string, string>, item: {name: string, value: string}) => {
+              acc[item.name] = item.value;
+              return acc;
+            }, {});
+          } catch (e) {
+            console.error('Failed to parse dynamic variables:', e);
+          }
+        }
+        
         // Call the endpoint v2/create-web-call
         const response = await fetchWithAuth('/v2/create-web-call', {
           method: 'POST',
           body: JSON.stringify({
-            agent_id: agent.agent_id
+            agent_id: agent.agent_id,
+            retell_llm_dynamic_variables: dynamicVariables
           })
         });
         

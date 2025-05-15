@@ -59,6 +59,7 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
         onAudioTest={handleAudioTest}
         onLlmTest={handleLlmTest}
         onCodeTest={handleCodeTest}
+        agentId={agent?.agent_id || agent?.id}
       />
       
       <TranscriptPanel 
