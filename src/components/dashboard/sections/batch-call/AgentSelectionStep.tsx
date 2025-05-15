@@ -7,6 +7,7 @@ import { Loader2, Play, RefreshCw } from 'lucide-react';
 import { Agent } from './types';
 import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
+import { ContactData } from './hooks/useCsvProcessor';
 
 interface PhoneNumberData {
   id: string;
@@ -42,6 +43,7 @@ const AgentSelectionStep = ({
   const [phoneNumberError, setPhoneNumberError] = useState<string | null>(null);
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState<string>('');
   const [processingBatchCall, setProcessingBatchCall] = useState<boolean>(false);
+  const [contacts, setContacts] = useState<ContactData[]>([]);
 
   const fetchPhoneNumbers = async () => {
     setFetchingPhoneNumbers(true);
@@ -77,6 +79,16 @@ const AgentSelectionStep = ({
   // Fetch phone numbers on component mount
   useEffect(() => {
     fetchPhoneNumbers();
+    
+    // Load contacts from localStorage
+    const storedContacts = localStorage.getItem('batch_call_contacts');
+    if (storedContacts) {
+      try {
+        setContacts(JSON.parse(storedContacts));
+      } catch (error) {
+        console.error('Failed to parse contacts from localStorage:', error);
+      }
+    }
   }, []);
 
   const handlePhoneNumberChange = (phoneNumber: string) => {
@@ -102,19 +114,28 @@ const AgentSelectionStep = ({
       return;
     }
 
+    if (!contacts || contacts.length === 0) {
+      toast.error('No contacts found in the CSV file. Please upload a valid file first.');
+      return;
+    }
+
     setProcessingBatchCall(true);
     try {
+      // Prepare the tasks array from the contacts
+      const tasks = contacts.map(contact => ({
+        to_number: contact.phone,
+        variables: contact.variables || {}
+      }));
+
+      console.log('Creating batch call with contacts:', tasks);
+
       // Prepare the payload for the batch call
       const payload = {
         name: "",
         from_number: selectedPhoneNumber,
         status: "planned",
         timezone: "America/Sao_Paulo",
-        tasks: [
-          {
-            to_number: "+5511947414271" // This is a fixed number as per the example
-          }
-        ]
+        tasks: tasks
       };
 
       // Make the API call
@@ -127,7 +148,7 @@ const AgentSelectionStep = ({
       });
 
       console.log('Batch call created:', response);
-      toast.success('Batch call successfully created');
+      toast.success(`Batch call successfully created with ${tasks.length} contacts`);
       onStartBatch(); // Notify parent component
     } catch (error) {
       console.error('Failed to create batch call:', error);
@@ -184,13 +205,22 @@ const AgentSelectionStep = ({
         )}
       </div>
 
+      {contacts && contacts.length > 0 && (
+        <div className="bg-muted/50 p-4 rounded-md">
+          <p className="text-sm font-medium mb-2">Contacts from CSV ({contacts.length})</p>
+          <p className="text-xs text-muted-foreground">
+            The batch call will be made to these phone numbers
+          </p>
+        </div>
+      )}
+
       <div className="flex items-center space-x-2 pt-4">
         <Button variant="outline" onClick={onBack}>
           Back
         </Button>
         <Button 
           onClick={startBatchCall} 
-          disabled={!selectedPhoneNumber || fetchingPhoneNumbers || processingBatchCall}
+          disabled={!selectedPhoneNumber || fetchingPhoneNumbers || processingBatchCall || contacts.length === 0}
         >
           {processingBatchCall ? (
             <>

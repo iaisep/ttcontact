@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { FileText, Upload, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useCsvProcessor, ContactData } from './hooks/useCsvProcessor';
 
 interface FileUploadStepProps {
   uploadedFile: File | null;
@@ -21,13 +22,14 @@ const FileUploadStep = ({
   setFilePreview,
   onContinue,
 }: FileUploadStepProps) => {
+  const { processFile } = useCsvProcessor();
   // Template CSV content
   const csvTemplateContent = `phone number,dynamic variable1,dynamic variable2
 +14001231234,value1 (optional),value2 (optional),Only the phone number is required. Feel free to add or remove the other columns.,
 ,,
 ,,`;
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setUploadedFile(file);
@@ -36,7 +38,21 @@ const FileUploadStep = ({
       if (file.type === 'text/csv' || file.type === 'application/json') {
         const reader = new FileReader();
         reader.onload = (event) => {
-          setFilePreview(event.target?.result as string);
+          const content = event.target?.result as string;
+          setFilePreview(content);
+          
+          // Process the CSV file and extract contacts
+          if (file.type === 'text/csv') {
+            processFile(file)
+              .then((contacts: ContactData[]) => {
+                console.log('Processed contacts:', contacts);
+                toast.success(`Successfully processed ${contacts.length} contacts`);
+              })
+              .catch(error => {
+                console.error('Error processing CSV file:', error);
+                toast.error('Error processing the CSV file');
+              });
+          }
         };
         reader.readAsText(file);
       } else {
