@@ -158,7 +158,14 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       <DeleteSourceDialog
         open={deleteSourceDialogOpen}
         onOpenChange={setDeleteSourceDialogOpen}
-        source={sourceToDelete}
+        knowledgeBase={sourceToDelete ? { 
+          id: sourceToDelete.id, 
+          name: sourceToDelete.title,
+          created_at: sourceToDelete.created_at,
+          updated_at: '',
+          source_count: 0,
+          sources: []
+        } : null}
         onConfirm={() => 
           onDeleteSource(
             currentKnowledgeBase, 
