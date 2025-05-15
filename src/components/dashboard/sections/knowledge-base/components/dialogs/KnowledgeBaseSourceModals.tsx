@@ -11,7 +11,7 @@ interface KnowledgeBaseSourceModalsProps {
   sourceToDelete: KnowledgeBaseSource | null;
   deleteSourceDialogOpen: boolean;
   setDeleteSourceDialogOpen: (open: boolean) => void;
-  onAddUrlSource: (url: string, autoSync: boolean, selectedPages: WebPage[]) => Promise<KnowledgeBase>;
+  onAddUrlSource: (url: string, autoSync: boolean, selectedPages: WebPage[], knowledgeBaseName?: string) => Promise<KnowledgeBase>;
   onAddFileSource: (file: File) => Promise<KnowledgeBase>;
   onAddTextSource: (fileName: string, content: string) => Promise<KnowledgeBase>;
   onDeleteSource: () => Promise<KnowledgeBase>;
@@ -63,6 +63,9 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
       auto_sync: false
     } : null);
 
+  console.log('KnowledgeBaseSourceModals - effectiveKnowledgeBase:', effectiveKnowledgeBase);
+  console.log('KnowledgeBaseSourceModals - knowledgeBaseName:', knowledgeBaseName);
+
   return (
     <>
       {/* URL Source Modal */}
@@ -73,6 +76,8 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           handleSourceAdded();
         }}
         onSave={async (urls, autoSync, knowledgeBaseName) => {
+          console.log('AddUrlSourceModal onSave called with:', { urls, autoSync, knowledgeBaseName });
+          
           // Create dummy WebPage objects from URLs
           const webPages: WebPage[] = urls.map(url => ({
             url,
@@ -80,7 +85,8 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
             selected: true
           }));
           
-          await onAddUrlSource(urls[0], autoSync, webPages);
+          // Pass the knowledgeBaseName to ensure it's used 
+          await onAddUrlSource(urls[0], autoSync, webPages, knowledgeBaseName);
           handleSourceAdded();
         }}
         knowledgeBaseName={knowledgeBaseName}

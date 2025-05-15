@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { KnowledgeBase, WebPage } from '../types';
 import { useKnowledgeBaseCreateApi } from './api/knowledge-base/useKnowledgeBaseCreateApi';
@@ -44,12 +45,17 @@ export const useSourceOperations = ({ onAddSource }: UseSourceOperationsProps) =
         });
       } else {
         // Create a new knowledge base with the URL source
-        // This is the critical part - use the provided name
-        const name = knowledgeBaseName || 'New Knowledge Base';
+        // Use the provided name, defaulting to "New Knowledge Base" if none is available
+        const name = knowledgeBaseName || knowledgeBase?.name || 'New Knowledge Base';
         console.log('Creating new knowledge base with name:', name);
         
+        // Make sure the name isn't empty
+        if (!name.trim()) {
+          throw new Error('Knowledge base name cannot be empty');
+        }
+        
         const newKnowledgeBase = await createKnowledgeBase({
-          name: name,
+          name: name.trim(),
           urls: urls,
           autoSync: autoSync
         });

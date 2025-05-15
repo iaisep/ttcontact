@@ -34,13 +34,16 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   currentKnowledgeBase,
   knowledgeBaseName
 }) => {
-  // Modified logic to allow proceeding even if no pages are selected, as long as a Knowledge Base exists
+  // Modified logic to always allow proceeding if a knowledge base name is provided
   const hasSelectedPages = selectedPageUrls.length > 0;
-  const hasKnowledgeBase = !!currentKnowledgeBase?.id || !!knowledgeBaseName;
   
-  // Changed condition: If we have at least some web pages available, require a selection
-  // But if no web pages are found (error or empty response), we can proceed with just a KB name
-  const canProceed = (webPages.length === 0 || hasSelectedPages) && hasKnowledgeBase;
+  // If we have a knowledge base name or ID, we can proceed
+  const hasKnowledgeBase = !!(knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.id));
+  
+  // Allow proceeding if we have a knowledge base name/ID, and either:
+  // 1. We have selected pages, or
+  // 2. No web pages were found (empty response or error)
+  const canProceed = hasKnowledgeBase && (hasSelectedPages || webPages.length === 0);
   
   const displayName = knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name);
 
