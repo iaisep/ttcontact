@@ -21,11 +21,11 @@ const PhoneNumberSelect = ({
   onRefresh,
   phoneNumberError
 }: PhoneNumberSelectProps) => {
-  // Registrar los cambios en las props para debug
+  // Log props for debugging
   useEffect(() => {
     console.log('PhoneNumberSelect received props:', {
       fetchingPhoneNumbers,
-      phoneNumbersLength: phoneNumbers?.length,
+      phoneNumbersLength: phoneNumbers?.length || 0,
       phoneNumbersData: phoneNumbers,
       selectedPhoneNumber
     });
@@ -57,7 +57,10 @@ const PhoneNumberSelect = ({
       <select
         id="agent-select"
         value={selectedPhoneNumber}
-        onChange={(e) => onPhoneNumberChange(e.target.value)}
+        onChange={(e) => {
+          console.log('Phone number selected:', e.target.value);
+          onPhoneNumberChange(e.target.value);
+        }}
         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
         disabled={fetchingPhoneNumbers || phoneNumbers.length === 0}
       >

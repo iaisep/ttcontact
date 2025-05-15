@@ -27,7 +27,7 @@ const AgentSelectionStep = ({
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState<string>('');
   const [contacts, setContacts] = useState<ContactData[]>([]);
 
-  // Inicializar el hook usePhoneNumbers con el estado de selectedPhoneNumber
+  // Initialize usePhoneNumbers hook
   const {
     phoneNumbers,
     fetchingPhoneNumbers,
@@ -40,7 +40,7 @@ const AgentSelectionStep = ({
     startBatchCall
   } = useBatchCall(onStartBatch);
 
-  // Cargar los contactos desde localStorage solo una vez al iniciar
+  // Load contacts from localStorage once on mount
   useEffect(() => {
     console.log('AgentSelectionStep: Loading contacts from localStorage');
     const storedContacts = localStorage.getItem('batch_call_contacts');
@@ -66,15 +66,15 @@ const AgentSelectionStep = ({
     }
   };
 
-  // El botón debe estar deshabilitado si no hay un número de teléfono seleccionado,
-  // si estamos cargando los números de teléfono, si estamos procesando la llamada por lotes,
-  // o si no hay contactos
+  // Button should be disabled if no phone number is selected,
+  // if we are loading phone numbers, if we are processing the batch call,
+  // or if there are no contacts
   const isButtonDisabled = !selectedPhoneNumber || 
                           fetchingPhoneNumbers || 
                           processingBatchCall || 
                           contacts.length === 0;
 
-  // Log para depuración del estado del botón
+  // Log for debugging the button state
   useEffect(() => {
     console.log('Button state:', {
       selectedPhoneNumber,

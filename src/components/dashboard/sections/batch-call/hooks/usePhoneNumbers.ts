@@ -12,25 +12,23 @@ export const usePhoneNumbers = (selectedPhoneNumber: string, setSelectedAgent: (
   const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
 
   const fetchPhoneNumbers = useCallback(async () => {
-    // Si ya estamos cargando, no ejecutamos otra llamada
-    if (fetchingPhoneNumbers) {
-      console.log('Already fetching phone numbers, skipping duplicate request');
-      return;
-    }
+    console.log('fetchPhoneNumbers called, current state:', { fetchingPhoneNumbers, fetchAttempted });
     
-    console.log('Starting to fetch phone numbers...');
     setFetchingPhoneNumbers(true);
     setPhoneNumberError(null);
     
     try {
+      console.log('Making API call to fetch phone numbers...');
       const data = await fetchWithAuth('/list-phone-numbers');
-      console.log('Fetched phone numbers:', data);
+      console.log('Fetched phone numbers successful:', data);
       
       if (Array.isArray(data)) {
+        // Filter phone numbers that have an outbound agent assigned
         const phonesWithAgents = data.filter(phone => phone.outbound_agent_id);
         console.log('Phone numbers with agents:', phonesWithAgents.length);
         setPhoneNumbers(phonesWithAgents);
         
+        // Auto-select first phone number with agent if none is selected
         if (phonesWithAgents.length > 0 && !selectedPhoneNumber) {
           const firstPhone = phonesWithAgents[0];
           console.log('Auto-selecting first phone with agent:', firstPhone.phone_number);
@@ -47,16 +45,15 @@ export const usePhoneNumbers = (selectedPhoneNumber: string, setSelectedAgent: (
     } finally {
       setFetchingPhoneNumbers(false);
       setFetchAttempted(true);
+      console.log('Phone number fetch completed');
     }
   }, [fetchWithAuth, selectedPhoneNumber, setSelectedAgent]);
 
-  // Realizar la llamada inicial solo una vez cuando el componente se monta
+  // Use a regular useEffect to make the API call when the component mounts
   useEffect(() => {
-    console.log('usePhoneNumbers init, fetchAttempted:', fetchAttempted);
-    if (!fetchAttempted) {
-      fetchPhoneNumbers();
-    }
-  }, [fetchAttempted, fetchPhoneNumbers]);
+    console.log('usePhoneNumbers effect running');
+    fetchPhoneNumbers();
+  }, [fetchPhoneNumbers]);
 
   return {
     phoneNumbers,
