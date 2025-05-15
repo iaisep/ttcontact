@@ -20,12 +20,20 @@ export const InterruptionSection: React.FC<InterruptionSectionProps> = ({
     setValue(sensitivity);
   }, [sensitivity]);
 
+  // ⏱ Debounce de 500 ms para reducir peticiones al servidor
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (onUpdate) {
+        onUpdate(value);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout); // Cancela si el usuario sigue moviendo el slider
+  }, [value]);
+
   const handleValueChange = (values: number[]) => {
     const newValue = values[0];
-    setValue(newValue);
-    if (onUpdate) {
-      onUpdate(newValue);
-    }
+    setValue(newValue); // Solo actualiza localmente
   };
 
   return (
@@ -34,7 +42,9 @@ export const InterruptionSection: React.FC<InterruptionSectionProps> = ({
         <Label className="text-xs font-medium text-amber-600">Interruption Sensitivity</Label>
         <span className="text-xs text-gray-500">{value.toFixed(2)}</span>
       </div>
-      <p className="text-xs text-gray-500">Control how sensitively AI can be interrupted by human speech.</p>
+      <p className="text-xs text-gray-500">
+        Control how sensitively AI can be interrupted by human speech.
+      </p>
       <Slider 
         defaultValue={[value]} 
         value={[value]}
@@ -43,7 +53,7 @@ export const InterruptionSection: React.FC<InterruptionSectionProps> = ({
         className="w-full"
         agentId={agentId}
         fieldName="interruption_sensitivity"
-        debounceMs={800} // Incrementado para dar más tiempo
+        debounceMs={0} // Desactivado porque ya tienes el debounce en useEffect
         onValueChange={handleValueChange}
       />
     </div>
@@ -51,3 +61,4 @@ export const InterruptionSection: React.FC<InterruptionSectionProps> = ({
 };
 
 export default InterruptionSection;
+
