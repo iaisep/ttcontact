@@ -209,7 +209,7 @@ const AgentSettingsAccordion: React.FC<AgentSettingsAccordionProps> = ({
       </AccordionItem>
 
       <AccordionItem value="security-fallback">
-        <AccordionTrigger className="hover:no-underline">Security & Fallback</AccordionTrigger>
+        <AccordionTrigger className="hover:no-underline">Dynamics Variables</AccordionTrigger>
         <AccordionContent>
           <SecurityFallbackSection agent={agent} updateAgentField={updateAgentField} />
         </AccordionContent>
