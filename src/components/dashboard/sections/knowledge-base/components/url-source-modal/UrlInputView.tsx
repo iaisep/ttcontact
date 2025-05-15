@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Link, AlertCircle, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DialogFooter } from '@/components/ui/dialog';
+import { useApiContext } from '@/context/ApiContext';
+import { toast } from 'sonner';
 
 interface UrlInputViewProps {
   url: string;
@@ -25,6 +27,40 @@ const UrlInputView: React.FC<UrlInputViewProps> = ({
   onCancel,
   knowledgeBaseName
 }) => {
+  const { fetchWithAuth } = useApiContext();
+  
+  const handleFetchSitemap = async () => {
+    try {
+      // Format URL if needed
+      let formattedUrl = url.trim();
+      if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+        formattedUrl = `https://${formattedUrl}`;
+      }
+      
+      toast.info('Fetching sitemap data...', {
+        duration: 3000
+      });
+      
+      // Make the request to the list-sitemap endpoint
+      const response = await fetchWithAuth('/list-sitemap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ website_url: formattedUrl }),
+      });
+      
+      console.log('Sitemap API response:', response);
+      
+      // After getting the response, proceed with the regular flow
+      onSubmit();
+      
+    } catch (error) {
+      console.error('Failed to fetch sitemap:', error);
+      toast.error('Failed to fetch sitemap. Please try again.');
+    }
+  };
+
   return (
     <div className="space-y-4 p-6">
       {knowledgeBaseName && (
@@ -73,7 +109,7 @@ const UrlInputView: React.FC<UrlInputViewProps> = ({
           Cancel
         </Button>
         <Button 
-          onClick={() => onSubmit()} 
+          onClick={handleFetchSitemap} 
           disabled={isLoading || !url.trim()}
           className="bg-black text-white hover:bg-black/80"
         >
