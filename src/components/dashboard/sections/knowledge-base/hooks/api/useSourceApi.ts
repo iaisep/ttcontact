@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -34,18 +34,11 @@ export const useSourceApi = () => {
     
     console.log(`Using endpoint ${endpoint} for ${sourceType} source. Creating new KB: ${isCreatingNew}`);
     
-    // FIXED: Always add the knowledge_base_name if provided
-    if (sourceData.knowledgeBaseName) {
+    // If creating a new KB, we need to provide a name
+    if (isCreatingNew && sourceData.knowledgeBaseName) {
       formData.append('knowledge_base_name', sourceData.knowledgeBaseName);
-      console.log('Added knowledge_base_name:', sourceData.knowledgeBaseName);
-    } else if (isCreatingNew) {
-      // If creating new KB but no name provided, use a default
-      formData.append('knowledge_base_name', 'New Knowledge Base');
-      console.log('Using default knowledge_base_name: New Knowledge Base');
-    }
-    
-    // If adding to existing KB, include KB ID for the add-sources endpoint
-    if (!isCreatingNew) {
+    } else if (!isCreatingNew) {
+      // If adding to existing KB, include KB ID for the add-sources endpoint
       formData.append('knowledge_base_id', kbId);
     }
     
@@ -62,12 +55,6 @@ export const useSourceApi = () => {
       
       formData.set('knowledge_base_urls', JSON.stringify(urls));
       formData.set('enable_auto_refresh', String(sourceData.autoSync || false));
-      
-      // Log the complete formData for debugging
-      console.log('FormData for URL source:');
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
     } 
     else if (sourceType === 'file' && sourceData.file) {
       // For file upload, include the file in formData

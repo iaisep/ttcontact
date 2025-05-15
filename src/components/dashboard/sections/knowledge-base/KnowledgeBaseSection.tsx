@@ -188,31 +188,21 @@ const KnowledgeBaseSection: React.FC = () => {
           requestData = {
             url: sourceData.url,
             autoSync: sourceData.autoSync,
-            webPages: sourceData.webPages || [],
-            knowledgeBaseName: sourceData.knowledgeBaseName
+            webPages: sourceData.webPages || []
           };
         }
       } else if (sourceType === 'file') {
         // Handle file source
         requestData = {
-          file: sourceData.file,
-          knowledgeBaseName: sourceData.knowledgeBaseName
+          file: sourceData.file
         };
       } else if (sourceType === 'text') {
         // Handle text source
         requestData = {
           fileName: sourceData.fileName,
-          content: sourceData.content,
-          knowledgeBaseName: sourceData.knowledgeBaseName
+          content: sourceData.content
         };
       }
-      
-      // Always include knowledgeBaseName in requestData
-      if (sourceData.knowledgeBaseName && !requestData.knowledgeBaseName) {
-        requestData.knowledgeBaseName = sourceData.knowledgeBaseName;
-      }
-      
-      console.log('Final request data:', requestData);
       
       const updatedKb = await addSourceToKnowledgeBase(
         isNewKnowledgeBase ? 'create_new' : kbId, 
