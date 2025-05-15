@@ -139,7 +139,7 @@ const TestControlButton: React.FC<TestControlButtonProps> = ({
         disabled={endingCall}
       >
         <Square className="mr-2 h-4 w-4" />
-        {endingCall ? t('ending_call') || 'Ending call...' : t('end_the_call')}
+        {endingCall ? t('ending_call') || 'Ending call...' : t('Colgar')}
       </Button>
     );
   }
