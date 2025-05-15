@@ -61,6 +61,12 @@ const AgentSelectionStep = ({
     }
   };
 
+  // Check if we have a valid phone number and contacts
+  const isButtonDisabled = !selectedPhoneNumber || 
+                          fetchingPhoneNumbers || 
+                          processingBatchCall || 
+                          contacts.length === 0;
+
   return (
     <div className="space-y-4">
       <PhoneNumberSelect
@@ -87,7 +93,7 @@ const AgentSelectionStep = ({
         </Button>
         <Button 
           onClick={() => startBatchCall(selectedPhoneNumber, contacts)} 
-          disabled={!selectedPhoneNumber || fetchingPhoneNumbers || processingBatchCall || contacts.length === 0}
+          disabled={isButtonDisabled}
         >
           {processingBatchCall ? (
             <>
