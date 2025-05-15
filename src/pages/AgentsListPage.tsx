@@ -111,23 +111,6 @@ const AgentsListPage: React.FC = () => {
             className="max-w-sm"
           />
         </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={handleImportAgents}
-            className="flex items-center"
-          >
-            <Import className="mr-2 h-4 w-4" />
-            {t('import')}
-          </Button>
-          <Button 
-            onClick={handleCreateAgent}
-            className="flex items-center"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t('create_an_agent')}
-          </Button>
-        </div>
       </div>
       
       <AgentsTable 
