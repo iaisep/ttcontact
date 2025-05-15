@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AgentsTable from './agents/AgentsTable';
 import AgentsToolbar from './agents/AgentsToolbar';
 import AgentForm from './agents/AgentForm';
@@ -36,6 +36,8 @@ const AgentsSection: React.FC = () => {
   
   // State for the template selection dialog
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+  // Add searchQuery state to filter agents
+  const [searchQuery, setSearchQuery] = useState('');
   
   const handleOpenTemplateDialog = () => {
     setIsTemplateDialogOpen(true);
@@ -50,15 +52,24 @@ const AgentsSection: React.FC = () => {
     // The actual creation logic is now handled in the dialog component
   };
 
+  // Filter agents based on search query
+  const filteredAgents = searchQuery.trim() === '' 
+    ? agents 
+    : agents.filter(agent => 
+        agent.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
   return (
     <div className="p-6 space-y-6">
       <AgentsToolbar 
         onAddAgent={handleOpenTemplateDialog}
         onImportAgents={handleImportAgents}
         onRefreshAgents={fetchRetellData}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
       />
       <AgentsTable 
-        agents={agents} 
+        agents={filteredAgents} 
         onEditAgent={handleEditAgent} 
         onDeleteAgent={handleDeleteAgent}
         isLoading={isLoading || isCreating}

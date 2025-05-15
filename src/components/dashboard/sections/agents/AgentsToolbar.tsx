@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,20 +16,28 @@ interface AgentsToolbarProps {
   onAddAgent: () => void;
   onImportAgents: () => void;
   onRefreshAgents: () => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
 const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
   onAddAgent,
   onImportAgents,
   onRefreshAgents,
+  searchQuery = '',
+  onSearchChange = () => {},
 }) => {
   const { t } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState('');
   const [folderFilter, setFolderFilter] = useState('');
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   
   // Mock folders for demonstration
   const folders = ['Personal', 'Business', 'Support'];
+
+  // Handle search input changes
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSearchChange(e.target.value);
+  };
 
   return (
     <div className="space-y-6">
@@ -80,7 +89,7 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
             placeholder={t('search_agents')}
             className="pl-8"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
 
