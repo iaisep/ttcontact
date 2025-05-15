@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { CallHistoryFilters } from './components/CallHistoryFilters';
-import { CallHistoryHeader } from './components/CallHistoryHeader';
+import CallHistoryFilters from './components/CallHistoryFilters';
+import CallHistoryHeader from './components/CallHistoryHeader';
 import CallHistoryTable from './components/CallHistoryTable';
-import { CallDetailDrawer } from './components/CallDetailDrawer';
+import CallDetailDrawer from './components/CallDetailDrawer';
 import { useCallHistory } from './hooks';
 
 /**
@@ -78,10 +78,12 @@ const CallHistorySection = () => {
       />
       
       {/* Call Detail Drawer */}
-      <CallDetailDrawer
-        selectedCall={selectedCall}
-        onClose={closeCallDetails}
-      />
+      {selectedCall && (
+        <CallDetailDrawer
+          call={selectedCall}
+          onClose={closeCallDetails}
+        />
+      )}
     </div>
   );
 };

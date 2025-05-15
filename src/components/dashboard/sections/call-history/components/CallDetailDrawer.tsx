@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { CallHistoryItem } from '../types';
-import { formatDate, formatDuration } from '@/lib/utils';
+import { formatDuration } from '@/lib/utils';
 
 interface CallDetailDrawerProps {
   call: CallHistoryItem;
@@ -22,6 +22,26 @@ interface CallDetailDrawerProps {
 
 const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) => {
   const { t } = useLanguage();
+
+  // Safe date formatting for call timestamp
+  const formatCallTimestamp = () => {
+    if (!call.date) return 'Unknown';
+    
+    try {
+      if (call.date === 'Invalid date') {
+        return 'Unknown';
+      }
+      
+      // If we just have dates, display them directly
+      const dateStr = call.date;
+      const timeStr = call.time || '';
+      
+      return timeStr ? `${dateStr} ${timeStr}` : dateStr;
+    } catch (error) {
+      console.error('Error formatting date/time:', error);
+      return 'Unknown';
+    }
+  };
 
   return (
     <Drawer open={true} onOpenChange={(open) => !open && onClose()}>
@@ -47,7 +67,7 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
               <dl className="space-y-1">
                 <div className="flex justify-between">
                   <dt className="text-sm text-muted-foreground">{t('timestamp')}:</dt>
-                  <dd className="text-sm">{formatDate(new Date(call.date + ' ' + call.time))}</dd>
+                  <dd className="text-sm">{formatCallTimestamp()}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm text-muted-foreground">{t('agent')}:</dt>

@@ -15,10 +15,20 @@ export function formatDate(date: Date | number | string): string {
   let dateObj: Date;
   
   try {
+    if (!date) {
+      console.warn('Null or undefined date input');
+      return "Unknown date";
+    }
+    
     if (typeof date === "number") {
       // Handle timestamp in milliseconds
       dateObj = new Date(date);
     } else if (typeof date === "string") {
+      // Check if it's already a formatted date string (e.g. "Jan 1, 2023")
+      if (date.includes(',') && /[a-zA-Z]/.test(date)) {
+        return date; // Already formatted, return as is
+      }
+      
       // Try to parse the string as a date
       if (date.match(/^\d+$/)) {
         // If it's just a numeric string, treat as timestamp
@@ -45,7 +55,7 @@ export function formatDate(date: Date | number | string): string {
     }).format(dateObj);
   } catch (error) {
     console.error("Error formatting date:", error, date);
-    return "Invalid date";
+    return "Unknown date";
   }
 }
 
@@ -56,14 +66,27 @@ export function formatDate(date: Date | number | string): string {
  */
 export function formatTimestamp(timestamp: number | string): { date: string; time: string } {
   try {
+    // Handle null/undefined
+    if (!timestamp) {
+      console.warn("Null or undefined timestamp");
+      return { date: "Unknown date", time: "00:00" };
+    }
+    
     // Convert string to number if needed
     const ts = typeof timestamp === "string" ? parseInt(timestamp, 10) : timestamp;
+    
+    // Check for NaN after conversion
+    if (isNaN(ts)) {
+      console.warn("Invalid timestamp (NaN):", timestamp);
+      return { date: "Unknown date", time: "00:00" };
+    }
+    
     const date = new Date(ts);
     
     // Validate date
     if (isNaN(date.getTime())) {
-      console.warn("Invalid timestamp:", timestamp);
-      return { date: "Invalid date", time: "00:00" };
+      console.warn("Invalid timestamp (invalid Date):", timestamp);
+      return { date: "Unknown date", time: "00:00" };
     }
 
     return {
@@ -80,7 +103,7 @@ export function formatTimestamp(timestamp: number | string): { date: string; tim
     };
   } catch (error) {
     console.error("Error formatting timestamp:", error, timestamp);
-    return { date: "Invalid date", time: "00:00" };
+    return { date: "Unknown date", time: "00:00" };
   }
 }
 
