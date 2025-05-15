@@ -5,7 +5,7 @@ import { useUrlSourceModal } from './hooks/useUrlSourceModal';
 import UrlInputView from './UrlInputView';
 import SitemapSelectionView from './SitemapSelectionView';
 import { KnowledgeBase } from '../../types';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 
@@ -114,12 +114,10 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
       }
     }}>
       <DialogContent className="max-w-2xl w-full">
-        <div className="p-6 border-b">
-          <div className="flex items-center">
-            <Globe className="h-5 w-5 mr-2 text-blue-500" />
-            <h2 className="text-lg font-medium">Add Web Pages</h2>
-          </div>
-        </div>
+        <DialogTitle className="flex items-center">
+          <Globe className="h-5 w-5 mr-2 text-blue-500" />
+          <span>Add Web Pages</span>
+        </DialogTitle>
         
         {isLoading ? (
           <div className="flex-1 flex items-center justify-center p-8">

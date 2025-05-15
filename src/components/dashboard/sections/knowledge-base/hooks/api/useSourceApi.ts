@@ -1,4 +1,3 @@
-
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase, KnowledgeBaseSource, WebPage } from '../../types';
 
@@ -19,6 +18,7 @@ export const useSourceApi = () => {
     }
   ) => {
     console.log(`API call: Adding ${sourceType} source to KB ${kbId}:`, sourceData);
+    console.log(`API call: sourceData.knowledgeBaseName:`, sourceData.knowledgeBaseName);
     
     // Create FormData object for all types
     const formData = new FormData();
@@ -33,11 +33,20 @@ export const useSourceApi = () => {
       : `/add-knowledge-base-sources/${kbId}`; // For existing KB, use the add sources endpoint
     
     console.log(`Using endpoint ${endpoint} for ${sourceType} source. Creating new KB: ${isCreatingNew}`);
+    console.log(`Knowledge Base Name being used:`, sourceData.knowledgeBaseName);
     
     // If creating a new KB, we need to provide a name
-    if (isCreatingNew && sourceData.knowledgeBaseName) {
-      formData.append('knowledge_base_name', sourceData.knowledgeBaseName);
-    } else if (!isCreatingNew) {
+    if (isCreatingNew) {
+      if (sourceData.knowledgeBaseName && sourceData.knowledgeBaseName.trim() !== '') {
+        formData.append('knowledge_base_name', sourceData.knowledgeBaseName.trim());
+        console.log(`Added knowledge_base_name to formData:`, sourceData.knowledgeBaseName.trim());
+      } else {
+        // Use a default name if none provided
+        const defaultName = "New Knowledge Base";
+        formData.append('knowledge_base_name', defaultName);
+        console.log(`Using default knowledge_base_name:`, defaultName);
+      }
+    } else {
       // If adding to existing KB, include KB ID for the add-sources endpoint
       formData.append('knowledge_base_id', kbId);
     }
@@ -55,18 +64,13 @@ export const useSourceApi = () => {
       
       formData.set('knowledge_base_urls', JSON.stringify(urls));
       formData.set('enable_auto_refresh', String(sourceData.autoSync || false));
+      
+      // Log the URLs being added
+      console.log(`Adding URLs to knowledge base:`, urls);
     } 
     else if (sourceType === 'file' && sourceData.file) {
       // For file upload, include the file in formData
       formData.append('knowledge_base_files', sourceData.file);
-      
-      // Make sure we have a knowledge base name
-      if (isCreatingNew && !formData.has('knowledge_base_name')) {
-        const kbName = sourceData.knowledgeBaseName || 
-                      (sourceData.file.name.split('.')[0]) || 
-                      "New Knowledge Base";
-        formData.append('knowledge_base_name', kbName);
-      }
     } 
     else if (sourceType === 'text') {
       // Format text content according to the API documentation
@@ -77,14 +81,6 @@ export const useSourceApi = () => {
       }];
       
       formData.set('knowledge_base_texts', JSON.stringify(textContent));
-      
-      // Make sure we have a knowledge base name
-      if (isCreatingNew && !formData.has('knowledge_base_name')) {
-        const kbName = sourceData.knowledgeBaseName || 
-                      sourceData.fileName || 
-                      "New Knowledge Base";
-        formData.append('knowledge_base_name', kbName);
-      }
     }
     
     try {
