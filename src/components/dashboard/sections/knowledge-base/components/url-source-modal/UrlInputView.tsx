@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Link, AlertCircle, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { DialogFooter } from '@/components/ui/dialog';
 
 interface UrlInputViewProps {
   url: string;
@@ -62,19 +63,19 @@ const UrlInputView: React.FC<UrlInputViewProps> = ({
         </Alert>
       )}
       
-      <div className="flex justify-end gap-2 mt-4">
+      <DialogFooter className="mt-6">
         <Button 
           variant="outline" 
           onClick={onCancel} 
           disabled={isLoading}
-          className="w-20"
+          className="mr-2"
         >
           Cancel
         </Button>
         <Button 
           onClick={() => onSubmit()} 
           disabled={isLoading || !url.trim()}
-          className="w-20 bg-black text-white hover:bg-black/80"
+          className="bg-black text-white hover:bg-black/80"
         >
           {isLoading ? (
             <span className="flex items-center">
@@ -85,7 +86,7 @@ const UrlInputView: React.FC<UrlInputViewProps> = ({
             'Next'
           )}
         </Button>
-      </div>
+      </DialogFooter>
     </div>
   );
 };

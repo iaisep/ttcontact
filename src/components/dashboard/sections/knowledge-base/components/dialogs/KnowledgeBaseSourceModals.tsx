@@ -81,6 +81,7 @@ const KnowledgeBaseSourceModals: React.FC<KnowledgeBaseSourceModalsProps> = ({
           }));
           
           await onAddUrlSource(urls[0], autoSync, webPages);
+          handleSourceAdded();
         }}
         knowledgeBaseName={knowledgeBaseName}
       />
