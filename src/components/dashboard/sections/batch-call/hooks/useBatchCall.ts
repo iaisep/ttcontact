@@ -14,11 +14,6 @@ export const useBatchCall = (onStartBatch: () => void) => {
       return;
     }
 
-    if (!contacts || contacts.length === 0) {
-      toast.error('No contacts found in the CSV file. Please upload a valid file first.');
-      return;
-    }
-
     setProcessingBatchCall(true);
     try {
       const tasks = contacts.map(contact => ({

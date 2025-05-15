@@ -25,9 +25,7 @@ const AgentSelectionStep = ({
   loading,
 }: AgentSelectionStepProps) => {
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState<string>('');
-  const [contacts, setContacts] = useState<ContactData[]>([]);
 
-  // Initialize usePhoneNumbers hook
   const {
     phoneNumbers,
     fetchingPhoneNumbers,
@@ -40,25 +38,10 @@ const AgentSelectionStep = ({
     startBatchCall
   } = useBatchCall(onStartBatch);
 
-  // Load contacts from localStorage once on mount
-  useEffect(() => {
-    console.log('AgentSelectionStep: Loading contacts from localStorage');
-    const storedContacts = localStorage.getItem('batch_call_contacts');
-    if (storedContacts) {
-      try {
-        const parsedContacts = JSON.parse(storedContacts);
-        setContacts(parsedContacts);
-        console.log('Loaded contacts from localStorage:', parsedContacts.length);
-      } catch (error) {
-        console.error('Failed to parse contacts from localStorage:', error);
-      }
-    }
-  }, []);
-
   const handlePhoneNumberChange = (phoneNumber: string) => {
     console.log('Phone number selected:', phoneNumber);
     setSelectedPhoneNumber(phoneNumber);
-    
+
     const selectedPhone = phoneNumbers.find(phone => phone.phone_number === phoneNumber);
     if (selectedPhone) {
       console.log('Setting selected agent to:', selectedPhone.outbound_agent_id);
@@ -66,24 +49,21 @@ const AgentSelectionStep = ({
     }
   };
 
-  // Button should be disabled if no phone number is selected,
-  // if we are loading phone numbers, if we are processing the batch call,
-  // or if there are no contacts
-  const isButtonDisabled = !selectedPhoneNumber || 
-                          fetchingPhoneNumbers || 
-                          processingBatchCall || 
-                          contacts.length === 0;
+  // ✅ Solo se desactiva si no hay número, o si está cargando, o si está procesando
+  const isButtonDisabled =
+    !selectedPhoneNumber ||
+    fetchingPhoneNumbers ||
+    processingBatchCall;
 
-  // Log for debugging the button state
+  // Log de depuración
   useEffect(() => {
     console.log('Button state:', {
       selectedPhoneNumber,
       fetchingPhoneNumbers,
       processingBatchCall,
-      contactsLength: contacts.length,
       isButtonDisabled
     });
-  }, [selectedPhoneNumber, fetchingPhoneNumbers, processingBatchCall, contacts.length, isButtonDisabled]);
+  }, [selectedPhoneNumber, fetchingPhoneNumbers, processingBatchCall, isButtonDisabled]);
 
   return (
     <div className="space-y-4">
@@ -96,21 +76,12 @@ const AgentSelectionStep = ({
         phoneNumberError={phoneNumberError}
       />
 
-      {contacts && contacts.length > 0 && (
-        <div className="bg-muted/50 p-4 rounded-md">
-          <p className="text-sm font-medium mb-2">Contacts from CSV ({contacts.length})</p>
-          <p className="text-xs text-muted-foreground">
-            The batch call will be made to these phone numbers
-          </p>
-        </div>
-      )}
-
       <div className="flex items-center space-x-2 pt-4">
         <Button variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button 
-          onClick={() => startBatchCall(selectedPhoneNumber, contacts)} 
+        <Button
+          onClick={() => startBatchCall(selectedPhoneNumber, [])}
           disabled={isButtonDisabled}
         >
           {processingBatchCall ? (
