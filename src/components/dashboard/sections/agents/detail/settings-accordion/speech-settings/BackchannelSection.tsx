@@ -52,39 +52,44 @@ export const BackchannelSection: React.FC<BackchannelSectionProps> = ({
         </div>
       </div>
 
-      {/* Backchannel Frequency */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="text-xs font-medium text-amber-600">Backchannel Frequency</Label>
-          <span className="text-xs text-gray-500">{localFrequency.toFixed(2)}</span>
-        </div>
-        <Slider 
-          value={[localFrequency]}
-          max={1} 
-          step={0.01} 
-          className="w-full"
-          agentId={agentId}
-          fieldName="backchannel_frequency"
-          debounceMs={800}
-          onValueChange={handleFrequencyChange}
-        />
-      </div>
+      {/* Only show these settings when backchanneling is enabled */}
+      {enabled && (
+        <>
+          {/* Backchannel Frequency */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-medium text-amber-600">Backchannel Frequency</Label>
+              <span className="text-xs text-gray-500">{localFrequency.toFixed(2)}</span>
+            </div>
+            <Slider 
+              value={[localFrequency]}
+              max={1} 
+              step={0.01} 
+              className="w-full"
+              agentId={agentId}
+              fieldName="backchannel_frequency"
+              debounceMs={800}
+              onValueChange={handleFrequencyChange}
+            />
+          </div>
 
-      {/* Backchannel Words */}
-      <div className="space-y-2">
-        <Label className="text-xs font-medium text-amber-600">Backchannel Words</Label>
-        <p className="text-xs text-gray-500">A list of words that the agent would use for backchanneling</p>
-        <Textarea 
-          placeholder="Vale, entiendo, aja, comprendo, mmmm"
-          defaultValue={words.join(", ")}
-          className="w-full text-sm"
-          rows={2}
-          onChange={(e) => {
-            const newWords = e.target.value.split(',').map(word => word.trim());
-            onUpdateWords(newWords);
-          }}
-        />
-      </div>
+          {/* Backchannel Words */}
+          <div className="space-y-2">
+            <Label className="text-xs font-medium text-amber-600">Backchannel Words</Label>
+            <p className="text-xs text-gray-500">A list of words that the agent would use for backchanneling</p>
+            <Textarea 
+              placeholder="Vale, entiendo, aja, comprendo, mmmm"
+              defaultValue={words.join(", ")}
+              className="w-full text-sm"
+              rows={2}
+              onChange={(e) => {
+                const newWords = e.target.value.split(',').map(word => word.trim());
+                onUpdateWords(newWords);
+              }}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
