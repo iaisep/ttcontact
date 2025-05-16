@@ -45,6 +45,10 @@ export function ThemeToggle({ variant = "icon" }: { variant?: "icon" | "switch" 
     );
   }
 
+  // For the icon variant, display the opposite text in tooltip (what it will change to)
+  const tooltipText = theme === "dark" ? t("light_mode") : t("dark_mode");
+  const ariaLabel = language === 'es' ? "Cambiar tema" : "Toggle theme";
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -53,16 +57,16 @@ export function ThemeToggle({ variant = "icon" }: { variant?: "icon" | "switch" 
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            aria-label={language === 'es' ? "Cambiar tema" : "Toggle theme"}
+            aria-label={ariaLabel}
             className="h-8 w-8 rounded-full"
           >
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500" />
             <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-sky-300" />
-            <span className="sr-only">{theme === "dark" ? t("light_mode") : t("dark_mode")}</span>
+            <span className="sr-only">{tooltipText}</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{theme === "dark" ? t("light_mode") : t("dark_mode")}</p>
+          <p>{tooltipText}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
