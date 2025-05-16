@@ -11,7 +11,8 @@ export function ThemeToggle({ variant = "icon" }: { variant?: "icon" | "switch" 
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { t, language } = useLanguage();
-
+  
+  // Ensure component is mounted before rendering to avoid hydration issues
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -20,6 +21,7 @@ export function ThemeToggle({ variant = "icon" }: { variant?: "icon" | "switch" 
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
+  // Don't render anything until mounted to prevent hydration mismatch
   if (!mounted) {
     return null;
   }
@@ -31,7 +33,14 @@ export function ThemeToggle({ variant = "icon" }: { variant?: "icon" | "switch" 
           id="theme-toggle"
           checked={theme === "dark"}
           onCheckedChange={toggleTheme}
+          aria-label={language === 'es' ? "Cambiar tema" : "Toggle theme"}
         />
+        <label 
+          htmlFor="theme-toggle" 
+          className="text-sm cursor-pointer"
+        >
+          {theme === "dark" ? t("dark_mode") : t("light_mode")}
+        </label>
       </div>
     );
   }
