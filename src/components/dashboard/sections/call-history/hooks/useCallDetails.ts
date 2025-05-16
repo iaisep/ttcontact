@@ -27,6 +27,9 @@ export const useCallDetails = () => {
       // Fetch detailed call information
       const { data: callDetails, success: callSuccess } = await fetchCallDetailsData(callId);
       
+      // Log what we received from the call details API for debugging
+      console.log('Call details received:', callDetails);
+      
       // Fetch agent details if we have an agent ID
       let agentDetails = null;
       if (callInfo.agentId) {
@@ -34,9 +37,18 @@ export const useCallDetails = () => {
         agentDetails = agentData;
       }
       
+      // Prioritize call_summary from the API response
+      const summaryData = {
+        call_summary: callDetails?.call_summary || callInfo.call_summary || '',
+        resumen_2da_llamada: callDetails?.resumen_2da_llamada || callInfo.resumen_2da_llamada || ''
+      };
+      
+      console.log('Setting selected call with summary data:', summaryData);
+      
       setSelectedCall({
         ...callInfo,
         ...(callDetails || {}),
+        ...summaryData,
         agentDetails
       });
     } catch (error) {

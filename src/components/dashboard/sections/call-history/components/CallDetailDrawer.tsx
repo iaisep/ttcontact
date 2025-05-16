@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { 
@@ -104,12 +105,18 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
 
   // Determine call summary content to display
   const getCallSummary = () => {
+    // Log data for debugging
+    console.log("Call summary data:", {
+      call_summary: call.call_summary,
+      resumen_2da_llamada: call.resumen_2da_llamada
+    });
+    
     // Prioritize call_summary from API if available
-    if (call.call_summary) {
+    if (call.call_summary && call.call_summary !== "") {
       return call.call_summary;
     }
     // Fall back to resumen_2da_llamada if call_summary is not available
-    if (call.resumen_2da_llamada) {
+    if (call.resumen_2da_llamada && call.resumen_2da_llamada !== "") {
       return call.resumen_2da_llamada;
     }
     // Default message if no summary is available
@@ -229,12 +236,12 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
             </div>
           </div>
           
-          {/* Call summary section - now using the getCallSummary function */}
-          <div className="mt-6">
+          {/* Call summary section - with improved visibility styling */}
+          <div className="mt-6 p-3 bg-slate-50 rounded-md">
             <h3 className="font-medium mb-2">{t('call_summary')}</h3>
-            <p className="text-sm text-muted-foreground">
+            <div className="text-sm bg-white p-3 rounded border border-slate-200 min-h-[100px]">
               {getCallSummary()}
-            </p>
+            </div>
           </div>
           
           {/* Call metrics section */}
@@ -247,7 +254,7 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
               </div>
               <div className="bg-muted rounded-lg p-3 text-center">
                 <p className="text-xs text-muted-foreground">{t('user_sentiment')}</p>
-                <p className="text-lg font-semibold">{call.userSentiment || 'Positive'}</p>
+                <p className="text-lg font-semibold">{call.userSentiment || 'Unknown'}</p>
               </div>
               <div className="bg-muted rounded-lg p-3 text-center">
                 <p className="text-xs text-muted-foreground">{t('completion_rate')}</p>

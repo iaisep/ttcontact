@@ -23,6 +23,10 @@ export const transformCallData = (item: any, agentMapping: Record<string, string
     ? agentMapping[agentId] 
     : (item.agentName || item.agent_name || 'Unknown');
 
+  // Extract call summary data - log it to help with debugging
+  const callSummary = item.call_summary || '';
+  console.log('Call summary from API:', callSummary);
+
   return {
     id: item.id || item.callId || item.call_id || `call-${Math.random().toString(36).substring(2, 9)}`,
     callId: item.callId || item.call_id || `call-${Math.random().toString(36).substring(2, 9)}`,
@@ -47,6 +51,6 @@ export const transformCallData = (item: any, agentMapping: Record<string, string
     opportunidad: item.opportunidad || '',
     resumen_2da_llamada: item.resumen_2da_llamada || '',
     recording_url: item.recording_url || '',
-    call_summary: item.call_summary || ''
+    call_summary: callSummary
   };
 };
