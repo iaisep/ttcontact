@@ -3,107 +3,15 @@ import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { CallHistoryItem } from '../types';
 import { generateMockCallHistory } from '../utils/mockCallData';
-import { formatTimestamp } from '@/lib/utils';
+import { useAgentService } from './agentService';
+import { transformCallData } from './utils/callDataTransformer';
 
 /**
  * Service for handling call history API requests
  */
 export const useCallHistoryService = () => {
   const { fetchWithAuth } = useApiContext();
-
-  /**
-   * Parse a date safely, returning a valid date string
-   * @param dateValue The date to parse
-   * @returns A valid date string or current date if invalid
-   */
-  const safelyParseDate = (dateValue: any): string => {
-    if (!dateValue) return new Date().toLocaleDateString();
-    
-    try {
-      const date = new Date(dateValue);
-      // Check if the resulting date is valid
-      if (isNaN(date.getTime())) {
-        console.warn('Invalid date value:', dateValue);
-        return new Date().toLocaleDateString();
-      }
-      return date.toLocaleDateString();
-    } catch (e) {
-      console.warn('Error parsing date:', dateValue);
-      return new Date().toLocaleDateString();
-    }
-  };
-
-  /**
-   * Process timestamp from API data
-   * @param timestamp Timestamp in milliseconds or ISO string
-   * @returns Formatted date and time
-   */
-  const processTimestamp = (timestamp: string | number | undefined): { date: string, time: string } => {
-    // If no timestamp, return current date/time
-    if (!timestamp) {
-      console.log('Missing timestamp, using current date/time');
-      return formatTimestamp(Date.now());
-    }
-    
-    console.log('Processing timestamp:', timestamp, typeof timestamp);
-    
-    try {
-      // If it's a number as string (typical API response)
-      if (typeof timestamp === 'string' && /^\d+$/.test(timestamp)) {
-        return formatTimestamp(parseInt(timestamp, 10));
-      }
-      
-      // If it's already a number
-      if (typeof timestamp === 'number') {
-        return formatTimestamp(timestamp);
-      }
-      
-      // Otherwise try to parse as a date string
-      const dateObj = new Date(timestamp);
-      if (!isNaN(dateObj.getTime())) {
-        return formatTimestamp(dateObj.getTime());
-      }
-      
-      console.warn('Could not parse timestamp:', timestamp);
-      return { date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
-    } catch (e) {
-      console.error('Error processing timestamp:', e, timestamp);
-      return { date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
-    }
-  };
-
-  /**
-   * Fetch agents data to map agent IDs to names
-   * @returns Object mapping agent IDs to agent names
-   */
-  const fetchAgentData = async (): Promise<Record<string, string>> => {
-    try {
-      // Use GET method to fetch agents
-      const response = await fetchWithAuth('/list-agents', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      console.log('Agents data response:', response);
-      
-      if (Array.isArray(response)) {
-        // Create a mapping of agent IDs to agent names
-        return response.reduce((mapping, agent) => {
-          if (agent.id || agent.agent_id) {
-            mapping[agent.id || agent.agent_id] = agent.agent_name || agent.name || 'Unknown Agent';
-          }
-          return mapping;
-        }, {} as Record<string, string>);
-      }
-      
-      return {};
-    } catch (error) {
-      console.error('Error fetching agents:', error);
-      return {};
-    }
-  };
+  const { fetchAgentData } = useAgentService();
 
   /**
    * Fetch call history data from API
@@ -132,46 +40,7 @@ export const useCallHistoryService = () => {
       // Check if we have valid response data
       if (response && Array.isArray(response)) {
         // Transform API response to match CallHistoryItem type
-        const transformedData = response.map(item => {
-          // Get date from timestamp or use current date as fallback
-          let dateInfo = { date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
-          
-          if (item.start_timestamp) {
-            console.log('Processing start_timestamp:', item.start_timestamp, typeof item.start_timestamp);
-            dateInfo = processTimestamp(item.start_timestamp);
-          }
-
-          // Use agent mapping to get agent name if available
-          const agentId = item.agentId || item.agent_id;
-          const agentName = agentId && agentMapping[agentId] 
-            ? agentMapping[agentId] 
-            : (item.agentName || item.agent_name || 'Unknown');
-
-          return {
-            id: item.id || item.callId || item.call_id || `call-${Math.random().toString(36).substring(2, 9)}`,
-            callId: item.callId || item.call_id || `call-${Math.random().toString(36).substring(2, 9)}`,
-            batchCallId: item.batchCallId || item.batch_call_id,
-            agentName: agentName,
-            agentId: agentId,
-            phoneNumber: item.phoneNumber || item.phone_number || '',
-            from: item.from || item.from_number || 'Unknown',
-            to: item.to || item.to_number || 'Unknown',
-            date: dateInfo.date,
-            time: dateInfo.time,
-            duration: item.duration || (item.duration_ms ? `${Math.floor(Number(item.duration_ms) / 1000)}s` : '0s'),
-            type: item.type || item.call_type || 'unknown',
-            cost: item.cost || '0.00',
-            status: item.status || item.call_status || 'ended',
-            disconnectionReason: item.disconnectionReason || item.disconnection_reason || '',
-            userSentiment: item.userSentiment || item.user_sentiment || 'Unknown',
-            callSuccessful: item.callSuccessful || item.call_successful || false,
-            callSuccessfulStatus: item.callSuccessfulStatus || item.call_successful_status,
-            endToEndLatency: item.endToEndLatency || item.end_to_end_latency,
-            oportunidad: item.oportunidad || false,
-            opportunidad: item.opportunidad || '',
-            resumen_2da_llamada: item.resumen_2da_llamada || ''
-          };
-        });
+        const transformedData = response.map(item => transformCallData(item, agentMapping));
 
         return {
           data: transformedData as CallHistoryItem[],
