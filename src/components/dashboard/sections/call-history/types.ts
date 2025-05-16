@@ -24,6 +24,7 @@ export interface CallHistoryItem {
   resumen_2da_llamada?: string;
   recording_url?: string;
   call_summary?: string;
+  transcript?: string;
 }
 
 export interface FilterOption {

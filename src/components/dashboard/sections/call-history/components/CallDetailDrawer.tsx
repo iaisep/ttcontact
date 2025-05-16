@@ -123,6 +123,14 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
     return t('no_call_summary_available');
   };
 
+  // Get and format the transcript
+  const getTranscript = () => {
+    if (call.transcript && call.transcript.trim() !== "") {
+      return call.transcript;
+    }
+    return 'No transcript available';
+  };
+
   return (
     <Drawer open={true} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent>
@@ -243,6 +251,16 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
               {getCallSummary()}
             </div>
           </div>
+
+          {/* Transcript section */}
+          {call.transcript && (
+            <div className="mt-6 p-3 bg-slate-50 rounded-md">
+              <h3 className="font-medium mb-2">{t('transcript')}</h3>
+              <div className="text-sm bg-white p-3 rounded border border-slate-200 min-h-[150px] max-h-[300px] overflow-y-auto whitespace-pre-line">
+                {getTranscript()}
+              </div>
+            </div>
+          )}
           
           {/* Call metrics section */}
           <div className="mt-6">

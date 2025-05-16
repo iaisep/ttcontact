@@ -37,10 +37,11 @@ export const useCallDetails = () => {
         agentDetails = agentData;
       }
       
-      // Prioritize call_summary from the API response
+      // Extract call data from API response
       const summaryData = {
-        call_summary: callDetails?.call_summary || callInfo.call_summary || '',
-        resumen_2da_llamada: callDetails?.resumen_2da_llamada || callInfo.resumen_2da_llamada || ''
+        call_summary: callDetails?.call_analysis?.call_summary || callDetails?.call_summary || callInfo.call_summary || '',
+        resumen_2da_llamada: callDetails?.resumen_2da_llamada || callInfo.resumen_2da_llamada || '',
+        transcript: callDetails?.transcript || ''
       };
       
       console.log('Setting selected call with summary data:', summaryData);
