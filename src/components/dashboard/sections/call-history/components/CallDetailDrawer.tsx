@@ -18,7 +18,6 @@ import {
   CallAudioPlayer,
   CallBasicInfo,
   CallContactDetails,
-  CallMetrics,
   CallSummarySection,
   TranscriptSection
 } from './call-detail';
@@ -141,12 +140,7 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
             transcript_with_tool_calls={call.transcript_with_tool_calls}
           />
           
-          {/* Call metrics section */}
-          <CallMetrics 
-            latency={call.endToEndLatency}
-            sentiment={call.userSentiment}
-            completionRate={call.callSuccessfulStatus}
-          />
+          {/* Call metrics section removed */}
         </div>
         
         <DrawerFooter className="border-t">
