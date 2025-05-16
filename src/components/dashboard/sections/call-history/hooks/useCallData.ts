@@ -12,7 +12,7 @@ export const useCallData = (
   pageSize: number,
   searchQuery: string,
   filters: FilterOption[],
-  dateRange: {start: Date | null, end: Date | null},
+  dateRange: {from: Date | null, to: Date | null},
   setTotalItems: (total: number) => void
 ) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -101,7 +101,7 @@ export const useCallData = (
   useEffect(() => {
     console.log('Triggering call history load based on filters/pagination change');
     loadCallHistory();
-  }, [currentPage, pageSize, searchQuery, filters, dateRange.start, dateRange.end]);
+  }, [currentPage, pageSize, searchQuery, filters, dateRange.from, dateRange.to]);
 
   return {
     isLoading,
