@@ -1,10 +1,8 @@
-
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { CallHistoryItem } from '../types';
 import { generateMockCallHistory } from '../utils/mockCallData';
 import { formatTimestamp } from '@/lib/utils';
-import { buildQueryParams } from '../utils/callRequestUtils';
 
 /**
  * Service for handling call history API requests
@@ -82,15 +80,12 @@ export const useCallHistoryService = () => {
     try {
       console.log('Fetching call history with data:', requestData);
       
-      // Convert request data to query parameters for GET request - use list-calls (sin v2/)
-      const queryParams = buildQueryParams(requestData);
-      const url = `/list-calls${queryParams ? `?${queryParams}` : ''}`;
-      
-      const response = await fetchWithAuth(url, {
-        method: 'GET',
+      const response = await fetchWithAuth('/v2/list-calls', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify(requestData)
       });
       
       console.log('Call history API response:', response);

@@ -35,22 +35,3 @@ export const prepareCallHistoryRequest = (
 
   return request;
 };
-
-/**
- * Builds query parameters for GET request
- */
-export const buildQueryParams = (params: Record<string, any>): string => {
-  const queryParams = new URLSearchParams();
-  
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== null && value !== undefined) {
-      if (typeof value === 'object') {
-        queryParams.append(key, JSON.stringify(value));
-      } else {
-        queryParams.append(key, String(value));
-      }
-    }
-  });
-  
-  return queryParams.toString();
-};
