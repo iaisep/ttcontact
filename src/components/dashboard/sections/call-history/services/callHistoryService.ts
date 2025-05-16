@@ -1,10 +1,8 @@
-
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { CallHistoryItem } from '../types';
 import { generateMockCallHistory } from '../utils/mockCallData';
 import { formatTimestamp } from '@/lib/utils';
-import { buildQueryParams } from '../utils/callRequestUtils';
 
 /**
  * Service for handling call history API requests
@@ -82,18 +80,12 @@ export const useCallHistoryService = () => {
     try {
       console.log('Fetching call history with data:', requestData);
       
-      // Use GET method instead of POST
-      // Convert requestData to query parameters
-      const queryParams = buildQueryParams(requestData);
-      const url = `/v2/list-calls${queryParams}`;
-      
-      console.log('Calling API with URL:', url);
-      
-      const response = await fetchWithAuth(url, {
-        method: 'GET',
+      const response = await fetchWithAuth('/v2/list-calls', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify(requestData)
       });
       
       console.log('Call history API response:', response);
@@ -114,7 +106,7 @@ export const useCallHistoryService = () => {
             id: item.id || item.callId || item.call_id || `call-${Math.random().toString(36).substring(2, 9)}`,
             callId: item.callId || item.call_id || `call-${Math.random().toString(36).substring(2, 9)}`,
             batchCallId: item.batchCallId || item.batch_call_id,
-            agentName: item.agentName || item.agent_name || 'Unknown',
+            agentName: item.agentName || item.agent_name,
             agentId: item.agentId || item.agent_id,
             phoneNumber: item.phoneNumber || item.phone_number || '',
             from: item.from || item.from_number || 'Unknown',

@@ -2,7 +2,6 @@
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { CallDetailInfo, CallHistoryItem } from '../types';
-import { buildQueryParams } from '../utils/callRequestUtils';
 
 /**
  * Service for handling call details API operations
@@ -17,13 +16,8 @@ export const useCallDetailsService = () => {
    */
   const fetchCallDetailsData = async (callId: string) => {
     try {
-      // Use GET method with query parameters
-      const queryParams = buildQueryParams({ callId });
-      const url = `/v2/get-call-details${queryParams}`;
-      
-      console.log('Calling API for call details with URL:', url);
-      
-      const callDetails = await fetchWithAuth(url, {
+      // Fetch detailed call info using GET method instead of POST
+      const callDetails = await fetchWithAuth(`/v2/get-call-details?callId=${encodeURIComponent(callId)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -51,14 +45,8 @@ export const useCallDetailsService = () => {
    */
   const fetchAgentDetails = async (agentId: string) => {
     try {
-      // Build query params specifically for list-agents endpoint
-      // Use agent_name to match the field name required by the API
-      const queryParams = buildQueryParams({ agent_name: agentId });
-      const url = `/list-agents${queryParams}`;
-      
-      console.log('Calling API for agent details with URL:', url);
-      
-      const agentResponse = await fetchWithAuth(url, {
+      // Use GET method instead of POST for fetching agent details
+      const agentResponse = await fetchWithAuth(`/list-agents?id=${encodeURIComponent(agentId)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
