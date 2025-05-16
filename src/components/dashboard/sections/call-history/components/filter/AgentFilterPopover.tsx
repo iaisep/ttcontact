@@ -64,7 +64,7 @@ const AgentFilterPopover: React.FC<AgentFilterPopoverProps> = ({
   return (
     <PopoverContent className="w-80">
       <div className="space-y-4">
-        <div className="font-medium">{t('filter_by_agent')}</div>
+        <div className="font-medium">{t('filter by agent')}</div>
         
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />

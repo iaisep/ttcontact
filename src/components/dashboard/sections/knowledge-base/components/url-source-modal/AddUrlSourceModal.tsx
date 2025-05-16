@@ -1,10 +1,13 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Globe, Loader2 } from 'lucide-react';
 import { useUrlSourceModal } from './hooks/useUrlSourceModal';
 import UrlInputView from './UrlInputView';
 import SitemapSelectionView from './SitemapSelectionView';
 import { KnowledgeBase } from '../../types';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { useApiContext } from '@/context/ApiContext';
+import { toast } from 'sonner';
 
 interface AddUrlSourceModalProps {
   isOpen: boolean;
@@ -19,6 +22,54 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
   onSave,
   isOpen
 }) => {
+  const { fetchWithAuth } = useApiContext();
+  
+  // Implement fetch sitemap functionality
+  const handleFetchSitemap = async (url: string) => {
+    try {
+      console.log('Fetching sitemap for URL:', url);
+      
+      const response = await fetchWithAuth('/list-sitemap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ website_url: url }),
+      });
+      
+      console.log('Sitemap API response:', response);
+      
+      // Store the response in localStorage for other components to use
+      localStorage.setItem('sitemap_pages', JSON.stringify(response));
+      
+      // Convert the response to WebPage objects
+      const pages = Array.isArray(response) 
+        ? response.map((item) => {
+            if (typeof item === 'string') {
+              return {
+                url: item,
+                title: item.split('/').pop() || 'Page',
+                selected: true
+              };
+            }
+            return {
+              url: item.url || url,
+              title: item.title || 'Page',
+              selected: true
+            };
+          })
+        : [{ url, title: 'Main Page', selected: true }];
+      
+      console.log('Converted pages:', pages);
+      return pages;
+    } catch (error) {
+      console.error('Error fetching sitemap:', error);
+      toast.error('Error fetching sitemap');
+      // Return a default page on error
+      return [{ url, title: 'Main Page', selected: true }];
+    }
+  };
+
   const {
     url,
     setUrl,
@@ -35,37 +86,38 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
     handleConfirmSelection,
     resetState
   } = useUrlSourceModal({
-    onFetchSitemap: async (url: string) => {
-      // This will be implemented by the parent component
-      return [];
+    onFetchSitemap: handleFetchSitemap,
+    onSubmit: async (url, autoSync, selectedPages) => {
+      try {
+        // Get the URLs from selected pages
+        const urls = selectedPages.map(page => page.url);
+        
+        console.log('Submitting URLs:', urls, 'autoSync:', autoSync, 'knowledgeBaseName:', knowledgeBaseName);
+        await onSave(urls, autoSync, knowledgeBaseName);
+        
+        return {} as KnowledgeBase; // Just to satisfy the interface
+      } catch (error) {
+        console.error('Error in onSubmit:', error);
+        throw error;
+      }
     },
-    onSubmit: async (url: string, autoSync: boolean, selectedPages: any, knowledgeBaseName?: string) => {
-      // Implement the submission logic
-      return {} as KnowledgeBase;
-    }
+    currentKnowledgeBase: null,
+    knowledgeBaseName: knowledgeBaseName
   });
 
-  // Create a custom handler to adapt to the expected prop interface
-  const handleSave = async () => {
-    // Get the URLs from selected pages
-    const urls = webPages
-      .filter(page => selectedPageUrls.includes(page.url))
-      .map(page => page.url);
-    
-    await onSave(urls, autoSync, knowledgeBaseName || '');
-  };
-
-  if (!isOpen) return null;
+  console.log('AddUrlSourceModal - knowledgeBaseName received:', knowledgeBaseName);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
-        <div className="p-6 border-b">
-          <div className="flex items-center">
-            <Globe className="h-5 w-5 mr-2 text-blue-500" />
-            <h2 className="text-lg font-medium">Add Web Pages</h2>
-          </div>
-        </div>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        onCancel();
+      }
+    }}>
+      <DialogContent className="max-w-2xl w-full">
+        <DialogTitle className="flex items-center">
+          <Globe className="h-5 w-5 mr-2 text-blue-500" />
+          <span>Add Web Pages</span>
+        </DialogTitle>
         
         {isLoading ? (
           <div className="flex-1 flex items-center justify-center p-8">
@@ -104,8 +156,8 @@ const AddUrlSourceModal: React.FC<AddUrlSourceModalProps> = ({
             )}
           </>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

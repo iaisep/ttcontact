@@ -22,6 +22,10 @@ export interface CallHistoryItem {
   oportunidad?: boolean;
   opportunidad?: string;
   resumen_2da_llamada?: string;
+  recording_url?: string;
+  call_summary?: string;
+  transcript?: string;
+  transcript_with_tool_calls?: any[];
 }
 
 export interface FilterOption {

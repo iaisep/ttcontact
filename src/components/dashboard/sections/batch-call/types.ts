@@ -1,4 +1,3 @@
-
 export interface Agent {
   id: string;
   name: string;
@@ -20,9 +19,12 @@ export interface BatchCall {
 }
 
 export interface PhoneNumberData {
+  id: string;
   phone_number: string;
   phone_number_type: string;
   phone_number_pretty: string;
   nickname: string;
+  friendly_name: string;
   outbound_agent_id: string;
+  inbound_agent_id: string;
 }

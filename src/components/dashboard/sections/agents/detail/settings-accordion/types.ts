@@ -1,20 +1,17 @@
 
 import { RetellAgent } from '../../types/retell-types';
 
-export interface KnowledgeBase {
-  id: string;
-  name: string;
-  description?: string;
-  created_at?: string;
-}
-
 export interface AccordionSectionProps {
   agent: RetellAgent;
-  updateAgentField: (fieldName: string, value: any) => void;
+  updateAgentField: (field: string, value: any) => void;
+}
+
+export interface KnowledgeBaseSectionProps extends AccordionSectionProps {
+  knowledgeBases?: any[];
 }
 
 export interface AgentSettingsAccordionProps {
   agent: RetellAgent;
-  knowledgeBases?: KnowledgeBase[];
-  updateAgentField: (fieldName: string, value: any) => void;
+  knowledgeBases?: any[];
+  updateAgentField: (field: string, value: any) => void;
 }

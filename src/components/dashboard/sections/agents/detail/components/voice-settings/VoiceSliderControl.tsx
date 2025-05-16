@@ -13,6 +13,8 @@ interface VoiceSliderControlProps {
   onValueChange: (value: number) => void;
   leftLabel: string;
   rightLabel: string;
+  agentId?: string;
+  fieldName?: string;
 }
 
 const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
@@ -25,8 +27,17 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
   onValueChange,
   leftLabel,
   rightLabel,
+  agentId,
+  fieldName,
 }) => {
+  const [localValue, setLocalValue] = useState(value);
   const [isActive, setIsActive] = useState(false);
+  
+  const handleValueChange = (values: number[]) => {
+    const newValue = values[0];
+    setLocalValue(newValue);
+    onValueChange(newValue);
+  };
   
   const formatSliderValue = (value: number) => {
     return value.toFixed(2);
@@ -39,7 +50,7 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
         <div className="text-xs text-muted-foreground flex items-center gap-2">
           <span className="text-muted-foreground text-xs">{leftLabel}</span>
           <span className="font-medium bg-muted px-2 py-1 rounded-md">
-            {formatSliderValue(value)}
+            {formatSliderValue(localValue)}
           </span>
           <span className="text-muted-foreground text-xs">{rightLabel}</span>
         </div>
@@ -49,11 +60,14 @@ const VoiceSliderControl: React.FC<VoiceSliderControlProps> = ({
         min={min}
         max={max}
         step={step}
-        value={[value]}
-        onValueChange={(values) => onValueChange(values[0])}
+        value={[localValue]}
+        onValueChange={handleValueChange}
         onMouseEnter={() => setIsActive(true)}
         onMouseLeave={() => setIsActive(false)}
         className={isActive ? "cursor-pointer" : ""}
+        agentId={agentId}
+        fieldName={fieldName}
+        debounceMs={800}
       />
     </div>
   );

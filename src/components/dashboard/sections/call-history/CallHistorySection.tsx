@@ -1,14 +1,15 @@
 
 import React from 'react';
+import CallHistoryFilters from './components/CallHistoryFilters';
+import CallHistoryHeader from './components/CallHistoryHeader';
+import CallHistoryTable from './components/CallHistoryTable';
+import CallDetailDrawer from './components/CallDetailDrawer';
 import { useCallHistory } from './hooks';
-import {
-  CallHistoryHeader,
-  CallHistoryFilters,
-  CallHistoryTable,
-  CallDetailDrawer
-} from './components';
 
-const CallHistorySection: React.FC = () => {
+/**
+ * Main component for the Call History section
+ */
+const CallHistorySection = () => {
   const {
     isLoading,
     callHistory,
@@ -30,23 +31,26 @@ const CallHistorySection: React.FC = () => {
     totalItems,
     selectedCall,
     fetchCallDetails,
-    closeCallDetails
+    closeCallDetails,
+    refreshData
   } = useCallHistory();
 
-  // Function to handle exports
-  const handleExport = () => {
-    // In a real application, this would trigger a download of the filtered call history data
-    console.log('Exporting data:', { callHistory, filters, dateRange });
-    // For now, just show a success message
-    alert('Export started. You will receive a notification when it is ready.');
-  };
+  // Log the call history data before rendering
+  React.useEffect(() => {
+    console.log('Call History Section rendering with data:', { 
+      callHistoryLength: callHistory?.length,
+      dateRange,
+      filters,
+      columnVisibility
+    });
+  }, [callHistory, dateRange, filters, columnVisibility]);
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <CallHistoryHeader onExport={handleExport} />
-
-      {/* Filters Bar */}
+      <CallHistoryHeader refreshData={refreshData} />
+      
+      {/* Filters */}
       <CallHistoryFilters
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -54,18 +58,13 @@ const CallHistorySection: React.FC = () => {
         addFilter={addFilter}
         removeFilter={removeFilter}
         clearFilters={clearFilters}
-        dateRange={{
-          from: dateRange.start as Date, 
-          to: dateRange.end as Date
-        }}
-        updateDateRange={(range) => {
-          updateDateRange(range.from, range.to);
-        }}
+        dateRange={dateRange}
+        updateDateRange={updateDateRange}
         columnVisibility={columnVisibility}
         toggleColumnVisibility={toggleColumnVisibility}
         updateColumnVisibility={updateColumnVisibility}
       />
-
+      
       {/* Table */}
       <CallHistoryTable
         isLoading={isLoading}
@@ -77,10 +76,13 @@ const CallHistorySection: React.FC = () => {
         setPageSize={setPageSize}
         onRowClick={fetchCallDetails}
       />
-
-      {/* Call Details Drawer */}
+      
+      {/* Call Detail Drawer */}
       {selectedCall && (
-        <CallDetailDrawer call={selectedCall} onClose={closeCallDetails} />
+        <CallDetailDrawer
+          call={selectedCall}
+          onClose={closeCallDetails}
+        />
       )}
     </div>
   );

@@ -45,6 +45,28 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
 
   // Filter visible columns
   const visibleColumns = columns.filter(column => column.visible);
+  
+  // Helper function to format date and time together
+  const formatDateTime = (dateStr?: string, timeStr?: string): string => {
+    if (!dateStr) return 'Unknown';
+    
+    try {
+      if (dateStr === 'Invalid date') {
+        console.warn('Invalid date string received', { dateStr, timeStr });
+        return 'Unknown';
+      }
+      
+      // If we just have dates, display them directly
+      if (!timeStr) {
+        return dateStr;
+      }
+      
+      return `${dateStr} ${timeStr}`;
+    } catch (error) {
+      console.error('Error formatting date/time:', error, { dateStr, timeStr });
+      return 'Unknown';
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -85,7 +107,7 @@ const CallHistoryTable: React.FC<CallHistoryTableProps> = ({
                   className="cursor-pointer hover:bg-muted"
                 >
                   {columns.find(col => col.id === 'timestamp')?.visible && (
-                    <TableCell>{call.date && call.time ? formatDate(new Date(`${call.date} ${call.time}`)) : 'Unknown'}</TableCell>
+                    <TableCell>{formatDateTime(call.date, call.time)}</TableCell>
                   )}
                   {columns.find(col => col.id === 'agentName')?.visible && (
                     <TableCell>{call.agentName || 'Unknown'}</TableCell>

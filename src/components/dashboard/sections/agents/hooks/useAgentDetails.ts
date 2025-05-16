@@ -61,6 +61,8 @@ export const useAgentDetails = (agentId: string | undefined) => {
       const voiceId = formattedAgent.voice_id;
       const knowledgeBaseIds = formattedAgent.knowledge_base_ids || [];
       
+      console.log('Knowledge base IDs from agent:', knowledgeBaseIds);
+      
       // Step 2: Fetch LLM, voice, and knowledge bases in parallel using fetchWithAuth
       const [llmData, voiceData, allKnowledgeBases, voicesList] = await Promise.all([
         llmId ? fetchWithAuth(`/get-retell-llm/${llmId}`) : null,
@@ -69,23 +71,48 @@ export const useAgentDetails = (agentId: string | undefined) => {
         fetchWithAuth('/list-voices') 
       ]);
       
+      console.log('All knowledge bases response:', allKnowledgeBases);
+      
       // If the LLM data doesn't contain the ID, add it from the agent
       if (llmData && llmId && !llmData.id) {
         llmData.id = llmId;
       }
       
-      // Filter knowledge bases to only include those associated with the agent
-      const agentKnowledgeBases = Array.isArray(allKnowledgeBases) 
-        ? allKnowledgeBases.filter((kb: KnowledgeBase) => 
-            knowledgeBaseIds.includes(kb.id))
+      // Transform knowledge bases to consistent format
+      const formattedKnowledgeBases = Array.isArray(allKnowledgeBases) 
+        ? allKnowledgeBases.map(kb => ({
+            id: kb.knowledge_base_id || kb.id,
+            name: kb.knowledge_base_name || kb.name,
+            created_at: kb.created_at || new Date(kb.user_modified_timestamp).toISOString(),
+            sources: kb.knowledge_base_sources || [],
+            auto_sync: kb.enable_auto_refresh || false
+          }))
         : [];
+      
+      console.log('Formatted knowledge bases:', formattedKnowledgeBases);
+      
+      // Filter knowledge bases to only include those associated with the agent
+      let agentKnowledgeBases = [];
+      
+      // If the agent has knowledge_base_ids, use those to filter
+      if (knowledgeBaseIds && knowledgeBaseIds.length > 0) {
+        agentKnowledgeBases = formattedKnowledgeBases.filter(kb => 
+          knowledgeBaseIds.includes(kb.id));
+        console.log('Filtered knowledge bases by IDs:', agentKnowledgeBases);
+      } 
+      // Legacy support: if agent has a single knowledge_base property
+      else if (formattedAgent.knowledge_base) {
+        agentKnowledgeBases = formattedKnowledgeBases.filter(kb => 
+          kb.id === formattedAgent.knowledge_base);
+        console.log('Filtered knowledge bases by legacy ID:', agentKnowledgeBases);
+      }
       
       // Update state with all fetched data
       setState(prev => ({
         ...prev,
         llm: llmData,
         voice: voiceData,
-        knowledgeBases: agentKnowledgeBases,
+        knowledgeBases: formattedKnowledgeBases, // Pass all knowledge bases, not just filtered ones
         availableVoices: voicesList?.voices ?? [],
         isLoading: false
       }));

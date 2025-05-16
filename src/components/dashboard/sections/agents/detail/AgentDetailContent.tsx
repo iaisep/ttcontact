@@ -1,11 +1,11 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RetellAgent, RetellVoice, RetellLLM } from '@/components/dashboard/sections/agents/types/retell-types';
 import AgentDetailHeader from './AgentDetailHeader';
 import AgentLeftColumn from './AgentLeftColumn';
 import AgentRightColumn from './AgentRightColumn';
-import AgentSettingsAccordion from './AgentSettingsAccordion';
-import KnowledgeBaseSummary from './KnowledgeBaseSummary';
+import AgentSettingsAccordion from './settings-accordion';
+import { Toaster } from '@/components/ui/sonner';
 
 interface KnowledgeBase {
   id: string;
@@ -31,6 +31,11 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
   updateAgentField,
   refreshData
 }) => {
+  // Debug logs
+  useEffect(() => {
+    console.log('Agent Detail Content - knowledgeBases:', knowledgeBases);
+  }, [knowledgeBases]);
+
   return (
     <div className="min-h-screen bg-background">
       <AgentDetailHeader 
@@ -40,8 +45,6 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
       />
 
       <div className="container py-6 px-4">
-        <KnowledgeBaseSummary knowledgeBases={knowledgeBases} />
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Left Column - Prompt Editor */}
           <div className="lg:col-span-5">
@@ -73,6 +76,9 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({
           </div>
         </div>
       </div>
+      
+      {/* Add Sonner Toaster for toast notifications */}
+      <Toaster />
     </div>
   );
 };

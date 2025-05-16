@@ -16,19 +16,19 @@ const SidebarHeader = ({ sidebarCollapsed, toggleSidebar }: SidebarHeaderProps) 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder.svg" />
+            <AvatarImage src="https://retell-utils-public.s3.us-west-2.amazonaws.com/Dorothy.png" alt="Avatar" />
             <AvatarFallback>RA</AvatarFallback>
           </Avatar>
-          {!sidebarCollapsed && <h1 className="text-lg font-semibold">UISEP_IA</h1>}
+          {!sidebarCollapsed && <h1 className="text-lg font-semibold">Agentes</h1>}
         </div>
         <SidebarToggle sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
       </div>
       {!sidebarCollapsed && (
         <div className="mt-2 flex items-center justify-between">
           <select className="bg-background border border-input rounded px-2 py-1 text-xs w-full">
-            <option>{t('my_workspace')}</option>
-            <option>{t('team_workspace')}</option>
-            <option>{t('enterprise_workspace')}</option>
+            <option>{t('my workspace')}</option>
+            <option>{t('team workspace')}</option>
+            <option>{t('enterprise workspace')}</option>
           </select>
         </div>
       )}

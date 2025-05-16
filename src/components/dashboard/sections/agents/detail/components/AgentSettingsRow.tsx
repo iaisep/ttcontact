@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
 import SelectorsRow from './SelectorsRow';
@@ -14,7 +15,7 @@ interface AgentSettingsRowProps {
   updateAgentField: (fieldName: string, value: any) => void;
 }
 
-export const AgentSettingsRow: React.FC<AgentSettingsRowProps> = ({
+const AgentSettingsRow: React.FC<AgentSettingsRowProps> = ({
   agent,
   llmId,
   llmSettings,
@@ -113,3 +114,5 @@ export const AgentSettingsRow: React.FC<AgentSettingsRowProps> = ({
     </>
   );
 };
+
+export { AgentSettingsRow };

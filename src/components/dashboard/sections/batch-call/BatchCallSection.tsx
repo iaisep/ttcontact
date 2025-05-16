@@ -1,99 +1,103 @@
 
-import { useState, useEffect } from 'react';
-import { useApiContext } from '@/context/ApiContext';
-import { 
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { toast } from 'sonner';
-import { BatchCall, Agent } from './types';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Agent } from './types';
 import FileUploadStep from './FileUploadStep';
 import AgentSelectionStep from './AgentSelectionStep';
+import BatchCallHistory from './BatchCallHistory';
 import BatchCallGuide from './BatchCallGuide';
+import { useBatchCallData } from '../analytics/hooks/useBatchCallData';
 
 const BatchCallSection = () => {
-  const { fetchWithAuth } = useApiContext();
-  const [loading, setLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
-  const [selectedAgent, setSelectedAgent] = useState('');
+  const [currentStep, setCurrentStep] = useState<'upload' | 'agent' | 'history'>('upload');
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [uploadStep, setUploadStep] = useState(1);
-
-  const fetchAgents = async () => {
-    try {
-      const data = await fetchWithAuth('/agents');
-      setAgents(data);
-    } catch (error) {
-      console.error('Failed to fetch agents:', error);
-      // Mock data for UI demonstration
-      setAgents([
-        { id: 'agent_1', name: 'Sales Agent', agent_id: 'agent_1', voice_id: 'voice_1', agent_type: 'sales', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
-        { id: 'agent_2', name: 'Support Agent', agent_id: 'agent_2', voice_id: 'voice_2', agent_type: 'support', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
-        { id: 'agent_3', name: 'Appointment Scheduler', agent_id: 'agent_3', voice_id: 'voice_3', agent_type: 'scheduler', last_modification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString() },
-      ]);
-    }
-  };
-
-  // Use mock data for UI demonstration
-  useEffect(() => {
-    fetchAgents();
-  }, []);
-
-  const handleBatchCallCompletion = () => {
-    // Reset form
+  const [selectedAgent, setSelectedAgent] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  
+  // Get batch call data using the hook
+  const { batches, batchAgents } = useBatchCallData();
+  
+  // Reset the form
+  const resetForm = () => {
     setUploadedFile(null);
     setFilePreview(null);
+    setCurrentStep('upload');
     setSelectedAgent('');
-    setUploadStep(1);
-    
-    // Notify user that they can view the batch history in Analytics
-    toast.info('You can view batch call history in the Analytics section');
+  };
+
+  // Move to the agent selection step
+  const handleContinueToAgent = () => {
+    setCurrentStep('agent');
+  };
+
+  // Move back to the upload step
+  const handleBackToUpload = () => {
+    setCurrentStep('upload');
+  };
+
+  // Complete the batch call process
+  const handleBatchCallComplete = () => {
+    setCurrentStep('history');
+    resetForm();
   };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Batch Call</h1>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload Contacts</CardTitle>
-              <CardDescription>
-                Upload a CSV or JSON file with phone numbers to make batch calls.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {uploadStep === 1 ? (
-                <FileUploadStep 
-                  uploadedFile={uploadedFile}
-                  setUploadedFile={setUploadedFile}
-                  filePreview={filePreview}
-                  setFilePreview={setFilePreview}
-                  onContinue={() => setUploadStep(2)}
-                />
-              ) : (
-                <AgentSelectionStep 
-                  agents={agents}
-                  selectedAgent={selectedAgent}
-                  setSelectedAgent={setSelectedAgent}
-                  onBack={() => setUploadStep(1)}
-                  onStartBatch={handleBatchCallCompletion}
-                  loading={loading}
-                />
-              )}
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div>
-          <BatchCallGuide />
-        </div>
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold tracking-tight">Batch Call</h2>
       </div>
+      
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle>
+            Upload Contacts
+          </CardTitle>
+          <p className="text-muted-foreground">
+            Upload a CSV or JSON file with phone numbers to make batch calls.
+          </p>
+        </CardHeader>
+        <CardContent>
+          {currentStep === 'upload' && (
+            <FileUploadStep 
+              uploadedFile={uploadedFile}
+              setUploadedFile={setUploadedFile}
+              filePreview={filePreview}
+              setFilePreview={setFilePreview}
+              onContinue={handleContinueToAgent}
+            />
+          )}
+          
+          {currentStep === 'agent' && (
+            <AgentSelectionStep 
+              agents={agents}
+              selectedAgent={selectedAgent}
+              setSelectedAgent={setSelectedAgent}
+              onBack={handleBackToUpload}
+              onStartBatch={handleBatchCallComplete}
+              loading={loading}
+            />
+          )}
+          
+          {currentStep === 'history' && (
+            <div className="space-y-4">
+              <BatchCallHistory 
+                batches={batches}
+                agents={batchAgents}
+              />
+              <div className="flex justify-end">
+                <Button onClick={() => setCurrentStep('upload')}>
+                  Start New Batch Call
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      <BatchCallGuide />
     </div>
   );
 };

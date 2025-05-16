@@ -10,6 +10,7 @@ export interface RetellAgent {
   volume?: number;
   enable_backchannel?: boolean;
   backchannel_words?: string[];
+  backchannel_frequency?: number;
   reminder_trigger_ms?: number;
   reminder_max_count?: number;
   interruption_sensitivity?: number;
@@ -26,12 +27,14 @@ export interface RetellAgent {
   opt_out_sensitive_data_storage?: boolean;
   normalize_for_speech?: boolean;
   end_call_after_silence_ms?: number;
+  end_call_after_silence?: boolean;
   enable_voicemail_detection?: boolean;
   voicemail_message?: string;
   post_call_analysis_data?: PostCallAnalysisItem[];
   max_call_duration_ms?: number;
   voicemail_detection_timeout_ms?: number;
   begin_message_delay_ms?: number;
+  ring_duration_ms?: number;
   post_call_analysis_model?: string;
   enable_transcription_formatting?: boolean;
   description?: string;
@@ -47,6 +50,11 @@ export interface RetellAgent {
   };
   functions?: RetellFunction[];
   folder?: string;
+  pronunciation_dictionary?: {
+    word: string;
+    alphabet: string;
+    phoneme: string;
+  }[];
   
   // Additional properties for backward compatibility
   name?: string;
@@ -64,6 +72,7 @@ export interface PostCallAnalysisItem {
   name: string;
   description: string;
   examples?: string[];
+  choices?: string[]; // Added for enum/selector type items
 }
 
 export interface RetellFunction {

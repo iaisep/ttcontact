@@ -18,3 +18,11 @@ export interface VoiceFilterState {
   accent: string;
   age: string;
 }
+
+export interface CommunityVoice {
+  id: string;
+  name: string;
+  description: string;
+  provider_voice_id: string;
+  public_user_id: string;
+}

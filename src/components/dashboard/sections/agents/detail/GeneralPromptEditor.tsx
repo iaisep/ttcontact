@@ -82,7 +82,7 @@ const GeneralPromptEditor: React.FC<GeneralPromptEditorProps> = ({
   return (
     <div className="rounded-md border overflow-hidden">
       <div className="bg-muted/30 px-4 py-2 border-b flex justify-between items-center">
-        <span className="text-sm font-medium">{t('llm_general_prompt')}</span>
+        <span className="text-sm font-medium">{t('General prompt')}</span>
         <button 
           onClick={() => setExpanded(!expanded)}
           className="text-[10px] text-muted-foreground hover:text-foreground"

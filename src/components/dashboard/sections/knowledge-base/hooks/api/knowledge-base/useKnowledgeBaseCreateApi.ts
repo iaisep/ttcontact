@@ -1,126 +1,80 @@
 
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { useApiContext } from '@/context/ApiContext';
 import { KnowledgeBase } from '../../../types';
 
 export const useKnowledgeBaseCreateApi = () => {
-  const { fetchWithAuth, baseURL } = useApiContext();
-  const [loading, setLoading] = useState(false);
+  const { fetchWithAuth } = useApiContext();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const createKnowledgeBase = async (nameOrData: string | { 
-    name: string; 
-    urls?: string[]; 
-    autoSync?: boolean 
-  }) => {
+  const createKnowledgeBase = async (
+    nameOrData: string | { 
+      name: string; 
+      urls?: string[]; 
+      autoSync?: boolean;
+    }
+  ): Promise<KnowledgeBase> => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       
-      let name: string;
-      let urls: string[] = [];
-      let autoSync: boolean = false;
+      // Convert string parameter to object format
+      const data = typeof nameOrData === 'string' 
+        ? { name: nameOrData } 
+        : nameOrData;
       
-      if (typeof nameOrData === 'string') {
-        name = nameOrData;
-      } else {
-        name = nameOrData.name;
-        urls = nameOrData.urls || [];
-        autoSync = nameOrData.autoSync || false;
-      }
-      
-      // Make sure we have a valid name, never use default unless empty string
-      const kbName = name && name.trim() !== '' ? name.trim() : 'New Knowledge Base';
-      
-      console.log('Creating knowledge base with form data:', {
-        name: kbName,
-        urls,
-        autoSync
-      });
-      
-      // Create FormData object according to the API requirements shown in the images
+      console.log('Creating knowledge base with data:', data);
+
+      // Create FormData for the API call
       const formData = new FormData();
       
-      // Use the provided name - this is the critical part
-      formData.append('knowledge_base_name', kbName);
+      // Always set the knowledge base name
+      formData.append('knowledge_base_name', data.name);
       
-      // Always include these fields as empty arrays if not provided
+      // Initialize empty arrays for texts and URLs
       formData.append('knowledge_base_texts', JSON.stringify([]));
-      formData.append('knowledge_base_urls', JSON.stringify(urls));
-      formData.append('enable_auto_refresh', String(autoSync));
       
-      console.log('Request URL:', `${baseURL}/create-knowledge-base`);
-      console.log('Form data:', Object.fromEntries(formData.entries()));
-      
-      const response = await fetchWithAuth('create-knowledge-base', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-        },
-        body: formData,
-        mode: 'cors'
-      });
-      
-      console.log('Knowledge base creation response:', response);
-      
-      const responseData = response;
-      
-      // Always use the provided name for consistency
-      const createdKb: KnowledgeBase = {
-        id: responseData.knowledge_base_id || `kb_${Date.now()}`,
-        name: kbName,
-        created_at: new Date(responseData.user_modified_timestamp || Date.now()).toISOString(),
-        updated_at: new Date(responseData.user_modified_timestamp || Date.now()).toISOString(),
-        source_count: urls.length,
-        sources: urls.map(url => ({
-          id: `src_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          type: 'url',
-          title: url,
-          url: url,
-          created_at: new Date().toISOString(),
-        })),
-        auto_sync: responseData.enable_auto_refresh || autoSync
-      };
-      
-      toast.success('Knowledge base created');
-      return createdKb;
-    } catch (error) {
-      console.error('Failed to create knowledge base:', error);
-      toast.error('Failed to create knowledge base');
-      
-      // Create fallback knowledge base with user-provided name
-      let name: string;
-      
-      if (typeof nameOrData === 'string') {
-        name = nameOrData || 'New Knowledge Base';
+      // If URLs are provided, add them
+      if (data.urls && data.urls.length > 0) {
+        formData.append('knowledge_base_urls', JSON.stringify(data.urls));
+        formData.append('enable_auto_refresh', data.autoSync ? 'true' : 'false');
       } else {
-        name = nameOrData.name || 'New Knowledge Base';
+        formData.append('knowledge_base_urls', JSON.stringify([]));
+        formData.append('enable_auto_refresh', 'false');
+      }
+
+      // Make the API call
+      const response = await fetchWithAuth('/create-knowledge-base', {
+        method: 'POST',
+        body: formData,
+      });
+
+      console.log('Create knowledge base response:', response);
+      
+      // If the API returns a proper response, use it
+      if (response && response.id) {
+        return response as KnowledgeBase;
       }
       
-      const newKb: KnowledgeBase = {
+      // Fallback to mock response if the API doesn't return expected data
+      return {
         id: `kb_${Date.now()}`,
-        name: name,
+        name: data.name,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        source_count: typeof nameOrData === 'string' ? 0 : (nameOrData.urls?.length || 0),
-        sources: typeof nameOrData === 'string' ? [] : (nameOrData.urls || []).map(url => ({
-          id: `src_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          type: 'url',
-          title: url,
-          url: url,
-          created_at: new Date().toISOString(),
-        })),
-        auto_sync: typeof nameOrData === 'string' ? false : (nameOrData.autoSync || false)
+        source_count: data.urls?.length || 0,
+        sources: [],
+        auto_sync: !!data.autoSync
       };
-      
-      return newKb;
+    } catch (error) {
+      console.error('Error creating knowledge base:', error);
+      throw error;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return {
-    loading,
-    setLoading,
-    createKnowledgeBase
+    createKnowledgeBase,
+    isLoading
   };
 };

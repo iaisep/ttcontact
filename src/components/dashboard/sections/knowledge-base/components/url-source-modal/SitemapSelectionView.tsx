@@ -34,11 +34,23 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
   currentKnowledgeBase,
   knowledgeBaseName
 }) => {
+  // Modified logic to always allow proceeding if a knowledge base name is provided
   const hasSelectedPages = selectedPageUrls.length > 0;
-  const hasKnowledgeBase = !!currentKnowledgeBase?.id || !!knowledgeBaseName;
-  const canProceed = hasSelectedPages && hasKnowledgeBase;
   
+  // If we have a knowledge base name or ID, we can proceed
+  const hasKnowledgeBase = !!(knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.id));
+  
+  // Allow proceeding if we have a knowledge base name/ID, and either:
+  // 1. We have selected pages, or
+  // 2. No web pages were found (empty response or error)
+  const canProceed = hasKnowledgeBase && (hasSelectedPages || webPages.length === 0);
+  
+  // Determine the name to display - prioritize knowledgeBaseName prop over currentKnowledgeBase.name
   const displayName = knowledgeBaseName || (currentKnowledgeBase && currentKnowledgeBase.name);
+
+  console.log('SitemapSelectionView - knowledgeBaseName:', knowledgeBaseName);
+  console.log('SitemapSelectionView - currentKnowledgeBase:', currentKnowledgeBase);
+  console.log('SitemapSelectionView - displayName:', displayName);
 
   return (
     <div className="space-y-4 p-6">
@@ -64,35 +76,43 @@ const SitemapSelectionView: React.FC<SitemapSelectionViewProps> = ({
           </label>
         </div>
         
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm font-medium">Select pages to include:</div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleAll}
-            className="text-xs"
-          >
-            {selectedPageUrls.length === webPages.length ? 'Deselect all' : 'Select all'}
-          </Button>
-        </div>
-        
-        <div className="border rounded-md max-h-60 overflow-y-auto">
-          {webPages.map((page) => (
-            <div 
-              key={page.url}
-              className="flex items-center px-3 py-2 hover:bg-gray-50 border-b last:border-b-0"
-            >
-              <Checkbox
-                id={`page-${page.url}`}
-                checked={selectedPageUrls.includes(page.url)}
-                onCheckedChange={() => onSelectionToggle(page.url)}
-              />
-              <label htmlFor={`page-${page.url}`} className="ml-2 text-sm truncate flex-grow cursor-pointer">
-                {page.title || page.url}
-              </label>
+        {webPages.length > 0 ? (
+          <>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm font-medium">Select pages to include:</div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onToggleAll}
+                className="text-xs"
+              >
+                {selectedPageUrls.length === webPages.length ? 'Deselect all' : 'Select all'}
+              </Button>
             </div>
-          ))}
-        </div>
+            
+            <div className="border rounded-md max-h-60 overflow-y-auto">
+              {webPages.map((page) => (
+                <div 
+                  key={page.url}
+                  className="flex items-center px-3 py-2 hover:bg-gray-50 border-b last:border-b-0"
+                >
+                  <Checkbox
+                    id={`page-${page.url}`}
+                    checked={selectedPageUrls.includes(page.url)}
+                    onCheckedChange={() => onSelectionToggle(page.url)}
+                  />
+                  <label htmlFor={`page-${page.url}`} className="ml-2 text-sm truncate flex-grow cursor-pointer">
+                    {page.title || page.url}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="p-4 bg-amber-50 text-amber-700 rounded-md">
+            <p className="text-sm">No pages were found or there was an error retrieving the sitemap. You can still create a knowledge base for this URL.</p>
+          </div>
+        )}
 
         <div className="flex justify-between mt-4 pt-4 border-t">
           <Button

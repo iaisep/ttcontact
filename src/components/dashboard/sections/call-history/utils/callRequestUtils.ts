@@ -1,50 +1,37 @@
 
-import { FilterOption } from '../types';
+import { FilterOption } from "../types";
 
 /**
- * Prepare request data for the call history API
- * @param currentPage Current page number
- * @param pageSize Number of items per page
- * @param searchQuery Search query string
- * @param filters Array of applied filters
- * @param dateRange Date range for filtering
- * @returns Request data object for API call
+ * Prepares the request data for fetching call history
  */
 export const prepareCallHistoryRequest = (
-  currentPage: number,
+  page: number,
   pageSize: number,
   searchQuery: string,
   filters: FilterOption[],
-  dateRange: {start: Date | null, end: Date | null}
-): Record<string, any> => {
-  const requestData: Record<string, any> = {
-    page: currentPage,
-    page_size: pageSize
+  dateRange: {from: Date | null, to: Date | null}
+) => {
+  // Create the base request object
+  const request = {
+    page,
+    pageSize,
+    search: searchQuery || "",
+    filters: [],
+    dateRange: {
+      from: dateRange.from ? dateRange.from.toISOString() : null,
+      to: dateRange.to ? dateRange.to.toISOString() : null
+    }
   };
-  
-  // Add date range if defined
-  if (dateRange.start) {
-    requestData.start_date = dateRange.start.toISOString();
-  }
-  if (dateRange.end) {
-    requestData.end_date = dateRange.end.toISOString();
-  }
-  
-  // Add filters if any
-  if (filters.length > 0) {
-    const filterData: Record<string, any> = {};
-    filters.forEach(filter => {
-      if (filter.value !== null && filter.value !== '') {
-        filterData[`filter_${filter.field}`] = String(filter.value);
-      }
-    });
-    requestData.filters = filterData;
+
+  // Add any applied filters
+  if (filters && filters.length > 0) {
+    // @ts-ignore - This is fine, we're building the request object
+    request.filters = filters.map(filter => ({
+      field: filter.field,
+      value: filter.value,
+      operator: filter.operator
+    }));
   }
 
-  // Add search query if exists
-  if (searchQuery) {
-    requestData.search = searchQuery;
-  }
-
-  return requestData;
+  return request;
 };

@@ -1,16 +1,12 @@
 
 import React, { useState } from 'react';
 import { RetellAgent, RetellVoice } from '@/components/dashboard/sections/agents/types/retell-types';
-import { Mic, Phone, TestTube, Volume, Clock as ClockIcon } from 'lucide-react';
+import { Mic } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTestPanel } from '../../hooks/useTestPanel';
 import TestButtons from './TestButtons';
 import TranscriptPanel from '../TranscriptPanel';
 import TestControlButton from '../TestControlButton';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 
 interface TestPanelProps {
   agent: RetellAgent;
@@ -63,6 +59,7 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
         onAudioTest={handleAudioTest}
         onLlmTest={handleLlmTest}
         onCodeTest={handleCodeTest}
+        agentId={agent?.agent_id || agent?.id}
       />
       
       <TranscriptPanel 
@@ -71,41 +68,7 @@ const TestPanel: React.FC<TestPanelProps> = ({ agent, voice }) => {
       />
       
       <div className="w-full flex justify-between items-center px-2 mb-1">
-        <Popover>
-          <PopoverTrigger asChild>
-            <button className="flex items-center text-gray-500 hover:text-gray-700">
-              <Volume className="h-3 w-3 mr-1" />
-              <span className="text-xs">{audioVolume}%</span>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-72">
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm">{t('audio_settings') || 'Audio Settings'}</h4>
-              <Separator />
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="volume" className="text-xs">{t('volume') || 'Volume'}</Label>
-                  <span className="text-xs text-muted-foreground">{audioVolume}%</span>
-                </div>
-                <Slider
-                  id="volume"
-                  min={0}
-                  max={100}
-                  step={5}
-                  defaultValue={[audioVolume]}
-                  onValueChange={(value) => setAudioVolume(value[0])}
-                />
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-        
-        {isRecording && (
-          <div className="flex items-center">
-            <ClockIcon className="h-3 w-3 text-red-500 mr-1" />
-            <span className="text-xs text-red-500">{formatTime(recordingDuration)}</span>
-          </div>
-        )}
+        {/* Volume control and timer removed/commented */}
       </div>
       
       <div className={`mb-3 rounded-full bg-gray-100 p-5 flex items-center justify-center ${isRecording ? 'bg-red-100 animate-pulse' : ''}`}>

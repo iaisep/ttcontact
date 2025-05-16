@@ -50,7 +50,11 @@ const WebhookSettings = ({ webhookUrl, onUpdateWebhook }: WebhookSettingsProps) 
     setUrl(e.target.value);
   };
 
-  const handleWebhookSave = async () => {
+  const handleWebhookBlur = async () => {
+    if (!webhookEnabled || url === webhookUrl) {
+      return; // Skip if webhook is disabled or URL hasn't changed
+    }
+
     if (!url) {
       toast.error('Please enter a valid webhook URL');
       return;
@@ -93,6 +97,7 @@ const WebhookSettings = ({ webhookUrl, onUpdateWebhook }: WebhookSettingsProps) 
               placeholder="https://your-webhook-url.com" 
               value={url}
               onChange={handleWebhookUrlChange}
+              onBlur={handleWebhookBlur}
               className="w-full"
               disabled={isLoading}
             />

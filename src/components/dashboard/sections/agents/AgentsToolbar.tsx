@@ -16,20 +16,28 @@ interface AgentsToolbarProps {
   onAddAgent: () => void;
   onImportAgents: () => void;
   onRefreshAgents: () => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
 const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
   onAddAgent,
   onImportAgents,
   onRefreshAgents,
+  searchQuery = '',
+  onSearchChange = () => {},
 }) => {
   const { t } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState('');
   const [folderFilter, setFolderFilter] = useState('');
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   
   // Mock folders for demonstration
   const folders = ['Personal', 'Business', 'Support'];
+
+  // Handle search input changes
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSearchChange(e.target.value);
+  };
 
   return (
     <div className="space-y-6">
@@ -40,7 +48,7 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
             <DropdownMenuTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
-                {t('create_agent')}
+                {t('create agent')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
@@ -66,9 +74,7 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="outline" onClick={onImportAgents}>
-            {t('import')}
-          </Button>
+
           <Button variant="ghost" size="icon" onClick={onRefreshAgents} title={t('refresh')}>
             <RefreshCw className="h-4 w-4" />
           </Button>
@@ -83,24 +89,10 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
             placeholder={t('search_agents')}
             className="pl-8"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
-        <div className="relative w-64">
-          <Filter className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <select
-            className="w-full h-10 rounded-md border border-input bg-background px-8 py-2"
-            value={folderFilter}
-            onChange={(e) => setFolderFilter(e.target.value)}
-          >
-            <option value="">{t('all_folders')}</option>
-            {folders.map((folder) => (
-              <option key={folder} value={folder}>
-                {folder}
-              </option>
-            ))}
-          </select>
-        </div>
+
       </div>
       
       {showTemplateDialog && (
