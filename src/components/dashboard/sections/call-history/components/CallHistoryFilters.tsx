@@ -5,7 +5,6 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
 import { FilterOption } from '../types';
 import DateRangePicker from './DateRangePicker';
 import AgentFilterPopover from './filter/AgentFilterPopover';
@@ -20,8 +19,8 @@ interface CallHistoryFiltersProps {
   addFilter: (filter: FilterOption) => void;
   removeFilter: (index: number) => void;
   clearFilters: () => void;
-  dateRange: { from: Date | undefined; to: Date | undefined };
-  updateDateRange: (range: { from: Date | undefined; to: Date | undefined }) => void;
+  dateRange: { from: Date | null; to: Date | null };
+  updateDateRange: (range: { from: Date | null; to: Date | null }) => void;
   columnVisibility: Record<string, boolean>;
   toggleColumnVisibility: (columnId: string) => void;
   updateColumnVisibility: (columnVisibility: Record<string, boolean>) => void;
@@ -63,6 +62,11 @@ const CallHistoryFilters: React.FC<CallHistoryFiltersProps> = ({
     setIsAgentFilterOpen(false);
   };
 
+  // Handle date range change
+  const handleDateRangeChange = (start: Date | null, end: Date | null) => {
+    updateDateRange({ from: start, to: end });
+  };
+
   return (
     <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
       {/* Search bar */}
@@ -81,7 +85,7 @@ const CallHistoryFilters: React.FC<CallHistoryFiltersProps> = ({
         <DateRangePicker
           startDate={dateRange.from || null}
           endDate={dateRange.to || null}
-          onRangeChange={(start, end) => updateDateRange({ from: start, to: end })}
+          onRangeChange={handleDateRangeChange}
           className="ml-2"
         />
       </div>

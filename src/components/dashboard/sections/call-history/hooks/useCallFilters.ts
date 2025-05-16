@@ -5,9 +5,9 @@ import { FilterOption } from '../types';
 export const useCallFilters = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<FilterOption[]>([]);
-  const [dateRange, setDateRange] = useState<{start: Date | null, end: Date | null}>({
-    start: null,
-    end: null
+  const [dateRange, setDateRange] = useState<{from: Date | null, to: Date | null}>({
+    from: null,
+    to: null
   });
 
   // Apply filters function
@@ -33,8 +33,8 @@ export const useCallFilters = () => {
   };
 
   // Update date range
-  const updateDateRange = (start: Date | null, end: Date | null) => {
-    setDateRange({ start, end });
+  const updateDateRange = (range: { from: Date | null, to: Date | null }) => {
+    setDateRange(range);
   };
 
   return {

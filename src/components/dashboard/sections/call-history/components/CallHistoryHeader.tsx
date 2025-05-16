@@ -2,13 +2,14 @@
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Download, RefreshCw } from 'lucide-react';
 
 interface CallHistoryHeaderProps {
-  onExport: () => void;
+  onExport?: () => void;
+  refreshData?: () => Promise<void>;
 }
 
-const CallHistoryHeader: React.FC<CallHistoryHeaderProps> = ({ onExport }) => {
+const CallHistoryHeader: React.FC<CallHistoryHeaderProps> = ({ onExport, refreshData }) => {
   const { t } = useLanguage();
 
   return (
@@ -16,6 +17,17 @@ const CallHistoryHeader: React.FC<CallHistoryHeaderProps> = ({ onExport }) => {
       <h1 className="text-2xl font-bold">{t('call_history')}</h1>
       
       <div className="flex flex-wrap items-center gap-2">
+        {refreshData && (
+          <Button 
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={refreshData}
+          >
+            <RefreshCw className="h-4 w-4" />
+            {t('refresh')}
+          </Button>
+        )}
+        
         <Button 
           variant="outline"
           className="flex items-center gap-2"
