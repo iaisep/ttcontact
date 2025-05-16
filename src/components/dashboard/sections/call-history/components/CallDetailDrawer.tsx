@@ -62,6 +62,40 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
     }
   };
 
+  // Handle transcript download in JSON format
+  const handleDownloadTranscript = () => {
+    try {
+      // If transcript_with_tool_calls is available, use it
+      if (call.transcript_with_tool_calls && Array.isArray(call.transcript_with_tool_calls)) {
+        const jsonData = JSON.stringify(call.transcript_with_tool_calls, null, 2);
+        const blob = new Blob([jsonData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `transcript-${call.callId}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } else if (call.transcript) {
+        // Fallback to plain text transcript if available
+        const blob = new Blob([call.transcript], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `transcript-${call.callId}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Error downloading transcript:', error);
+    }
+  };
+
   // Determine call summary content to display
   const getCallSummary = () => {
     // Log data for debugging
@@ -148,7 +182,7 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
             <Button variant="outline" onClick={onClose}>
               {t('close')}
             </Button>
-            <Button onClick={handleDownload}>{t('download_transcript')}</Button>
+            <Button onClick={handleDownloadTranscript}>{t('download_transcript')}</Button>
           </div>
         </DrawerFooter>
       </DrawerContent>
