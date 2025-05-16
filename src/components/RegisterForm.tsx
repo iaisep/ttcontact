@@ -7,13 +7,14 @@ import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { signUpWithEmail } from "@/lib/supabase";
 import { getValidationError } from "@/lib/validators";
 import { useLanguage } from "@/context/LanguageContext";
+import { toast } from "sonner";
 
 interface RegisterFormProps {
   switchToLogin: () => void;
 }
 
 const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,9 +28,9 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
 
   const validateForm = () => {
     const newErrors = {
-      name: getValidationError("name", name),
-      email: getValidationError("email", email),
-      password: getValidationError("password", password),
+      name: language === 'es' ? getValidationError("name", name) : name ? "" : "Name is required",
+      email: language === 'es' ? getValidationError("email", email) : !email ? "Email is required" : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "Enter a valid email" : "",
+      password: language === 'es' ? getValidationError("password", password) : password.length < 6 ? "Password must be at least 6 characters" : "",
     };
 
     setErrors(newErrors);
@@ -46,18 +47,31 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
     try {
       const { user, error } = await signUpWithEmail(email, password, name);
       
-      if (user && !error) {
-        // Registration successful, Supabase will send confirmation email
-        // We'll switch to login view
+      if (error) {
+        console.error("Registration error:", error);
+        toast.error(error.message);
+      } else if (user) {
+        toast.success(t('registration_success'));
+        // Registration successful, switch to login view
         switchToLogin();
       }
     } catch (error) {
       console.error("Registration error:", error);
+      toast.error(language === 'es' ? "Error al registrarse. Por favor intente nuevamente." : "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Labels for form fields
+  const nameLabel = language === 'es' ? "Nombre" : "Name";
+  const emailLabel = language === 'es' ? "Email" : "Email";
+  const passwordLabel = language === 'es' ? "Contraseña" : "Password";
+  
+  // Placeholders for form inputs
+  const namePlaceholder = language === 'es' ? "Tu nombre" : "Your name";
+  const emailPlaceholder = language === 'es' ? "Tu correo electrónico" : "Your email";
+  
   return (
     <div className="animate-fade-in w-full max-w-md px-8 py-10">
       <div className="space-y-2 text-center mb-8">
@@ -69,11 +83,11 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="name">{t("name")}</Label>
+          <Label htmlFor="name">{nameLabel}</Label>
           <Input
             id="name"
             type="text"
-            placeholder={t("your_name")}
+            placeholder={namePlaceholder}
             value={name}
             onChange={(e) => {
               setName(e.target.value);
@@ -91,11 +105,11 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">{t("email")}</Label>
+          <Label htmlFor="email">{emailLabel}</Label>
           <Input
             id="email"
             type="email"
-            placeholder={t("your_email")}
+            placeholder={emailPlaceholder}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -113,7 +127,7 @@ const RegisterForm = ({ switchToLogin }: RegisterFormProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="register-password">{t("password")}</Label>
+          <Label htmlFor="register-password">{passwordLabel}</Label>
           <div className="relative">
             <Input
               id="register-password"
