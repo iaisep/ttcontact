@@ -1,10 +1,13 @@
+
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { CallDetailInfo, CallHistoryItem } from '../types';
 import { useCallDetailsService } from '../services';
+import { useAgentDetailsService } from '../services/agentDetailsService';
 
 export const useCallDetails = () => {
-  const { fetchCallDetailsData, fetchAgentDetails } = useCallDetailsService();
+  const { fetchCallDetailsData } = useCallDetailsService();
+  const { fetchAgentDetails } = useAgentDetailsService();
   const [selectedCall, setSelectedCall] = useState<CallDetailInfo | null>(null);
 
   // Function to fetch call details when a call is selected

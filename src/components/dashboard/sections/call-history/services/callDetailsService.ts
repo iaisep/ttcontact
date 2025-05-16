@@ -1,7 +1,6 @@
 
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
-import { CallDetailInfo, CallHistoryItem } from '../types';
 
 /**
  * Service for handling call details API operations
@@ -16,7 +15,7 @@ export const useCallDetailsService = () => {
    */
   const fetchCallDetailsData = async (callId: string) => {
     try {
-      // Usar el endpoint correcto con GET para obtener detalles de llamada
+      // Use GET endpoint to fetch call details
       const callDetails = await fetchWithAuth(`/v2/get-call/${callId}`, {
         method: 'GET',
         headers: {
@@ -38,42 +37,7 @@ export const useCallDetailsService = () => {
     }
   };
 
-  /**
-   * Fetch information about an agent by ID
-   * @param agentId The ID of the agent to retrieve
-   * @returns Agent data response or error information
-   */
-  const fetchAgentDetails = async (agentId: string) => {
-    try {
-      // Usar el endpoint correcto con GET para obtener detalles del agente
-      const agentResponse = await fetchWithAuth(`/get-agent/${agentId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Procesar la respuesta del agente para asegurar que se use agent_name
-      const agentData = agentResponse;
-      if (agentData && agentData.agent_name) {
-        agentData.name = agentData.agent_name;
-      }
-      
-      return {
-        data: agentData || null,
-        success: true
-      };
-    } catch (error) {
-      console.error('Error fetching agent details:', error);
-      return {
-        data: null,
-        success: false
-      };
-    }
-  };
-
   return {
-    fetchCallDetailsData,
-    fetchAgentDetails
+    fetchCallDetailsData
   };
 };
