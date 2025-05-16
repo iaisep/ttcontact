@@ -82,9 +82,9 @@ export const useCallHistoryService = () => {
     try {
       console.log('Fetching call history with data:', requestData);
       
-      // Convert request data to query parameters for GET request
+      // Convert request data to query parameters for GET request - use list-calls (sin v2/)
       const queryParams = buildQueryParams(requestData);
-      const url = `/v2/list-calls${queryParams ? `?${queryParams}` : ''}`;
+      const url = `/list-calls${queryParams ? `?${queryParams}` : ''}`;
       
       const response = await fetchWithAuth(url, {
         method: 'GET',

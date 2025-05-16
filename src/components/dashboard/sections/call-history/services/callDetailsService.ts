@@ -16,8 +16,8 @@ export const useCallDetailsService = () => {
    */
   const fetchCallDetailsData = async (callId: string) => {
     try {
-      // Fetch detailed call info using GET method instead of POST
-      const callDetails = await fetchWithAuth(`/v2/get-call-details?callId=${encodeURIComponent(callId)}`, {
+      // Fetch detailed call info using GET method
+      const callDetails = await fetchWithAuth(`/get-call-details?callId=${encodeURIComponent(callId)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -45,7 +45,7 @@ export const useCallDetailsService = () => {
    */
   const fetchAgentDetails = async (agentId: string) => {
     try {
-      // Use GET method for fetching agent details
+      // Use GET method for fetching agent details with agent_name parameter
       const agentResponse = await fetchWithAuth(`/list-agents?agent_name=${encodeURIComponent(agentId)}`, {
         method: 'GET',
         headers: {
