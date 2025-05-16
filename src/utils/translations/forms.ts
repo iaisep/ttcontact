@@ -28,6 +28,15 @@ const formsTranslations = {
     "back_to_login": "Back to login",
     "no_account": "Don't have an account?",
     "sign_up": "Sign up",
+    // Reset Password
+    "reset_password": "Reset Password",
+    "enter_new_password": "Enter your new password below",
+    "new_password": "New Password",
+    "update_password": "Update Password",
+    "password_reset_success": "Password updated successfully!",
+    "password_reset_failed": "Failed to reset password. Please try again.",
+    "passwords_dont_match": "Passwords don't match",
+    "remember_password": "Remember your password?"
   },
   es: {
     // Login/Register
@@ -56,6 +65,15 @@ const formsTranslations = {
     "back_to_login": "Volver al inicio de sesión",
     "no_account": "¿No tienes una cuenta?",
     "sign_up": "Registrarse",
+    // Reset Password
+    "reset_password": "Restablecer Contraseña",
+    "enter_new_password": "Ingresa tu nueva contraseña a continuación",
+    "new_password": "Nueva Contraseña",
+    "update_password": "Actualizar Contraseña",
+    "password_reset_success": "¡Contraseña actualizada con éxito!",
+    "password_reset_failed": "Error al restablecer la contraseña. Por favor, inténtalo de nuevo.",
+    "passwords_dont_match": "Las contraseñas no coinciden",
+    "remember_password": "¿Recuerdas tu contraseña?"
   }
 };
 
