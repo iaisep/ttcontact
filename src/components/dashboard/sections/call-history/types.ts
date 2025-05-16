@@ -23,6 +23,7 @@ export interface CallHistoryItem {
   opportunidad?: string;
   resumen_2da_llamada?: string;
   recording_url?: string;
+  call_summary?: string;
 }
 
 export interface FilterOption {

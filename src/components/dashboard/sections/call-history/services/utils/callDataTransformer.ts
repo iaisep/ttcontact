@@ -45,6 +45,8 @@ export const transformCallData = (item: any, agentMapping: Record<string, string
     endToEndLatency: item.endToEndLatency || item.end_to_end_latency,
     oportunidad: item.oportunidad || false,
     opportunidad: item.opportunidad || '',
-    resumen_2da_llamada: item.resumen_2da_llamada || ''
+    resumen_2da_llamada: item.resumen_2da_llamada || '',
+    recording_url: item.recording_url || '',
+    call_summary: item.call_summary || ''
   };
 };

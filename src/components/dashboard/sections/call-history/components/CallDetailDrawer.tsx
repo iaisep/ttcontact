@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { 
@@ -101,6 +100,20 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
       audioRef.current.currentTime = seekTime;
       setCurrentTime(seekTime);
     }
+  };
+
+  // Determine call summary content to display
+  const getCallSummary = () => {
+    // Prioritize call_summary from API if available
+    if (call.call_summary) {
+      return call.call_summary;
+    }
+    // Fall back to resumen_2da_llamada if call_summary is not available
+    if (call.resumen_2da_llamada) {
+      return call.resumen_2da_llamada;
+    }
+    // Default message if no summary is available
+    return t('no_call_summary_available');
   };
 
   return (
@@ -216,11 +229,11 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
             </div>
           </div>
           
-          {/* Additional call details could be added here */}
+          {/* Call summary section - now using the getCallSummary function */}
           <div className="mt-6">
             <h3 className="font-medium mb-2">{t('call_summary')}</h3>
             <p className="text-sm text-muted-foreground">
-              {call.resumen_2da_llamada || t('no_call_summary_available')}
+              {getCallSummary()}
             </p>
           </div>
           
