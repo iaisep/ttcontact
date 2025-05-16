@@ -16,7 +16,7 @@ const SidebarHeader = ({ sidebarCollapsed, toggleSidebar }: SidebarHeaderProps) 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder.svg" />
+            <AvatarImage src="https://retell-utils-public.s3.us-west-2.amazonaws.com/Dorothy.png" alt="Avatar" />
             <AvatarFallback>RA</AvatarFallback>
           </Avatar>
           {!sidebarCollapsed && <h1 className="text-lg font-semibold">Agentes</h1>}
