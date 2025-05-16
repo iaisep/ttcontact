@@ -12,13 +12,13 @@ import {
   FormLabel
 } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
-import { 
-  useWebhooks,
+import { useWebhooks } from './webhooks';
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from './webhooks';
+} from '@/components/ui/tooltip';
 
 interface WebhookFormValues {
   webhookUrl: string;
