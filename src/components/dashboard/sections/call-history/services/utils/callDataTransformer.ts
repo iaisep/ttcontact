@@ -52,6 +52,7 @@ export const transformCallData = (item: any, agentMapping: Record<string, string
     resumen_2da_llamada: item.resumen_2da_llamada || '',
     recording_url: item.recording_url || '',
     call_summary: callSummary,
-    transcript: item.transcript || ''
+    transcript: item.transcript || '',
+    transcript_with_tool_calls: item.transcript_with_tool_calls || []
   };
 };

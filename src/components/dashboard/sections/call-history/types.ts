@@ -25,6 +25,7 @@ export interface CallHistoryItem {
   recording_url?: string;
   call_summary?: string;
   transcript?: string;
+  transcript_with_tool_calls?: any[];
 }
 
 export interface FilterOption {

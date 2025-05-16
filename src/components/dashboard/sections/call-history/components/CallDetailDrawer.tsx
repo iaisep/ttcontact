@@ -88,7 +88,7 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
     if (call.transcript && call.transcript.trim() !== "") {
       return call.transcript;
     }
-    return 'No transcript available';
+    return '';
   };
 
   return (
@@ -135,8 +135,11 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
           {/* Call summary section */}
           <CallSummarySection summary={getCallSummary()} />
 
-          {/* Transcript section */}
-          <TranscriptSection transcript={getTranscript()} />
+          {/* Transcript section - now with transcript_with_tool_calls support */}
+          <TranscriptSection 
+            transcript={getTranscript()} 
+            transcript_with_tool_calls={call.transcript_with_tool_calls}
+          />
           
           {/* Call metrics section */}
           <CallMetrics 
