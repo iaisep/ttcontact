@@ -16,13 +16,12 @@ export const useCallDetailsService = () => {
    */
   const fetchCallDetailsData = async (callId: string) => {
     try {
-      // Fetch detailed call info using POST method
-      const callDetails = await fetchWithAuth(`/v2/get-call-details`, {
-        method: 'POST',
+      // Fetch detailed call info using GET method instead of POST
+      const callDetails = await fetchWithAuth(`/v2/get-call-details?callId=${encodeURIComponent(callId)}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ callId })
+        }
       });
       
       return {
@@ -46,12 +45,12 @@ export const useCallDetailsService = () => {
    */
   const fetchAgentDetails = async (agentId: string) => {
     try {
-      const agentResponse = await fetchWithAuth(`/list-agents`, {
-        method: 'POST',
+      // Use GET method instead of POST for fetching agent details
+      const agentResponse = await fetchWithAuth(`/list-agents?id=${encodeURIComponent(agentId)}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id: agentId })
+        }
       });
       
       return {
