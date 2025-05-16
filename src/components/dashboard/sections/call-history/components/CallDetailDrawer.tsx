@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { 
   Drawer, 
@@ -11,7 +11,7 @@ import {
   DrawerClose
 } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Play, Pause, Download } from 'lucide-react';
 import { CallHistoryItem } from '../types';
 import { formatDuration } from '@/lib/utils';
 
@@ -22,6 +22,10 @@ interface CallDetailDrawerProps {
 
 const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) => {
   const { t } = useLanguage();
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   // Safe date formatting for call timestamp
   const formatCallTimestamp = () => {
@@ -43,6 +47,62 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
     }
   };
 
+  // Handle play/pause toggle
+  const togglePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play().catch(error => {
+          console.error("Error playing audio:", error);
+        });
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  // Handle audio time update
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  // Handle audio load metadata
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  // Format time in MM:SS format
+  const formatTime = (timeInSeconds: number) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  // Handle audio download
+  const handleDownload = () => {
+    if (call.recording_url) {
+      const link = document.createElement('a');
+      link.href = call.recording_url;
+      link.download = `call-recording-${call.callId}.mp3`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  // Handle audio seeking
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const seekTime = parseFloat(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = seekTime;
+      setCurrentTime(seekTime);
+    }
+  };
+
   return (
     <Drawer open={true} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent>
@@ -61,6 +121,49 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
         </DrawerHeader>
         
         <div className="p-6">
+          {/* Audio Player */}
+          {call.recording_url && (
+            <div className="mb-6">
+              <audio 
+                ref={audioRef} 
+                src={call.recording_url} 
+                onTimeUpdate={handleTimeUpdate}
+                onLoadedMetadata={handleLoadedMetadata}
+                onEnded={() => setIsPlaying(false)}
+                className="hidden"
+              />
+              <div className="bg-gray-100 rounded-lg p-2 flex items-center space-x-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={togglePlayPause}
+                  className="h-8 w-8"
+                >
+                  {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                </Button>
+                <div className="text-sm">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </div>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max={duration || 100}
+                  value={currentTime}
+                  onChange={handleSeek}
+                  className="flex-1 h-2"
+                />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleDownload}
+                  className="h-8 w-8"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <h3 className="font-medium">{t('basic_info')}</h3>
@@ -146,7 +249,7 @@ const CallDetailDrawer: React.FC<CallDetailDrawerProps> = ({ call, onClose }) =>
             <Button variant="outline" onClick={onClose}>
               {t('close')}
             </Button>
-            <Button>{t('download_transcript')}</Button>
+            <Button onClick={handleDownload}>{t('download_transcript')}</Button>
           </div>
         </DrawerFooter>
       </DrawerContent>

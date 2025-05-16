@@ -22,6 +22,7 @@ export interface CallHistoryItem {
   oportunidad?: boolean;
   opportunidad?: string;
   resumen_2da_llamada?: string;
+  recording_url?: string;
 }
 
 export interface FilterOption {
