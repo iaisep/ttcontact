@@ -9,12 +9,14 @@ import AgentDetailPage from './pages/AgentDetailPage';
 import { useLanguage } from '@/context/LanguageContext';
 import LandingPage from './pages/LandingPage';
 import Index from './pages/Index';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Index />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/agentes" element={<AgentsListPage />} />
       <Route path="/agentes/:slug/edit" element={<AgentEditPage />} />
