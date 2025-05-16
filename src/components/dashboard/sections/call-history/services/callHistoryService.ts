@@ -1,3 +1,4 @@
+
 import { useApiContext } from '@/context/ApiContext';
 import { toast } from 'sonner';
 import { CallHistoryItem } from '../types';
@@ -72,6 +73,39 @@ export const useCallHistoryService = () => {
   };
 
   /**
+   * Fetch agents data to map agent IDs to names
+   * @returns Object mapping agent IDs to agent names
+   */
+  const fetchAgentData = async (): Promise<Record<string, string>> => {
+    try {
+      // Use GET method to fetch agents
+      const response = await fetchWithAuth('/list-agents', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Agents data response:', response);
+      
+      if (Array.isArray(response)) {
+        // Create a mapping of agent IDs to agent names
+        return response.reduce((mapping, agent) => {
+          if (agent.id || agent.agent_id) {
+            mapping[agent.id || agent.agent_id] = agent.agent_name || agent.name || 'Unknown Agent';
+          }
+          return mapping;
+        }, {} as Record<string, string>);
+      }
+      
+      return {};
+    } catch (error) {
+      console.error('Error fetching agents:', error);
+      return {};
+    }
+  };
+
+  /**
    * Fetch call history data from API
    * @param requestData Request data for API call
    * @returns API response or mock data on failure
@@ -80,6 +114,11 @@ export const useCallHistoryService = () => {
     try {
       console.log('Fetching call history with data:', requestData);
       
+      // First fetch agent data to map IDs to names
+      const agentMapping = await fetchAgentData();
+      console.log('Agent mapping:', agentMapping);
+      
+      // Then fetch call history
       const response = await fetchWithAuth('/v2/list-calls', {
         method: 'POST',
         headers: {
@@ -102,12 +141,18 @@ export const useCallHistoryService = () => {
             dateInfo = processTimestamp(item.start_timestamp);
           }
 
+          // Use agent mapping to get agent name if available
+          const agentId = item.agentId || item.agent_id;
+          const agentName = agentId && agentMapping[agentId] 
+            ? agentMapping[agentId] 
+            : (item.agentName || item.agent_name || 'Unknown');
+
           return {
             id: item.id || item.callId || item.call_id || `call-${Math.random().toString(36).substring(2, 9)}`,
             callId: item.callId || item.call_id || `call-${Math.random().toString(36).substring(2, 9)}`,
             batchCallId: item.batchCallId || item.batch_call_id,
-            agentName: item.agentName || item.agent_name,
-            agentId: item.agentId || item.agent_id,
+            agentName: agentName,
+            agentId: agentId,
             phoneNumber: item.phoneNumber || item.phone_number || '',
             from: item.from || item.from_number || 'Unknown',
             to: item.to || item.to_number || 'Unknown',

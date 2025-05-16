@@ -45,13 +45,22 @@ export const useCallDetailsService = () => {
    */
   const fetchAgentDetails = async (agentId: string) => {
     try {
-      // Use GET method instead of POST for fetching agent details
+      // Use GET method for fetching agent details
       const agentResponse = await fetchWithAuth(`/list-agents?id=${encodeURIComponent(agentId)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
         }
       });
+      
+      // Process agent response to ensure agent_name is used
+      if (agentResponse && agentResponse.length > 0) {
+        const agentData = agentResponse[0];
+        // Ensure agent_name is used for agent name field
+        if (agentData.agent_name) {
+          agentData.name = agentData.agent_name;
+        }
+      }
       
       return {
         data: agentResponse && agentResponse.length > 0 ? agentResponse[0] : null,
