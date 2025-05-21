@@ -6,7 +6,7 @@ import { useApiContext } from '@/context/ApiContext';
 
 export const useVoiceCloneHandler = () => {
   const { t } = useLanguage();
-  const { fetchWithAuth } = useApiContext();
+  const { fetchWithAuth,apiKey } = useApiContext();
   const { 
     voiceName, 
     audioFile, 
@@ -35,7 +35,7 @@ export const useVoiceCloneHandler = () => {
       // Get authentication token from the API context
       const authToken = localStorage.getItem('auth_token') || '';
       
-      console.log('Cloning voice with token:', authToken ? 'Token exists' : 'No token available');
+      console.log('Cloning voice with token:', ,apiKey ? 'Token exists' : 'No token available');
       console.log('Using baseURL:', fetchWithAuth.baseURL);
       
       // Use the fetchWithAuth.baseURL and proper authorization header
@@ -43,7 +43,7 @@ export const useVoiceCloneHandler = () => {
         method: 'POST',
         body: formData,
         headers: {
-          'Authorization': `Bearer ${authToken}`
+          'Authorization': `Bearer ${,apiKey}`
         }
       });
       
