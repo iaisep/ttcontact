@@ -7,6 +7,7 @@ const helpCenterTranslations = {
     "search_help_center": "Search for help articles...",
     "search": "Search",
     "back_to_dashboard": "Back to Dashboard",
+    "back_to_home": "Back to Home",
     "all_rights_reserved": "All rights reserved.",
     "introduction": "Introduction",
     "guides": "Guides",
@@ -26,7 +27,11 @@ const helpCenterTranslations = {
     "try_different_search_terms": "Try different search terms or browse categories on the left.",
     "no_content_for_category": "No content is available for this category yet.",
     "close": "Close",
-    "documentation": "Documentation"
+    "documentation": "Documentation",
+    "read_more": "Read More",
+    "need_help": "Need Help?",
+    "cant_find_what_looking_for": "Can't find what you're looking for? Contact our support team.",
+    "contact_us": "Contact Us"
   },
   es: {
     "help_center": "Centro de Ayuda",
@@ -34,6 +39,7 @@ const helpCenterTranslations = {
     "search_help_center": "Buscar artículos de ayuda...",
     "search": "Buscar",
     "back_to_dashboard": "Volver al Panel",
+    "back_to_home": "Volver al Inicio",
     "all_rights_reserved": "Todos los derechos reservados.",
     "introduction": "Introducción",
     "guides": "Guías",
@@ -53,7 +59,11 @@ const helpCenterTranslations = {
     "try_different_search_terms": "Intenta con diferentes términos de búsqueda o navega por las categorías de la izquierda.",
     "no_content_for_category": "Aún no hay contenido disponible para esta categoría.",
     "close": "Cerrar",
-    "documentation": "Documentación"
+    "documentation": "Documentación",
+    "read_more": "Leer Más",
+    "need_help": "¿Necesitas Ayuda?",
+    "cant_find_what_looking_for": "¿No encuentras lo que buscas? Contacta con nuestro equipo de soporte.",
+    "contact_us": "Contáctanos"
   }
 };
 

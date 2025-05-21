@@ -12,6 +12,7 @@ import Index from './pages/Index';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import HelpCenterPage from './pages/HelpCenterPage';
 import DocumentationPage from './pages/DocumentationPage';
+import GuidesPage from './pages/GuidesPage';
 
 const App: React.FC = () => {
   return (
@@ -27,6 +28,7 @@ const App: React.FC = () => {
       <Route path="/help-center" element={<HelpCenterPage />} />
       <Route path="/docs" element={<Navigate to="/help-center" replace />} />
       <Route path="/documentation" element={<DocumentationPage />} />
+      <Route path="/guides" element={<GuidesPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
