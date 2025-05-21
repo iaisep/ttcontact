@@ -17,9 +17,9 @@ const HelpCenterLayout = ({ children }: HelpCenterLayoutProps) => {
       <header className="bg-background border-b">
         <div className="container mx-auto flex items-center justify-between p-4">
           <div className="flex items-center gap-6">
-            <Link to="/dashboard" className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary">
+            <Link to="/" className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary">
               <ArrowLeft size={16} className="mr-1" />
-              {t('back_to_dashboard')}
+              {t('back_to_home')}
             </Link>
             <Link to="/" className="text-xl font-bold">
               UISEP
