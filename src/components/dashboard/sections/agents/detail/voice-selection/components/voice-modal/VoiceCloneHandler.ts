@@ -32,28 +32,15 @@ export const useVoiceCloneHandler = () => {
       formData.append('name', voiceName);
       formData.append('audio_file', audioFile);
       
-      // Get authentication token from localStorage
-      const authToken = localStorage.getItem('auth_token');
-      
-      if (!authToken) {
-        console.error('Authentication token not found');
-        toast.error(t('authentication_error') || 'Authentication error: No token found');
-        return false;
-      }
-      
-      console.log('Using auth token for voice clone:', authToken.substring(0, 5) + '...');
-      
-      // Use the clone-voice endpoint with proper authorization header
+      // Use the clone-voice endpoint and handle 201 Created response
+      // Don't expect an immediate response with data
       const response = await fetch(`${fetchWithAuth.baseURL}/clone-voice`, {
         method: 'POST',
         body: formData,
         headers: {
-          'Authorization': `Bearer ${authToken}` // Make sure token is included
-        },
-        // Don't include content-type as it's automatically set for FormData
+          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`
+        }
       });
-      
-      console.log('Voice clone response status:', response.status);
       
       if (response.status === 201 || response.ok) {
         toast.success(t('voice_cloning_started') || 'Voice cloning started successfully');
@@ -66,8 +53,6 @@ export const useVoiceCloneHandler = () => {
         
         return true;
       } else {
-        const errorText = await response.text();
-        console.error('Error response from clone-voice:', errorText);
         throw new Error(`Unexpected response status: ${response.status}`);
       }
     } catch (error) {
