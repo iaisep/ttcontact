@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { ArrowLeft } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { useApiContext } from '@/context/ApiContext';
 
 interface HelpCenterLayoutProps {
   children: ReactNode;
@@ -12,20 +11,15 @@ interface HelpCenterLayoutProps {
 
 const HelpCenterLayout = ({ children }: HelpCenterLayoutProps) => {
   const { t } = useLanguage();
-  const { isAuthenticated } = useApiContext();
-
-  // Set the return link destination based on authentication status
-  const backToPath = isAuthenticated ? "/dashboard" : "/login";
-  const backToLabel = isAuthenticated ? t('back_to_dashboard') : t('login');
 
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-background border-b">
         <div className="container mx-auto flex items-center justify-between p-4">
           <div className="flex items-center gap-6">
-            <Link to={backToPath} className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary">
+            <Link to="/dashboard" className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary">
               <ArrowLeft size={16} className="mr-1" />
-              {backToLabel}
+              {t('back_to_dashboard')}
             </Link>
             <Link to="/" className="text-xl font-bold">
               UISEP
@@ -33,11 +27,9 @@ const HelpCenterLayout = ({ children }: HelpCenterLayoutProps) => {
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle variant="switch" />
-            {!isAuthenticated && (
-              <Link to="/login" className="text-sm font-medium hover:text-primary">
-                {t('login')}
-              </Link>
-            )}
+            <Link to="/login" className="text-sm font-medium hover:text-primary">
+              {t('login')}
+            </Link>
           </div>
         </div>
       </header>
