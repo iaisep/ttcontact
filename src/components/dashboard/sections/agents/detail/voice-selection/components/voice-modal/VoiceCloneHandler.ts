@@ -33,7 +33,7 @@ export const useVoiceCloneHandler = () => {
       formData.append('audio_file', audioFile);
       
       // Get authentication token from the API context
-      const authToken = localStorage.getItem('auth_token') || '';
+      //const authToken = localStorage.getItem('auth_token') || '';
       
       console.log('Cloning voice with token:'apiKey ? 'Token exists' : 'No token available');
       console.log('Using baseURL:', fetchWithAuth.baseURL);
