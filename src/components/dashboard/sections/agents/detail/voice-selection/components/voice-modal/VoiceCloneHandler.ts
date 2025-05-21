@@ -6,7 +6,7 @@ import { useApiContext } from '@/context/ApiContext';
 
 export const useVoiceCloneHandler = () => {
   const { t } = useLanguage();
-  const { fetchWithAuth, apiKey } = useApiContext();
+  const { fetchWithAuth,apiKey } = useApiContext();
   const { 
     voiceName, 
     audioFile, 
@@ -27,26 +27,37 @@ export const useVoiceCloneHandler = () => {
     
     setIsLoading(true);
     try {
+      // Create a FormData object to send the file
       const formData = new FormData();
       formData.append('name', voiceName);
-      formData.append('files', audioFile);  // este campo debe llamarse 'files' si usas ElevenLabs
-
-      console.log('Cloning voice with token:', apiKey ? 'Token exists' : 'No token available');
+      formData.append('audio_file', audioFile);
+      
+      // Get authentication token from the API context
+      const authToken = localStorage.getItem('auth_token') || '';
+      
+      console.log('Cloning voice with token:', ,apiKey ? 'Token exists' : 'No token available');
       console.log('Using baseURL:', fetchWithAuth.baseURL);
-
+      
+      // Use the fetchWithAuth.baseURL and proper authorization header
       const response = await fetch(`${fetchWithAuth.baseURL}/clone-voice`, {
         method: 'POST',
         body: formData,
         headers: {
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer ${,apiKey}`
         }
       });
-
+      
       console.log('Voice clone response status:', response.status);
-
+      
       if (response.status === 201 || response.ok) {
         toast.success(t('voice_cloning_started') || 'Voice cloning started successfully');
-        toast.info(t('voice_processing_info') || 'Your voice is being processed and will be available shortly');
+        
+        // Inform the user that the voice will be available after processing
+        toast.info(
+          t('voice_processing_info') || 
+          'Your voice is being processed and will be available shortly'
+        );
+        
         return true;
       } else {
         const errorText = await response.text();
