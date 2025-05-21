@@ -88,7 +88,7 @@ const LandingNav = () => {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <Link to="/docs" className="flex items-center gap-1 text-sm font-medium px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                  <Link to="/help-center" className="flex items-center gap-1 text-sm font-medium px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                     {t("documentation")}
                   </Link>
                 </NavigationMenuItem>

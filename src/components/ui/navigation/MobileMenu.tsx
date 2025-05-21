@@ -71,7 +71,7 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
 
           {/* Documentation link */}
           <Link
-            to="/docs"
+            to="/help-center"
             onClick={closeMenu}
             className="py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
           >

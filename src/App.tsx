@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 import AgentEditPage from './pages/AgentEditPage';
@@ -10,6 +10,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import LandingPage from './pages/LandingPage';
 import Index from './pages/Index';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import HelpCenterPage from './pages/HelpCenterPage';
+import DocumentationPage from './pages/DocumentationPage';
 
 const App: React.FC = () => {
   return (
@@ -22,6 +24,9 @@ const App: React.FC = () => {
       <Route path="/agentes/:slug/edit" element={<AgentEditPage />} />
       <Route path="/agentes/:slug" element={<AgentDetailPage />} />
       <Route path="/agentes/new" element={<AgentEditPage />} />
+      <Route path="/help-center" element={<HelpCenterPage />} />
+      <Route path="/docs" element={<Navigate to="/help-center" replace />} />
+      <Route path="/documentation" element={<DocumentationPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

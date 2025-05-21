@@ -9,10 +9,10 @@ const DocumentationPage = () => {
   const { t } = useLanguage();
 
   useEffect(() => {
-    toast.info(t("page_under_construction"));
-    // Redirigir después de un momento
+    toast.info(t("redirecting_to_help_center"));
+    // Redirect to help center instead of home
     const timeout = setTimeout(() => {
-      navigate("/");
+      navigate("/help-center");
     }, 3000);
     
     return () => clearTimeout(timeout);
@@ -22,7 +22,7 @@ const DocumentationPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{t("documentation")}</h1>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">{t("page_coming_soon")}</p>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">{t("redirecting_to_help_center")}</p>
         <div className="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
       </div>
     </div>
