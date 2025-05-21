@@ -38,11 +38,22 @@ const VoiceSelectionContent: React.FC<VoiceSelectionContentProps> = ({
   selectedVoice,
   onVoiceAdded
 }) => {
+  const handleVoiceAdded = () => {
+    // This function will be called when a voice is added
+    console.log('Voice added in VoiceSelectionContent');
+    // If onVoiceAdded prop exists, call it
+    if (onVoiceAdded) {
+      // Since we don't have a voice object here, we'll need to refresh the list instead
+      // onVoiceAdded(voice); 
+    }
+  };
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <VoiceProviderTabs 
         activeProvider={activeProvider}
         setActiveProvider={setActiveProvider}
+        onVoiceAdded={handleVoiceAdded}
       >
         <VoiceFilterBar
           searchTerm={searchTerm}

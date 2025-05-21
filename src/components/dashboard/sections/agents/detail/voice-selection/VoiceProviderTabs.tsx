@@ -1,18 +1,39 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface VoiceProviderTabsProps {
   activeProvider: string;
   setActiveProvider: (provider: string) => void;
   children: React.ReactNode;
+  onVoiceAdded?: () => void;
 }
 
 const VoiceProviderTabs: React.FC<VoiceProviderTabsProps> = ({
   activeProvider,
   setActiveProvider,
-  children
+  children,
+  onVoiceAdded
 }) => {
+  // Listen for voiceAdded custom event
+  useEffect(() => {
+    const handleVoiceAdded = (event: CustomEvent) => {
+      console.log('Voice added event received:', event.detail);
+      // Call the onVoiceAdded callback if provided
+      if (onVoiceAdded) {
+        onVoiceAdded();
+      }
+    };
+
+    // Add event listener with proper typing
+    window.addEventListener('voiceAdded', handleVoiceAdded as EventListener);
+    
+    // Cleanup the event listener
+    return () => {
+      window.removeEventListener('voiceAdded', handleVoiceAdded as EventListener);
+    };
+  }, [onVoiceAdded]);
+
   return (
     <Tabs value={activeProvider} className="w-full h-full flex flex-col">
       <TabsList className="flex w-full h-10 border-b rounded-none bg-transparent">

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { X, Loader2 } from 'lucide-react';
 import { useVoiceFiltering } from './useVoiceFiltering';
@@ -47,15 +47,8 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
     getFilteredVoices
   } = useVoiceFiltering();
 
-  // Only fetch voices when the modal is opened and hasn't loaded yet
-  useEffect(() => {
-    if (open && !hasInitiallyLoaded) {
-      fetchVoices();
-      setHasInitiallyLoaded(true);
-    }
-  }, [open, hasInitiallyLoaded]);
-
-  const fetchVoices = async () => {
+  // Create a fetchVoices function using useCallback to prevent unnecessary re-renders
+  const fetchVoices = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
@@ -78,7 +71,31 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [fetchWithAuth, t]);
+
+  // Only fetch voices when the modal is opened and hasn't loaded yet
+  useEffect(() => {
+    if (open && !hasInitiallyLoaded) {
+      fetchVoices();
+      setHasInitiallyLoaded(true);
+    }
+  }, [open, hasInitiallyLoaded, fetchVoices]);
+
+  // Listen for voiceAdded custom event and refresh voices
+  useEffect(() => {
+    const handleVoiceAdded = () => {
+      console.log('Voice added event received in Modal, refreshing voices');
+      fetchVoices();
+    };
+
+    // Add event listener with proper typing
+    window.addEventListener('voiceAdded', handleVoiceAdded as EventListener);
+    
+    // Cleanup the event listener
+    return () => {
+      window.removeEventListener('voiceAdded', handleVoiceAdded as EventListener);
+    };
+  }, [fetchVoices]);
 
   const handleTryAgain = () => {
     fetchVoices();
@@ -87,6 +104,8 @@ const VoiceSelectionModal: React.FC<VoiceSelectionModalProps> = ({
   const handleVoiceAdded = (newVoice: RetellVoice) => {
     setVoices(prevVoices => [...prevVoices, newVoice]);
     toast.success(t('voice_added_successfully') || 'Voice added successfully');
+    // Force refresh the voice list
+    fetchVoices();
   };
 
   const filteredVoices = getFilteredVoices(voices);

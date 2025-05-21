@@ -6,7 +6,7 @@ import { useApiContext } from '@/context/ApiContext';
 
 export const useVoiceCloneHandler = () => {
   const { t } = useLanguage();
-  const { fetchWithAuth,apiKey } = useApiContext();
+  const { fetchWithAuth, apiKey } = useApiContext();
   const { 
     voiceName, 
     audioFile, 
@@ -33,7 +33,6 @@ export const useVoiceCloneHandler = () => {
       formData.append('files', audioFile);
       
       // Get authentication token from the API context
-      const authToken = localStorage.getItem('auth_token') || '';
       
       console.log('Cloning voice with token:', apiKey ? 'Token exists' : 'No token available');
       console.log('Using baseURL:', fetchWithAuth.baseURL);
@@ -57,6 +56,14 @@ export const useVoiceCloneHandler = () => {
           t('voice_processing_info') || 
           'Your voice is being processed and will be available shortly'
         );
+        
+        // Dispatch a custom event to trigger UI refresh
+        window.dispatchEvent(new CustomEvent('voiceAdded', { 
+          detail: { 
+            voiceName: voiceName,
+            status: 'processing'
+          } 
+        }));
         
         return true;
       } else {
