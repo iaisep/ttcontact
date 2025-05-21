@@ -29,8 +29,8 @@ export const useVoiceCloneHandler = () => {
     try {
       // Create a FormData object to send the file
       const formData = new FormData();
-      formData.append('name', voiceName);
-      formData.append('audio_file', audioFile);
+      formData.append('voice_name', voiceName);
+      formData.append('files', audioFile);
       
       // Get authentication token from the API context
       const authToken = localStorage.getItem('auth_token') || '';
