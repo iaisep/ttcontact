@@ -13,8 +13,8 @@ import ContactDialog from './ContactDialog';
 export interface Contact {
   id: string;
   name: string;
-  email: string;
-  phone: string;
+  email?: string; // Changed from required to optional
+  phone?: string;
   tags: string[];
   last_activity: string | null;
   id_crm: number | null; // Added id_crm field
