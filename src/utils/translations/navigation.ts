@@ -47,7 +47,13 @@ const navigationTranslations = {
     "Teléfono": "Phone",
     "Etiquetas": "Tags",
     "Última actividad": "Last Activity",
-    "back_to_dashboard": "Back to Dashboard"
+    "back_to_dashboard": "Back to Dashboard",
+    "Complete the form to add a new contact": "Complete the form to add a new contact",
+    "Update contact information": "Update contact information",
+    "Contact created successfully": "Contact created successfully",
+    "Failed to create contact": "Failed to create contact",
+    "Contact deleted successfully": "Contact deleted successfully",
+    "Failed to delete contact": "Failed to delete contact"
   },
   es: {
     // Navegación y Común
@@ -95,7 +101,13 @@ const navigationTranslations = {
     "Teléfono": "Teléfono",
     "Etiquetas": "Etiquetas",
     "Última actividad": "Última actividad",
-    "back_to_dashboard": "Volver al Panel de Control"
+    "back_to_dashboard": "Volver al Panel de Control",
+    "Complete the form to add a new contact": "Complete el formulario para agregar un nuevo contacto",
+    "Update contact information": "Actualizar información de contacto",
+    "Contact created successfully": "Contacto creado exitosamente",
+    "Failed to create contact": "Error al crear el contacto",
+    "Contact deleted successfully": "Contacto eliminado exitosamente",
+    "Failed to delete contact": "Error al eliminar el contacto"
   }
 };
 

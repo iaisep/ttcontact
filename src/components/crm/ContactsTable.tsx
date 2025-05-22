@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { getContacts, createContact, deleteContact } from '@/lib/api/contacts';
+import ContactDialog from './ContactDialog';
 
 export interface Contact {
   id: string;
@@ -23,6 +25,7 @@ export const ContactsTable = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   
   const { data: contacts = [], isLoading, error } = useQuery({
@@ -35,6 +38,7 @@ export const ContactsTable = () => {
     onSuccess: () => {
       toast.success(t('Contact created successfully'));
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      setIsDialogOpen(false);
     },
     onError: (error) => {
       console.error('Error creating contact:', error);
@@ -136,14 +140,13 @@ export const ContactsTable = () => {
   };
 
   const handleAddContact = () => {
-    // Example contact data
+    setIsDialogOpen(true);
+  };
+
+  const handleContactSubmit = (contactData: Omit<Contact, 'id' | 'last_activity'>) => {
     const newContact = {
-      name: 'New Contact',
-      email: 'example@email.com',
-      phone: '123-456-7890',
-      tags: ['new', 'lead'],
+      ...contactData,
       last_activity: new Date().toISOString(),
-      id_crm: 12345 // Added sample id_crm value
     };
     
     createContactMutation.mutate(newContact);
@@ -200,6 +203,14 @@ export const ContactsTable = () => {
           }
         />
       )}
+
+      <ContactDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSubmit={handleContactSubmit}
+        isSubmitting={createContactMutation.isPending}
+        mode="create"
+      />
     </div>
   );
 };
