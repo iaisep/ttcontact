@@ -16,7 +16,7 @@ export interface Contact {
   phone: string;
   tags: string[];
   last_activity: string | null;
-  id_crm: string | null;
+  id_crm: number | null;
 }
 
 export const ContactsTable = () => {
@@ -138,14 +138,14 @@ export const ContactsTable = () => {
   };
 
   const handleAddContact = () => {
-    // Example contact data
+    // Example contact data con id_crm como número entero
     const newContact = {
       name: 'New Contact',
       email: 'example@email.com',
       phone: '123-456-7890',
       tags: ['new', 'lead'],
       last_activity: new Date().toISOString(),
-      id_crm: 'CRM-12345', // Agregando el campo id_crm al crear un nuevo contacto
+      id_crm: 12345, // Cambiado de string a número entero
     };
     
     createContactMutation.mutate(newContact);

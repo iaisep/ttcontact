@@ -292,7 +292,7 @@ export type Database = {
           created_at: string | null
           email: string | null
           id: string
-          id_crm: string | null
+          id_crm: number | null
           last_activity: string | null
           name: string
           phone: string | null
@@ -304,7 +304,7 @@ export type Database = {
           created_at?: string | null
           email?: string | null
           id?: string
-          id_crm?: string | null
+          id_crm?: number | null
           last_activity?: string | null
           name: string
           phone?: string | null
@@ -316,7 +316,7 @@ export type Database = {
           created_at?: string | null
           email?: string | null
           id?: string
-          id_crm?: string | null
+          id_crm?: number | null
           last_activity?: string | null
           name?: string
           phone?: string | null

@@ -8,25 +8,29 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useLanguage } from '@/context/LanguageContext';
 
-// Esquema actualizado para incluir id_crm
+// Esquema actualizado para manejar id_crm como número
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().optional(),
   tags: z.string().optional(),
-  id_crm: z.string().optional(),
+  id_crm: z.string().optional()
+    .transform(val => val ? parseInt(val) : undefined)
+    .refine(val => val === undefined || !isNaN(val), { 
+      message: 'CRM ID must be a number' 
+    }),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
 
-// Actualizar la interfaz para incluir id_crm
+// Actualizar la interfaz para manejar id_crm como número
 interface ContactFormProps {
   onSubmit: (values: { 
     name: string; 
     email?: string; 
     phone?: string; 
     tags: string[];
-    id_crm?: string;
+    id_crm?: number;
   }) => void;
   initialValues?: Partial<ContactFormValues>;
   isSubmitting?: boolean;
@@ -42,7 +46,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       email: initialValues?.email || '',
       phone: initialValues?.phone || '',
       tags: initialValues?.tags || '',
-      id_crm: initialValues?.id_crm || '',
+      id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm) : '',
     },
   });
 
@@ -53,7 +57,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       email: values.email,
       phone: values.phone,
       tags: values.tags ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-      id_crm: values.id_crm,
+      id_crm: values.id_crm, // Ahora es un número o undefined
     };
     
     onSubmit(formattedValues);
@@ -125,7 +129,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
             <FormItem>
               <FormLabel>{t('ID CRM')}</FormLabel>
               <FormControl>
-                <Input placeholder="CRM-12345" {...field} />
+                <Input placeholder="12345" type="number" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
