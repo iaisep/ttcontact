@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
@@ -45,9 +44,9 @@ export const ContactsTable = () => {
     onError: (error: any) => {
       console.error('Error creating contact:', error);
       
-      // Check for duplicate CRM ID error
-      if (error.message && error.message.includes('CRM ID') && error.message.includes('already in use')) {
-        toast.error(t('CRM ID already in use. Please use a unique identifier.'));
+      // Check for duplicate CRM ID error and show translated toast message
+      if (error.message) {
+        toast.error(t(error.message));
       } else {
         toast.error(t('Failed to create contact'));
       }

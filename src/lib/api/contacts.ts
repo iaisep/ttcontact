@@ -35,7 +35,7 @@ export async function createContact(contactData: Omit<Contact, 'id'>) {
       // Convert database error message to a more user-friendly format
       if (error.message && error.message.includes('unique_id_crm') || 
           error.message && error.message.includes('CRM ID')) {
-        throw new Error('The CRM ID is already in use. Please use a unique identifier.');
+        throw new Error('El ID CRM ya está en uso. Por favor utilice un identificador único.');
       }
       throw error;
     }
@@ -59,7 +59,7 @@ export async function updateContact(id: string, contactData: Partial<Omit<Contac
       // Handle specific error for duplicate CRM ID
       if (error.message && error.message.includes('unique_id_crm') || 
           error.message && error.message.includes('CRM ID')) {
-        throw new Error('The CRM ID is already in use. Please use a unique identifier.');
+        throw new Error('El ID CRM ya está en uso. Por favor utilice un identificador único.');
       }
       throw error;
     }
@@ -103,7 +103,7 @@ export async function importContactsFromCSV(contacts: Omit<Contact, 'id'>[]) {
     if (error) {
       // Check if error is related to duplicate CRM ID
       if (error.message && (error.message.includes('unique_id_crm') || error.message.includes('CRM ID'))) {
-        throw new Error('One or more contacts have CRM IDs that are already in use. Please check your data and try again.');
+        throw new Error('Uno o más contactos tienen IDs CRM que ya están en uso. Por favor, verifique sus datos e intente nuevamente.');
       }
       throw error;
     }

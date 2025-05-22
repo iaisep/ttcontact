@@ -98,9 +98,9 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
     } catch (error: any) {
       console.error('Error processing file:', error);
       
-      // Show specific message for duplicate CRM ID errors
-      if (error.message && (error.message.includes('unique_id_crm') || error.message.includes('CRM ID'))) {
-        toast.error(t('One or more contacts have CRM IDs that are already in use.'));
+      // Show specific translated message for duplicate CRM ID errors
+      if (error.message) {
+        toast.error(t(error.message));
       } else {
         toast.error(t('Error processing file'));
       }

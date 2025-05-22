@@ -79,6 +79,8 @@ const navigationTranslations = {
     // New translations for duplicate CRM ID
     "CRM ID already in use. Please use a unique identifier.": "CRM ID already in use. Please use a unique identifier.",
     "One or more contacts have CRM IDs that are already in use.": "One or more contacts have CRM IDs that are already in use. Please check your data and try again.",
+    "El ID CRM ya está en uso. Por favor utilice un identificador único.": "CRM ID already in use. Please use a unique identifier.",
+    "Uno o más contactos tienen IDs CRM que ya están en uso. Por favor, verifique sus datos e intente nuevamente.": "One or more contacts have CRM IDs that are already in use. Please check your data and try again.",
   },
   es: {
     // Navegación y Común
@@ -159,6 +161,8 @@ const navigationTranslations = {
     // New translations for duplicate CRM ID
     "CRM ID already in use. Please use a unique identifier.": "ID de CRM ya está en uso. Por favor utilice un identificador único.",
     "One or more contacts have CRM IDs that are already in use.": "Uno o más contactos tienen ID de CRM que ya están en uso. Por favor, verifique sus datos e intente nuevamente.",
+    "El ID CRM ya está en uso. Por favor utilice un identificador único.": "El ID CRM ya está en uso. Por favor utilice un identificador único.",
+    "Uno o más contactos tienen IDs CRM que ya están en uso. Por favor, verifique sus datos e intente nuevamente.": "Uno o más contactos tienen IDs CRM que ya están en uso. Por favor, verifique sus datos e intente nuevamente.",
   }
 };
 
