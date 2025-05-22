@@ -31,7 +31,7 @@ const HelpCenterPage = () => {
         <HelpCenterLayout>
           <div className="container mx-auto px-4 py-8">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
+              <h1 className="text-3xl font-bold mb-3 text-gray-900 dark:text-white">
                 {t('help_center')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">

@@ -33,29 +33,33 @@ const HelpCenterSidebar = ({
   ];
 
   return (
-    <aside className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-      <h2 className="text-lg font-semibold mb-4 px-2">{t('documentation')}</h2>
+    <aside className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+      <div className="p-4 border-b dark:border-gray-700">
+        <h2 className="text-lg font-semibold px-2">{t('documentation')}</h2>
+      </div>
       <ScrollArea className="h-[calc(100vh-300px)]">
-        <nav className="space-y-1">
-          {categories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <button
-                key={category.id}
-                onClick={() => onSelectCategory(category.id)}
-                className={cn(
-                  "flex items-center w-full px-2 py-2 text-sm rounded-md transition-colors",
-                  selectedCategory === category.id
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
-                <Icon size={18} className="mr-2 shrink-0" />
-                <span>{category.name}</span>
-              </button>
-            );
-          })}
-        </nav>
+        <div className="p-3">
+          <nav className="space-y-1">
+            {categories.map((category) => {
+              const Icon = category.icon;
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => onSelectCategory(category.id)}
+                  className={cn(
+                    "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
+                    selectedCategory === category.id
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  )}
+                >
+                  <Icon size={16} className="mr-3 shrink-0" />
+                  <span>{category.name}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
       </ScrollArea>
     </aside>
   );

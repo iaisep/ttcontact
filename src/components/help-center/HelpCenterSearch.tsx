@@ -19,14 +19,14 @@ const HelpCenterSearch = ({ onSearch }: HelpCenterSearchProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto">
+    <form onSubmit={handleSubmit} className="max-w-xl mx-auto">
       <div className="relative">
         <Input
           type="text"
           placeholder={t('search_help_center')}
           value={searchInputValue}
           onChange={(e) => setSearchInputValue(e.target.value)}
-          className="pr-12 pl-10 h-12 rounded-full border border-gray-300 dark:border-gray-600"
+          className="pr-20 pl-10 h-12 rounded-full border bg-white dark:bg-gray-800"
         />
         <Search 
           className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" 
@@ -34,8 +34,7 @@ const HelpCenterSearch = ({ onSearch }: HelpCenterSearchProps) => {
         />
         <Button 
           type="submit" 
-          size="sm" 
-          className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full h-8"
+          className="absolute right-1 top-1/2 -translate-y-1/2 h-10 rounded-full px-6"
         >
           {t('search')}
         </Button>
