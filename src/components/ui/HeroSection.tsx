@@ -72,7 +72,7 @@ const HeroSection = () => {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700">
             <div className="w-full overflow-hidden">
               <img 
-                src="https://framerusercontent.com/images/qJhyU3qIKQMH2JZW92Aga7E332E.png" 
+                src="/lovable-uploads/ec9f83a1-dd66-491e-bea3-affdd9f21c21.png" 
                 alt="Voice AI Platform" 
                 className="w-full h-auto object-cover"
               />
