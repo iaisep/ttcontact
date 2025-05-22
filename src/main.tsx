@@ -7,6 +7,7 @@ import App from './App.tsx';
 import './index.css';
 import { ApiProvider } from './context/ApiContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { Toaster } from 'sonner';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -25,6 +26,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <LanguageProvider>
           <BrowserRouter>
             <App />
+            <Toaster richColors position="top-right" />
           </BrowserRouter>
         </LanguageProvider>
       </ApiProvider>
