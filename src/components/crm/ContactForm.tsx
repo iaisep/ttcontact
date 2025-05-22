@@ -44,9 +44,11 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
   });
 
   const handleSubmit = (values: ContactFormValues) => {
-    // Convert tags from comma-separated string to array
+    // Convert tags from comma-separated string to array and ensure name is always provided
     const formattedValues = {
-      ...values,
+      name: values.name, // This ensures name is always passed as required
+      email: values.email,
+      phone: values.phone,
       tags: values.tags ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
     };
     
