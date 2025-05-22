@@ -1,6 +1,6 @@
 
 import { useLanguage } from '@/context/LanguageContext';
-import { helpCenterContent } from '@/data/helpCenterContent';
+import { helpCenterContent } from '@/data/helpCenter';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
