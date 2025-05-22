@@ -32,7 +32,7 @@ interface ContactFormProps {
     email?: string; 
     phone?: string; 
     tags: string[];
-    id_crm?: number;
+    id_crm?: string | number;
   }) => void;
   initialValues?: Partial<ContactFormValues>;
   isSubmitting?: boolean;
