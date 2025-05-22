@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Contact } from '@/components/crm/ContactsTable';
+import { toast } from 'sonner';
 
 export async function getContacts(searchTerm: string = '') {
   try {
@@ -32,9 +33,8 @@ export async function createContact(contactData: Omit<Contact, 'id'>) {
     const { data, error } = await supabase.from('contacts').insert([formattedData]).select();
     
     if (error) {
-      // Convert database error message to a more user-friendly format
-      if (error.message && error.message.includes('unique_id_crm') || 
-          error.message && error.message.includes('CRM ID')) {
+      // Check for duplicate CRM ID error
+      if (error.code === '23505' && error.message && error.message.includes('contacts_id_crm_key')) {
         throw new Error('El ID CRM ya está en uso. Por favor utilice un identificador único.');
       }
       throw error;
@@ -56,9 +56,8 @@ export async function updateContact(id: string, contactData: Partial<Omit<Contac
       .select();
     
     if (error) {
-      // Handle specific error for duplicate CRM ID
-      if (error.message && error.message.includes('unique_id_crm') || 
-          error.message && error.message.includes('CRM ID')) {
+      // Check for duplicate CRM ID error
+      if (error.code === '23505' && error.message && error.message.includes('contacts_id_crm_key')) {
         throw new Error('El ID CRM ya está en uso. Por favor utilice un identificador único.');
       }
       throw error;
@@ -101,8 +100,8 @@ export async function importContactsFromCSV(contacts: Omit<Contact, 'id'>[]) {
       .select();
     
     if (error) {
-      // Check if error is related to duplicate CRM ID
-      if (error.message && (error.message.includes('unique_id_crm') || error.message.includes('CRM ID'))) {
+      // Check for duplicate CRM ID error with exact code from screenshot
+      if (error.code === '23505' && error.message && error.message.includes('contacts_id_crm_key')) {
         throw new Error('Uno o más contactos tienen IDs CRM que ya están en uso. Por favor, verifique sus datos e intente nuevamente.');
       }
       throw error;

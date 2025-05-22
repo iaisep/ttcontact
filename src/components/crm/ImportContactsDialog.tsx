@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Upload, FileDown, AlertCircle, CheckCircle, Table } from 'lucide-react'
 import { parseCSV, generateContactTemplate, createContactsFromImport, ContactImport } from '@/lib/utils/fileImport';
 import { toast } from 'sonner';
 import { Table as UITable, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { importContactsFromCSV } from '@/lib/api/contacts';
 
 interface ImportContactsDialogProps {
   open: boolean;
@@ -82,8 +82,17 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
 
     setIsProcessing(true);
     try {
-      // Import valid contacts
-      const successCount = await createContactsFromImport(parsedData.validData);
+      // Import valid contacts via bulk API call
+      const { count: successCount } = await importContactsFromCSV(
+        parsedData.validData.map(item => ({
+          name: item.name,
+          email: item.email,
+          phone: item.phone,
+          id_crm: Number(item.id_crm),
+          tags: item.tags ? item.tags.split(',').map(tag => tag.trim()) : [],
+          last_activity: new Date().toISOString()
+        }))
+      );
       
       setImportStats({
         valid: parsedData.validData.length,
@@ -96,11 +105,11 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
         onImportComplete();
       }
     } catch (error: any) {
-      console.error('Error processing file:', error);
+      console.error('Error importing contacts:', error);
       
-      // Show specific translated message for duplicate CRM ID errors
+      // Display the error message from the API response
       if (error.message) {
-        toast.error(t(error.message));
+        toast.error(error.message);
       } else {
         toast.error(t('Error processing file'));
       }

@@ -1,3 +1,4 @@
+
 import Papa from 'papaparse';
 import { toast } from 'sonner';
 import { Contact } from '@/components/crm/ContactsTable';
@@ -95,12 +96,18 @@ export const createContactsFromImport = async (validData: ContactImport[]): Prom
         phone: item.phone,
         id_crm: Number(item.id_crm),
         tags,
-        last_activity: new Date().toISOString() // Add the missing field
+        last_activity: new Date().toISOString()
       });
       
       successCount++;
-    } catch (error) {
+    } catch (error: any) {
+      // Log the specific error and continue with next contact
       console.error('Error creating contact:', error);
+      
+      // Display the error message from Supabase in a toast
+      if (error.message) {
+        toast.error(error.message);
+      }
     }
   }
   
