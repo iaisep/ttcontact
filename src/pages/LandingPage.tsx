@@ -13,6 +13,7 @@ import ContactSection from "@/components/ui/ContactSection";
 import Footer from "@/components/ui/Footer";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
+import { Helmet } from "react-helmet-async";
 
 const LandingPage = () => {
   const location = useLocation();
@@ -32,6 +33,10 @@ const LandingPage = () => {
   
   return (
     <TooltipProvider>
+      <Helmet>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
+      </Helmet>
       <div className="min-h-screen bg-white dark:bg-gray-950">
         <LandingNav />
         <main>
