@@ -30,6 +30,15 @@ const navigationTranslations = {
     "my_workspace": "My Workspace",
     "team_workspace": "Team Workspace",
     "enterprise_workspace": "Enterprise Workspace",
+    "crm": "CRM",
+    "contacts": "Contacts",
+    "kanban": "Kanban",
+    "add_column": "Add Column",
+    "add_contact": "Add Contact",
+    "filter": "Filter",
+    "search": "Search",
+    "create_campaign": "Create Campaign",
+    "call": "Call"
   },
   es: {
     // Navegación y Común
@@ -60,6 +69,15 @@ const navigationTranslations = {
     "my_workspace": "Mi Espacio de Trabajo",
     "team_workspace": "Espacio de Trabajo de Equipo",
     "enterprise_workspace": "Espacio de Trabajo Empresarial",
+    "crm": "CRM",
+    "contacts": "Contactos",
+    "kanban": "Tablero",
+    "add_column": "Agregar Columna",
+    "add_contact": "Agregar Contacto",
+    "filter": "Filtrar",
+    "search": "Buscar",
+    "create_campaign": "Crear Campaña",
+    "call": "Llamar"
   }
 };
 

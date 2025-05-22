@@ -15,6 +15,7 @@ import DocumentationPage from './pages/DocumentationPage';
 import GuidesPage from './pages/GuidesPage';
 import BlogPage from './pages/BlogPage';
 import ExamplesPage from './pages/ExamplesPage';
+import CRMPage from './pages/CRMPage';
 
 const App: React.FC = () => {
   return (
@@ -33,6 +34,7 @@ const App: React.FC = () => {
       <Route path="/guides" element={<GuidesPage />} />
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/examples" element={<ExamplesPage />} />
+      <Route path="/crm" element={<CRMPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
