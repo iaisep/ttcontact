@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -8,22 +7,25 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useLanguage } from '@/context/LanguageContext';
 
-// Esquema actualizado para manejar id_crm como número
+// Updated schema to properly handle id_crm as either a number or undefined
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().optional(),
   tags: z.string().optional(),
   id_crm: z.string().optional()
-    .transform(val => val ? parseInt(val) : undefined)
-    .refine(val => val === undefined || !isNaN(val), { 
-      message: 'CRM ID must be a number' 
-    }),
+    .transform(val => {
+      // If empty string or undefined, return undefined
+      if (!val || val === '') return undefined;
+      // Otherwise, try to parse as number
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? undefined : parsed;
+    })
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
 
-// Actualizar la interfaz para manejar id_crm como número
+// Update the interface to match the schema
 interface ContactFormProps {
   onSubmit: (values: { 
     name: string; 
@@ -46,20 +48,25 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       name: initialValues?.name || '',
       email: initialValues?.email || '',
       phone: initialValues?.phone || '',
-      tags: initialValues?.tags ? initialValues.tags.join(',') : '',
-      // Convert number to string for the form
-      id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm) : '',
+      // Handle tags correctly - check if it's an array first
+      tags: Array.isArray(initialValues?.tags) 
+        ? initialValues.tags.join(',') 
+        : (initialValues?.tags as string || ''),
+      // Convert number to string for the form input
+      id_crm: initialValues?.id_crm !== undefined 
+        ? String(initialValues.id_crm) 
+        : '',
     },
   });
 
   const handleSubmit = (values: ContactFormValues) => {
-    // Convert tags from comma-separated string to array and ensure name is always provided
+    // Convert tags from comma-separated string to array
     const formattedValues = {
       name: values.name,
       email: values.email,
       phone: values.phone,
       tags: values.tags ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-      // id_crm is now a number or undefined after zod transformation
+      // id_crm will already be properly transformed by zod
       id_crm: values.id_crm,
     };
     
