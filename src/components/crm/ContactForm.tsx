@@ -8,12 +8,15 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useLanguage } from '@/context/LanguageContext';
 
-// Updated schema to reflect that tags will be handled as a string in the form
+// Updated schema to include id_crm field as a number
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().optional(),
   tags: z.string().optional(),
+  id_crm: z.string().optional()
+    .transform(val => val === '' ? null : Number(val))
+    .refine(val => val === null || !isNaN(val), { message: 'ID CRM must be a number' })
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -24,9 +27,16 @@ interface ContactFormProps {
     name: string; 
     email?: string; 
     phone?: string; 
-    tags: string[]; // This reflects that parent expects tags as an array
+    tags: string[]; 
+    id_crm: number | null; // Updated to match the Supabase schema (int4)
   }) => void;
-  initialValues?: Partial<ContactFormValues>;
+  initialValues?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    tags?: string;
+    id_crm?: number | null;
+  };
   isSubmitting?: boolean;
 }
 
@@ -40,16 +50,18 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       email: initialValues?.email || '',
       phone: initialValues?.phone || '',
       tags: initialValues?.tags || '',
+      id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm) : '',
     },
   });
 
   const handleSubmit = (values: ContactFormValues) => {
     // Convert tags from comma-separated string to array and ensure name is always provided
     const formattedValues = {
-      name: values.name, // This ensures name is always passed as required
+      name: values.name,
       email: values.email,
       phone: values.phone,
       tags: values.tags ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
+      id_crm: values.id_crm,
     };
     
     onSubmit(formattedValues);
@@ -94,6 +106,20 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
               <FormLabel>{t('Teléfono')}</FormLabel>
               <FormControl>
                 <Input placeholder="+1 (555) 123-4567" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="id_crm"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>ID CRM</FormLabel>
+              <FormControl>
+                <Input placeholder="123456" type="number" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

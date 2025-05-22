@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,7 @@ export interface Contact {
   phone: string;
   tags: string[];
   last_activity: string | null;
+  id_crm: number | null; // Added id_crm field
 }
 
 export const ContactsTable = () => {
@@ -90,6 +90,15 @@ export const ContactsTable = () => {
       cell: (contact: Contact) => <span>{contact.phone}</span>,
     },
     {
+      key: 'id_crm',
+      header: (
+        <div className="flex items-center gap-2">
+          <span>ID CRM</span>
+        </div>
+      ),
+      cell: (contact: Contact) => <span>{contact.id_crm !== null ? contact.id_crm : '—'}</span>,
+    },
+    {
       key: 'tags',
       header: (
         <div className="flex items-center gap-2">
@@ -134,6 +143,7 @@ export const ContactsTable = () => {
       phone: '123-456-7890',
       tags: ['new', 'lead'],
       last_activity: new Date().toISOString(),
+      id_crm: 12345 // Added sample id_crm value
     };
     
     createContactMutation.mutate(newContact);
