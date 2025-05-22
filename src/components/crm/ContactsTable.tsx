@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
 import { Plus, Import, Search, User, Mail, Phone, Tag, Calendar } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { supabase } from '@/lib/supabase';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { getContacts, createContact, deleteContact } from '@/lib/api/contacts';
 
 export interface Contact {
   id: string;
@@ -23,34 +23,35 @@ export const ContactsTable = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const queryClient = useQueryClient();
   
-  const fetchContacts = async () => {
-    try {
-      console.log('Fetching contacts');
-      let query = supabase.from('contacts').select('*');
-      
-      if (searchTerm) {
-        query = query.ilike('name', `%${searchTerm}%`);
-      }
-      
-      const { data, error } = await query;
-      
-      if (error) {
-        console.error('Error fetching contacts:', error);
-        throw error;
-      }
-      
-      console.log('Contacts fetched:', data);
-      return data || [];
-    } catch (error) {
-      console.error('Error in fetchContacts:', error);
-      return [];
-    }
-  };
-
   const { data: contacts = [], isLoading, error } = useQuery({
     queryKey: ['contacts', searchTerm],
-    queryFn: fetchContacts,
+    queryFn: () => getContacts(searchTerm),
+  });
+
+  const createContactMutation = useMutation({
+    mutationFn: createContact,
+    onSuccess: () => {
+      toast.success(t('Contact created successfully'));
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    },
+    onError: (error) => {
+      console.error('Error creating contact:', error);
+      toast.error(t('Failed to create contact'));
+    }
+  });
+
+  const deleteContactMutation = useMutation({
+    mutationFn: deleteContact,
+    onSuccess: () => {
+      toast.success(t('Contact deleted successfully'));
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    },
+    onError: (error) => {
+      console.error('Error deleting contact:', error);
+      toast.error(t('Failed to delete contact'));
+    }
   });
 
   if (error) {
@@ -126,7 +127,16 @@ export const ContactsTable = () => {
   };
 
   const handleAddContact = () => {
-    toast.info('Add contact functionality will be implemented');
+    // Example contact data
+    const newContact = {
+      name: 'New Contact',
+      email: 'example@email.com',
+      phone: '123-456-7890',
+      tags: ['new', 'lead'],
+      last_activity: new Date().toISOString(),
+    };
+    
+    createContactMutation.mutate(newContact);
   };
 
   const handleImport = () => {

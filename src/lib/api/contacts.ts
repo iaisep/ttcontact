@@ -1,5 +1,5 @@
 
-import { supabase } from '../supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Contact } from '@/components/crm/ContactsTable';
 
 export async function getContacts(searchTerm: string = '') {
@@ -23,6 +23,7 @@ export async function getContacts(searchTerm: string = '') {
 
 export async function createContact(contactData: Omit<Contact, 'id'>) {
   try {
+    // Note: user_id will be automatically set by the trigger we created
     const { data, error } = await supabase.from('contacts').insert([contactData]).select();
     
     if (error) throw error;
