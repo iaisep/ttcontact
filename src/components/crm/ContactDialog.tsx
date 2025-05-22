@@ -42,8 +42,11 @@ export const ContactDialog = ({
 
   // Format tags array to comma-separated string for the form
   const formValues = initialValues ? {
-    ...initialValues,
-    tags: initialValues.tags?.join(', ') || ''
+    name: initialValues.name || '',
+    email: initialValues.email || '',
+    phone: initialValues.phone || '',
+    tags: initialValues.tags?.join(', ') || '',
+    id_crm: initialValues.id_crm
   } : undefined;
 
   return (

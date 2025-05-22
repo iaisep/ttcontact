@@ -31,7 +31,14 @@ export async function createContact(contactData: Omit<Contact, 'id'>) {
 
     const { data, error } = await supabase.from('contacts').insert([formattedData]).select();
     
-    if (error) throw error;
+    if (error) {
+      // Convert database error message to a more user-friendly format
+      if (error.message && error.message.includes('unique_id_crm') || 
+          error.message && error.message.includes('CRM ID')) {
+        throw new Error('The CRM ID is already in use. Please use a unique identifier.');
+      }
+      throw error;
+    }
     
     return data?.[0];
   } catch (error) {
@@ -48,7 +55,14 @@ export async function updateContact(id: string, contactData: Partial<Omit<Contac
       .eq('id', id)
       .select();
     
-    if (error) throw error;
+    if (error) {
+      // Handle specific error for duplicate CRM ID
+      if (error.message && error.message.includes('unique_id_crm') || 
+          error.message && error.message.includes('CRM ID')) {
+        throw new Error('The CRM ID is already in use. Please use a unique identifier.');
+      }
+      throw error;
+    }
     
     return data?.[0];
   } catch (error) {
@@ -86,7 +100,13 @@ export async function importContactsFromCSV(contacts: Omit<Contact, 'id'>[]) {
       .insert(formattedContacts)
       .select();
     
-    if (error) throw error;
+    if (error) {
+      // Check if error is related to duplicate CRM ID
+      if (error.message && (error.message.includes('unique_id_crm') || error.message.includes('CRM ID'))) {
+        throw new Error('One or more contacts have CRM IDs that are already in use. Please check your data and try again.');
+      }
+      throw error;
+    }
     
     return { count: data?.length || 0, data };
   } catch (error) {

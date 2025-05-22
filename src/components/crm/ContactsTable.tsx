@@ -42,9 +42,15 @@ export const ContactsTable = () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
       setIsDialogOpen(false);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error creating contact:', error);
-      toast.error(t('Failed to create contact'));
+      
+      // Check for duplicate CRM ID error
+      if (error.message && error.message.includes('CRM ID') && error.message.includes('already in use')) {
+        toast.error(t('CRM ID already in use. Please use a unique identifier.'));
+      } else {
+        toast.error(t('Failed to create contact'));
+      }
     }
   });
 

@@ -95,9 +95,15 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
         toast.success(`${successCount} contacts imported successfully`);
         onImportComplete();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error processing file:', error);
-      toast.error(t('Error processing file'));
+      
+      // Show specific message for duplicate CRM ID errors
+      if (error.message && (error.message.includes('unique_id_crm') || error.message.includes('CRM ID'))) {
+        toast.error(t('One or more contacts have CRM IDs that are already in use.'));
+      } else {
+        toast.error(t('Error processing file'));
+      }
     } finally {
       setIsProcessing(false);
     }
