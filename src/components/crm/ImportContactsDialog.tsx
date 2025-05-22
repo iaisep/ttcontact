@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -66,7 +65,20 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ open, onOpe
 
         const potentialDuplicates = await checkForDuplicates(validData);
 
-        setParsedData({ validData, invalidData, potentialDuplicates });
+        // Update validData with validation_percent values from potentialDuplicates
+        const validDataWithValidation = validData.map(item => {
+          const duplicate = potentialDuplicates.find(d => d.row === item);
+          return {
+            ...item,
+            validation_percent: duplicate ? duplicate.score : 0
+          };
+        });
+
+        setParsedData({ 
+          validData: validDataWithValidation, 
+          invalidData, 
+          potentialDuplicates 
+        });
       },
       error: (error) => {
         console.error("Error parsing CSV:", error);
@@ -207,7 +219,7 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ open, onOpe
                   <TableRow>
                     <TableHead>{t('Row Data')}</TableHead>
                     <TableHead>{t('Matched Contact')}</TableHead>
-                    <TableHead>{t('Score')}</TableHead>
+                    <TableHead>{t('Validation %')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

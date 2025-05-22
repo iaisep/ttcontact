@@ -110,7 +110,8 @@ export async function importContactsFromCSV(contacts: Omit<Contact, 'id'>[]) {
     const formattedContacts = contacts.map(contact => ({
       ...contact,
       id_crm: contact.id_crm === undefined ? null : contact.id_crm,
-      last_activity: new Date().toISOString()
+      last_activity: new Date().toISOString(),
+      validation_percent: contact.validation_percent || null
     }));
     
     const { data, error } = await supabase

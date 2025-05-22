@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
@@ -24,6 +23,7 @@ export interface Contact {
   id_crm: number | null;
   isDuplicate?: boolean;
   duplicateScore?: number;
+  validation_percent?: number;
 }
 
 export const ContactsTable = () => {

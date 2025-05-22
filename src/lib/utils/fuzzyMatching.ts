@@ -92,7 +92,8 @@ export const checkDuplicatesInBatch = (
     return {
       ...contact,
       isDuplicate,
-      duplicateScore: isDuplicate ? score : undefined
+      duplicateScore: isDuplicate ? score : undefined,
+      validation_percent: score
     };
   });
 };
