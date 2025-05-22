@@ -13,6 +13,7 @@ import {
   UserCircle,
   HelpCircle,
   ChevronLeft,
+  Kanban,
 } from "lucide-react";
 import SidebarMenuItem from "./SidebarMenuItem";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,13 @@ const SidebarMenu = ({
       icon: Upload,
       title: t('Batch call'),
       id: "batch-call",
+    },
+    {
+      icon: Kanban,
+      title: t('CRM'),
+      id: "crm",
+      external: true,
+      url: "/crm",
     },
     {
       icon: History,

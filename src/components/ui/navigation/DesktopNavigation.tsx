@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
+import { ExternalLink } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -64,12 +65,15 @@ const DesktopNavigation = () => {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link
-              to="/docs"
+            <a
+              href="/help-center"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
             >
               {t("documentation")}
-            </Link>
+              <ExternalLink size={14} className="ml-1" />
+            </a>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-transparent text-gray-700 dark:text-gray-200">

@@ -30,18 +30,18 @@ const HelpCenterPage = () => {
 
         <HelpCenterLayout>
           <div className="container mx-auto px-4 py-8">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
+            <div className="mb-10 text-center">
+              <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
                 {t('help_center')}
               </h1>
-              <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+              <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
                 {t('help_center_description')}
               </p>
               <HelpCenterSearch onSearch={handleSearch} />
             </div>
 
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="w-full md:w-64 shrink-0">
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="w-full md:w-72 shrink-0">
                 <HelpCenterSidebar 
                   selectedCategory={selectedCategory} 
                   onSelectCategory={handleCategorySelect} 

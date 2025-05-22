@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -70,13 +70,16 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
           </div>
 
           {/* Documentation link */}
-          <Link
-            to="/docs"
+          <a
+            href="/help-center"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
             onClick={closeMenu}
-            className="py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
           >
             {t("documentation")}
-          </Link>
+            <ExternalLink size={16} className="ml-1.5" />
+          </a>
 
           {/* Resources dropdown */}
           <div>

@@ -287,6 +287,48 @@ export type Database = {
         }
         Relationships: []
       }
+      contacts: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          id_crm: number | null
+          last_activity: string | null
+          name: string
+          phone: string | null
+          tags: string[] | null
+          updated_at: string | null
+          user_id: string | null
+          validation_percent: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          id_crm?: number | null
+          last_activity?: string | null
+          name: string
+          phone?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+          validation_percent?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          id_crm?: number | null
+          last_activity?: string | null
+          name?: string
+          phone?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+          validation_percent?: number | null
+        }
+        Relationships: []
+      }
       knowledge_base_sources: {
         Row: {
           content_url: string | null
