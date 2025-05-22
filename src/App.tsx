@@ -14,6 +14,7 @@ import HelpCenterPage from './pages/HelpCenterPage';
 import DocumentationPage from './pages/DocumentationPage';
 import GuidesPage from './pages/GuidesPage';
 import BlogPage from './pages/BlogPage';
+import ExamplesPage from './pages/ExamplesPage';
 
 const App: React.FC = () => {
   return (
@@ -31,6 +32,7 @@ const App: React.FC = () => {
       <Route path="/documentation" element={<DocumentationPage />} />
       <Route path="/guides" element={<GuidesPage />} />
       <Route path="/blog" element={<BlogPage />} />
+      <Route path="/examples" element={<ExamplesPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

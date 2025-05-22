@@ -31,7 +31,10 @@ const helpCenterTranslations = {
     "read_more": "Read More",
     "need_help": "Need Help?",
     "cant_find_what_looking_for": "Can't find what you're looking for? Contact our support team.",
-    "contact_us": "Contact Us"
+    "contact_us": "Contact Us",
+    "examples": "Examples",
+    "examples_description": "Explore interactive examples and code samples to help you implement our solutions",
+    "explore": "Explore"
   },
   es: {
     "help_center": "Centro de Ayuda",
@@ -63,7 +66,10 @@ const helpCenterTranslations = {
     "read_more": "Leer Más",
     "need_help": "¿Necesitas Ayuda?",
     "cant_find_what_looking_for": "¿No encuentras lo que buscas? Contacta con nuestro equipo de soporte.",
-    "contact_us": "Contáctanos"
+    "contact_us": "Contáctanos",
+    "examples": "Ejemplos",
+    "examples_description": "Explora ejemplos interactivos y muestras de código para ayudarte a implementar nuestras soluciones",
+    "explore": "Explorar"
   }
 };
 
