@@ -35,7 +35,7 @@ const HelpCenterSidebar = ({
   return (
     <aside className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       <div className="p-4 border-b dark:border-gray-700">
-        <h2 className="text-lg font-semibold px-2">{t('documentation')}</h2>
+        <h2 className="text-lg font-semibold px-2 text-gray-800 dark:text-gray-100">{t('documentation')}</h2>
       </div>
       <ScrollArea className="h-[calc(100vh-300px)]">
         <div className="p-3">
@@ -47,7 +47,7 @@ const HelpCenterSidebar = ({
                   key={category.id}
                   onClick={() => onSelectCategory(category.id)}
                   className={cn(
-                    "flex items-center w-full px-3 py-2 text-sm rounded-md transition-colors",
+                    "flex items-center w-full px-3 py-2.5 text-sm rounded-md transition-colors",
                     selectedCategory === category.id
                       ? "bg-primary/10 text-primary font-medium"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"

@@ -4,6 +4,7 @@ import { helpCenterContent } from '@/data/helpCenterContent';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { X } from 'lucide-react';
 
 interface HelpCenterContentProps {
   selectedCategory: string;
@@ -17,7 +18,7 @@ const HelpCenterContent = ({ selectedCategory, searchQuery }: HelpCenterContentP
 
   useEffect(() => {
     if (searchQuery) {
-      // Filtrar contenido basado en la búsqueda en todas las categorías
+      // Filter content based on search query across all categories
       const results = Object.values(helpCenterContent).flat().filter(article => {
         const searchLower = searchQuery.toLowerCase();
         return (
@@ -27,7 +28,7 @@ const HelpCenterContent = ({ selectedCategory, searchQuery }: HelpCenterContentP
       });
       setFilteredContent(results);
     } else {
-      // Mostrar contenido para la categoría seleccionada
+      // Show content for the selected category
       setFilteredContent(helpCenterContent[selectedCategory] || []);
     }
   }, [selectedCategory, searchQuery]);
@@ -58,13 +59,13 @@ const HelpCenterContent = ({ selectedCategory, searchQuery }: HelpCenterContentP
           {filteredContent.map((article) => (
             <Card 
               key={article.id} 
-              className="overflow-hidden border-0 shadow-sm hover:shadow transition-shadow"
+              className="overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow transition-shadow"
             >
               <div 
                 className="p-5 cursor-pointer"
                 onClick={() => toggleArticle(article.id)}
               >
-                <h3 className="text-lg font-medium mb-2">{article.title}</h3>
+                <h3 className="text-lg font-medium mb-2 text-gray-800 dark:text-gray-100">{article.title}</h3>
                 {expandedArticleId !== article.id && (
                   <p className="text-muted-foreground text-sm line-clamp-2">
                     {article.excerpt || article.content.substring(0, 150) + '...'}
@@ -73,24 +74,31 @@ const HelpCenterContent = ({ selectedCategory, searchQuery }: HelpCenterContentP
               </div>
               
               {expandedArticleId === article.id && (
-                <div className="px-5 pb-5 pt-0 border-t dark:border-gray-700">
-                  <div 
-                    className="prose dark:prose-invert max-w-none text-sm pt-4"
-                    dangerouslySetInnerHTML={{ __html: article.content }}
-                  />
-                  <div className="mt-6 flex justify-end">
+                <div className="px-6 pb-6 pt-0 border-t dark:border-gray-700">
+                  <div className="relative">
                     <Button 
-                      variant="outline" 
+                      variant="ghost" 
                       size="sm" 
+                      className="absolute right-0 top-2 rounded-full p-1 h-auto"
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleArticle(article.id);
                       }}
-                      className="text-xs"
                     >
-                      {t('close')}
+                      <X size={16} className="text-gray-500" />
                     </Button>
                   </div>
+                  
+                  <div 
+                    className="prose dark:prose-invert max-w-none text-sm pt-4 [&>h2]:text-xl [&>h2]:font-semibold [&>h2]:mt-6 [&>h2]:mb-3 
+                    [&>h3]:text-lg [&>h3]:font-medium [&>h3]:mt-5 [&>h3]:mb-2 
+                    [&>p]:my-3 [&>p]:leading-relaxed 
+                    [&>ul]:pl-5 [&>ul]:my-3 [&>ol]:pl-5 [&>ol]:my-3
+                    [&>ul>li]:mb-1 [&>ol>li]:mb-1 [&>*:first-child]:mt-0
+                    [&>blockquote]:border-l-4 [&>blockquote]:border-gray-200 [&>blockquote]:pl-4 [&>blockquote]:py-0.5 [&>blockquote]:my-4
+                    [&>pre]:bg-gray-50 [&>pre]:dark:bg-gray-800 [&>pre]:p-4 [&>pre]:rounded [&>pre]:overflow-x-auto [&>pre]:my-4"
+                    dangerouslySetInnerHTML={{ __html: article.content }}
+                  />
                 </div>
               )}
             </Card>

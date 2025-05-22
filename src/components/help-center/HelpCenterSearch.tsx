@@ -26,7 +26,7 @@ const HelpCenterSearch = ({ onSearch }: HelpCenterSearchProps) => {
           placeholder={t('search_help_center')}
           value={searchInputValue}
           onChange={(e) => setSearchInputValue(e.target.value)}
-          className="pr-20 pl-10 h-12 rounded-full border bg-white dark:bg-gray-800"
+          className="pr-24 pl-10 h-12 rounded-full border border-gray-200 bg-white dark:bg-gray-800 shadow-sm"
         />
         <Search 
           className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" 
