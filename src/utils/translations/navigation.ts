@@ -46,7 +46,8 @@ const navigationTranslations = {
     "Email": "Email",
     "Teléfono": "Phone",
     "Etiquetas": "Tags",
-    "Última actividad": "Last Activity"
+    "Última actividad": "Last Activity",
+    "back_to_dashboard": "Back to Dashboard"
   },
   es: {
     // Navegación y Común
@@ -93,7 +94,8 @@ const navigationTranslations = {
     "Email": "Email",
     "Teléfono": "Teléfono",
     "Etiquetas": "Etiquetas",
-    "Última actividad": "Última actividad"
+    "Última actividad": "Última actividad",
+    "back_to_dashboard": "Volver al Panel de Control"
   }
 };
 
