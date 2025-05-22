@@ -29,7 +29,7 @@ const HowItWorksSection = () => {
       number: '04',
       title: t('Monitor'),
       description: t('Track success rates, latency, and user sentiment through call history dashboard. Quickly identify failed calls'),
-      animation: 'public/lovable-uploads/Animation - 1747946871596.json',
+      animation: 'https://lottie.host/e23beae6-5556-4e1d-8e27-6105d07b1a62/ZB4GMBBiw7.json',
     },
   ];
 
