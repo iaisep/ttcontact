@@ -17,7 +17,7 @@ const HelpCenterContent = ({ selectedCategory, searchQuery }: HelpCenterContentP
 
   useEffect(() => {
     if (searchQuery) {
-      // Filter content based on search query across all categories
+      // Filtrar contenido basado en la búsqueda en todas las categorías
       const results = Object.values(helpCenterContent).flat().filter(article => {
         const searchLower = searchQuery.toLowerCase();
         return (
@@ -27,7 +27,7 @@ const HelpCenterContent = ({ selectedCategory, searchQuery }: HelpCenterContentP
       });
       setFilteredContent(results);
     } else {
-      // Show content for the selected category
+      // Mostrar contenido para la categoría seleccionada
       setFilteredContent(helpCenterContent[selectedCategory] || []);
     }
   }, [selectedCategory, searchQuery]);
