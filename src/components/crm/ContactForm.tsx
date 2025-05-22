@@ -137,7 +137,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
             <FormItem>
               <FormLabel>{t('ID CRM')}</FormLabel>
               <FormControl>
-                <Input placeholder="12345" type="ext" {...register('id_crm')} />
+                <Input placeholder="12345" type="text" {...register('id_crm')} />
               </FormControl>
               <FormMessage />
             </FormItem>
