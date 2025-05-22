@@ -4,80 +4,16 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { useEffect, useRef, useState } from "react";
-
-declare global {
-  interface Window {
-    VANTA: {
-      WAVES: (config: any) => any;
-    };
-  }
-}
 
 const HeroSection = () => {
   const { t } = useLanguage();
-  const [vantaEffect, setVantaEffect] = useState<any>(null);
-  const vantaRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    // Load Three.js and Vanta.js if they're not already loaded
-    if (!window.VANTA) {
-      console.log("VANTA not loaded yet, waiting for scripts to load");
-      // We'll wait for the scripts to load from the LandingPage component
-      const checkVanta = setInterval(() => {
-        if (window.VANTA) {
-          clearInterval(checkVanta);
-          initVantaEffect();
-        }
-      }, 100);
-      
-      return () => clearInterval(checkVanta);
-    } else {
-      initVantaEffect();
-    }
-    
-    function initVantaEffect() {
-      if (!vantaEffect && vantaRef.current && window.VANTA) {
-        console.log("Initializing VANTA.WAVES effect");
-        const effect = window.VANTA.WAVES({
-          el: vantaRef.current,
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 600,
-          minWidth: 600,
-          scale: 1.00,
-          scaleMobile: 1.00,
-          color: 0x4f46e5,
-          shininess: 30,
-          waveHeight: 15,
-          waveSpeed: 1.0,
-          zoom: 0.75
-        });
-        
-        console.log("VANTA effect created:", effect);
-        setVantaEffect(effect);
-      }
-    }
-    
-    // Clean up the effect when component unmounts
-    return () => {
-      if (vantaEffect) {
-        console.log("Destroying VANTA effect");
-        vantaEffect.destroy();
-      }
-    };
-  }, [vantaEffect]);
   
   return (
     <section className="relative pt-28 md:pt-36 pb-16 md:pb-20 overflow-hidden">
-      {/* VANTA.WAVES container */}
-      <div 
-        ref={vantaRef} 
-        className="absolute inset-0 -z-10"
-        aria-hidden="true"
-        style={{ minHeight: '600px' }}
-      />
+      {/* Background gradients */}
+      <div className="absolute top-0 left-0 right-0 h-[600px] bg-gradient-to-b from-indigo-50/50 to-transparent dark:from-indigo-900/10 dark:to-transparent -z-10"></div>
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-100/30 dark:bg-indigo-800/10 rounded-full blur-3xl"></div>
+      <div className="absolute top-32 -left-24 w-80 h-80 bg-blue-100/30 dark:bg-blue-800/10 rounded-full blur-3xl"></div>
       
       <div className="container mx-auto px-4 relative">
         <motion.div 

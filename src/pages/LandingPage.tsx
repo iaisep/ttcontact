@@ -13,38 +13,9 @@ import ContactSection from "@/components/ui/ContactSection";
 import Footer from "@/components/ui/Footer";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
-import { Helmet } from "react-helmet-async";
 
 const LandingPage = () => {
   const location = useLocation();
-
-  // Load Three.js and VANTA.js scripts
-  useEffect(() => {
-    // Load Three.js
-    const threeScript = document.createElement('script');
-    threeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js';
-    threeScript.async = true;
-    document.body.appendChild(threeScript);
-
-    // Load VANTA.js after Three.js
-    threeScript.onload = () => {
-      console.log('Three.js loaded successfully');
-      const vantaScript = document.createElement('script');
-      vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js';
-      vantaScript.async = true;
-      document.body.appendChild(vantaScript);
-      
-      vantaScript.onload = () => {
-        console.log('Vanta.js loaded successfully');
-      };
-    };
-
-    return () => {
-      // Cleanup scripts on unmount
-      const scripts = document.querySelectorAll('script[src*="three.js"], script[src*="vanta"]');
-      scripts.forEach(script => script.remove());
-    };
-  }, []);
 
   // Scroll to the specific section if the URL contains a hash
   useEffect(() => {

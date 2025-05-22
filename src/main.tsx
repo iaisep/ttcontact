@@ -6,17 +6,14 @@ import App from './App.tsx';
 import './index.css';
 import { ApiProvider } from './context/ApiContext';
 import { LanguageProvider } from './context/LanguageContext';
-import { HelmetProvider } from 'react-helmet-async';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ApiProvider>
       <LanguageProvider>
-        <HelmetProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </HelmetProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </LanguageProvider>
     </ApiProvider>
   </React.StrictMode>,
