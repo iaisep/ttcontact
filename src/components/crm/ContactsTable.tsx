@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
@@ -13,8 +12,8 @@ import ContactDialog from './ContactDialog';
 export interface Contact {
   id: string;
   name: string;
-  email?: string; // Changed from required to optional
-  phone?: string;
+  email?: string; // Optional email
+  phone?: string; // Optional phone
   tags: string[];
   last_activity: string | null;
   id_crm: number | null; // Added id_crm field
@@ -111,7 +110,7 @@ export const ContactsTable = () => {
         </div>
       ),
       cell: (contact: Contact) => (
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {contact.tags?.map((tag, index) => (
             <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
               {tag}

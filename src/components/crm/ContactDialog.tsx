@@ -40,12 +40,6 @@ export const ContactDialog = ({
     onSubmit(values);
   };
 
-  // Format tags array to comma-separated string for the form
-  const formValues = initialValues ? {
-    ...initialValues,
-    tags: initialValues.tags?.join(', ') || ''
-  } : undefined;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -63,7 +57,7 @@ export const ContactDialog = ({
         
         <ContactForm 
           onSubmit={handleSubmit} 
-          initialValues={formValues} 
+          initialValues={initialValues} 
           isSubmitting={isSubmitting} 
         />
       </DialogContent>
