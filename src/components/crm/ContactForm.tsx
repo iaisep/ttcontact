@@ -33,7 +33,7 @@ interface ContactFormProps {
     email?: string; 
     phone?: string; 
     tags: string[];
-    id_crm?: number | undefined;
+    id_crm?: number;
   }) => void;
   initialValues?: Partial<ContactFormValues>;
   isSubmitting?: boolean;
@@ -42,7 +42,7 @@ interface ContactFormProps {
 export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFormProps) => {
   const { t } = useLanguage();
   
-  // Use string values in the form and convert to number on submit
+  // Use string values in the form for all fields including id_crm
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
@@ -53,7 +53,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       tags: Array.isArray(initialValues?.tags) 
         ? initialValues.tags.join(',') 
         : (initialValues?.tags as string || ''),
-      // Convert number to string for the form input
+      // Convert number to string for the form input (needed since HTML inputs work with strings)
       id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm) : '',
     },
   });
@@ -65,8 +65,8 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       email: values.email,
       phone: values.phone,
       tags: values.tags ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-      // id_crm will already be properly transformed by zod
-      id_crm: values.id_crm,
+      // id_crm will be transformed by zod schema to number or undefined
+      id_crm: values.id_crm as unknown as number | undefined,
     };
     
     onSubmit(formattedValues);
