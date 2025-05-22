@@ -119,7 +119,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
             <FormItem>
               <FormLabel>ID CRM</FormLabel>
               <FormControl>
-                <Input placeholder="123456" type="number" {...field} />
+                <Input placeholder="123456" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -95,7 +95,8 @@ export const createContactsFromImport = async (validData: ContactImport[]): Prom
         email: item.email,
         phone: item.phone,
         id_crm: Number(item.id_crm),
-        tags
+        tags,
+        last_activity: new Date().toISOString() // Add the missing field
       });
       
       successCount++;
