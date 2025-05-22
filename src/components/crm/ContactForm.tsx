@@ -39,14 +39,15 @@ interface ContactFormProps {
 export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFormProps) => {
   const { t } = useLanguage();
   
+  // Use string values in the form and convert to number on submit
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
       name: initialValues?.name || '',
       email: initialValues?.email || '',
       phone: initialValues?.phone || '',
-      tags: initialValues?.tags || '',
-      // Convierte el número a string para el formulario
+      tags: initialValues?.tags ? initialValues.tags.join(',') : '',
+      // Convert number to string for the form
       id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm) : '',
     },
   });
@@ -54,11 +55,12 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
   const handleSubmit = (values: ContactFormValues) => {
     // Convert tags from comma-separated string to array and ensure name is always provided
     const formattedValues = {
-      name: values.name, // This ensures name is always passed as required
+      name: values.name,
       email: values.email,
       phone: values.phone,
       tags: values.tags ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-      id_crm: values.id_crm, // Ahora es un número o undefined
+      // id_crm is now a number or undefined after zod transformation
+      id_crm: values.id_crm,
     };
     
     onSubmit(formattedValues);
