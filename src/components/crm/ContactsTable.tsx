@@ -145,6 +145,7 @@ export const ContactsTable = () => {
       phone: '123-456-7890',
       tags: ['new', 'lead'],
       last_activity: new Date().toISOString(),
+      id_crm: 'CRM-12345', // Agregando el campo id_crm al crear un nuevo contacto
     };
     
     createContactMutation.mutate(newContact);
