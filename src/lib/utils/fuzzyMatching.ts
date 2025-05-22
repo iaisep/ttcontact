@@ -63,12 +63,13 @@ export const checkDuplicateContact = (
 export const checkDuplicatesInBatch = (
   contacts: Contact[],
   existingContacts: Contact[]
-): (Contact & { isDuplicate: boolean })[] => {
+): (Contact & { isDuplicate: boolean; duplicateScore?: number })[] => {
   return contacts.map(contact => {
-    const { isDuplicate } = checkDuplicateContact(contact, existingContacts);
+    const { isDuplicate, score } = checkDuplicateContact(contact, existingContacts);
     return {
       ...contact,
-      isDuplicate
+      isDuplicate,
+      duplicateScore: isDuplicate ? score : undefined
     };
   });
 };

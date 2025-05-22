@@ -22,6 +22,7 @@ export interface Contact {
   last_activity: string | null;
   id_crm: number | null;
   isDuplicate?: boolean;
+  duplicateScore?: number;
 }
 
 export const ContactsTable = () => {
@@ -166,7 +167,12 @@ export const ContactsTable = () => {
           {contact.isDuplicate && (
             <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-300">
               <AlertTriangle className="h-3 w-3 mr-1" />
-              {t('duplicado')}
+              {t('duplicado')} 
+              {contact.duplicateScore !== undefined && (
+                <span className="ml-1 text-xs">
+                  ({contact.duplicateScore.toFixed(1)}%)
+                </span>
+              )}
             </Badge>
           )}
         </div>

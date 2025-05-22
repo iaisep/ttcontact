@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { toast } from 'sonner';
 import { Table as UITable, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { importContactsFromCSV } from '@/lib/api/contacts';
 import { getContacts } from '@/lib/api/contacts';
-import { checkDuplicateContact, checkDuplicatesInBatch } from '@/lib/utils/fuzzyMatching';
+import { checkDuplicateContact } from '@/lib/utils/fuzzyMatching';
 import { Contact } from '@/components/crm/ContactsTable';
 import { Badge } from '@/components/ui/badge';
 
@@ -194,9 +193,12 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
             <TableBody>
               {previewRows.map((row, index) => {
                 // Check if this row is marked as a potential duplicate
-                const isDuplicate = parsedData.potentialDuplicates?.some(
+                const duplicateEntry = parsedData.potentialDuplicates?.find(
                   dup => dup.row.email === row.email && dup.row.name === row.name
                 );
+                
+                const isDuplicate = Boolean(duplicateEntry);
+                const duplicateScore = duplicateEntry?.score;
                 
                 // Check if this row is invalid
                 const isInvalid = parsedData.invalidData?.some(
@@ -215,6 +217,11 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
                         <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-300 flex items-center">
                           <AlertTriangle className="h-3 w-3 mr-1" />
                           {t('duplicado')}
+                          {duplicateScore && (
+                            <span className="ml-1">
+                              ({duplicateScore.toFixed(1)}%)
+                            </span>
+                          )}
                         </Badge>
                       )}
                       {isInvalid && (
