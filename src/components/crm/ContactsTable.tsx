@@ -70,7 +70,7 @@ export const ContactsTable = () => {
   };
 
   const handleAddContact = () => {
-    // Example contact data con id_crm como número entero
+    // Example contact data with id_crm as number
     const newContact = {
       name: 'New Contact',
       email: 'example@email.com',

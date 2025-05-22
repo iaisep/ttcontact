@@ -23,7 +23,7 @@ export async function getContacts(searchTerm: string = '') {
 
 export async function createContact(contactData: Omit<Contact, 'id'>) {
   try {
-    // Asegurarse de que id_crm es un número o null
+    // Ensure id_crm is a number or null
     const formattedData = {
       ...contactData,
       id_crm: contactData.id_crm !== undefined ? contactData.id_crm : null

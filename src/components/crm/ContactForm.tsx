@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -32,7 +33,7 @@ interface ContactFormProps {
     email?: string; 
     phone?: string; 
     tags: string[];
-    id_crm?: string;
+    id_crm?: number | undefined;
   }) => void;
   initialValues?: Partial<ContactFormValues>;
   isSubmitting?: boolean;
@@ -53,7 +54,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
         ? initialValues.tags.join(',') 
         : (initialValues?.tags as string || ''),
       // Convert number to string for the form input
-      id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm as number | string) : ''
+      id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm) : '',
     },
   });
 
