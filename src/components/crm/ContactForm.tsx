@@ -18,15 +18,18 @@ import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-// Updated schema to include id_crm field as a number
+// Updated schema to properly handle id_crm field
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().optional(),
   tags: z.array(z.string()).default([]),
   id_crm: z.string().optional()
-    .transform(val => val === '' ? null : Number(val))
-    .refine(val => val === null || !isNaN(Number(val)), { message: 'ID CRM must be a number' })
+    .transform(val => {
+      if (val === '' || val === undefined) return null;
+      const num = Number(val);
+      return isNaN(num) ? null : num;
+    })
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -65,14 +68,14 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
   const [inputValue, setInputValue] = useState('');
   const [tagsOpen, setTagsOpen] = useState(false);
   
-  // Ensure we initialize tags as an empty array if it's undefined
+  // Initialize with empty arrays and proper types
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
       name: initialValues?.name || '',
       email: initialValues?.email || '',
       phone: initialValues?.phone || '',
-      tags: initialValues?.tags || [],
+      tags: Array.isArray(initialValues?.tags) ? initialValues.tags : [],
       id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm) : '',
     },
   });
@@ -82,22 +85,22 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       name: values.name,
       email: values.email,
       phone: values.phone,
-      tags: values.tags || [], // Ensure we always pass an array
+      tags: Array.isArray(values.tags) ? values.tags : [],
       id_crm: values.id_crm,
     });
   };
 
   // Get current tags from form with null safety
-  const selectedTags = form.watch('tags') || [];
+  const selectedTags = Array.isArray(form.watch('tags')) ? form.watch('tags') : [];
 
-  // Filter available tags based on input value
+  // Filter available tags based on input value with null safety
   const filteredTags = availableTags.filter(
     tag => tag.toLowerCase().includes((inputValue || '').toLowerCase())
   );
 
-  // Handle tag selection
+  // Handle tag selection with null safety
   const toggleTag = (tag: string) => {
-    const currentTags = form.getValues('tags') || [];
+    const currentTags = Array.isArray(form.getValues('tags')) ? form.getValues('tags') : [];
     const updatedTags = currentTags.includes(tag)
       ? currentTags.filter(t => t !== tag)
       : [...currentTags, tag];
@@ -114,7 +117,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && inputValue && !availableTags.includes(inputValue)) {
       e.preventDefault();
-      const currentTags = form.getValues('tags') || [];
+      const currentTags = Array.isArray(form.getValues('tags')) ? form.getValues('tags') : [];
       form.setValue('tags', [...currentTags, inputValue], { shouldValidate: true });
       setInputValue('');
     }

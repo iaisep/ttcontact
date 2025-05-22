@@ -37,7 +37,13 @@ export const ContactDialog = ({
     tags: string[];
     id_crm: number | null;
   }) => {
-    onSubmit(values);
+    onSubmit({
+      name: values.name,
+      email: values.email || '',
+      phone: values.phone,
+      tags: Array.isArray(values.tags) ? values.tags : [],
+      id_crm: values.id_crm,
+    });
   };
 
   return (
@@ -57,7 +63,10 @@ export const ContactDialog = ({
         
         <ContactForm 
           onSubmit={handleSubmit} 
-          initialValues={initialValues} 
+          initialValues={{
+            ...initialValues,
+            tags: Array.isArray(initialValues?.tags) ? initialValues.tags : []
+          }} 
           isSubmitting={isSubmitting} 
         />
       </DialogContent>

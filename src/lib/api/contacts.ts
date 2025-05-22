@@ -14,7 +14,13 @@ export async function getContacts(searchTerm: string = '') {
     
     if (error) throw error;
     
-    return data || [];
+    // Ensure all contacts have tags array
+    const processedData = data?.map(contact => ({
+      ...contact,
+      tags: Array.isArray(contact.tags) ? contact.tags : []
+    })) || [];
+    
+    return processedData;
   } catch (error) {
     console.error('Error fetching contacts:', error);
     throw error;
@@ -23,8 +29,14 @@ export async function getContacts(searchTerm: string = '') {
 
 export async function createContact(contactData: Omit<Contact, 'id'>) {
   try {
+    // Ensure tags is always an array
+    const safeContactData = {
+      ...contactData,
+      tags: Array.isArray(contactData.tags) ? contactData.tags : []
+    };
+    
     // Note: user_id will be automatically set by the trigger we created
-    const { data, error } = await supabase.from('contacts').insert([contactData]).select();
+    const { data, error } = await supabase.from('contacts').insert([safeContactData]).select();
     
     if (error) throw error;
     
@@ -37,9 +49,15 @@ export async function createContact(contactData: Omit<Contact, 'id'>) {
 
 export async function updateContact(id: string, contactData: Partial<Omit<Contact, 'id'>>) {
   try {
+    // If tags is present, ensure it's an array
+    const safeContactData = {
+      ...contactData,
+      ...(contactData.tags && { tags: Array.isArray(contactData.tags) ? contactData.tags : [] })
+    };
+    
     const { data, error } = await supabase
       .from('contacts')
-      .update(contactData)
+      .update(safeContactData)
       .eq('id', id)
       .select();
     
