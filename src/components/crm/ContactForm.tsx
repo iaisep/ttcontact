@@ -65,6 +65,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
   const [inputValue, setInputValue] = useState('');
   const [tagsOpen, setTagsOpen] = useState(false);
   
+  // Ensure we initialize tags as an empty array if it's undefined
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
@@ -81,22 +82,22 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       name: values.name,
       email: values.email,
       phone: values.phone,
-      tags: values.tags,
+      tags: values.tags || [], // Ensure we always pass an array
       id_crm: values.id_crm,
     });
   };
 
-  // Get current tags from form
+  // Get current tags from form with null safety
   const selectedTags = form.watch('tags') || [];
 
   // Filter available tags based on input value
   const filteredTags = availableTags.filter(
-    tag => tag.toLowerCase().includes(inputValue.toLowerCase())
+    tag => tag.toLowerCase().includes((inputValue || '').toLowerCase())
   );
 
   // Handle tag selection
   const toggleTag = (tag: string) => {
-    const currentTags = form.getValues('tags');
+    const currentTags = form.getValues('tags') || [];
     const updatedTags = currentTags.includes(tag)
       ? currentTags.filter(t => t !== tag)
       : [...currentTags, tag];
@@ -106,14 +107,14 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
 
   // Handle tag input change
   const handleTagInputChange = (value: string) => {
-    setInputValue(value);
+    setInputValue(value || '');
   };
 
   // Handle adding a custom tag on Enter key
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && inputValue && !availableTags.includes(inputValue)) {
       e.preventDefault();
-      const currentTags = form.getValues('tags');
+      const currentTags = form.getValues('tags') || [];
       form.setValue('tags', [...currentTags, inputValue], { shouldValidate: true });
       setInputValue('');
     }
@@ -171,7 +172,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
             <FormItem>
               <FormLabel>ID CRM</FormLabel>
               <FormControl>
-                <Input placeholder="123456" type="number" {...field} />
+                <Input placeholder="123456" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -240,6 +241,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
                           e.preventDefault();
                           setTagsOpen(false);
                         }}
+                        type="button"
                       >
                         Manage tags
                       </Button>

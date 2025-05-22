@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
@@ -111,11 +112,11 @@ export const ContactsTable = () => {
       ),
       cell: (contact: Contact) => (
         <div className="flex flex-wrap gap-1">
-          {contact.tags?.map((tag, index) => (
+          {(contact.tags || []).map((tag, index) => (
             <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
               {tag}
             </span>
-          )) || '—'}
+          ))}
         </div>
       ),
     },
@@ -146,6 +147,7 @@ export const ContactsTable = () => {
     const newContact = {
       ...contactData,
       last_activity: new Date().toISOString(),
+      tags: contactData.tags || [], // Ensure tags is always an array
     };
     
     createContactMutation.mutate(newContact);
