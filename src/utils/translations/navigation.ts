@@ -47,8 +47,7 @@ const navigationTranslations = {
     "Teléfono": "Phone",
     "Etiquetas": "Tags",
     "Última actividad": "Last Activity",
-    "back_to_dashboard": "Back to Dashboard",
-    "ID CRM": "CRM ID"
+    "back_to_dashboard": "Back to Dashboard"
   },
   es: {
     // Navegación y Común
@@ -96,8 +95,7 @@ const navigationTranslations = {
     "Teléfono": "Teléfono",
     "Etiquetas": "Etiquetas",
     "Última actividad": "Última actividad",
-    "back_to_dashboard": "Volver al Panel de Control",
-    "ID CRM": "ID CRM"
+    "back_to_dashboard": "Volver al Panel de Control"
   }
 };
 

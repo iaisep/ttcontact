@@ -23,13 +23,8 @@ export async function getContacts(searchTerm: string = '') {
 
 export async function createContact(contactData: Omit<Contact, 'id'>) {
   try {
-    // Ensure id_crm is a number or null
-    const formattedData = {
-      ...contactData,
-      id_crm: contactData.id_crm !== undefined ? contactData.id_crm : null
-    };
-    
-    const { data, error } = await supabase.from('contacts').insert([formattedData]).select();
+    // Note: user_id will be automatically set by the trigger we created
+    const { data, error } = await supabase.from('contacts').insert([contactData]).select();
     
     if (error) throw error;
     
