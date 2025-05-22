@@ -1,0 +1,187 @@
+
+import React, { useState } from 'react';
+import { TableWithPagination } from '@/components/ui/table-with-pagination';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/context/LanguageContext';
+import { Plus, Import, Search, User, Mail, Phone, Tag, Calendar } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { supabase } from '@/lib/supabase';
+import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
+
+export interface Contact {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  tags: string[];
+  last_activity: string | null;
+}
+
+export const ContactsTable = () => {
+  const { t } = useLanguage();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  
+  const fetchContacts = async () => {
+    try {
+      console.log('Fetching contacts');
+      let query = supabase.from('contacts').select('*');
+      
+      if (searchTerm) {
+        query = query.ilike('name', `%${searchTerm}%`);
+      }
+      
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error('Error fetching contacts:', error);
+        throw error;
+      }
+      
+      console.log('Contacts fetched:', data);
+      return data || [];
+    } catch (error) {
+      console.error('Error in fetchContacts:', error);
+      return [];
+    }
+  };
+
+  const { data: contacts = [], isLoading, error } = useQuery({
+    queryKey: ['contacts', searchTerm],
+    queryFn: fetchContacts,
+  });
+
+  if (error) {
+    toast.error('Failed to load contacts');
+  }
+
+  const columns = [
+    {
+      key: 'name',
+      header: (
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4" />
+          <span>{t('Nombre del contacto')}</span>
+        </div>
+      ),
+      cell: (contact: Contact) => <span className="font-medium">{contact.name}</span>,
+    },
+    {
+      key: 'email',
+      header: (
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4" />
+          <span>{t('Email')}</span>
+        </div>
+      ),
+      cell: (contact: Contact) => <span>{contact.email}</span>,
+    },
+    {
+      key: 'phone',
+      header: (
+        <div className="flex items-center gap-2">
+          <Phone className="h-4 w-4" />
+          <span>{t('Teléfono')}</span>
+        </div>
+      ),
+      cell: (contact: Contact) => <span>{contact.phone}</span>,
+    },
+    {
+      key: 'tags',
+      header: (
+        <div className="flex items-center gap-2">
+          <Tag className="h-4 w-4" />
+          <span>{t('Etiquetas')}</span>
+        </div>
+      ),
+      cell: (contact: Contact) => (
+        <div className="flex gap-1">
+          {contact.tags?.map((tag, index) => (
+            <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+              {tag}
+            </span>
+          )) || '—'}
+        </div>
+      ),
+    },
+    {
+      key: 'last_activity',
+      header: (
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4" />
+          <span>{t('Última actividad')}</span>
+        </div>
+      ),
+      cell: (contact: Contact) => (
+        <span>{contact.last_activity ? new Date(contact.last_activity).toLocaleDateString() : '—'}</span>
+      ),
+    },
+  ];
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
+  const handleAddContact = () => {
+    toast.info('Add contact functionality will be implemented');
+  };
+
+  const handleImport = () => {
+    toast.info('Import contacts functionality will be implemented');
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">{t('contacts')}</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleImport} className="flex gap-1 items-center">
+            <Import className="h-4 w-4" />
+            <span>{t('importar')}</span>
+          </Button>
+          <Button onClick={handleAddContact} className="flex gap-1 items-center">
+            <Plus className="h-4 w-4" />
+            <span>{t('add_contact')}</span>
+          </Button>
+        </div>
+      </div>
+      
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input 
+            className="pl-9"
+            placeholder={t('search')}
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+        </div>
+        <Button variant="outline">{t('filter')}</Button>
+      </div>
+      
+      {isLoading ? (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+        </div>
+      ) : (
+        <TableWithPagination 
+          data={contacts}
+          columns={columns}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+          emptyState={
+            <div className="text-center py-10 text-gray-500">
+              {searchTerm ? t('No hay resultados.') : t('No hay contactos.')}
+            </div>
+          }
+        />
+      )}
+    </div>
+  );
+};
+
+export default ContactsTable;

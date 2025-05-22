@@ -38,7 +38,15 @@ const navigationTranslations = {
     "filter": "Filter",
     "search": "Search",
     "create_campaign": "Create Campaign",
-    "call": "Call"
+    "call": "Call",
+    "importar": "Import",
+    "No hay resultados.": "No results found.",
+    "No hay contactos.": "No contacts yet.",
+    "Nombre del contacto": "Contact Name",
+    "Email": "Email",
+    "Teléfono": "Phone",
+    "Etiquetas": "Tags",
+    "Última actividad": "Last Activity"
   },
   es: {
     // Navegación y Común
@@ -77,7 +85,15 @@ const navigationTranslations = {
     "filter": "Filtrar",
     "search": "Buscar",
     "create_campaign": "Crear Campaña",
-    "call": "Llamar"
+    "call": "Llamar",
+    "importar": "Importar",
+    "No hay resultados.": "No hay resultados.",
+    "No hay contactos.": "No hay contactos.",
+    "Nombre del contacto": "Nombre del contacto",
+    "Email": "Email",
+    "Teléfono": "Teléfono",
+    "Etiquetas": "Etiquetas",
+    "Última actividad": "Última actividad"
   }
 };
 

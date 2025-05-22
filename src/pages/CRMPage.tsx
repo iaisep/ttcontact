@@ -2,21 +2,22 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KanbanBoard from '@/components/crm/KanbanBoard';
+import ContactsTable from '@/components/crm/ContactsTable';
+import { useLanguage } from '@/context/LanguageContext';
 
 const CRMPage = () => {
+  const { t } = useLanguage();
+  
   return (
     <div className="container mx-auto p-6 h-full">
-      <Tabs defaultValue="kanban" className="h-full">
+      <Tabs defaultValue="contacts" className="h-full">
         <TabsList>
-          <TabsTrigger value="contacts">Contacts</TabsTrigger>
-          <TabsTrigger value="kanban">Kanban</TabsTrigger>
+          <TabsTrigger value="contacts">{t('contacts')}</TabsTrigger>
+          <TabsTrigger value="kanban">{t('kanban')}</TabsTrigger>
         </TabsList>
         <TabsContent value="contacts" className="h-[calc(100%-40px)]">
           <div className="border rounded-md p-4 h-full">
-            <h1 className="text-2xl font-bold mb-4">Contacts</h1>
-            <div className="text-center py-10 text-gray-500">
-              Contact management view will be implemented here.
-            </div>
+            <ContactsTable />
           </div>
         </TabsContent>
         <TabsContent value="kanban" className="h-[calc(100%-40px)]">
