@@ -54,7 +54,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
         ? initialValues.tags.join(',') 
         : (initialValues?.tags as string || ''),
       // Convert number to string for the form input (needed since HTML inputs work with strings)
-      id_crm: nitialValues?.id_crm || '',
+      id_crm: initialValues?.id_crm || '',
     },
   });
 
