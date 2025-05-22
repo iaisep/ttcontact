@@ -32,7 +32,7 @@ interface ContactFormProps {
     email?: string; 
     phone?: string; 
     tags: string[];
-    id_crm?: string | number;
+    id_crm?: string;
   }) => void;
   initialValues?: Partial<ContactFormValues>;
   isSubmitting?: boolean;
@@ -53,7 +53,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
         ? initialValues.tags.join(',') 
         : (initialValues?.tags as string || ''),
       // Convert number to string for the form input
-      id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm) : ''
+      id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm as number | string) : ''
     },
   });
 
