@@ -53,9 +53,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
         ? initialValues.tags.join(',') 
         : (initialValues?.tags as string || ''),
       // Convert number to string for the form input
-      id_crm: initialValues?.id_crm !== undefined 
-        ? String(initialValues.id_crm) 
-        : '',
+      setValue('id_crm', initialValues?.id_crm !== undefined ? String(initialValues.id_crm) : '');
     },
   });
 
@@ -139,7 +137,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
             <FormItem>
               <FormLabel>{t('ID CRM')}</FormLabel>
               <FormControl>
-                <Input placeholder="12345" type="number" {...field} />
+                <Input placeholder="12345" type="ext" {...register('id_crm')} />
               </FormControl>
               <FormMessage />
             </FormItem>
