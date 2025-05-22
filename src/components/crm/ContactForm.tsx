@@ -46,6 +46,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       email: initialValues?.email || '',
       phone: initialValues?.phone || '',
       tags: initialValues?.tags || '',
+      // Convierte el número a string para el formulario
       id_crm: initialValues?.id_crm !== undefined ? String(initialValues.id_crm) : '',
     },
   });
