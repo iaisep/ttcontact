@@ -34,7 +34,17 @@ const helpCenterTranslations = {
     "contact_us": "Contact Us",
     "examples": "Examples",
     "examples_description": "Explore interactive examples and code samples to help you implement our solutions",
-    "explore": "Explore"
+    "explore": "Explore",
+    "blog": "Blog",
+    "blog_posts": "Blog Posts",
+    "recent_articles": "Recent Articles",
+    "subscribe": "Subscribe",
+    "subscribe_newsletter": "Subscribe to Our Newsletter",
+    "newsletter_description": "Get the latest articles, updates and news delivered straight to your inbox.",
+    "your_email": "Your email address",
+    "share_blog": "Share Our Blog",
+    "featured": "Featured",
+    "all_categories": "All Categories"
   },
   es: {
     "help_center": "Centro de Ayuda",
@@ -69,7 +79,17 @@ const helpCenterTranslations = {
     "contact_us": "Contáctanos",
     "examples": "Ejemplos",
     "examples_description": "Explora ejemplos interactivos y muestras de código para ayudarte a implementar nuestras soluciones",
-    "explore": "Explorar"
+    "explore": "Explorar",
+    "blog": "Blog",
+    "blog_posts": "Artículos del Blog",
+    "recent_articles": "Artículos Recientes",
+    "subscribe": "Suscribirse",
+    "subscribe_newsletter": "Suscríbete a Nuestro Boletín",
+    "newsletter_description": "Recibe los últimos artículos, actualizaciones y noticias directamente en tu bandeja de entrada.",
+    "your_email": "Tu dirección de correo electrónico",
+    "share_blog": "Comparte Nuestro Blog",
+    "featured": "Destacado",
+    "all_categories": "Todas las Categorías"
   }
 };
 
