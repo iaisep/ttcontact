@@ -118,16 +118,19 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
     
     return (
       <div className="mt-4">
-        <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
-          <Table className="h-4 w-4" />
-          {t('Data Preview')} ({Math.min(5, parsedData.data.length)} of {parsedData.data.length} rows)
-        </h3>
+        <div className="flex items-center mb-2">
+          <Table className="h-4 w-4 mr-2" />
+          <h3 className="text-sm font-medium">
+            {t('Data Preview')} ({Math.min(5, parsedData.data.length)} {t('of')} {parsedData.data.length} {t('rows')})
+          </h3>
+        </div>
+        
         <div className="border rounded-md overflow-auto max-h-60">
           <UITable>
             <TableHeader>
               <TableRow>
                 {allKeys.map(key => (
-                  <TableHead key={key} className="text-xs">
+                  <TableHead key={key} className="text-xs py-2 px-3 bg-muted/50">
                     {key}
                   </TableHead>
                 ))}
@@ -135,9 +138,9 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
             </TableHeader>
             <TableBody>
               {previewRows.map((row, index) => (
-                <TableRow key={index}>
+                <TableRow key={index} className="border-b last:border-b-0">
                   {allKeys.map(key => (
-                    <TableCell key={`${index}-${key}`} className="text-xs py-1">
+                    <TableCell key={`${index}-${key}`} className="text-xs py-2 px-3">
                       {row[key as keyof typeof row]?.toString() || '—'}
                     </TableCell>
                   ))}
@@ -147,22 +150,22 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
           </UITable>
         </div>
         
-        <div className="mt-4 space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>{t('Valid contacts')}:</span>
-            <span className="font-medium text-green-600">{parsedData.validData.length}</span>
+        <div className="mt-4">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium">{t('Valid contacts')}:</span>
+            <span className="font-medium text-sm text-green-600">{parsedData.validData.length}</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span>{t('Invalid contacts')}:</span>
-            <span className={parsedData.invalidData.length > 0 ? "font-medium text-amber-600" : "font-medium"}>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium">{t('Invalid contacts')}:</span>
+            <span className={`font-medium text-sm ${parsedData.invalidData.length > 0 ? "text-amber-600" : ""}`}>
               {parsedData.invalidData.length}
             </span>
           </div>
           
           {parsedData.invalidData.length > 0 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-2">
-              <p className="text-xs text-amber-800 font-medium mb-1">{t('Validation Errors')}:</p>
-              <ul className="text-xs text-amber-700 space-y-1 list-disc pl-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mt-3">
+              <p className="text-sm text-amber-800 font-medium mb-2">{t('Validation Errors')}:</p>
+              <ul className="text-sm text-amber-700 space-y-1 list-disc pl-4">
                 {parsedData.invalidData.slice(0, 3).map((item, idx) => (
                   <li key={idx}>
                     Row {idx + 1}: {item.errors.join(', ')}
@@ -181,15 +184,15 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{t('Import Contacts')}</DialogTitle>
+      <DialogContent className="max-w-md sm:max-w-lg md:max-w-xl p-5">
+        <DialogHeader className="text-left">
+          <DialogTitle className="text-xl">{t('Import Contacts')}</DialogTitle>
           <DialogDescription>
             {t('Upload a CSV file with contacts information')}
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <div className="space-y-5">
           <div>
             <Button
               onClick={handleDownloadTemplate}
@@ -214,12 +217,21 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
               className="flex flex-col items-center justify-center cursor-pointer"
             >
               <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-              <p className="text-sm font-medium mb-1">
-                {file ? file.name : t('Click to upload or drag and drop')}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                CSV {t('or')} Excel (max 1000 {t('contacts')})
-              </p>
+              {file ? (
+                <>
+                  <p className="text-sm font-medium mb-1">{file.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {file.name.endsWith('.csv') ? 'CSV' : 'Excel'} ({t('max')} 1000 {t('contacts')})
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium mb-1">{t('Click to upload or drag and drop')}</p>
+                  <p className="text-xs text-muted-foreground">
+                    CSV {t('or')} Excel ({t('max')} 1000 {t('contacts')})
+                  </p>
+                </>
+              )}
             </label>
           </div>
 
@@ -243,20 +255,30 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
                 <h3 className="font-medium">{t('Import Results')}</h3>
               </div>
               <ul className="text-sm space-y-1">
-                <li>{t('Valid contacts')}: {importStats.valid}</li>
-                <li>{t('Invalid contacts')}: {importStats.invalid}</li>
-                <li>{t('Successfully imported')}: {importStats.success}</li>
+                <li className="flex justify-between">
+                  <span>{t('Valid contacts')}:</span> 
+                  <span>{importStats.valid}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>{t('Invalid contacts')}:</span>
+                  <span>{importStats.invalid}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>{t('Successfully imported')}:</span>
+                  <span>{importStats.success}</span>
+                </li>
               </ul>
             </div>
           )}
           
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3 pt-3 border-t">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               {t('cancel')}
             </Button>
             <Button 
               onClick={handleImport} 
               disabled={!parsedData || !parsedData.validData.length || isProcessing || isParsingFile}
+              className="bg-primary"
             >
               {isProcessing ? (
                 <>

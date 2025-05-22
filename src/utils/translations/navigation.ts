@@ -1,3 +1,4 @@
+
 // Navigation related translations
 const navigationTranslations = {
   en: {
@@ -69,10 +70,13 @@ const navigationTranslations = {
     "Only CSV and Excel files are supported": "Only CSV and Excel files are supported",
     "Please select a file to import": "Please select a file to import",
     "Error processing file": "Error processing file",
-    // New translations for CSV import preview
     "Data Preview": "Data Preview",
     "Validation Errors": "Validation Errors",
-    "No valid contacts to import": "No valid contacts to import"
+    "No valid contacts to import": "No valid contacts to import",
+    "rows": "rows",
+    "of": "of",
+    "max": "max",
+    "Name is required": "Name is required"
   },
   es: {
     // Navegación y Común
@@ -143,10 +147,13 @@ const navigationTranslations = {
     "Only CSV and Excel files are supported": "Solo se admiten archivos CSV y Excel",
     "Please select a file to import": "Por favor selecciona un archivo para importar",
     "Error processing file": "Error al procesar el archivo",
-    // New translations for CSV import preview
     "Data Preview": "Vista Previa de Datos",
     "Validation Errors": "Errores de Validación",
-    "No valid contacts to import": "No hay contactos válidos para importar"
+    "No valid contacts to import": "No hay contactos válidos para importar",
+    "rows": "filas",
+    "of": "de",
+    "max": "máximo",
+    "Name is required": "El nombre es requerido"
   }
 };
 
