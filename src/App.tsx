@@ -13,6 +13,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import HelpCenterPage from './pages/HelpCenterPage';
 import DocumentationPage from './pages/DocumentationPage';
 import GuidesPage from './pages/GuidesPage';
+import BlogPage from './pages/BlogPage';
 
 const App: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ const App: React.FC = () => {
       <Route path="/docs" element={<Navigate to="/help-center" replace />} />
       <Route path="/documentation" element={<DocumentationPage />} />
       <Route path="/guides" element={<GuidesPage />} />
+      <Route path="/blog" element={<BlogPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
