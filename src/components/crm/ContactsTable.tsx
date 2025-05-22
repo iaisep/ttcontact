@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
-import { Plus, Import, Search, User, Mail, Phone, Tag, Calendar, AlertTriangle } from 'lucide-react';
+import { Plus, Import, Search, User, Mail, Phone, Tag, Calendar, AlertTriangle, Trash2, Check, Square, CheckSquare } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getContacts, createContact, deleteContact } from '@/lib/api/contacts';
+import { getContacts, createContact, deleteContact, deleteMultipleContacts } from '@/lib/api/contacts';
 import ContactDialog from './ContactDialog';
 import ImportContactsDialog from './ImportContactsDialog';
 import { checkDuplicatesInBatch } from '@/lib/utils/fuzzyMatching';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export interface Contact {
   id: string;
@@ -31,6 +32,7 @@ export const ContactsTable = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [contactsWithDuplicates, setContactsWithDuplicates] = useState<Contact[]>([]);
+  const [selectedContactIds, setSelectedContactIds] = useState<string[]>([]);
   const queryClient = useQueryClient();
   
   const { data: contacts = [], isLoading, error } = useQuery({
@@ -46,6 +48,11 @@ export const ContactsTable = () => {
     } else {
       setContactsWithDuplicates([]);
     }
+  }, [contacts]);
+
+  // Reset selected contacts when contacts list changes
+  useEffect(() => {
+    setSelectedContactIds([]);
   }, [contacts]);
 
   const createContactMutation = useMutation({
@@ -79,11 +86,72 @@ export const ContactsTable = () => {
     }
   });
 
+  const deleteMultipleContactsMutation = useMutation({
+    mutationFn: deleteMultipleContacts,
+    onSuccess: (result) => {
+      toast.success(t('Selected contacts deleted successfully'));
+      setSelectedContactIds([]);
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    },
+    onError: (error) => {
+      console.error('Error deleting multiple contacts:', error);
+      toast.error(t('Failed to delete selected contacts'));
+    }
+  });
+
   if (error) {
     toast.error('Failed to load contacts');
   }
 
+  const toggleSelectAll = () => {
+    if (selectedContactIds.length === contactsWithDuplicates.length) {
+      // Deselect all
+      setSelectedContactIds([]);
+    } else {
+      // Select all
+      setSelectedContactIds(contactsWithDuplicates.map(contact => contact.id));
+    }
+  };
+
+  const toggleSelectContact = (id: string) => {
+    setSelectedContactIds(prev => 
+      prev.includes(id) 
+        ? prev.filter(contactId => contactId !== id) 
+        : [...prev, id]
+    );
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedContactIds.length === 0) return;
+    
+    if (window.confirm(t(`Are you sure you want to delete ${selectedContactIds.length} contact(s)?`))) {
+      deleteMultipleContactsMutation.mutate(selectedContactIds);
+    }
+  };
+
   const columns = [
+    {
+      key: 'select',
+      header: (
+        <div className="flex items-center justify-center">
+          <Checkbox 
+            checked={selectedContactIds.length > 0 && selectedContactIds.length === contactsWithDuplicates.length}
+            onCheckedChange={toggleSelectAll}
+            aria-label={t('Select all contacts')}
+          />
+        </div>
+      ),
+      cell: (contact: Contact) => (
+        <div className="flex items-center justify-center">
+          <Checkbox 
+            checked={selectedContactIds.includes(contact.id)}
+            onCheckedChange={() => toggleSelectContact(contact.id)}
+            aria-label={t('Select contact')}
+          />
+        </div>
+      ),
+      className: "w-12",
+    },
     {
       key: 'name',
       header: (
@@ -219,6 +287,18 @@ export const ContactsTable = () => {
           />
         </div>
         <Button variant="outline">{t('filter')}</Button>
+        
+        {selectedContactIds.length > 0 && (
+          <Button 
+            variant="destructive" 
+            onClick={handleDeleteSelected}
+            className="flex gap-1 items-center"
+            disabled={deleteMultipleContactsMutation.isPending}
+          >
+            <Trash2 className="h-4 w-4" />
+            {t('Delete Selected')} ({selectedContactIds.length})
+          </Button>
+        )}
       </div>
       
       {isLoading ? (

@@ -83,6 +83,25 @@ export async function deleteContact(id: string) {
   }
 }
 
+export async function deleteMultipleContacts(ids: string[]) {
+  try {
+    if (ids.length === 0) return { count: 0 };
+    
+    const { data, error } = await supabase
+      .from('contacts')
+      .delete()
+      .in('id', ids)
+      .select();
+    
+    if (error) throw error;
+    
+    return { count: ids.length, deletedIds: ids };
+  } catch (error) {
+    console.error(`Error deleting multiple contacts:`, error);
+    throw error;
+  }
+}
+
 export async function importContactsFromCSV(contacts: Omit<Contact, 'id'>[]) {
   try {
     if (contacts.length === 0) return { count: 0 };
