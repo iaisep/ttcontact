@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { toast } from 'sonner';
 import { getContacts, createContact, deleteContact, deleteMultipleContacts } from '@/lib/api/contacts';
 import ContactDialog from './ContactDialog';
 import ImportContactsDialog from './ImportContactsDialog';
-import { checkDuplicatesInBatch } from '@/lib/utils/fuzzyMatching';
+import { checkDuplicatesInBatch, checkDuplicateContact } from '@/lib/utils/fuzzyMatching';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 

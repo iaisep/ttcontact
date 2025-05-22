@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -85,7 +86,8 @@ const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ open, onOpe
         toast.success(t('Contacts imported successfully'));
         onImportComplete?.();
       } else {
-        toast.warn(t('No valid contacts to import'));
+        // Change warn to a supported method
+        toast.error(t('No valid contacts to import'));
       }
     } catch (error: any) {
       console.error("Error importing contacts:", error);
