@@ -53,7 +53,23 @@ const navigationTranslations = {
     "Contact created successfully": "Contact created successfully",
     "Failed to create contact": "Failed to create contact",
     "Contact deleted successfully": "Contact deleted successfully",
-    "Failed to delete contact": "Failed to delete contact"
+    "Failed to delete contact": "Failed to delete contact",
+    // New translations for CSV import
+    "Import Contacts": "Import Contacts",
+    "Upload a CSV file with contacts information": "Upload a CSV file with contacts information",
+    "Download Template": "Download Template",
+    "Click to upload or drag and drop": "Click to upload or drag and drop",
+    "or": "or",
+    "contacts": "contacts",
+    "Processing...": "Processing...",
+    "Import": "Import",
+    "Import Results": "Import Results",
+    "Valid contacts": "Valid contacts",
+    "Invalid contacts": "Invalid contacts",
+    "Successfully imported": "Successfully imported",
+    "Only CSV and Excel files are supported": "Only CSV and Excel files are supported",
+    "Please select a file to import": "Please select a file to import",
+    "Error processing file": "Error processing file"
   },
   es: {
     // Navegación y Común
@@ -107,7 +123,23 @@ const navigationTranslations = {
     "Contact created successfully": "Contacto creado exitosamente",
     "Failed to create contact": "Error al crear el contacto",
     "Contact deleted successfully": "Contacto eliminado exitosamente",
-    "Failed to delete contact": "Error al eliminar el contacto"
+    "Failed to delete contact": "Error al eliminar el contacto",
+    // New translations for CSV import
+    "Import Contacts": "Importar Contactos",
+    "Upload a CSV file with contacts information": "Subir un archivo CSV con información de contactos",
+    "Download Template": "Descargar Plantilla",
+    "Click to upload or drag and drop": "Haz clic para subir o arrastra y suelta",
+    "or": "o",
+    "contacts": "contactos",
+    "Processing...": "Procesando...",
+    "Import": "Importar",
+    "Import Results": "Resultados de la Importación",
+    "Valid contacts": "Contactos válidos",
+    "Invalid contacts": "Contactos inválidos",
+    "Successfully imported": "Importados con éxito",
+    "Only CSV and Excel files are supported": "Solo se admiten archivos CSV y Excel",
+    "Please select a file to import": "Por favor selecciona un archivo para importar",
+    "Error processing file": "Error al procesar el archivo"
   }
 };
 

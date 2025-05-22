@@ -8,15 +8,15 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useLanguage } from '@/context/LanguageContext';
 
-// Updated schema to include id_crm field as a number
+// Updated schema to validate id_crm properly
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().optional(),
   tags: z.string().optional(),
   id_crm: z.string().optional()
-    .transform(val => val === '' ? null : Number(val))
-    .refine(val => val === null || !isNaN(val), { message: 'ID CRM must be a number' })
+    .transform(val => val === '' || val === undefined ? null : Number(val))
+    .refine(val => val === null || !isNaN(val as number), { message: 'ID CRM must be a number' })
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -28,7 +28,7 @@ interface ContactFormProps {
     email?: string; 
     phone?: string; 
     tags: string[]; 
-    id_crm: number | null; // Updated to match the Supabase schema (int4)
+    id_crm: number | null; // Ensure this is a number or null
   }) => void;
   initialValues?: {
     name?: string;
@@ -61,7 +61,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       email: values.email,
       phone: values.phone,
       tags: values.tags ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-      id_crm: values.id_crm,
+      id_crm: values.id_crm as number | null, // This is now correctly typed thanks to the schema transform
     };
     
     onSubmit(formattedValues);

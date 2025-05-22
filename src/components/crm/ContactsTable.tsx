@@ -9,15 +9,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { getContacts, createContact, deleteContact } from '@/lib/api/contacts';
 import ContactDialog from './ContactDialog';
+import ImportContactsDialog from './ImportContactsDialog';
 
 export interface Contact {
   id: string;
   name: string;
-  email?: string; // Changed from required to optional
+  email?: string;
   phone?: string;
   tags: string[];
   last_activity: string | null;
-  id_crm: number | null; // Added id_crm field
+  id_crm: number | null;
 }
 
 export const ContactsTable = () => {
@@ -26,6 +27,7 @@ export const ContactsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   
   const { data: contacts = [], isLoading, error } = useQuery({
@@ -111,7 +113,7 @@ export const ContactsTable = () => {
         </div>
       ),
       cell: (contact: Contact) => (
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-wrap">
           {contact.tags?.map((tag, index) => (
             <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
               {tag}
@@ -153,7 +155,12 @@ export const ContactsTable = () => {
   };
 
   const handleImport = () => {
-    toast.info('Import contacts functionality will be implemented');
+    setIsImportDialogOpen(true);
+  };
+
+  const handleImportComplete = () => {
+    queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    setIsImportDialogOpen(false);
   };
 
   return (
@@ -210,6 +217,12 @@ export const ContactsTable = () => {
         onSubmit={handleContactSubmit}
         isSubmitting={createContactMutation.isPending}
         mode="create"
+      />
+
+      <ImportContactsDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        onImportComplete={handleImportComplete}
       />
     </div>
   );

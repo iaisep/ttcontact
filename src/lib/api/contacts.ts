@@ -23,8 +23,13 @@ export async function getContacts(searchTerm: string = '') {
 
 export async function createContact(contactData: Omit<Contact, 'id'>) {
   try {
-    // Note: user_id will be automatically set by the trigger we created
-    const { data, error } = await supabase.from('contacts').insert([contactData]).select();
+    // Ensure id_crm is properly typed
+    const formattedData = {
+      ...contactData,
+      id_crm: contactData.id_crm === undefined ? null : contactData.id_crm
+    };
+
+    const { data, error } = await supabase.from('contacts').insert([formattedData]).select();
     
     if (error) throw error;
     
@@ -61,6 +66,31 @@ export async function deleteContact(id: string) {
     return true;
   } catch (error) {
     console.error(`Error deleting contact with ID ${id}:`, error);
+    throw error;
+  }
+}
+
+export async function importContactsFromCSV(contacts: Omit<Contact, 'id'>[]) {
+  try {
+    if (contacts.length === 0) return { count: 0 };
+    
+    // Format contacts to ensure proper types
+    const formattedContacts = contacts.map(contact => ({
+      ...contact,
+      id_crm: contact.id_crm === undefined ? null : contact.id_crm,
+      last_activity: new Date().toISOString()
+    }));
+    
+    const { data, error } = await supabase
+      .from('contacts')
+      .insert(formattedContacts)
+      .select();
+    
+    if (error) throw error;
+    
+    return { count: data?.length || 0, data };
+  } catch (error) {
+    console.error('Error importing contacts:', error);
     throw error;
   }
 }
