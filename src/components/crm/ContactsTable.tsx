@@ -13,8 +13,8 @@ import ContactDialog from './ContactDialog';
 export interface Contact {
   id: string;
   name: string;
-  email?: string; // Optional email
-  phone?: string; // Optional phone
+  email?: string; // Changed from required to optional
+  phone?: string;
   tags: string[];
   last_activity: string | null;
   id_crm: number | null; // Added id_crm field
@@ -111,12 +111,12 @@ export const ContactsTable = () => {
         </div>
       ),
       cell: (contact: Contact) => (
-        <div className="flex flex-wrap gap-1">
-          {(Array.isArray(contact.tags) ? contact.tags : []).map((tag, index) => (
+        <div className="flex gap-1">
+          {contact.tags?.map((tag, index) => (
             <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
               {tag}
             </span>
-          ))}
+          )) || '—'}
         </div>
       ),
     },
@@ -147,7 +147,6 @@ export const ContactsTable = () => {
     const newContact = {
       ...contactData,
       last_activity: new Date().toISOString(),
-      tags: Array.isArray(contactData.tags) ? contactData.tags : [], // Ensure tags is always an array
     };
     
     createContactMutation.mutate(newContact);
