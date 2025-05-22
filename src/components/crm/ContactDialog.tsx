@@ -41,13 +41,14 @@ export const ContactDialog = ({
   };
 
   // Format tags array to comma-separated string for the form
-  const formValues = initialValues ? {
-    name: initialValues.name || '',
-    email: initialValues.email || '',
-    phone: initialValues.phone || '',
-    tags: initialValues.tags?.join(', ') || '',
-    id_crm: initialValues.id_crm
-  } : undefined;
+  // Ensure all required properties are provided with default values
+  const formValues = {
+    name: initialValues?.name || '',
+    email: initialValues?.email || '',
+    phone: initialValues?.phone || '',
+    tags: initialValues?.tags?.join(', ') || '',
+    id_crm: initialValues?.id_crm === undefined ? null : initialValues.id_crm
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
