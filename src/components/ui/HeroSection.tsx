@@ -78,16 +78,7 @@ const HeroSection = () => {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="mt-16 md:mt-20 relative max-w-6xl mx-auto"
         >
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-            <div className="w-full overflow-hidden">
-              <img 
-                src="/lovable-uploads/ec9f83a1-dd66-491e-bea3-affdd9f21c21.png" 
-                alt="Voice AI Platform" 
-                className="w-full h-auto object-cover"
-              />
-            </div>
-          </div>
-
+          
           {/* Elementos decorativos */}
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-indigo-400/10 rounded-full z-0 blur-xl"></div>
           <div className="absolute -top-6 -right-6 w-32 h-32 bg-blue-300/20 rounded-full z-0 blur-xl"></div>
