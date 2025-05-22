@@ -4,18 +4,27 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import Spline from "@splinetool/react-spline";
 
 const HeroSection = () => {
   const { t } = useLanguage();
-  
+
   return (
-    <section className="relative pt-28 md:pt-36 pb-16 md:pb-20 overflow-hidden">
-      {/* Background gradients */}
-      <div className="absolute top-0 left-0 right-0 h-[600px] bg-gradient-to-b from-indigo-50/50 to-transparent dark:from-indigo-900/10 dark:to-transparent -z-10"></div>
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-100/30 dark:bg-indigo-800/10 rounded-full blur-3xl"></div>
-      <div className="absolute top-32 -left-24 w-80 h-80 bg-blue-100/30 dark:bg-blue-800/10 rounded-full blur-3xl"></div>
-      
-      <div className="container mx-auto px-4 relative">
+    <section className="relative min-h-screen pt-28 md:pt-36 pb-16 md:pb-20 overflow-hidden">
+      {/* 🌌 Fondo Spline */}
+      <div className="absolute inset-0 -z-10 pointer-events-none h-full w-full">
+        <Spline
+          scene="https://prod.spline.design/1UjZlPEUBkIEmBpR/scene.splinecode"
+          style={{ width: '100%', height: '100%' }}
+        />
+      </div>
+
+      {/* 🎨 Gradientes decorativos (opcionales) */}
+      <div className="absolute top-0 left-0 right-0 h-[600px] bg-gradient-to-b from-indigo-50/50 to-transparent dark:from-indigo-900/10 dark:to-transparent -z-20"></div>
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-100/30 dark:bg-indigo-800/10 rounded-full blur-3xl -z-20"></div>
+      <div className="absolute top-32 -left-24 w-80 h-80 bg-blue-100/30 dark:bg-blue-800/10 rounded-full blur-3xl -z-20"></div>
+
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -28,7 +37,7 @@ const HeroSection = () => {
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
             Retell helps you build voice AI with our simple SDK and API that sounds indistinguishable from a human.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-10">
             <Link to="/login">
               <Button size="lg" className="text-base px-6 py-6 bg-indigo-600 hover:bg-indigo-700 text-white w-full sm:w-auto">
@@ -41,7 +50,7 @@ const HeroSection = () => {
               Watch Demo
             </Button>
           </div>
-          
+
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -62,7 +71,7 @@ const HeroSection = () => {
             </span>
           </motion.div>
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -78,8 +87,8 @@ const HeroSection = () => {
               />
             </div>
           </div>
-          
-          {/* Decorative elements */}
+
+          {/* Elementos decorativos */}
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-indigo-400/10 rounded-full z-0 blur-xl"></div>
           <div className="absolute -top-6 -right-6 w-32 h-32 bg-blue-300/20 rounded-full z-0 blur-xl"></div>
         </motion.div>
