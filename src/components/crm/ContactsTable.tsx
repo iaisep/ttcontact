@@ -44,7 +44,19 @@ export const ContactsTable = () => {
   // Update contacts with duplicate flags whenever the contacts list changes
   useEffect(() => {
     if (contacts.length > 0) {
-      const withDuplicates = checkDuplicatesInBatch(contacts, contacts);
+      // Each contact should only be checked against other contacts, not itself
+      const withDuplicates = contacts.map(contact => {
+        // Filter out the current contact from the comparison list
+        const otherContacts = contacts.filter(c => c.id !== contact.id);
+        const { isDuplicate, score } = checkDuplicateContact(contact, otherContacts);
+        
+        return {
+          ...contact,
+          isDuplicate,
+          duplicateScore: isDuplicate ? score : undefined
+        };
+      });
+      
       setContactsWithDuplicates(withDuplicates);
     } else {
       setContactsWithDuplicates([]);

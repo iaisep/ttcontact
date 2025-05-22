@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/context/LanguageContext';
-import { Upload, FileDown, AlertCircle, CheckCircle, Table, AlertTriangle } from 'lucide-react';
-import { parseCSV, generateContactTemplate, ContactImport } from '@/lib/utils/fileImport';
+import { AlertTriangle, FileWarning, Upload } from 'lucide-react';
+import Papa from 'papaparse';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import { Table as UITable, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { importContactsFromCSV } from '@/lib/api/contacts';
 import { getContacts } from '@/lib/api/contacts';
@@ -16,400 +16,215 @@ import { Badge } from '@/components/ui/badge';
 interface ImportContactsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onImportComplete: () => void;
+  onImportComplete?: () => void;
 }
 
-const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportContactsDialogProps) => {
-  const { t } = useLanguage();
-  const [file, setFile] = useState<File | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isParsingFile, setIsParsingFile] = useState(false);
-  const [parsedData, setParsedData] = useState<{
-    data: ContactImport[];
-    validData: ContactImport[];
-    invalidData: { row: ContactImport; errors: string[] }[];
-    potentialDuplicates: { row: ContactImport; score: number }[];
-  } | null>(null);
-  const [importStats, setImportStats] = useState<{
-    valid: number;
-    invalid: number;
-    duplicates: number;
-    success: number;
-  } | null>(null);
+interface ParsedData {
+  validData: Array<Partial<Contact>>;
+  invalidData?: Array<{row: any, reason: string}>;
+  potentialDuplicates?: Array<{row: Partial<Contact>, matchedContact: Contact, score: number}>;
+}
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      // Check file type
-      if (selectedFile.type !== 'text/csv' && 
-          !selectedFile.name.endsWith('.csv') &&
-          !selectedFile.type.includes('excel') &&
-          !selectedFile.name.endsWith('.xlsx')) {
-        toast.error(t('Only CSV and Excel files are supported'));
-        return;
-      }
-      
-      setFile(selectedFile);
-      setIsParsingFile(true);
-      setImportStats(null);
-      
-      try {
-        // Parse the file to show preview
-        const result = await parseCSV(selectedFile);
-        
-        // Get existing contacts to check for duplicates
-        const existingContacts = await getContacts();
-        
-        // Check for potential duplicates
-        const potentialDuplicates: { row: ContactImport; score: number }[] = [];
-        
-        // Map each valid contact and check for duplicates
-        for (const item of result.validData) {
-          const contactToCheck = {
-            id: '', // Temporary ID for checking
-            name: item.name,
-            email: item.email,
-            phone: item.phone,
-            id_crm: Number(item.id_crm),
-            tags: item.tags ? item.tags.split(',').map(tag => tag.trim()) : [],
-            last_activity: new Date().toISOString(),
-          };
-          
-          const { isDuplicate, score } = checkDuplicateContact(contactToCheck, existingContacts);
-          
-          if (isDuplicate) {
-            potentialDuplicates.push({ row: item, score });
-          }
-        }
-        
-        setParsedData({
-          ...result,
-          potentialDuplicates
-        });
-      } catch (error) {
-        console.error('Error parsing file:', error);
-        toast.error(t('Error processing file'));
-        setParsedData(null);
-      } finally {
-        setIsParsingFile(false);
-      }
+const ImportContactsDialog: React.FC<ImportContactsDialogProps> = ({ open, onOpenChange, onImportComplete }) => {
+  const { t } = useLanguage();
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [parsedData, setParsedData] = useState<ParsedData>({ validData: [] });
+  const [isImporting, setIsImporting] = useState(false);
+  const queryClient = useQueryClient();
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setCsvFile(file);
+    if (file) {
+      parseCSV(file);
     }
   };
 
-  const handleDownloadTemplate = () => {
-    const csvData = generateContactTemplate();
-    const blob = new Blob([csvData], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'contacts_import_template.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const parseCSV = (file: File) => {
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        const validData: Array<Partial<Contact>> = [];
+        const invalidData: Array<{row: any, reason: string}> = [];
+
+        results.data.forEach((row: any) => {
+          if (!row.name) {
+            invalidData.push({ row, reason: t('Name is required') });
+          } else {
+            validData.push({
+              name: row.name,
+              email: row.email || '',
+              phone: row.phone || '',
+              tags: row.tags ? row.tags.split(',').map((tag: string) => tag.trim()) : [],
+              last_activity: null,
+              id_crm: row.id_crm ? parseInt(row.id_crm, 10) : null,
+            });
+          }
+        });
+
+        const potentialDuplicates = await checkForDuplicates(validData);
+
+        setParsedData({ validData, invalidData, potentialDuplicates });
+      },
+      error: (error) => {
+        console.error("Error parsing CSV:", error);
+        toast.error(t('Failed to parse CSV file'));
+      }
+    });
   };
 
   const handleImport = async () => {
-    if (!parsedData || !parsedData.validData.length) {
-      toast.error(t('No valid contacts to import'));
-      return;
-    }
+    if (isImporting) return;
 
-    setIsProcessing(true);
+    setIsImporting(true);
     try {
-      // Import valid contacts via bulk API call
-      const { count: successCount } = await importContactsFromCSV(
-        parsedData.validData.map(item => ({
-          name: item.name,
-          email: item.email,
-          phone: item.phone,
-          id_crm: Number(item.id_crm),
-          tags: item.tags ? item.tags.split(',').map(tag => tag.trim()) : [],
-          last_activity: new Date().toISOString()
-        }))
-      );
-      
-      setImportStats({
-        valid: parsedData.validData.length,
-        invalid: parsedData.invalidData.length,
-        duplicates: parsedData.potentialDuplicates?.length || 0,
-        success: successCount
-      });
-      
-      if (successCount > 0) {
-        toast.success(`${successCount} contacts imported successfully`);
-        onImportComplete();
+      const { validData } = parsedData;
+      if (validData.length > 0) {
+        await importContactsFromCSV(validData as Omit<Contact, 'id'>[]);
+        toast.success(t('Contacts imported successfully'));
+        onImportComplete?.();
+      } else {
+        toast.warn(t('No valid contacts to import'));
       }
     } catch (error: any) {
-      console.error('Error importing contacts:', error);
-      
-      // Display the error message from the API response
+      console.error("Error importing contacts:", error);
       if (error.message) {
-        toast.error(error.message);
+        toast.error(t(error.message));
       } else {
-        toast.error(t('Error processing file'));
+        toast.error(t('Failed to import contacts'));
       }
     } finally {
-      setIsProcessing(false);
+      setIsImporting(false);
     }
   };
 
-  const renderDataPreview = () => {
-    if (!parsedData || parsedData.data.length === 0) return null;
-    
-    // Get all unique keys from the data
-    const allKeys = Array.from(
-      new Set(
-        parsedData.data.flatMap(item => Object.keys(item))
-      )
-    );
-    
-    // Limit the number of rows to display
-    const previewRows = parsedData.data.slice(0, 5);
-    
-    return (
-      <div className="mt-4">
-        <div className="flex items-center mb-2">
-          <Table className="h-4 w-4 mr-2" />
-          <h3 className="text-sm font-medium">
-            {t('Data Preview')} ({Math.min(5, parsedData.data.length)} {t('of')} {parsedData.data.length} {t('rows')})
-          </h3>
-        </div>
-        
-        <div className="border rounded-md overflow-auto max-h-60">
-          <UITable>
-            <TableHeader>
-              <TableRow>
-                {allKeys.map(key => (
-                  <TableHead key={key} className="text-xs py-2 px-3 bg-muted/50">
-                    {key}
-                  </TableHead>
-                ))}
-                <TableHead className="text-xs py-2 px-3 bg-muted/50">
-                  {t('Status')}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {previewRows.map((row, index) => {
-                // Check if this row is marked as a potential duplicate
-                const duplicateEntry = parsedData.potentialDuplicates?.find(
-                  dup => dup.row.email === row.email && dup.row.name === row.name
-                );
-                
-                const isDuplicate = Boolean(duplicateEntry);
-                const duplicateScore = duplicateEntry?.score;
-                
-                // Check if this row is invalid
-                const isInvalid = parsedData.invalidData?.some(
-                  inv => inv.row.email === row.email && inv.row.name === row.name
-                );
-                
-                return (
-                  <TableRow key={index} className="border-b last:border-b-0">
-                    {allKeys.map(key => (
-                      <TableCell key={`${index}-${key}`} className="text-xs py-2 px-3">
-                        {row[key as keyof typeof row]?.toString() || '—'}
-                      </TableCell>
-                    ))}
-                    <TableCell className="text-xs py-2 px-3">
-                      {isDuplicate && (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-300 flex items-center">
-                          <AlertTriangle className="h-3 w-3 mr-1" />
-                          {t('duplicado')}
-                          {duplicateScore && (
-                            <span className="ml-1">
-                              ({duplicateScore.toFixed(1)}%)
-                            </span>
-                          )}
-                        </Badge>
-                      )}
-                      {isInvalid && (
-                        <Badge variant="outline" className="bg-red-50 text-red-800 border-red-300 flex items-center">
-                          <AlertCircle className="h-3 w-3 mr-1" />
-                          {t('invalid')}
-                        </Badge>
-                      )}
-                      {!isDuplicate && !isInvalid && (
-                        <Badge variant="outline" className="bg-green-50 text-green-800 border-green-300 flex items-center">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          {t('valid')}
-                        </Badge>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </UITable>
-        </div>
-        
-        <div className="mt-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium">{t('Valid contacts')}:</span>
-            <span className="font-medium text-sm text-green-600">{parsedData.validData.length}</span>
-          </div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium">{t('Invalid contacts')}:</span>
-            <span className={`font-medium text-sm ${parsedData.invalidData.length > 0 ? "text-amber-600" : ""}`}>
-              {parsedData.invalidData.length}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">{t('Potential duplicates')}:</span>
-            <span className={`font-medium text-sm ${parsedData.potentialDuplicates?.length > 0 ? "text-amber-600" : "text-green-600"}`}>
-              {parsedData.potentialDuplicates?.length || 0}
-            </span>
-          </div>
+  // Function to check for potential duplicates in the CSV data
+  const checkForDuplicates = async (parsedData: Partial<Contact>[]) => {
+    try {
+      const existingContacts = await getContacts();
+      
+      // Check each parsed row against existing contacts for duplicates
+      const potentialDuplicates = parsedData
+        .map(row => {
+          const contactToCheck = {
+            id: 'temp-id', // Temporary ID for checking
+            name: row.name || '',
+            email: row.email,
+            phone: row.phone,
+            tags: row.tags || [],
+            last_activity: null,
+            id_crm: row.id_crm
+          };
           
-          {parsedData.invalidData.length > 0 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mt-3">
-              <p className="text-sm text-amber-800 font-medium mb-2">{t('Validation Errors')}:</p>
-              <ul className="text-sm text-amber-700 space-y-1 list-disc pl-4">
-                {parsedData.invalidData.slice(0, 3).map((item, idx) => (
-                  <li key={idx}>
-                    Row {idx + 1}: {item.errors.join(', ')}
-                  </li>
-                ))}
-                {parsedData.invalidData.length > 3 && (
-                  <li>...and {parsedData.invalidData.length - 3} more</li>
-                )}
-              </ul>
-            </div>
-          )}
+          const { isDuplicate, score, matchedContact } = checkDuplicateContact(
+            contactToCheck as Contact,
+            existingContacts
+          );
           
-          {(parsedData.potentialDuplicates?.length || 0) > 0 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mt-3">
-              <p className="text-sm text-amber-800 font-medium mb-2">{t('Potential Duplicates')}:</p>
-              <ul className="text-sm text-amber-700 space-y-1 list-disc pl-4">
-                {parsedData.potentialDuplicates?.slice(0, 3).map((item, idx) => (
-                  <li key={idx}>
-                    {item.row.name}: {t('Match score')}: {item.score.toFixed(1)}%
-                  </li>
-                ))}
-                {(parsedData.potentialDuplicates?.length || 0) > 3 && (
-                  <li>...and {(parsedData.potentialDuplicates?.length || 0) - 3} more</li>
-                )}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    );
+          if (isDuplicate && matchedContact) {
+            return {
+              row,
+              matchedContact,
+              score
+            };
+          }
+          
+          return null;
+        })
+        .filter(Boolean) as Array<{row: Partial<Contact>, matchedContact: Contact, score: number}>;
+      
+      return potentialDuplicates;
+    } catch (error) {
+      console.error("Error checking for duplicates:", error);
+      return [];
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md sm:max-w-lg md:max-w-xl p-5">
-        <DialogHeader className="text-left">
-          <DialogTitle className="text-xl">{t('Import Contacts')}</DialogTitle>
-          <DialogDescription>
-            {t('Upload a CSV file with contacts information')}
-          </DialogDescription>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t('Import Contacts')}</DialogTitle>
+          <DialogDescription>{t('Upload a CSV file to import contacts.')}</DialogDescription>
         </DialogHeader>
-        
-        <div className="space-y-5">
-          <div>
-            <Button
-              onClick={handleDownloadTemplate}
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-            >
-              <FileDown className="h-4 w-4" />
-              {t('Download Template')}
-            </Button>
-          </div>
-          
-          <div className="border border-dashed rounded-lg p-6 text-center">
-            <Input
-              type="file"
-              id="file-upload"
-              className="hidden"
-              accept=".csv,.xlsx"
-              onChange={handleFileChange}
-            />
-            <label
-              htmlFor="file-upload"
-              className="flex flex-col items-center justify-center cursor-pointer"
-            >
-              <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-              {file ? (
-                <>
-                  <p className="text-sm font-medium mb-1">{file.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {file.name.endsWith('.csv') ? 'CSV' : 'Excel'} ({t('max')} 1000 {t('contacts')})
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm font-medium mb-1">{t('Click to upload or drag and drop')}</p>
-                  <p className="text-xs text-muted-foreground">
-                    CSV {t('or')} Excel ({t('max')} 1000 {t('contacts')})
-                  </p>
-                </>
-              )}
+
+        <div className="grid gap-4 py-4">
+          <input
+            type="file"
+            id="upload-csv"
+            className="hidden"
+            accept=".csv"
+            onChange={handleFileChange}
+          />
+          <Button variant="outline" asChild>
+            <label htmlFor="upload-csv" className="flex items-center gap-2">
+              <Upload className="h-4 w-4" />
+              <span>{t('Select CSV File')}</span>
             </label>
-          </div>
-
-          {isParsingFile && (
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+          </Button>
+          {csvFile && (
+            <div className="text-sm text-gray-500">
+              {t('Selected file')}: {csvFile.name}
             </div>
           )}
 
-          {/* Data Preview Section */}
-          {parsedData && renderDataPreview()}
-
-          {importStats && (
-            <div className="bg-muted p-4 rounded-md">
-              <div className="flex items-center mb-2">
-                {importStats.success > 0 ? (
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                ) : (
-                  <AlertCircle className="h-5 w-5 text-amber-500 mr-2" />
-                )}
-                <h3 className="font-medium">{t('Import Results')}</h3>
+          {parsedData.invalidData && parsedData.invalidData.length > 0 && (
+            <div className="rounded-md border p-4 bg-amber-50 text-amber-700">
+              <div className="flex items-center gap-2">
+                <FileWarning className="h-4 w-4" />
+                <span>{t('Some rows have errors and will not be imported.')}</span>
               </div>
-              <ul className="text-sm space-y-1">
-                <li className="flex justify-between">
-                  <span>{t('Valid contacts')}:</span> 
-                  <span>{importStats.valid}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>{t('Invalid contacts')}:</span>
-                  <span>{importStats.invalid}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>{t('Potential duplicates')}:</span>
-                  <span>{importStats.duplicates}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>{t('Successfully imported')}:</span>
-                  <span>{importStats.success}</span>
-                </li>
-              </ul>
+              <UITable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">{t('Row Data')}</TableHead>
+                    <TableHead>{t('Reason')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {parsedData.invalidData.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{JSON.stringify(item.row)}</TableCell>
+                      <TableCell>{item.reason}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </UITable>
             </div>
           )}
-          
-          <div className="flex justify-end gap-3 pt-3 border-t">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              {t('cancel')}
-            </Button>
-            <Button 
-              onClick={handleImport} 
-              disabled={!parsedData || !parsedData.validData.length || isProcessing || isParsingFile}
-              className="bg-primary"
-            >
-              {isProcessing ? (
-                <>
-                  <span className="animate-spin mr-2">◌</span> {t('Processing...')}
-                </>
-              ) : (
-                t('Import')
-              )}
-            </Button>
-          </div>
+
+          {parsedData.potentialDuplicates && parsedData.potentialDuplicates.length > 0 && (
+            <div className="rounded-md border p-4 bg-orange-50 text-orange-700">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                <span>{t('Some rows might be duplicates.')}</span>
+              </div>
+              <UITable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('Row Data')}</TableHead>
+                    <TableHead>{t('Matched Contact')}</TableHead>
+                    <TableHead>{t('Score')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {parsedData.potentialDuplicates.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{JSON.stringify(item.row)}</TableCell>
+                      <TableCell>{item.matchedContact.name} <Badge variant="outline">Duplicate ({item.score.toFixed(1)}%)</Badge></TableCell>
+                      <TableCell>{item.score.toFixed(1)}%</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </UITable>
+            </div>
+          )}
         </div>
+
+        <Button onClick={handleImport} disabled={isImporting}>
+          {isImporting ? t('Importing...') : t('Import')}
+        </Button>
       </DialogContent>
     </Dialog>
   );

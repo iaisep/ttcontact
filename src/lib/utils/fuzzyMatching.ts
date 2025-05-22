@@ -21,6 +21,15 @@ export const checkDuplicateContact = (
     return { isDuplicate: false, score: 0 };
   }
 
+  // Do not compare a contact with itself
+  const filteredExistingContacts = existingContacts.filter(contact => 
+    contact.id !== newContact.id
+  );
+
+  if (filteredExistingContacts.length === 0) {
+    return { isDuplicate: false, score: 0 };
+  }
+
   // Create a FuzzySet with all existing contacts
   const fuzzySet = FuzzySet();
   
@@ -28,7 +37,7 @@ export const checkDuplicateContact = (
   const contactsMap = new Map<string, Contact>();
   
   // Add each contact to the fuzzy set
-  existingContacts.forEach(contact => {
+  filteredExistingContacts.forEach(contact => {
     const contactString = getContactString(contact);
     fuzzySet.add(contactString);
     contactsMap.set(contactString, contact);
@@ -42,12 +51,26 @@ export const checkDuplicateContact = (
     const [score, matchedString] = matches[0];
     const scorePercentage = score * 100;
     
-    if (scorePercentage > 98) {
-      return { 
-        isDuplicate: true, 
-        score: scorePercentage,
-        matchedContact: contactsMap.get(matchedString)
-      };
+    // Increase threshold to require higher match quality
+    // Only consider as duplicate if score is above 90%
+    if (scorePercentage > 90) {
+      const matchedContact = contactsMap.get(matchedString);
+      
+      // Additional verification to prevent false positives
+      // Compare name and email separately for more accuracy
+      if (matchedContact) {
+        const nameMatch = newContact.name.toLowerCase() === matchedContact.name.toLowerCase();
+        const emailMatch = newContact.email?.toLowerCase() === matchedContact.email?.toLowerCase();
+        
+        // Only consider as duplicate if either name or email match
+        if (nameMatch || (emailMatch && newContact.email && matchedContact.email)) {
+          return { 
+            isDuplicate: true, 
+            score: scorePercentage,
+            matchedContact: matchedContact
+          };
+        }
+      }
     }
   }
   
