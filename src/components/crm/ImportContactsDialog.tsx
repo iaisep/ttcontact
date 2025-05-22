@@ -4,9 +4,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/context/LanguageContext';
-import { Upload, FileDown, AlertCircle, CheckCircle } from 'lucide-react';
-import { parseCSV, generateContactTemplate, createContactsFromImport } from '@/lib/utils/fileImport';
+import { Upload, FileDown, AlertCircle, CheckCircle, Table } from 'lucide-react';
+import { parseCSV, generateContactTemplate, createContactsFromImport, ContactImport } from '@/lib/utils/fileImport';
 import { toast } from 'sonner';
+import { Table as UITable, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 
 interface ImportContactsDialogProps {
   open: boolean;
@@ -18,13 +19,19 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
   const { t } = useLanguage();
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isParsingFile, setIsParsingFile] = useState(false);
+  const [parsedData, setParsedData] = useState<{
+    data: ContactImport[];
+    validData: ContactImport[];
+    invalidData: { row: ContactImport; errors: string[] }[];
+  } | null>(null);
   const [importStats, setImportStats] = useState<{
     valid: number;
     invalid: number;
     success: number;
   } | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       // Check file type
@@ -35,8 +42,22 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
         toast.error(t('Only CSV and Excel files are supported'));
         return;
       }
+      
       setFile(selectedFile);
+      setIsParsingFile(true);
       setImportStats(null);
+      
+      try {
+        // Parse the file to show preview
+        const result = await parseCSV(selectedFile);
+        setParsedData(result);
+      } catch (error) {
+        console.error('Error parsing file:', error);
+        toast.error(t('Error processing file'));
+        setParsedData(null);
+      } finally {
+        setIsParsingFile(false);
+      }
     }
   };
 
@@ -54,26 +75,19 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
   };
 
   const handleImport = async () => {
-    if (!file) {
-      toast.error(t('Please select a file to import'));
+    if (!parsedData || !parsedData.validData.length) {
+      toast.error(t('No valid contacts to import'));
       return;
     }
 
     setIsProcessing(true);
     try {
-      const { validData, invalidData } = await parseCSV(file);
-      
-      // Show summary of validation
-      if (invalidData.length > 0) {
-        toast.warning(`${invalidData.length} rows have validation errors. Check the details.`);
-      }
-      
       // Import valid contacts
-      const successCount = await createContactsFromImport(validData);
+      const successCount = await createContactsFromImport(parsedData.validData);
       
       setImportStats({
-        valid: validData.length,
-        invalid: invalidData.length,
+        valid: parsedData.validData.length,
+        invalid: parsedData.invalidData.length,
         success: successCount
       });
       
@@ -87,6 +101,82 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const renderDataPreview = () => {
+    if (!parsedData || parsedData.data.length === 0) return null;
+    
+    // Get all unique keys from the data
+    const allKeys = Array.from(
+      new Set(
+        parsedData.data.flatMap(item => Object.keys(item))
+      )
+    );
+    
+    // Limit the number of rows to display
+    const previewRows = parsedData.data.slice(0, 5);
+    
+    return (
+      <div className="mt-4">
+        <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
+          <Table className="h-4 w-4" />
+          {t('Data Preview')} ({Math.min(5, parsedData.data.length)} of {parsedData.data.length} rows)
+        </h3>
+        <div className="border rounded-md overflow-auto max-h-60">
+          <UITable>
+            <TableHeader>
+              <TableRow>
+                {allKeys.map(key => (
+                  <TableHead key={key} className="text-xs">
+                    {key}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {previewRows.map((row, index) => (
+                <TableRow key={index}>
+                  {allKeys.map(key => (
+                    <TableCell key={`${index}-${key}`} className="text-xs py-1">
+                      {row[key as keyof typeof row]?.toString() || '—'}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </UITable>
+        </div>
+        
+        <div className="mt-4 space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>{t('Valid contacts')}:</span>
+            <span className="font-medium text-green-600">{parsedData.validData.length}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>{t('Invalid contacts')}:</span>
+            <span className={parsedData.invalidData.length > 0 ? "font-medium text-amber-600" : "font-medium"}>
+              {parsedData.invalidData.length}
+            </span>
+          </div>
+          
+          {parsedData.invalidData.length > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-md p-2">
+              <p className="text-xs text-amber-800 font-medium mb-1">{t('Validation Errors')}:</p>
+              <ul className="text-xs text-amber-700 space-y-1 list-disc pl-4">
+                {parsedData.invalidData.slice(0, 3).map((item, idx) => (
+                  <li key={idx}>
+                    Row {idx + 1}: {item.errors.join(', ')}
+                  </li>
+                ))}
+                {parsedData.invalidData.length > 3 && (
+                  <li>...and {parsedData.invalidData.length - 3} more</li>
+                )}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -133,6 +223,15 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
             </label>
           </div>
 
+          {isParsingFile && (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          )}
+
+          {/* Data Preview Section */}
+          {parsedData && renderDataPreview()}
+
           {importStats && (
             <div className="bg-muted p-4 rounded-md">
               <div className="flex items-center mb-2">
@@ -157,7 +256,7 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
             </Button>
             <Button 
               onClick={handleImport} 
-              disabled={!file || isProcessing}
+              disabled={!parsedData || !parsedData.validData.length || isProcessing || isParsingFile}
             >
               {isProcessing ? (
                 <>
