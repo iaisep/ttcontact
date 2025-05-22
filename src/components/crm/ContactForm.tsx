@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useLanguage } from '@/context/LanguageContext';
 
+// Updated schema to reflect that tags will be handled as a string in the form
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
@@ -17,8 +18,14 @@ const contactSchema = z.object({
 
 type ContactFormValues = z.infer<typeof contactSchema>;
 
+// Update the interface to match how the data will be passed to the parent component
 interface ContactFormProps {
-  onSubmit: (values: ContactFormValues) => void;
+  onSubmit: (values: { 
+    name: string; 
+    email?: string; 
+    phone?: string; 
+    tags: string[]; // This reflects that parent expects tags as an array
+  }) => void;
   initialValues?: Partial<ContactFormValues>;
   isSubmitting?: boolean;
 }
