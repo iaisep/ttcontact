@@ -1,13 +1,18 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/context/LanguageContext';
-import { Upload, FileDown, AlertCircle, CheckCircle, Table } from 'lucide-react';
-import { parseCSV, generateContactTemplate, createContactsFromImport, ContactImport } from '@/lib/utils/fileImport';
+import { Upload, FileDown, AlertCircle, CheckCircle, Table, AlertTriangle } from 'lucide-react';
+import { parseCSV, generateContactTemplate, ContactImport } from '@/lib/utils/fileImport';
 import { toast } from 'sonner';
 import { Table as UITable, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { importContactsFromCSV } from '@/lib/api/contacts';
+import { getContacts } from '@/lib/api/contacts';
+import { checkDuplicateContact, checkDuplicatesInBatch } from '@/lib/utils/fuzzyMatching';
+import { Contact } from '@/components/crm/ContactsTable';
+import { Badge } from '@/components/ui/badge';
 
 interface ImportContactsDialogProps {
   open: boolean;
@@ -24,10 +29,12 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
     data: ContactImport[];
     validData: ContactImport[];
     invalidData: { row: ContactImport; errors: string[] }[];
+    potentialDuplicates: { row: ContactImport; score: number }[];
   } | null>(null);
   const [importStats, setImportStats] = useState<{
     valid: number;
     invalid: number;
+    duplicates: number;
     success: number;
   } | null>(null);
 
@@ -50,7 +57,36 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
       try {
         // Parse the file to show preview
         const result = await parseCSV(selectedFile);
-        setParsedData(result);
+        
+        // Get existing contacts to check for duplicates
+        const existingContacts = await getContacts();
+        
+        // Check for potential duplicates
+        const potentialDuplicates: { row: ContactImport; score: number }[] = [];
+        
+        // Map each valid contact and check for duplicates
+        for (const item of result.validData) {
+          const contactToCheck = {
+            id: '', // Temporary ID for checking
+            name: item.name,
+            email: item.email,
+            phone: item.phone,
+            id_crm: Number(item.id_crm),
+            tags: item.tags ? item.tags.split(',').map(tag => tag.trim()) : [],
+            last_activity: new Date().toISOString(),
+          };
+          
+          const { isDuplicate, score } = checkDuplicateContact(contactToCheck, existingContacts);
+          
+          if (isDuplicate) {
+            potentialDuplicates.push({ row: item, score });
+          }
+        }
+        
+        setParsedData({
+          ...result,
+          potentialDuplicates
+        });
       } catch (error) {
         console.error('Error parsing file:', error);
         toast.error(t('Error processing file'));
@@ -97,6 +133,7 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
       setImportStats({
         valid: parsedData.validData.length,
         invalid: parsedData.invalidData.length,
+        duplicates: parsedData.potentialDuplicates?.length || 0,
         success: successCount
       });
       
@@ -149,18 +186,53 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
                     {key}
                   </TableHead>
                 ))}
+                <TableHead className="text-xs py-2 px-3 bg-muted/50">
+                  {t('Status')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {previewRows.map((row, index) => (
-                <TableRow key={index} className="border-b last:border-b-0">
-                  {allKeys.map(key => (
-                    <TableCell key={`${index}-${key}`} className="text-xs py-2 px-3">
-                      {row[key as keyof typeof row]?.toString() || '—'}
+              {previewRows.map((row, index) => {
+                // Check if this row is marked as a potential duplicate
+                const isDuplicate = parsedData.potentialDuplicates?.some(
+                  dup => dup.row.email === row.email && dup.row.name === row.name
+                );
+                
+                // Check if this row is invalid
+                const isInvalid = parsedData.invalidData?.some(
+                  inv => inv.row.email === row.email && inv.row.name === row.name
+                );
+                
+                return (
+                  <TableRow key={index} className="border-b last:border-b-0">
+                    {allKeys.map(key => (
+                      <TableCell key={`${index}-${key}`} className="text-xs py-2 px-3">
+                        {row[key as keyof typeof row]?.toString() || '—'}
+                      </TableCell>
+                    ))}
+                    <TableCell className="text-xs py-2 px-3">
+                      {isDuplicate && (
+                        <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-300 flex items-center">
+                          <AlertTriangle className="h-3 w-3 mr-1" />
+                          {t('duplicado')}
+                        </Badge>
+                      )}
+                      {isInvalid && (
+                        <Badge variant="outline" className="bg-red-50 text-red-800 border-red-300 flex items-center">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {t('invalid')}
+                        </Badge>
+                      )}
+                      {!isDuplicate && !isInvalid && (
+                        <Badge variant="outline" className="bg-green-50 text-green-800 border-green-300 flex items-center">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          {t('valid')}
+                        </Badge>
+                      )}
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </UITable>
         </div>
@@ -170,10 +242,16 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
             <span className="text-sm font-medium">{t('Valid contacts')}:</span>
             <span className="font-medium text-sm text-green-600">{parsedData.validData.length}</span>
           </div>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium">{t('Invalid contacts')}:</span>
             <span className={`font-medium text-sm ${parsedData.invalidData.length > 0 ? "text-amber-600" : ""}`}>
               {parsedData.invalidData.length}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium">{t('Potential duplicates')}:</span>
+            <span className={`font-medium text-sm ${parsedData.potentialDuplicates?.length > 0 ? "text-amber-600" : "text-green-600"}`}>
+              {parsedData.potentialDuplicates?.length || 0}
             </span>
           </div>
           
@@ -188,6 +266,22 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
                 ))}
                 {parsedData.invalidData.length > 3 && (
                   <li>...and {parsedData.invalidData.length - 3} more</li>
+                )}
+              </ul>
+            </div>
+          )}
+          
+          {(parsedData.potentialDuplicates?.length || 0) > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mt-3">
+              <p className="text-sm text-amber-800 font-medium mb-2">{t('Potential Duplicates')}:</p>
+              <ul className="text-sm text-amber-700 space-y-1 list-disc pl-4">
+                {parsedData.potentialDuplicates?.slice(0, 3).map((item, idx) => (
+                  <li key={idx}>
+                    {item.row.name}: {t('Match score')}: {item.score.toFixed(1)}%
+                  </li>
+                ))}
+                {(parsedData.potentialDuplicates?.length || 0) > 3 && (
+                  <li>...and {(parsedData.potentialDuplicates?.length || 0) - 3} more</li>
                 )}
               </ul>
             </div>
@@ -277,6 +371,10 @@ const ImportContactsDialog = ({ open, onOpenChange, onImportComplete }: ImportCo
                 <li className="flex justify-between">
                   <span>{t('Invalid contacts')}:</span>
                   <span>{importStats.invalid}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>{t('Potential duplicates')}:</span>
+                  <span>{importStats.duplicates}</span>
                 </li>
                 <li className="flex justify-between">
                   <span>{t('Successfully imported')}:</span>

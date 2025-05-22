@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
-import { Plus, Import, Search, User, Mail, Phone, Tag, Calendar } from 'lucide-react';
+import { Plus, Import, Search, User, Mail, Phone, Tag, Calendar, AlertTriangle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { getContacts, createContact, deleteContact } from '@/lib/api/contacts';
 import ContactDialog from './ContactDialog';
 import ImportContactsDialog from './ImportContactsDialog';
+import { checkDuplicatesInBatch } from '@/lib/utils/fuzzyMatching';
+import { Badge } from '@/components/ui/badge';
 
 export interface Contact {
   id: string;
@@ -18,6 +20,7 @@ export interface Contact {
   tags: string[];
   last_activity: string | null;
   id_crm: number | null;
+  isDuplicate?: boolean;
 }
 
 export const ContactsTable = () => {
@@ -27,12 +30,23 @@ export const ContactsTable = () => {
   const [pageSize, setPageSize] = useState(10);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [contactsWithDuplicates, setContactsWithDuplicates] = useState<Contact[]>([]);
   const queryClient = useQueryClient();
   
   const { data: contacts = [], isLoading, error } = useQuery({
     queryKey: ['contacts', searchTerm],
     queryFn: () => getContacts(searchTerm),
   });
+
+  // Update contacts with duplicate flags whenever the contacts list changes
+  useEffect(() => {
+    if (contacts.length > 0) {
+      const withDuplicates = checkDuplicatesInBatch(contacts, contacts);
+      setContactsWithDuplicates(withDuplicates);
+    } else {
+      setContactsWithDuplicates([]);
+    }
+  }, [contacts]);
 
   const createContactMutation = useMutation({
     mutationFn: createContact,
@@ -78,7 +92,17 @@ export const ContactsTable = () => {
           <span>{t('Nombre del contacto')}</span>
         </div>
       ),
-      cell: (contact: Contact) => <span className="font-medium">{contact.name}</span>,
+      cell: (contact: Contact) => (
+        <div className="flex items-center gap-2">
+          <span className="font-medium">{contact.name}</span>
+          {contact.isDuplicate && (
+            <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-300">
+              <AlertTriangle className="h-3 w-3 mr-1" />
+              {t('duplicado')}
+            </Badge>
+          )}
+        </div>
+      ),
     },
     {
       key: 'email',
@@ -203,7 +227,7 @@ export const ContactsTable = () => {
         </div>
       ) : (
         <TableWithPagination 
-          data={contacts}
+          data={contactsWithDuplicates}
           columns={columns}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
