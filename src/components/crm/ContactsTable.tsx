@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
-import { Plus, Import, Search, User, Mail, Phone, Tag, Calendar } from 'lucide-react';
+import { Plus, Import, Search, User, Mail, Phone, Tag, Calendar, Hash } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -16,6 +16,7 @@ export interface Contact {
   phone: string;
   tags: string[];
   last_activity: string | null;
+  id_crm: string | null;
 }
 
 export const ContactsTable = () => {
@@ -106,6 +107,16 @@ export const ContactsTable = () => {
           )) || '—'}
         </div>
       ),
+    },
+    {
+      key: 'id_crm',
+      header: (
+        <div className="flex items-center gap-2">
+          <Hash className="h-4 w-4" />
+          <span>{t('ID CRM')}</span>
+        </div>
+      ),
+      cell: (contact: Contact) => <span>{contact.id_crm || '—'}</span>,
     },
     {
       key: 'last_activity',

@@ -8,23 +8,25 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useLanguage } from '@/context/LanguageContext';
 
-// Updated schema to reflect that tags will be handled as a string in the form
+// Esquema actualizado para incluir id_crm
 const contactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().optional(),
   tags: z.string().optional(),
+  id_crm: z.string().optional(),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
 
-// Update the interface to match how the data will be passed to the parent component
+// Actualizar la interfaz para incluir id_crm
 interface ContactFormProps {
   onSubmit: (values: { 
     name: string; 
     email?: string; 
     phone?: string; 
-    tags: string[]; // This reflects that parent expects tags as an array
+    tags: string[];
+    id_crm?: string;
   }) => void;
   initialValues?: Partial<ContactFormValues>;
   isSubmitting?: boolean;
@@ -40,6 +42,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       email: initialValues?.email || '',
       phone: initialValues?.phone || '',
       tags: initialValues?.tags || '',
+      id_crm: initialValues?.id_crm || '',
     },
   });
 
@@ -50,6 +53,7 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
       email: values.email,
       phone: values.phone,
       tags: values.tags ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
+      id_crm: values.id_crm,
     };
     
     onSubmit(formattedValues);
@@ -108,6 +112,20 @@ export const ContactForm = ({ onSubmit, initialValues, isSubmitting }: ContactFo
               <FormLabel>{t('Etiquetas')}</FormLabel>
               <FormControl>
                 <Input placeholder="lead, important, follow-up" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="id_crm"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('ID CRM')}</FormLabel>
+              <FormControl>
+                <Input placeholder="CRM-12345" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
