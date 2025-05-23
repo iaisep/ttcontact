@@ -47,11 +47,11 @@ const LandingPage = () => {
                 Trusted by innovative companies worldwide
               </h2>
               <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12 opacity-70 grayscale">
-                <img src="https://framerusercontent.com/images/UbS7rZRKMmZ0fOTVAZ3weL2jSE.png" alt="Client Logo" className="h-8 object-contain" />
-                <img src="https://framerusercontent.com/images/mIAsKrgLvd7WbLpHOc5l8YbiJIg.png" alt="Client Logo" className="h-8 object-contain" />
-                <img src="https://framerusercontent.com/images/EbZOkxmv9wJ8MqOuCYvxlR3cU.png" alt="Client Logo" className="h-8 object-contain" />
-                <img src="https://framerusercontent.com/images/m3eUssK5PpYjP0cd3zcDKSUjRjk.png" alt="Client Logo" className="h-8 object-contain" />
-                <img src="https://framerusercontent.com/images/6pGm8bmFCMkkUdQXU5Rj76vBlo.png" alt="Client Logo" className="h-8 object-contain" />
+                <img src="public/lovable-uploads/logo_1.png" alt="Client Logo" className="h-8 object-contain" />
+                <img src="public/lovable-uploads/logo_2.png" alt="Client Logo" className="h-8 object-contain" />
+                <img src="public/lovable-uploads/logo_3.png" alt="Client Logo" className="h-8 object-contain" />
+                <img src="public/lovable-uploads/logo_4.png" alt="Client Logo" className="h-8 object-contain"/>
+                <img src="public/lovable-uploads/logo_5.png" alt="Client Logo" className="h-8 object-contain"/>
               </div>
             </div>
           </motion.div>
