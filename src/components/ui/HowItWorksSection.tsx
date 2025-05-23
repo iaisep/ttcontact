@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
+import { Player } from '@lottiefiles/react-lottie-player';
 
 const HowItWorksSection = () => {
   const { t } = useLanguage();
@@ -9,28 +9,28 @@ const HowItWorksSection = () => {
   const steps = [
     {
       number: '01',
-      title: t('how_it_works_step1_title'),
-      description: t('how_it_works_step1_description'),
-      image: '/lovable-uploads/photo-1487058792275-0ad4aaf24ca7.jpeg' // Code/development image
+      title: t('Build'),
+      description: t('Utilize the voice AI API and our intuitive agent builder to create custom voice AI agents effortlessly.'),
+      animation: 'https://lottie.host/2917e602-fd52-42ed-9142-be2264c1f3ab/qOaF752qdW.json',
     },
     {
       number: '02',
-      title: t('how_it_works_step2_title'),
-      description: t('how_it_works_step2_description'),
-      image: '/lovable-uploads/photo-1531297484001-80022131f5a1.jpeg' // Testing with computer image
+      title: t('Test'),
+      description: t('Perform comprehensive agent testing with built-in test LLM features to ensure seamless handling of edge cases.'),
+      animation: 'https://lottie.host/4d363b44-ee86-47d6-8d81-6272ef92a296/eyX7tRFxsP.json',
     },
     {
       number: '03',
-      title: t('how_it_works_step3_title'),
-      description: t('how_it_works_step3_description'),
-      image: '/lovable-uploads/photo-1581091226825-a6a2a5aee158.jpeg' // Person deploying application
+      title: t('Deploy'),
+      description: t('Easily deploy your agents to phone calls, web calls, SMS, and more.'),
+      animation: 'https://lottie.host/03f80b0f-62a0-4c3f-9edf-facbaa8d776d/FONyBJ2OIl.json',
     },
     {
       number: '04',
-      title: t('how_it_works_step4_title'),
-      description: t('how_it_works_step4_description'),
-      image: '/lovable-uploads/photo-1605810230434-7631ac76ec81.jpeg' // Monitoring dashboard screens
-    }
+      title: t('Monitor'),
+      description: t('Track success rates, latency, and user sentiment through call history dashboard. Quickly identify failed calls'),
+      animation: 'https://lottie.host/e23beae6-5556-4e1d-8e27-6105d07b1a62/ZB4GMBBiw7.json',
+    },
   ];
 
   return (
@@ -44,7 +44,7 @@ const HowItWorksSection = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4"
           >
-            {t('how_it_works_title')}
+            {t('How it Works')}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -53,7 +53,7 @@ const HowItWorksSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
           >
-            {t('how_it_works_subtitle')}
+           
           </motion.p>
         </div>
 
@@ -70,11 +70,12 @@ const HowItWorksSection = () => {
               <div className="text-6xl font-bold text-indigo-600 mb-4">{step.number}</div>
               <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{step.title}</h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">{step.description}</p>
-              <div className="w-full h-48 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
-                <img 
-                  src={step.image} 
-                  alt={`Step ${step.number}: ${step.title}`} 
-                  className="w-full h-full object-cover"
+              <div className="w-full h-48 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
+                <Player
+                  autoplay
+                  loop
+                  src={step.animation}
+                  style={{ height: '100%', width: '100%' }}
                 />
               </div>
             </motion.div>
@@ -86,3 +87,4 @@ const HowItWorksSection = () => {
 };
 
 export default HowItWorksSection;
+

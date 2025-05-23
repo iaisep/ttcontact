@@ -55,7 +55,7 @@ const FeaturesSection = () => {
             className="inline-block px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full mb-4"
           >
             Features
-          </motion.span>
+          </motion.span>x
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -110,12 +110,12 @@ const FeaturesSection = () => {
               <div className="max-w-lg">
                 <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Integrate voice AI in minutes, not months</h3>
                 <p className="text-white/80 text-lg mb-6">Our simple SDK and well-documented API make it easy to add voice AI to your application</p>
-                <Link to="/docs">
+                <a href="/#features">
                   <Button className="bg-white text-indigo-600 hover:bg-gray-100 font-medium">
                     View Documentation
                     <ArrowRight size={16} className="ml-2" />
                   </Button>
-                </Link>
+                </a>
               </div>
               
               <div className="bg-black/30 backdrop-blur-sm rounded-xl p-4 border border-white/10 max-w-sm w-full">
@@ -210,7 +210,7 @@ agent.onCall((call) => {
           >
             <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700">
               <img 
-                src="https://assets-global.website-files.com/648e74f5512794caa3e45a7a/65a073e30eddd12eba1c81d8_Group%2048095957.png" 
+                src="/public/industrias/a09d0bb1-a08b-4b92-bc18-268d6affcc9c.webp" 
                 alt="Industries" 
                 className="w-full h-auto"
               />

@@ -13,19 +13,19 @@ const CaseStudiesSection = () => {
     {
       title: "How TrustBank reduced call center costs by 45% with voice AI",
       description: "TrustBank implemented our voice AI solution to handle routine customer inquiries, resulting in shorter wait times and significant cost savings.",
-      image: "https://assets-global.website-files.com/648e74f5512794caa3e45a7a/6588e9f87ac5c221cda626c2_Blog%20post%20thumbnail-p-1080.webp",
+      image: "/public/success/2.webp",
       category: "Financial Services"
     },
     {
       title: "HealthPlus: Scaling patient appointment scheduling with AI",
       description: "HealthPlus used our voice agents to automate appointment scheduling, reducing no-shows by 35% and improving patient satisfaction.",
-      image: "https://assets-global.website-files.com/648e74f5512794caa3e45a7a/6588e9f87ac5c221cda626c2_Blog%20post%20thumbnail-p-1080.webp",
+      image: "/public/success/1.webp",
       category: "Healthcare"
     }
   ];
 
   return (
-    <section className="py-20 bg-white dark:bg-gray-950">
+    <section id="case-studies" className="py-20 bg-white dark:bg-gray-950">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <motion.span 
@@ -78,10 +78,6 @@ const CaseStudiesSection = () => {
                 <div className="text-sm text-indigo-600 font-medium mb-2">{study.category}</div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{study.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">{study.description}</p>
-                <Link to="/case-studies" className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-700">
-                  Read case study
-                  <ArrowRight size={16} className="ml-1" />
-                </Link>
               </div>
             </motion.div>
           ))}
@@ -94,12 +90,6 @@ const CaseStudiesSection = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-12 text-center"
         >
-          <Link to="/case-studies">
-            <Button variant="outline" className="mt-6">
-              View all case studies
-              <ArrowRight size={16} className="ml-2" />
-            </Button>
-          </Link>
         </motion.div>
       </div>
     </section>

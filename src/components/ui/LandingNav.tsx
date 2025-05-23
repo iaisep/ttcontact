@@ -49,9 +49,9 @@ const LandingNav = () => {
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       <li className="row-span-3">
                         <NavigationMenuLink asChild>
-                          <Link
+                          <a
                             className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-indigo-50 to-white dark:from-indigo-900/20 dark:to-gray-900 p-6 no-underline outline-none focus:shadow-md"
-                            to="/voice-sdk"
+                            href="/#features"
                           >
                             <div className="mb-2 mt-4 text-lg font-medium text-gray-900 dark:text-white">
                               {t("voice_sdk")}
@@ -59,23 +59,23 @@ const LandingNav = () => {
                             <p className="text-sm leading-tight text-gray-600 dark:text-gray-400">
                               {t("voice_sdk_desc")}
                             </p>
-                          </Link>
+                          </a>
                         </NavigationMenuLink>
                       </li>
                       <li>
-                        <Link
-                          to="/ai-agents"
+                        <a
+                          href="/#industries"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 focus:bg-gray-100"
                         >
                           <div className="text-sm font-medium leading-none text-gray-900 dark:text-white">{t("ai_agents")}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-gray-600 dark:text-gray-400">
                             {t("ai_agents_desc")}
                           </p>
-                        </Link>
+                        </a>
                       </li>
                       <li>
                         <a
-                          href="#features"
+                          href="/#features"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 focus:bg-gray-100"
                         >
                           <div className="text-sm font-medium leading-none text-gray-900 dark:text-white">{t("features")}</div>
@@ -141,7 +141,7 @@ const LandingNav = () => {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <a href="#pricing" className="flex items-center gap-1 text-sm font-medium px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                  <a href="/#pricing" className="flex items-center gap-1 text-sm font-medium px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                     {t("pricing")}
                   </a>
                 </NavigationMenuItem>

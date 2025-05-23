@@ -51,20 +51,20 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
             </button>
             {openSubmenu === "products" && (
               <div className="pl-4 pt-2 pb-1 space-y-2">
-                <Link
-                  to="/voice-sdk"
+                <a
+                  href="/#features"
                   onClick={closeMenu}
                   className="block py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 >
                   {t("voice_sdk")}
-                </Link>
-                <Link
-                  to="/ai-agents"
+                </a>
+                <a
+                  href="/#industries"
                   onClick={closeMenu}
                   className="block py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 >
                   {t("ai_agents")}
-                </Link>
+                </a>
               </div>
             )}
           </div>
@@ -110,13 +110,20 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
                 >
                   {t("guides")}
                 </Link>
+                <Link
+                  to="/examples"
+                  onClick={closeMenu}
+                  className="block py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                >
+                  {t("examples")}
+                </Link>
               </div>
             )}
           </div>
 
           {/* Pricing link */}
           <a
-            href="#pricing"
+            href="/#pricing"
             onClick={closeMenu}
             className="py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
           >

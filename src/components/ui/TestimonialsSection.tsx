@@ -8,21 +8,21 @@ const TestimonialsSection = () => {
 
   const testimonials = [
     {
-      quote: "Retell helped us scale our customer support operations without sacrificing quality. The voice agents are so natural that our customers can't tell they're talking to AI.",
+      quote: "The power of IA helped us scale our customer support operations without sacrificing quality. The voice agents are so natural that our customers can't tell they're talking to AI.",
       author: "Sarah Johnson",
       position: "CTO, TechFusion",
       company: "TechFusion",
       avatar: "https://randomuser.me/api/portraits/women/45.jpg"
     },
     {
-      quote: "We've seen a 40% increase in lead qualification since implementing Retell. It's been a game-changer for our sales team.",
+      quote: "We've seen a 40% increase in lead qualification since implementing the power of IA. It's been a game-changer for our sales team.",
       author: "Michael Chen",
-      position: "VP of Sales, SalesForce",
-      company: "SalesForce",
+      position: "VP of Sales, SalesTrain",
+      company: "SalesTrain",
       avatar: "https://randomuser.me/api/portraits/men/32.jpg"
     },
     {
-      quote: "The voice quality is extraordinary. After years of disappointing experiences with other voice AI solutions, Retell finally delivers natural-sounding conversations.",
+      quote: "The voice quality is extraordinary. After years of disappointing experiences with other voice AI solutions, the power of IA finally delivers natural-sounding conversations.",
       author: "Elena Rodriguez",
       position: "Customer Experience Director, Global Health",
       company: "Global Health",
