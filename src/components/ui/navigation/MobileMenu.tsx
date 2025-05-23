@@ -110,6 +110,13 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
                 >
                   {t("guides")}
                 </Link>
+                <Link
+                  to="/examples"
+                  onClick={closeMenu}
+                  className="block py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                >
+                  {t("examples")}
+                </Link>
               </div>
             )}
           </div>

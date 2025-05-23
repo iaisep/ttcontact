@@ -127,15 +127,15 @@ const LandingNav = () => {
                         </Link>
                       </li>
                       <li>
-                        <a
-                          href="/#features"
+                        <Link
+                          to="/examples"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 focus:bg-gray-100"
                         >
                           <div className="text-sm font-medium leading-none text-gray-900 dark:text-white">{t("examples")}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-gray-600 dark:text-gray-400">
                             {t("examples_desc")}
                           </p>
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </NavigationMenuContent>
