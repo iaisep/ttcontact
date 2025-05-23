@@ -13,13 +13,13 @@ const CaseStudiesSection = () => {
     {
       title: "How TrustBank reduced call center costs by 45% with voice AI",
       description: "TrustBank implemented our voice AI solution to handle routine customer inquiries, resulting in shorter wait times and significant cost savings.",
-      image: "https://assets-global.website-files.com/648e74f5512794caa3e45a7a/6588e9f87ac5c221cda626c2_Blog%20post%20thumbnail-p-1080.webp",
+      image: "/public/success/2.webp",
       category: "Financial Services"
     },
     {
       title: "HealthPlus: Scaling patient appointment scheduling with AI",
       description: "HealthPlus used our voice agents to automate appointment scheduling, reducing no-shows by 35% and improving patient satisfaction.",
-      image: "https://assets-global.website-files.com/648e74f5512794caa3e45a7a/6588e9f87ac5c221cda626c2_Blog%20post%20thumbnail-p-1080.webp",
+      image: "/public/success/1.webp",
       category: "Healthcare"
     }
   ];

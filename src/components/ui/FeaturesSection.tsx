@@ -210,7 +210,7 @@ agent.onCall((call) => {
           >
             <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700">
               <img 
-                src="https://assets-global.website-files.com/648e74f5512794caa3e45a7a/65a073e30eddd12eba1c81d8_Group%2048095957.png" 
+                src="/public/industrias/a09d0bb1-a08b-4b92-bc18-268d6affcc9c.webp" 
                 alt="Industries" 
                 className="w-full h-auto"
               />
