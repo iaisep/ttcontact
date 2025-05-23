@@ -18,3 +18,16 @@ export interface Agent {
   last_modification_timestamp: string | number;
   updated_at: string;
 }
+
+/**
+ * Interface representing a phone number with its associated data
+ */
+export interface PhoneNumberData {
+  id: string;
+  phone_number: string;
+  friendly_name?: string;
+  outbound_agent_id?: string;
+  outbound_agent_name?: string;
+  status?: string;
+  created_at?: string;
+}
