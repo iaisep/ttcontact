@@ -110,12 +110,12 @@ const FeaturesSection = () => {
               <div className="max-w-lg">
                 <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Integrate voice AI in minutes, not months</h3>
                 <p className="text-white/80 text-lg mb-6">Our simple SDK and well-documented API make it easy to add voice AI to your application</p>
-                <Link to="/docs">
+                <a href="/#features">
                   <Button className="bg-white text-indigo-600 hover:bg-gray-100 font-medium">
                     View Documentation
                     <ArrowRight size={16} className="ml-2" />
                   </Button>
-                </Link>
+                </a>
               </div>
               
               <div className="bg-black/30 backdrop-blur-sm rounded-xl p-4 border border-white/10 max-w-sm w-full">
