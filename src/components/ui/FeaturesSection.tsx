@@ -55,7 +55,7 @@ const FeaturesSection = () => {
             className="inline-block px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full mb-4"
           >
             Features
-          </motion.span>
+          </motion.span>x
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

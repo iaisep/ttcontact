@@ -99,7 +99,8 @@ const AgentsTable: React.FC<AgentsTableProps> = ({
       header: t('agent_type'),
       cell: (agent: Agent) => (
         <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100">
-          {agent.agent_type || t('standard')}
+          {t('standard')}
+          {/* {agent.agent_type || t('standard')} */}
         </span>
       ),
     },
