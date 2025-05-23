@@ -1,5 +1,6 @@
 
-import { AnalyticsData, Agent } from '../types';
+import { AnalyticsData } from '../types';
+import { Agent } from '../../agents/types';
 
 /**
  * Provides mock analytics data for fallback scenarios

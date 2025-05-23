@@ -1,16 +1,7 @@
-export interface Agent {
-  id: string;
-  name: string;
-  agent_id: string;
-  voice_id: string;
-  agent_type: string;
-  last_modification_timestamp: string;
-  updated_at: string;
-}
 
 export interface BatchCall {
   id: string;
-  status: 'completed' | 'in-progress' | 'failed';
+  status: 'completed' | 'in-progress' | 'failed' | 'queued';
   total_calls: number;
   completed_calls: number;
   failed_calls: number;
@@ -18,13 +9,12 @@ export interface BatchCall {
   created_at: string;
 }
 
-export interface PhoneNumberData {
+export interface Agent {
   id: string;
-  phone_number: string;
-  phone_number_type: string;
-  phone_number_pretty: string;
-  nickname: string;
-  friendly_name: string;
-  outbound_agent_id: string;
-  inbound_agent_id: string;
+  name: string;
+  agent_id: string;
+  voice_id: string;
+  agent_type: string;
+  last_modification_timestamp: string | number;
+  updated_at: string;
 }
