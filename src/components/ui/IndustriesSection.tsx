@@ -42,7 +42,7 @@ const IndustriesSection = () => {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-b from-indigo-50/30 to-white dark:from-indigo-950/10 dark:to-gray-950">
+    <section id="industries" className="py-20 bg-gradient-to-b from-indigo-50/30 to-white dark:from-indigo-950/10 dark:to-gray-950">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <motion.span 
