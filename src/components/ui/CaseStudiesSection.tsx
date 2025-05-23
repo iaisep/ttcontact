@@ -78,10 +78,6 @@ const CaseStudiesSection = () => {
                 <div className="text-sm text-indigo-600 font-medium mb-2">{study.category}</div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{study.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">{study.description}</p>
-                <Link to="/case-studies" className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-700">
-                  Read case study
-                  <ArrowRight size={16} className="ml-1" />
-                </Link>
               </div>
             </motion.div>
           ))}
@@ -94,12 +90,6 @@ const CaseStudiesSection = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-12 text-center"
         >
-          <Link to="/case-studies">
-            <Button variant="outline" className="mt-6">
-              View all case studies
-              <ArrowRight size={16} className="ml-2" />
-            </Button>
-          </Link>
         </motion.div>
       </div>
     </section>

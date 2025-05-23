@@ -89,12 +89,6 @@ const IndustriesSection = () => {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{industry.title}</h3>
               <p className="text-gray-600 dark:text-gray-300">{industry.description}</p>
-              <Link to={`/industries/${industry.title.toLowerCase().replace(/\s+/g, '-')}`} className="inline-flex items-center text-indigo-600 font-medium mt-4 hover:text-indigo-700">
-                Learn more
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </Link>
             </motion.div>
           ))}
         </div>
@@ -106,12 +100,6 @@ const IndustriesSection = () => {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="mt-16 text-center"
         >
-          <Link to="/industries" className="inline-flex items-center justify-center text-indigo-600 font-medium hover:text-indigo-700">
-            View all industry solutions
-            <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-            </svg>
-          </Link>
         </motion.div>
       </div>
     </section>
