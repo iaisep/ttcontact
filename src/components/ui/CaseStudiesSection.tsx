@@ -25,7 +25,7 @@ const CaseStudiesSection = () => {
   ];
 
   return (
-    <section className="py-20 bg-white dark:bg-gray-950">
+    <section id="case-studies" className="py-20 bg-white dark:bg-gray-950">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <motion.span 

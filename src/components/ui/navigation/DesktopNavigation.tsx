@@ -28,7 +28,7 @@ const DesktopNavigation = () => {
                   <NavigationMenuLink asChild>
                     <a
                       className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-indigo-500/50 to-indigo-600 p-6 no-underline outline-none focus:shadow-md"
-                      href="#features"
+                      href="/#features"
                     >
                       <div className="mt-4 mb-2 text-lg font-medium text-white">
                         {t("features")}
@@ -40,26 +40,26 @@ const DesktopNavigation = () => {
                   </NavigationMenuLink>
                 </li>
                 <li>
-                  <Link
-                    to="/voice-sdk"
+                  <a
+                    href="/#features"
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                   >
                     <div className="text-sm font-medium leading-none">{t("voice_sdk")}</div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                       {t("voice_sdk_desc")}
                     </p>
-                  </Link>
+                  </a>
                 </li>
                 <li>
-                  <Link
-                    to="/ai-agents"
+                  <a
+                    href="/#industries"
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                   >
                     <div className="text-sm font-medium leading-none">{t("ai_agents")}</div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                       {t("ai_agents_desc")}
                     </p>
-                  </Link>
+                  </a>
                 </li>
               </ul>
             </NavigationMenuContent>
@@ -82,44 +82,44 @@ const DesktopNavigation = () => {
             <NavigationMenuContent>
               <ul className="grid gap-3 p-6 w-[400px]">
                 <li>
-                  <Link
-                    to="/blog"
+                  <a
+                    href="/#case-studies"
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                   >
                     <div className="text-sm font-medium leading-none">{t("blog")}</div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                       {t("blog_desc")}
                     </p>
-                  </Link>
+                  </a>
                 </li>
                 <li>
-                  <Link
-                    to="/guides"
+                  <a
+                    href="/#testimonials"
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                   >
                     <div className="text-sm font-medium leading-none">{t("guides")}</div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                       {t("guides_desc")}
                     </p>
-                  </Link>
+                  </a>
                 </li>
                 <li>
-                  <Link
-                    to="/examples"
+                  <a
+                    href="/#features"
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                   >
                     <div className="text-sm font-medium leading-none">{t("examples")}</div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                       {t("examples_desc")}
                     </p>
-                  </Link>
+                  </a>
                 </li>
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <a
-              href="#pricing"
+              href="/#pricing"
               className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
             >
               {t("pricing")}
