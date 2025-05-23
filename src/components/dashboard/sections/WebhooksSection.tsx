@@ -19,6 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip';
+import { Link } from 'react-router-dom';
 
 interface WebhookFormValues {
   webhookUrl: string;
@@ -70,7 +71,7 @@ const WebhooksSection = () => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-primary cursor-pointer ml-1">(Learn more)</span>
+                <Link to="/help-center" className="text-primary cursor-pointer ml-1">(Learn more)</Link>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="w-80">
