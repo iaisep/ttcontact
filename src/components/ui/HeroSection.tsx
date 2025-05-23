@@ -72,17 +72,6 @@ const HeroSection = () => {
           </motion.div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="mt-16 md:mt-20 relative max-w-6xl mx-auto"
-        >
-          
-          {/* Elementos decorativos */}
-          <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-indigo-400/10 rounded-full z-0 blur-xl"></div>
-          <div className="absolute -top-6 -right-6 w-32 h-32 bg-blue-300/20 rounded-full z-0 blur-xl"></div>
-        </motion.div>
       </div>
     </section>
   );
