@@ -105,26 +105,26 @@ const LandingNav = () => {
                   <NavigationMenuContent>
                     <ul className="grid gap-3 p-4 md:w-[400px] md:grid-cols-2">
                       <li>
-                        <a
-                          href="/#case-studies"
+                        <Link
+                          to="/blog"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 focus:bg-gray-100"
                         >
                           <div className="text-sm font-medium leading-none text-gray-900 dark:text-white">{t("blog")}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-gray-600 dark:text-gray-400">
                             {t("blog_desc")}
                           </p>
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a
-                          href="/#testimonials"
+                        <Link
+                          to="/guides"
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 focus:bg-gray-100"
                         >
                           <div className="text-sm font-medium leading-none text-gray-900 dark:text-white">{t("guides")}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-gray-600 dark:text-gray-400">
                             {t("guides_desc")}
                           </p>
-                        </a>
+                        </Link>
                       </li>
                       <li>
                         <a

@@ -82,26 +82,26 @@ const DesktopNavigation = () => {
             <NavigationMenuContent>
               <ul className="grid gap-3 p-6 w-[400px]">
                 <li>
-                  <a
-                    href="/#case-studies"
+                  <Link
+                    to="/blog"
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                   >
                     <div className="text-sm font-medium leading-none">{t("blog")}</div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                       {t("blog_desc")}
                     </p>
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="/#testimonials"
+                  <Link
+                    to="/guides"
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                   >
                     <div className="text-sm font-medium leading-none">{t("guides")}</div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                       {t("guides_desc")}
                     </p>
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a

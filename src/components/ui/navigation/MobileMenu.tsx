@@ -96,20 +96,20 @@ const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }: MobileMenuProps) 
             </button>
             {openSubmenu === "resources" && (
               <div className="pl-4 pt-2 pb-1 space-y-2">
-                <a
-                  href="/#case-studies"
+                <Link
+                  to="/blog"
                   onClick={closeMenu}
                   className="block py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 >
                   {t("blog")}
-                </a>
-                <a
-                  href="/#testimonials"
+                </Link>
+                <Link
+                  to="/guides"
                   onClick={closeMenu}
                   className="block py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 >
                   {t("guides")}
-                </a>
+                </Link>
               </div>
             )}
           </div>
