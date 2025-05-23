@@ -5,9 +5,24 @@ import { ArrowRight, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import Spline from "@splinetool/react-spline";
+import { useState, useEffect } from "react";
 
 const HeroSection = () => {
   const { t } = useLanguage();
+  const [splineLoaded, setSplineLoaded] = useState(false);
+  const [splineError, setSplineError] = useState(false);
+
+  // Handle successful loading of Spline
+  const handleSplineLoad = () => {
+    console.log("Spline scene loaded successfully");
+    setSplineLoaded(true);
+  };
+
+  // Handle Spline loading error
+  const handleSplineError = () => {
+    console.error("Error loading Spline scene");
+    setSplineError(true);
+  };
 
   return (
     <section className="relative min-h-screen pt-28 md:pt-36 pb-16 md:pb-20 overflow-hidden">
@@ -16,7 +31,14 @@ const HeroSection = () => {
         <Spline
           scene="https://prod.spline.design/1UjZlPEUBkIEmBpR/scene.splinecode"
           style={{ width: '100%', height: '100%' }}
+          onLoad={handleSplineLoad}
+          onError={handleSplineError}
         />
+        
+        {/* Fallback gradient background in case Spline fails to load */}
+        {splineError && (
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 to-blue-50 dark:from-indigo-950 dark:to-blue-900"></div>
+        )}
       </div>
 
       {/* 🎨 Gradientes decorativos (opcionales) */}
