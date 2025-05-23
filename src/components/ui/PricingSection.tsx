@@ -21,7 +21,7 @@ const PricingSection = () => {
       price: "0",
       description: "For developers and hobbyists to try our Voice AI platform",
       features: [
-        "100 free minutes",
+        "10 free minutes",
         "2 voice options",
         "Basic AI capabilities",
         "REST API access",
