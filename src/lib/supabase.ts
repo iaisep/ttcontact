@@ -1,11 +1,10 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { toast } from "sonner";
 
 // Add your Supabase URL and anon key here
 // These should be replaced with your actual Supabase project credentials
-const supabaseUrl = 'https://hhejcxsjjayzylrbdlcr.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhoZWpjeHNqamF5enlscmJkbGNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwMzY1MzYsImV4cCI6MjA1ODYxMjUzNn0.h4SJwsY0GvcBUOR6RDd3HCLTCnxxJB1hvq6rBQ8LJHQ';
+const supabaseUrl = 'https://supabasuna.universidadisep.com/';
+const supabaseKey = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc0OTI0MDg0MCwiZXhwIjo0OTA0OTE0NDQwLCJyb2xlIjoiYW5vbiJ9.xc_ZGQt1RtsRZSSqxhScWmtwOzZgoSUBy0BCPQ-3MQU';
 
 // Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseKey);
