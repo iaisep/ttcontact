@@ -4,7 +4,8 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   BookOpen, BookText, Phone, History, Code, Key, 
-  FileText, Settings, Shield, FileQuestion, Headphones
+  FileText, Settings, Shield, FileQuestion, Headphones,
+  Cpu, Network, Puzzle
 } from 'lucide-react';
 
 interface HelpCenterSidebarProps {
@@ -20,11 +21,14 @@ const HelpCenterSidebar = ({
 
   const categories = [
     { id: 'introduction', name: t('introduction'), icon: BookOpen },
+    { id: 'technical-documentation', name: t('technical_documentation'), icon: Code },
+    { id: 'system-architecture', name: t('system_architecture'), icon: Cpu },
+    { id: 'integrations', name: t('integrations'), icon: Puzzle },
     { id: 'guides', name: t('guides'), icon: BookText },
     { id: 'agents', name: t('agents'), icon: Headphones },
     { id: 'phone-numbers', name: t('phone_numbers'), icon: Phone },
     { id: 'call-history', name: t('call_history'), icon: History },
-    { id: 'api', name: t('api'), icon: Code },
+    { id: 'api', name: t('api'), icon: Network },
     { id: 'api-keys', name: t('api_keys'), icon: Key },
     { id: 'knowledge-base', name: t('knowledge_base'), icon: FileText },
     { id: 'security', name: t('security'), icon: Shield },

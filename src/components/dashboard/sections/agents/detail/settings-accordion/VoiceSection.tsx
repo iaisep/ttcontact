@@ -9,13 +9,15 @@ import { useVoiceSettings } from '../hooks/useVoiceSettings';
 export interface VoiceSectionProps extends AccordionSectionProps {
   openVoiceModal?: () => void;
   selectedVoice?: string;
+  selectedLanguage?: string;
 }
 
 const VoiceSection: React.FC<VoiceSectionProps> = ({ 
   agent, 
   updateAgentField,
   openVoiceModal: externalOpenVoiceModal,
-  selectedVoice: externalSelectedVoice
+  selectedVoice: externalSelectedVoice,
+  selectedLanguage = 'en-US'
 }) => {
   const { t } = useLanguage();
   
@@ -42,6 +44,7 @@ const VoiceSection: React.FC<VoiceSectionProps> = ({
             openVoiceModal={handleOpenVoiceModal}
             onSettingsClick={handleOpenVoiceModal}
             voiceAvatarUrl={voiceSettings.voiceAvatarUrl}
+            selectedLanguage={selectedLanguage}
           />
         </div>
       </AccordionContent>

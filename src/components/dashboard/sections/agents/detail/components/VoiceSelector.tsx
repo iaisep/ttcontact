@@ -7,6 +7,7 @@ interface VoiceSelectorProps {
   openVoiceModal: () => void;
   onSettingsClick?: () => void;
   voiceAvatarUrl?: string;
+  selectedLanguage?: string;
 }
 
 const VoiceSelector: React.FC<VoiceSelectorProps> = (props) => {

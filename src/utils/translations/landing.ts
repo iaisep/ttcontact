@@ -14,6 +14,19 @@ const landingTranslations = {
     "free_minutes": "15 free minutes",
     "easy_integration": "Easy integration",
     
+    // How It Works section
+    "How it Works": "How it Works",
+    "how_it_works_title": "How It Works",
+    "how_it_works_subtitle": "Create powerful, context-aware voice AI agents in four simple steps",
+    "Build": "Build",
+    "Test": "Test", 
+    "Deploy": "Deploy",
+    "Monitor": "Monitor",
+    "Utilize the voice AI API and our intuitive agent builder to create custom voice AI agents effortlessly.": "Utilize the voice AI API and our intuitive agent builder to create custom voice AI agents effortlessly.",
+    "Perform comprehensive agent testing with built-in test LLM features to ensure seamless handling of edge cases.": "Perform comprehensive agent testing with built-in test LLM features to ensure seamless handling of edge cases.",
+    "Easily deploy your agents to phone calls, web calls, SMS, and more.": "Easily deploy your agents to phone calls, web calls, SMS, and more.",
+    "Track success rates, latency, and user sentiment through call history dashboard. Quickly identify failed calls": "Track success rates, latency, and user sentiment through call history dashboard. Quickly identify failed calls",
+    
     // Features section
     "features": "Features",
     "features_section_title": "AI voice agents for any use case",
@@ -30,6 +43,8 @@ const landingTranslations = {
     "human_agent_transfer_description": "Seamlessly transfer to a human agent when needed, with full conversation history",
     "continuous_learning": "Continuous Learning",
     "continuous_learning_description": "Our AI agents improve over time based on interactions and feedback",
+    
+    // Industries section
     "industries_section_title": "Solutions for every industry",
     "industries_section_subtitle": "See how our voice agents are transforming businesses across different sectors",
     "customer_service": "Customer Service",
@@ -62,9 +77,9 @@ const landingTranslations = {
     "examples": "Examples",
     "examples_desc": "Sample projects and demos",
 
-    // Plans
+    // Plans and Pricing
     "basic_plan": "Starter",
-    "pro_plan": "Professional",
+    "pro_plan": "Professional", 
     "enterprise_plan": "Enterprise",
     "basic_description": "Perfect for small businesses testing voice automation",
     "pro_description": "For growing businesses ready to scale voice interactions",
@@ -97,20 +112,6 @@ const landingTranslations = {
     "contact_us": "Contact us",
     "loading": "Loading...",
 
-    // Under construction pages
-    "page_under_construction": "This page is under construction",
-    "page_coming_soon": "We're working on this page. You'll be redirected to home shortly.",
-    "how_it_works_title": "How It Works",
-    "how_it_works_subtitle": "Create powerful, context-aware voice AI agents in four simple steps",
-    "how_it_works_step1_title": "Build",
-    "how_it_works_step1_description": "Utilize the voice AI API and our intuitive agent builder to create custom voice AI agents effortlessly.",
-    "how_it_works_step2_title": "Test",
-    "how_it_works_step2_description": "Perform comprehensive agent testing with built-in test LLM features to ensure seamless handling of edge cases.",
-    "how_it_works_step3_title": "Deploy",
-    "how_it_works_step3_description": "Easily deploy your agents to phone calls, web calls, SMS, and more.",
-    "how_it_works_step4_title": "Monitor",
-    "how_it_works_step4_description": "Track success rates, latency, and user sentiment through call history dashboard. Quickly identify failed calls.",
-    
     // Testimonials section
     "testimonials_title": "Loved by customers worldwide",
     "testimonials_subtitle": "See what our customers have to say about their experience with our voice AI solutions",
@@ -121,7 +122,7 @@ const landingTranslations = {
     "view_all_case_studies": "View all case studies",
     "read_case_study": "Read case study",
     
-    // Industries section
+    // Industries section  
     "industries_title": "Voice AI solutions for every industry",
     "industries_subtitle": "Discover how our voice AI technology can be customized for your specific industry needs",
     "view_all_industries": "View all industry solutions",
@@ -130,7 +131,21 @@ const landingTranslations = {
     "industry_financial": "Financial Services",
     "industry_retail": "Retail & E-commerce",
     "industry_sales": "Sales & Marketing",
-    "industry_education": "Education"
+    "industry_education": "Education",
+
+    // Contact section
+    "contact_title": "Ready to transform your voice experiences?",
+    "contact_subtitle": "Get in touch with our team to learn how our platform can help your business",
+    "contact_form_title": "Contact Us",
+    "full_name": "Full Name",
+    "email": "Email",
+    "company": "Company", 
+    "message": "Message",
+    "send_message": "Send Message",
+    "sending": "Sending...",
+    "contact_info_title": "Contact Information",
+    "office_hours_title": "Office Hours",
+    "office_hours_time": "Monday - Friday: 9:00 AM - 6:00 PM PT"
   },
   "es": {
     // Hero section
@@ -145,6 +160,19 @@ const landingTranslations = {
     "no_credit_card": "Sin tarjeta de crédito",
     "free_minutes": "15 minutos gratis",
     "easy_integration": "Fácil integración",
+    
+    // How It Works section
+    "How it Works": "Cómo Funciona",
+    "how_it_works_title": "Cómo Funciona",
+    "how_it_works_subtitle": "Crea agentes de voz IA potentes y conscientes del contexto en cuatro pasos simples",
+    "Build": "Construir",
+    "Test": "Probar",
+    "Deploy": "Implementar", 
+    "Monitor": "Monitorear",
+    "Utilize the voice AI API and our intuitive agent builder to create custom voice AI agents effortlessly.": "Utiliza la API de IA de voz y nuestro constructor de agentes intuitivo para crear agentes de voz IA personalizados sin esfuerzo.",
+    "Perform comprehensive agent testing with built-in test LLM features to ensure seamless handling of edge cases.": "Realiza pruebas exhaustivas de agentes con funciones de prueba LLM integradas para garantizar un manejo perfecto de casos extremos.",
+    "Easily deploy your agents to phone calls, web calls, SMS, and more.": "Implementa fácilmente tus agentes en llamadas telefónicas, llamadas web, SMS y más.",
+    "Track success rates, latency, and user sentiment through call history dashboard. Quickly identify failed calls": "Rastrea tasas de éxito, latencia y sentimiento del usuario a través del panel de historial de llamadas. Identifica rápidamente las llamadas fallidas",
     
     // Features section
     "features": "Características",
@@ -162,6 +190,8 @@ const landingTranslations = {
     "human_agent_transfer_description": "Transfiere sin problemas a un agente humano cuando sea necesario, con todo el historial de conversación",
     "continuous_learning": "Aprendizaje Continuo",
     "continuous_learning_description": "Nuestros agentes de IA mejoran con el tiempo basándose en interacciones y feedback",
+    
+    // Industries section
     "industries_section_title": "Soluciones para cada industria",
     "industries_section_subtitle": "Mira cómo nuestros agentes de voz están transformando negocios en diferentes sectores",
     "customer_service": "Servicio al Cliente",
@@ -179,7 +209,7 @@ const landingTranslations = {
 
     // Navigation
     "products": "Productos",
-    "documentation": "Documentación",
+    "documentation": "Documentación", 
     "resources": "Recursos",
     "pricing": "Precios",
     "voice_sdk": "SDK de Voz",
@@ -191,10 +221,10 @@ const landingTranslations = {
     "blog_desc": "Últimas actualizaciones y perspectivas",
     "guides": "Guías",
     "guides_desc": "Tutoriales detallados y cómo hacer",
-    "examples": "Ejemplos",
+    "examples": "Ejemplos", 
     "examples_desc": "Proyectos de muestra y demos",
 
-    // Plans
+    // Plans and Pricing
     "basic_plan": "Inicial",
     "pro_plan": "Profesional",
     "enterprise_plan": "Empresa",
@@ -211,7 +241,7 @@ const landingTranslations = {
     "human_transfer": "Transferencia a agente humano",
     "priority_support": "Soporte prioritario",
     "unlimited_minutes": "Minutos ilimitados",
-    "unlimited_agents": "Agentes de voz ilimitados",
+    "unlimited_agents": "Agentes de voz ilimitados", 
     "custom_integrations": "Integraciones personalizadas",
     "custom_voice": "Clonación de voz personalizada",
     "dedicated_api": "Acceso API dedicado",
@@ -229,20 +259,6 @@ const landingTranslations = {
     "contact_us": "Contáctanos",
     "loading": "Cargando...",
 
-    // Under construction pages
-    "page_under_construction": "Esta página está en construcción",
-    "page_coming_soon": "Estamos trabajando en esta página. Serás redirigido al inicio en breve.",
-    "how_it_works_title": "Cómo Funciona",
-    "how_it_works_subtitle": "Crea agentes de voz IA potentes y conscientes del contexto en cuatro pasos simples",
-    "how_it_works_step1_title": "Construir",
-    "how_it_works_step1_description": "Utiliza la API de IA de voz y nuestro constructor de agentes intuitivo para crear agentes de voz IA personalizados sin esfuerzo.",
-    "how_it_works_step2_title": "Probar",
-    "how_it_works_step2_description": "Realiza pruebas exhaustivas de agentes con funciones de prueba LLM integradas para garantizar un manejo perfecto de casos extremos.",
-    "how_it_works_step3_title": "Implementar",
-    "how_it_works_step3_description": "Implementa fácilmente tus agentes en llamadas telefónicas, llamadas web, SMS y más.",
-    "how_it_works_step4_title": "Monitorear",
-    "how_it_works_step4_description": "Rastrea tasas de éxito, latencia y sentimiento del usuario a través del panel de historial de llamadas. Identifica rápidamente las llamadas fallidas.",
-    
     // Testimonials section
     "testimonials_title": "Amado por clientes en todo el mundo",
     "testimonials_subtitle": "Mira lo que nuestros clientes dicen sobre su experiencia con nuestras soluciones de IA de voz",
@@ -258,11 +274,25 @@ const landingTranslations = {
     "industries_subtitle": "Descubre cómo nuestra tecnología de IA de voz puede ser personalizada para las necesidades específicas de tu industria",
     "view_all_industries": "Ver todas las soluciones por industria",
     "industry_call_centers": "Centros de Llamadas",
-    "industry_healthcare": "Salud",
+    "industry_healthcare": "Salud", 
     "industry_financial": "Servicios Financieros",
     "industry_retail": "Retail y E-commerce",
     "industry_sales": "Ventas y Marketing",
-    "industry_education": "Educación"
+    "industry_education": "Educación",
+
+    // Contact section
+    "contact_title": "¿Listo para transformar tus experiencias de voz?",
+    "contact_subtitle": "Ponte en contacto con nuestro equipo para aprender cómo nuestra plataforma puede ayudar a tu negocio",
+    "contact_form_title": "Contáctanos",
+    "full_name": "Nombre Completo",
+    "email": "Correo Electrónico",
+    "company": "Empresa",
+    "message": "Mensaje",
+    "send_message": "Enviar Mensaje",
+    "sending": "Enviando...",
+    "contact_info_title": "Información de Contacto",
+    "office_hours_title": "Horario de Oficina",
+    "office_hours_time": "Lunes - Viernes: 9:00 AM - 6:00 PM PT"
   }
 };
 

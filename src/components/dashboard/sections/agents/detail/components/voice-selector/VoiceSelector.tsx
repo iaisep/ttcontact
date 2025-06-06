@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
@@ -14,13 +13,15 @@ interface VoiceSelectorProps {
   openVoiceModal: () => void;
   onSettingsClick?: () => void;
   voiceAvatarUrl?: string;
+  selectedLanguage?: string;
 }
 
 const VoiceSelector: React.FC<VoiceSelectorProps> = ({
   selectedVoice,
   openVoiceModal,
   onSettingsClick,
-  voiceAvatarUrl
+  voiceAvatarUrl,
+  selectedLanguage = 'en-US'
 }) => {
   // Get initials for avatar fallback
   const getInitials = (name: string) => {
@@ -85,7 +86,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
         <VoiceTooltip onSettingsClick={handleSettingsClick} />
       </Button>
 
-      {/* Voice Settings Modal with the onVoiceAdded prop */}
+      {/* Voice Settings Modal with the onVoiceAdded prop and selectedLanguage */}
       <VoiceSettingsModal
         open={isVoiceSettingsModalOpen}
         onClose={() => setIsVoiceSettingsModalOpen(false)}
@@ -99,6 +100,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
         setVoiceVolume={setVoiceVolume}
         onSettingsUpdated={handleSaveVoiceSettings}
         onVoiceAdded={handleCustomVoiceAdded}
+        selectedLanguage={selectedLanguage}
       />
     </>
   );

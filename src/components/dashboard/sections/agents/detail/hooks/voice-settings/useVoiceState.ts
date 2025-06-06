@@ -10,7 +10,8 @@ export function useVoiceState({ initialVoice }: UseVoiceSettingsProps) {
   const [isVoiceSettingsOpen, setIsVoiceSettingsOpen] = useState(false);
   
   // Voice settings state with default values
-  const [voiceModel, setVoiceModel] = useState('eleven_turbo_v2');
+  // Default to "auto" instead of "eleven_turbo_v2"
+  const [voiceModel, setVoiceModel] = useState('auto');
   const [voiceSpeed, setVoiceSpeed] = useState(1.0);
   const [voiceTemperature, setVoiceTemperature] = useState(1.0);
   const [voiceVolume, setVoiceVolume] = useState(1.0);

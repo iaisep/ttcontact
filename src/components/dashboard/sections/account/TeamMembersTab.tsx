@@ -2,39 +2,30 @@
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Plus } from "lucide-react";
-import { toast } from 'sonner';
-import { User, Workspace } from './types';
 import { InviteMemberDialog } from './InviteMemberDialog';
+import { Workspace, useWorkspace } from '@/hooks/useWorkspace';
+import { useAuth } from '@/hooks/useAuth';
 
 interface TeamMembersTabProps {
   workspace: Workspace | null;
 }
 
 const TeamMembersTab = ({ workspace }: TeamMembersTabProps) => {
+  const { user } = useAuth();
+  const { removeMember, updateMemberRole } = useWorkspace(user?.id);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
-  const removeMember = async (userId: string) => {
-    try {
-      // Logic would be implemented here for actual API calls
-      toast.success('Member removed successfully');
-    } catch (error) {
-      console.error('Failed to remove member:', error);
-      toast.error('Failed to remove member');
+  const handleRemoveMember = async (userId: string) => {
+    if (confirm('Are you sure you want to remove this member from the workspace?')) {
+      await removeMember(userId);
     }
   };
 
-  const changeMemberRole = async (userId: string, newRole: string) => {
-    try {
-      // Logic would be implemented here for actual API calls
-      toast.success('Member role updated successfully');
-    } catch (error) {
-      console.error('Failed to update member role:', error);
-      toast.error('Failed to update member role');
-    }
+  const handleChangeMemberRole = async (userId: string, newRole: string) => {
+    await updateMemberRole(userId, newRole as 'admin' | 'member' | 'viewer');
   };
 
   const getInitials = (name: string) => {
@@ -45,6 +36,14 @@ const TeamMembersTab = ({ workspace }: TeamMembersTabProps) => {
       .toUpperCase()
       .substring(0, 2);
   };
+
+  if (!workspace) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-muted-foreground">No workspace data available</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -63,7 +62,7 @@ const TeamMembersTab = ({ workspace }: TeamMembersTabProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {workspace?.members.map((member) => (
+            {workspace.members.map((member) => (
               <div key={member.id} className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Avatar>
@@ -85,7 +84,7 @@ const TeamMembersTab = ({ workspace }: TeamMembersTabProps) => {
                       id={`role-${member.id}`}
                       className="h-9 rounded-md border border-input bg-background px-3"
                       value={member.role}
-                      onChange={(e) => changeMemberRole(member.id, e.target.value)}
+                      onChange={(e) => handleChangeMemberRole(member.id, e.target.value)}
                       disabled={member.id === workspace.owner_id}
                     >
                       <option value="admin">Admin</option>
@@ -105,11 +104,7 @@ const TeamMembersTab = ({ workspace }: TeamMembersTabProps) => {
                       variant="ghost" 
                       size="icon"
                       className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => {
-                        if (confirm(`Are you sure you want to remove ${member.name} from the workspace?`)) {
-                          removeMember(member.id);
-                        }
-                      }}
+                      onClick={() => handleRemoveMember(member.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

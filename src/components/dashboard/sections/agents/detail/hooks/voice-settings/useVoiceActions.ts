@@ -89,12 +89,15 @@ export function useVoiceActions({
     try {
       toast.info('Saving voice settings...');
       
+      // If "auto" is selected, send null for voice_model
+      const voiceModelValue = voiceModel === 'auto' ? null : voiceModel;
+      
       // Prepare the payload for the update-agent endpoint
       const payload = {
         voice_speed: voiceSpeed,
         volume: voiceVolume,
         voice_temperature: voiceTemperature,
-        voice_model: voiceModel
+        voice_model: voiceModelValue
       };
       
       console.log('Sending voice settings update with payload:', payload);
@@ -107,7 +110,7 @@ export function useVoiceActions({
       
       // Update agent field in the parent component
       updateAgentField('voice_settings', {
-        voice_model: voiceModel,
+        voice_model: voiceModelValue,
         voice_speed: voiceSpeed,
         voice_temperature: voiceTemperature,
         volume: voiceVolume

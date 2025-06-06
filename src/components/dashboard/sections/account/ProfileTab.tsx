@@ -1,23 +1,25 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Save, Upload } from "lucide-react";
-import { toast } from 'sonner';
-import { User } from './types';
 import { useLanguage } from '@/context/LanguageContext';
 import { PasswordChangeDialog } from './PasswordChangeDialog';
 import TwoFactorAuthDialog from './TwoFactorAuthDialog';
+import { Profile, useProfile } from '@/hooks/useProfile';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ProfileTabProps {
-  currentUser: User | null;
+  currentUser: Profile | null;
 }
 
 const ProfileTab = ({ currentUser }: ProfileTabProps) => {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { updateProfile } = useProfile(user?.id);
   const [editingUser, setEditingUser] = useState(false);
   const [userFormData, setUserFormData] = useState({
     name: currentUser?.name || '',
@@ -26,14 +28,10 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [twoFactorDialogOpen, setTwoFactorDialogOpen] = useState(false);
 
-  const updateUserProfile = async () => {
-    try {
-      // Logic would be implemented here for actual API calls
-      toast.success(t('Profile updated successfully'));
+  const handleUpdateProfile = async () => {
+    const success = await updateProfile(userFormData);
+    if (success) {
       setEditingUser(false);
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-      toast.error(t('Failed to update profile'));
     }
   };
 
@@ -45,6 +43,16 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
       .toUpperCase()
       .substring(0, 2);
   };
+
+  // Update form data when currentUser changes
+  React.useEffect(() => {
+    if (currentUser) {
+      setUserFormData({
+        name: currentUser.name,
+        email: currentUser.email,
+      });
+    }
+  }, [currentUser]);
 
   return (
     <div className="space-y-4">
@@ -99,15 +107,11 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
                     value={userFormData.email}
                     onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
                     placeholder={t('Your email address')}
+                    disabled // Email changes should be handled differently
                   />
                 ) : (
                   <p className="text-lg">{currentUser?.email}</p>
                 )}
-              </div>
-              
-              <div className="space-y-2">
-                <Label>{t('role')}</Label>
-                <p className="text-lg capitalize">{currentUser?.role}</p>
               </div>
               
               <div className="space-y-2">
@@ -123,14 +127,16 @@ const ProfileTab = ({ currentUser }: ProfileTabProps) => {
                 <div className="flex justify-end gap-2 pt-4">
                   <Button variant="outline" onClick={() => {
                     setEditingUser(false);
-                    setUserFormData({
-                      name: currentUser?.name || '',
-                      email: currentUser?.email || '',
-                    });
+                    if (currentUser) {
+                      setUserFormData({
+                        name: currentUser.name,
+                        email: currentUser.email,
+                      });
+                    }
                   }}>
                     {t('cancel')}
                   </Button>
-                  <Button onClick={updateUserProfile}>
+                  <Button onClick={handleUpdateProfile}>
                     <Save className="h-4 w-4 mr-2" />
                     {t('save')}
                   </Button>

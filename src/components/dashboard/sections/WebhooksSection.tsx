@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Webhook } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import {
   FormLabel
 } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
-import { useWebhooks } from './webhooks';
+import { useApiContext } from '@/context/ApiContext';
 import {
   Tooltip,
   TooltipContent,
@@ -25,15 +25,36 @@ interface WebhookFormValues {
   webhookUrl: string;
 }
 
+interface WebhookData {
+  url: string;
+  events: string[];
+}
+
 const WebhooksSection = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { webhooks, createWebhook } = useWebhooks();
+  const [currentWebhook, setCurrentWebhook] = useState<WebhookData | null>(null);
+  const { fetchWithAuth } = useApiContext();
   
   const form = useForm<WebhookFormValues>({
     defaultValues: {
-      webhookUrl: webhooks?.[0]?.url || ''
+      webhookUrl: ''
     }
   });
+
+  // Load existing webhook data on component mount
+  useEffect(() => {
+    // Try to load existing webhook data if available
+    const storedWebhook = localStorage.getItem('retell_webhook');
+    if (storedWebhook) {
+      try {
+        const webhookData = JSON.parse(storedWebhook);
+        setCurrentWebhook(webhookData);
+        form.setValue('webhookUrl', webhookData.url);
+      } catch (error) {
+        console.error('Error parsing stored webhook data:', error);
+      }
+    }
+  }, [form]);
 
   const onSubmit = async (data: WebhookFormValues) => {
     if (!data.webhookUrl) {
@@ -43,13 +64,37 @@ const WebhooksSection = () => {
 
     setIsLoading(true);
     try {
-      // Using the first webhook event from eventOptions for simplicity
-      const success = await createWebhook(data.webhookUrl, ['call.started']);
-      if (success) {
-        toast.success('Webhook updated successfully');
-      } else {
-        toast.error('Failed to update webhook');
-      }
+      const payload = {
+        webhook: {
+          url: data.webhookUrl,
+          events: ["call_started", "call_ended"]
+        }
+      };
+
+      console.log('Sending webhook payload:', payload);
+
+      const response = await fetchWithAuth('/add-or-update-webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      console.log('Webhook API response:', response);
+
+      // Update local state with the new webhook data
+      const webhookData = {
+        url: data.webhookUrl,
+        events: ["call_started", "call_ended"]
+      };
+
+      setCurrentWebhook(webhookData);
+      
+      // Persist to localStorage for UI state
+      localStorage.setItem('retell_webhook', JSON.stringify(webhookData));
+
+      toast.success('Webhook updated successfully');
     } catch (error) {
       console.error('Error updating webhook:', error);
       toast.error('Failed to update webhook settings');
@@ -84,6 +129,19 @@ const WebhooksSection = () => {
           </TooltipProvider>
         </p>
 
+        {/* Show current webhook info if exists */}
+        {currentWebhook && (
+          <div className="mb-4 p-4 bg-muted rounded-lg">
+            <h3 className="text-sm font-medium mb-2">Current Webhook Configuration:</h3>
+            <p className="text-sm text-muted-foreground mb-1">
+              <strong>URL:</strong> {currentWebhook.url}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              <strong>Events:</strong> {currentWebhook.events.join(', ')}
+            </p>
+          </div>
+        )}
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -103,12 +161,16 @@ const WebhooksSection = () => {
               )}
             />
             
+            <div className="text-sm text-muted-foreground">
+              <p><strong>Events configured:</strong> call_started, call_ended</p>
+            </div>
+            
             <div className="flex justify-end mt-4">
               <Button 
                 type="submit" 
                 disabled={isLoading}
               >
-                Save
+                {isLoading ? 'Saving...' : 'Save'}
               </Button>
             </div>
           </form>

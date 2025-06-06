@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 
 // Define and export the Language type
@@ -113,7 +112,9 @@ const translations: Record<Language, Record<string, string>> = {
     call_history: 'Call History',
     analytics: 'Analytics',
     billing: 'Billing',
-    agents: 'Agents'
+    agents: 'Agents',
+    hero_subtitle: 'Create AI agents with natural voices for your product or service',
+    all_rights_reserved: 'All rights reserved.'
   },
   es: {
     name: 'Nombre',
@@ -211,7 +212,9 @@ const translations: Record<Language, Record<string, string>> = {
     call_history: 'Historial de Llamadas',
     analytics: 'Analíticas',
     billing: 'Facturación',
-    agents: 'Agentes'
+    agents: 'Agentes',
+    hero_subtitle: 'Crea agentes de IA con voces naturales para tu producto o servicio',
+    all_rights_reserved: 'Todos los derechos reservados.'
   },
 };
 

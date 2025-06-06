@@ -51,7 +51,7 @@ const ContactSection = () => {
               transition={{ duration: 0.6 }}
               className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
             >
-              Ready to transform your voice experiences?
+              {t('contact_title')}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -60,7 +60,7 @@ const ContactSection = () => {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-xl text-gray-600"
             >
-              Get in touch with our team to learn how Retell can help your business
+              {t('contact_subtitle')}
             </motion.p>
           </div>
 
@@ -73,10 +73,10 @@ const ContactSection = () => {
           >
             <div className="grid grid-cols-1 md:grid-cols-2">
               <div className="p-8 md:p-10">
-                <h3 className="text-2xl font-semibold mb-6">Contact Us</h3>
+                <h3 className="text-2xl font-semibold mb-6">{t('contact_form_title')}</h3>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="name">{t('full_name')}</Label>
                     <Input
                       id="name"
                       name="name"
@@ -87,7 +87,7 @@ const ContactSection = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('email')}</Label>
                     <Input
                       id="email"
                       name="email"
@@ -99,7 +99,7 @@ const ContactSection = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="company">Company</Label>
+                    <Label htmlFor="company">{t('company')}</Label>
                     <Input
                       id="company"
                       name="company"
@@ -110,7 +110,7 @@ const ContactSection = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="message">Message</Label>
+                    <Label htmlFor="message">{t('message')}</Label>
                     <textarea
                       id="message"
                       name="message"
@@ -126,19 +126,19 @@ const ContactSection = () => {
                     disabled={isSubmitting}
                     className="w-full bg-indigo-600 hover:bg-indigo-700"
                   >
-                    {isSubmitting ? "Sending..." : "Send Message"}
+                    {isSubmitting ? t('sending') : t('send_message')}
                   </Button>
                 </form>
               </div>
               <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 p-8 md:p-10 text-white flex flex-col justify-between">
                 <div>
-                  <h3 className="text-2xl font-semibold mb-6">Contact Information</h3>
+                  <h3 className="text-2xl font-semibold mb-6">{t('contact_info_title')}</h3>
                   <div className="space-y-4">
                     <p className="flex items-start">
                       <svg className="w-5 h-5 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span>hello@retellai.com</span>
+                      <span>hello@totalcontac.com</span>
                     </p>
                     <p className="flex items-start">
                       <svg className="w-5 h-5 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,8 +150,8 @@ const ContactSection = () => {
                   </div>
                 </div>
                 <div className="mt-12">
-                  <h4 className="text-lg font-medium mb-4">Office Hours</h4>
-                  <p>Monday - Friday: 9:00 AM - 6:00 PM PT</p>
+                  <h4 className="text-lg font-medium mb-4">{t('office_hours_title')}</h4>
+                  <p>{t('office_hours_time')}</p>
                 </div>
               </div>
             </div>

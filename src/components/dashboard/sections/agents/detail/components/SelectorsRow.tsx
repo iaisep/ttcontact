@@ -100,6 +100,7 @@ const SelectorsRow: React.FC<SelectorsRowProps> = ({
           selectedVoice={selectedVoice} 
           openVoiceModal={openVoiceModal}
           voiceAvatarUrl={voiceAvatarUrl}
+          selectedLanguage={selectedLanguage}
         />
       </div>
       

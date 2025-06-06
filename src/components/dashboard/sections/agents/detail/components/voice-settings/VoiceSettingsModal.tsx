@@ -21,7 +21,8 @@ interface VoiceSettingsModalProps {
   voiceVolume: number;
   setVoiceVolume: (value: number) => void;
   onSettingsUpdated?: () => void;
-  onVoiceAdded?: (voice: RetellVoice) => void; // Made this prop optional with ?
+  onVoiceAdded?: (voice: RetellVoice) => void;
+  selectedLanguage?: string;
 }
 
 const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
@@ -36,7 +37,8 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
   voiceVolume,
   setVoiceVolume,
   onSettingsUpdated,
-  onVoiceAdded // Add this prop to the destructured props
+  onVoiceAdded,
+  selectedLanguage = 'en-US'
 }) => {
   const { t } = useLanguage();
   const { fetchWithAuth } = useApiContext();
@@ -68,11 +70,14 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
     
     try {
       // Prepare the payload for the update-agent endpoint
+      // If "auto" is selected, send null for voice_model
+      const voiceModelValue = tempVoiceModel === 'auto' ? null : tempVoiceModel;
+      
       const payload = {
         voice_speed: tempVoiceSpeed,
         volume: tempVoiceVolume,
         voice_temperature: tempVoiceTemperature,
-        voice_model: tempVoiceModel
+        voice_model: voiceModelValue
       };
       
       console.log('Sending update to agent with payload:', payload);
@@ -120,6 +125,7 @@ const VoiceSettingsModal: React.FC<VoiceSettingsModalProps> = ({
           <VoiceModelSelector 
             voiceModel={tempVoiceModel}
             setVoiceModel={setTempVoiceModel}
+            selectedLanguage={selectedLanguage}
           />
 
           <VoiceSliderControl

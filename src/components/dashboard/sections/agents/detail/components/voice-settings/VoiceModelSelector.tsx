@@ -2,6 +2,7 @@
 import React from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { getCompatibleVoiceModels } from './voiceModelUtils';
 
 interface VoiceModel {
   id: string;
@@ -12,21 +13,31 @@ interface VoiceModel {
 interface VoiceModelSelectorProps {
   voiceModel: string;
   setVoiceModel: (value: string) => void;
+  selectedLanguage?: string;
 }
 
 const VoiceModelSelector: React.FC<VoiceModelSelectorProps> = ({
   voiceModel,
   setVoiceModel,
+  selectedLanguage = 'en-US'
 }) => {
-  // Make sure all models have unique IDs for the radio group
-  const voiceModels: VoiceModel[] = [
-    { id: 'eleven_turbo_v2_auto', label: 'Auto(Elevenlabs Turbo V2)', description: 'English only, fast, high quality' },
-    { id: 'eleven_turbo_v2', label: 'Elevenlabs Turbo V2', description: 'English only, fast, high quality' },
-    { id: 'eleven_flash_v2', label: 'Elevenlabs Flash V2', description: 'English only, fastest, medium quality' },
-    { id: 'eleven_turbo_v2_5', label: 'Elevenlabs Turbo V2.5', description: 'Multilingual, fast, high quality' },
-    { id: 'eleven_flash_v2_5', label: 'Elevenlabs Flash V2.5', description: 'Multilingual, fastest, medium quality' },
-    { id: 'eleven_multilingual_v2', label: 'Elevenlabs Multilingual v2', description: 'Multilingual, slow, highest quality' },
-  ];
+  // Get compatible voice models based on selected language
+  const compatibleModels = getCompatibleVoiceModels(selectedLanguage);
+  
+  // Convert to VoiceModel interface format
+  const voiceModels: VoiceModel[] = compatibleModels.map(model => ({
+    id: model.id,
+    label: model.label,
+    description: model.description
+  }));
+
+  // If current voiceModel is not compatible with selected language, auto-select first compatible one
+  React.useEffect(() => {
+    const isCurrentModelCompatible = voiceModels.some(model => model.id === voiceModel);
+    if (!isCurrentModelCompatible && voiceModels.length > 0) {
+      setVoiceModel(voiceModels[0].id);
+    }
+  }, [selectedLanguage, voiceModel, setVoiceModel, voiceModels]);
 
   return (
     <div className="space-y-2">
@@ -36,24 +47,19 @@ const VoiceModelSelector: React.FC<VoiceModelSelectorProps> = ({
         onValueChange={setVoiceModel}
         className="space-y-1"
       >
-        {voiceModels.map((model) => {
-          // For the first "Auto" option, use eleven_turbo_v2 as value
-          const radioValue = model.id === 'eleven_turbo_v2_auto' ? 'eleven_turbo_v2' : model.id;
-          
-          return (
-            <div key={model.id} className="flex items-start space-x-2 rounded-md p-2 hover:bg-muted">
-              <RadioGroupItem value={radioValue} id={model.id} />
-              <div className="grid gap-1">
-                <Label htmlFor={model.id} className="text-sm font-medium">
-                  {model.label}
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  {model.description}
-                </p>
-              </div>
+        {voiceModels.map((model) => (
+          <div key={model.id} className="flex items-start space-x-2 rounded-md p-2 hover:bg-muted">
+            <RadioGroupItem value={model.id} id={model.id} />
+            <div className="grid gap-1">
+              <Label htmlFor={model.id} className="text-sm font-medium">
+                {model.label}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {model.description}
+              </p>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </RadioGroup>
     </div>
   );

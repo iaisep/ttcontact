@@ -25,17 +25,17 @@ const HelpCenterPage = () => {
     <HelmetProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Helmet>
-          <title>{t('help_center')} | UISEP</title>
+          <title>{t('help center')} | UISEP</title>
         </Helmet>
 
         <HelpCenterLayout>
           <div className="container mx-auto px-4 py-8">
             <div className="mb-10 text-center">
               <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
-                {t('help_center')}
+                {t('help center')}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-                {t('help_center_description')}
+                {t('help center description')}
               </p>
               <HelpCenterSearch onSearch={handleSearch} />
             </div>

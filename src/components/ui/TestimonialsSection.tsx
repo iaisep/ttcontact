@@ -8,21 +8,21 @@ const TestimonialsSection = () => {
 
   const testimonials = [
     {
-      quote: "The power of IA helped us scale our customer support operations without sacrificing quality. The voice agents are so natural that our customers can't tell they're talking to AI.",
+      quote: "Totalcontac helped us scale our customer support operations without sacrificing quality. The voice agents are so natural that our customers can't tell they're talking to AI.",
       author: "Sarah Johnson",
       position: "CTO, TechFusion",
       company: "TechFusion",
       avatar: "https://randomuser.me/api/portraits/women/45.jpg"
     },
     {
-      quote: "We've seen a 40% increase in lead qualification since implementing the power of IA. It's been a game-changer for our sales team.",
+      quote: "We've seen a 40% increase in lead qualification since implementing Totalcontac. It's been a game-changer for our sales team.",
       author: "Michael Chen",
       position: "VP of Sales, SalesTrain",
       company: "SalesTrain",
       avatar: "https://randomuser.me/api/portraits/men/32.jpg"
     },
     {
-      quote: "The voice quality is extraordinary. After years of disappointing experiences with other voice AI solutions, the power of IA finally delivers natural-sounding conversations.",
+      quote: "The voice quality is extraordinary. After years of disappointing experiences with other voice AI solutions, Totalcontac finally delivers natural-sounding conversations.",
       author: "Elena Rodriguez",
       position: "Customer Experience Director, Global Health",
       company: "Global Health",
@@ -41,7 +41,7 @@ const TestimonialsSection = () => {
             transition={{ duration: 0.5 }}
             className="inline-block px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full mb-4"
           >
-            Testimonials
+            {t('testimonials_title')}
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -50,7 +50,7 @@ const TestimonialsSection = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4"
           >
-            Loved by customers worldwide
+            {t('testimonials_title')}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -59,7 +59,7 @@ const TestimonialsSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
           >
-            See what our customers have to say about their experience with our voice AI solutions
+            {t('testimonials_subtitle')}
           </motion.p>
         </div>
 

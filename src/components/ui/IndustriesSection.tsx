@@ -11,33 +11,33 @@ const IndustriesSection = () => {
   const industries = [
     {
       icon: <Phone className="w-6 h-6 text-indigo-600" />,
-      title: "Call Centers",
-      description: "Transform your call center operations with AI agents that handle tier-1 support and seamlessly transfer to human agents when needed."
+      title: t("industry_call_centers"),
+      description: t("call_centers_description")
     },
     {
       icon: <HeartPulse className="w-6 h-6 text-indigo-600" />,
-      title: "Healthcare",
-      description: "Schedule appointments, follow up with patients, and provide information on services with natural voice interactions."
+      title: t("industry_healthcare"),
+      description: t("healthcare_description")
     },
     {
       icon: <Building2 className="w-6 h-6 text-indigo-600" />,
-      title: "Financial Services",
-      description: "Provide account information, process transactions, and offer personalized financial guidance through voice AI."
+      title: t("industry_financial"),
+      description: "Proporciona información de cuentas, procesa transacciones y ofrece orientación financiera personalizada a través de IA de voz."
     },
     {
       icon: <ShoppingCart className="w-6 h-6 text-indigo-600" />,
-      title: "Retail & E-commerce",
-      description: "Enhance customer service with order tracking, product recommendations, and return processing via natural voice."
+      title: t("industry_retail"),
+      description: "Mejora el servicio al cliente con seguimiento de pedidos, recomendaciones de productos y procesamiento de devoluciones vía voz natural."
     },
     {
       icon: <Briefcase className="w-6 h-6 text-indigo-600" />,
-      title: "Sales & Marketing",
-      description: "Qualify leads, conduct follow-ups, and schedule demonstrations with AI agents that sound like your best sales representatives."
+      title: t("industry_sales"),
+      description: "Califica prospectos, realiza seguimientos y programa demostraciones con agentes de IA que suenan como tus mejores representantes de ventas."
     },
     {
       icon: <School className="w-6 h-6 text-indigo-600" />,
-      title: "Education",
-      description: "Support student enrollment, answer common questions, and provide information about courses and programs."
+      title: t("industry_education"),
+      description: "Apoya la inscripción de estudiantes, responde preguntas comunes y proporciona información sobre cursos y programas."
     }
   ];
 
@@ -52,7 +52,7 @@ const IndustriesSection = () => {
             transition={{ duration: 0.5 }}
             className="inline-block px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full mb-4"
           >
-            Industries
+            {t('industries_section_title')}
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -61,7 +61,7 @@ const IndustriesSection = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4"
           >
-            Voice AI solutions for every industry
+            {t('industries_title')}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -70,7 +70,7 @@ const IndustriesSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
           >
-            Discover how our voice AI technology can be customized for your specific industry needs
+            {t('industries_subtitle')}
           </motion.p>
         </div>
 

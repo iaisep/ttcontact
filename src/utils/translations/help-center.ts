@@ -2,8 +2,8 @@
 // Help Center related translations
 const helpCenterTranslations = {
   en: {
-    "help_center": "Help Center",
-    "help_center_description": "Find answers to common questions and learn how to get the most out of UISEP AI",
+    "help center": "Help Center",
+    "help center description": "Find answers to common questions and learn how to get the most out of UISEP AI",
     "search_help_center": "Search for help articles...",
     "search": "Search",
     "back_to_dashboard": "Back to Dashboard",
@@ -44,11 +44,14 @@ const helpCenterTranslations = {
     "your_email": "Your email address",
     "share_blog": "Share Our Blog",
     "featured": "Featured",
-    "all_categories": "All Categories"
+    "all_categories": "All Categories",
+    "technical_documentation": "Technical Documentation",
+    "system_architecture": "System Architecture",
+    "integrations": "Integrations"
   },
   es: {
-    "help_center": "Centro de Ayuda",
-    "help_center_description": "Encuentra respuestas a preguntas frecuentes y aprende a sacar el máximo provecho de UISEP AI",
+    "help center": "Centro de Ayuda",
+    "help center description": "Encuentra respuestas a preguntas frecuentes y aprende a sacar el máximo provecho de UISEP AI",
     "search_help_center": "Buscar artículos de ayuda...",
     "search": "Buscar",
     "back_to_dashboard": "Volver al Panel",
@@ -89,7 +92,10 @@ const helpCenterTranslations = {
     "your_email": "Tu dirección de correo electrónico",
     "share_blog": "Comparte Nuestro Blog",
     "featured": "Destacado",
-    "all_categories": "Todas las Categorías"
+    "all_categories": "Todas las Categorías",
+    "technical_documentation": "Documentación Técnica",
+    "system_architecture": "Arquitectura del Sistema",
+    "integrations": "Integraciones"
   }
 };
 

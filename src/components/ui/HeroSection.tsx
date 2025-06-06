@@ -57,7 +57,7 @@ const HeroSection = () => {
             Build Voice AI that sounds exactly like a human
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Retell helps you build voice AI with our simple SDK and API that sounds indistinguishable from a human.
+            Totalcontac helps you build voice AI with our simple SDK and API that sounds indistinguishable from a human.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-10">
