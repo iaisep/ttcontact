@@ -14,6 +14,14 @@ RUN npm ci
 # Copy the rest of the code
 COPY . .
 
+# Build arguments for environment variables
+ARG VITE_RETELL_API_KEY
+ARG VITE_RETELL_BASE_URL
+
+# Set environment variables for build
+ENV VITE_RETELL_API_KEY=$VITE_RETELL_API_KEY
+ENV VITE_RETELL_BASE_URL=$VITE_RETELL_BASE_URL
+
 # Build the application
 RUN npm run build
 

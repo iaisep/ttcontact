@@ -1,0 +1,23 @@
+
+version: '3.8'
+
+services:
+  voice-agent-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_RETELL_API_KEY: ${RETELL_API_KEY}
+        VITE_RETELL_BASE_URL: ${RETELL_BASE_URL:-https://api.retellai.com}
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+# Para usar este archivo:
+# 1. Copia este archivo como docker-compose.yml
+# 2. Crea un archivo .env en el mismo directorio con:
+#    RETELL_API_KEY=tu_api_key_aqui
+#    RETELL_BASE_URL=https://api.retellai.com
+# 3. Ejecuta: docker-compose up --build

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { toast } from 'sonner';
 
@@ -27,8 +26,13 @@ interface ApiProviderProps {
 }
 
 export const ApiProvider = ({ children }: ApiProviderProps) => {
-  const [apiKey, setApiKey] = useState<string>('key_3e56474d09efbd04003f891fae5c');
-  const [baseURL, setBaseURL] = useState<string>('https://api.retellai.com');
+  // Read from environment variables with fallback values
+  const [apiKey, setApiKey] = useState<string>(
+    import.meta.env.VITE_RETELL_API_KEY || 'key_3e56474d09efbd04003f891fae5c'
+  );
+  const [baseURL, setBaseURL] = useState<string>(
+    import.meta.env.VITE_RETELL_BASE_URL || 'https://api.retellai.com'
+  );
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     localStorage.getItem('auth_token') !== null
   );
