@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, Filter, RefreshCw, Link, MessageSquare } from 'lucide-react';
+import { Plus, Search, Filter, RefreshCw, Link, MessageSquare, MessageCircle } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { 
   DropdownMenu,
@@ -70,6 +70,16 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
                 <div>
                   <p className="font-medium">Conversation Flow Agent</p>
                   <p className="text-xs text-muted-foreground">For tasks with complex transitions</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                disabled
+                className="flex items-center py-2 opacity-50"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                <div>
+                  <p className="font-medium">WhatsApp Chat Agent</p>
+                  <p className="text-xs text-muted-foreground">For WhatsApp business conversations</p>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
