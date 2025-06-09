@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -63,6 +62,16 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem 
+                onClick={() => setShowTemplateDialog(true)}
+                className="flex items-center py-2"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                <div>
+                  <p className="font-medium">WhatsApp Chat Agent</p>
+                  <p className="text-xs text-muted-foreground">For WhatsApp business conversations</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
                 disabled
                 className="flex items-center py-2 opacity-50"
               >
@@ -70,16 +79,6 @@ const AgentsToolbar: React.FC<AgentsToolbarProps> = ({
                 <div>
                   <p className="font-medium">Conversation Flow Agent</p>
                   <p className="text-xs text-muted-foreground">For tasks with complex transitions</p>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                disabled
-                className="flex items-center py-2 opacity-50"
-              >
-                <MessageCircle className="mr-2 h-4 w-4" />
-                <div>
-                  <p className="font-medium">WhatsApp Chat Agent</p>
-                  <p className="text-xs text-muted-foreground">For WhatsApp business conversations</p>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
