@@ -1,64 +1,21 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, RefreshCw, MessageCircle, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 
-// Mock data for chat agents
-const mockChatAgents = [
-  {
-    id: '1',
-    name: 'WhatsApp Support Bot',
-    platform: 'WhatsApp',
-    status: 'active',
-    description: 'Customer support agent for WhatsApp',
-    lastActivity: '2024-01-15T10:30:00Z',
-    messagesCount: 1250,
-    avatar: '🤖'
-  },
-  {
-    id: '2',
-    name: 'Telegram Sales Assistant',
-    platform: 'Telegram',
-    status: 'active',
-    description: 'Sales and lead generation bot',
-    lastActivity: '2024-01-15T09:15:00Z',
-    messagesCount: 890,
-    avatar: '💼'
-  },
-  {
-    id: '3',
-    name: 'SMS Appointment Reminder',
-    platform: 'SMS',
-    status: 'inactive',
-    description: 'Automated appointment reminders via SMS',
-    lastActivity: '2024-01-14T16:45:00Z',
-    messagesCount: 456,
-    avatar: '📅'
-  },
-  {
-    id: '4',
-    name: 'Facebook Messenger Bot',
-    platform: 'Facebook Messenger',
-    status: 'active',
-    description: 'Customer service chatbot for Facebook',
-    lastActivity: '2024-01-15T11:20:00Z',
-    messagesCount: 2340,
-    avatar: '📘'
-  },
-  {
-    id: '5',
-    name: 'Discord Community Bot',
-    platform: 'Discord',
-    status: 'active',
-    description: 'Community management and moderation',
-    lastActivity: '2024-01-15T08:30:00Z',
-    messagesCount: 567,
-    avatar: '🎮'
-  }
-];
+interface ChatAgent {
+  id: string;
+  name: string;
+  platform: string;
+  status: string;
+  description: string;
+  lastActivity: string;
+  messagesCount: number;
+  avatar: string;
+}
 
 const ChatAgentsSection: React.FC = () => {
   const { t } = useLanguage();
@@ -66,10 +23,81 @@ const ChatAgentsSection: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
+  const [chatAgents, setChatAgents] = useState<ChatAgent[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchChatAgents = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch('https://chatwoot.totalcontact.com.mx//platform/api/v1/agent_bots', {
+        method: 'GET',
+        headers: {
+          'api_access_token': 'C4dZzmKiWBTcXrvyWSxj5dLw',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('API Response:', data);
+
+      // Transform API data to match our interface
+      const transformedAgents: ChatAgent[] = (data.payload || data || []).map((agent: any, index: number) => ({
+        id: agent.id?.toString() || `agent-${index}`,
+        name: agent.name || agent.bot_name || `Agent Bot ${index + 1}`,
+        platform: agent.platform || agent.channel_type || 'Unknown',
+        status: agent.status || (agent.active ? 'active' : 'inactive'),
+        description: agent.description || agent.bot_description || 'No description available',
+        lastActivity: agent.updated_at || agent.last_activity || new Date().toISOString(),
+        messagesCount: agent.messages_count || agent.conversation_count || 0,
+        avatar: getPlatformIcon(agent.platform || agent.channel_type || 'Unknown')
+      }));
+
+      setChatAgents(transformedAgents);
+    } catch (error) {
+      console.error('Error fetching chat agents:', error);
+      setError('Failed to fetch chat agents. Please try again.');
+      
+      // Fallback to mock data if API fails
+      setChatAgents([
+        {
+          id: '1',
+          name: 'WhatsApp Support Bot',
+          platform: 'WhatsApp',
+          status: 'active',
+          description: 'Customer support agent for WhatsApp',
+          lastActivity: '2024-01-15T10:30:00Z',
+          messagesCount: 1250,
+          avatar: '🤖'
+        },
+        {
+          id: '2',
+          name: 'Telegram Sales Assistant',
+          platform: 'Telegram',
+          status: 'active',
+          description: 'Sales and lead generation bot',
+          lastActivity: '2024-01-15T09:15:00Z',
+          messagesCount: 890,
+          avatar: '💼'
+        }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchChatAgents();
+  }, []);
 
   const filteredAgents = searchQuery.trim() === '' 
-    ? mockChatAgents 
-    : mockChatAgents.filter(agent => 
+    ? chatAgents 
+    : chatAgents.filter(agent => 
         agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         agent.platform.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -79,8 +107,7 @@ const ChatAgentsSection: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1000);
+    fetchChatAgents();
   };
 
   const handleEditAgent = (agent: any) => {
@@ -92,19 +119,24 @@ const ChatAgentsSection: React.FC = () => {
   };
 
   const getPlatformIcon = (platform: string) => {
-    switch (platform) {
-      case 'WhatsApp':
+    switch (platform?.toLowerCase()) {
+      case 'whatsapp':
         return '💬';
-      case 'Telegram':
+      case 'telegram':
         return '✈️';
-      case 'SMS':
+      case 'sms':
         return '📱';
-      case 'Facebook Messenger':
+      case 'facebook messenger':
+      case 'facebook':
         return '📘';
-      case 'Discord':
+      case 'discord':
         return '🎮';
+      case 'instagram':
+        return '📷';
+      case 'twitter':
+        return '🐦';
       default:
-        return '💬';
+        return '🤖';
     }
   };
 
@@ -205,11 +237,18 @@ const ChatAgentsSection: React.FC = () => {
             <Plus className="mr-2 h-4 w-4" />
             Add Chat Agent
           </Button>
-          <Button variant="ghost" size="icon" onClick={handleRefresh} title="Refresh">
-            <RefreshCw className="h-4 w-4" />
+          <Button variant="ghost" size="icon" onClick={handleRefresh} title="Refresh" disabled={isLoading}>
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
 
       {/* Search */}
       <div className="flex gap-4 items-center">
@@ -238,9 +277,14 @@ const ChatAgentsSection: React.FC = () => {
         emptyState={
           <div className="p-8 text-center">
             <MessageCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium">No chat agents found</h3>
+            <h3 className="text-lg font-medium">
+              {isLoading ? 'Loading chat agents...' : 'No chat agents found'}
+            </h3>
             <p className="mt-2 text-gray-500 dark:text-gray-400">
-              Get started by creating your first chat agent for WhatsApp, Telegram, or SMS.
+              {isLoading 
+                ? 'Please wait while we fetch your chat agents.'
+                : 'Get started by creating your first chat agent for WhatsApp, Telegram, or SMS.'
+              }
             </p>
           </div>
         }
