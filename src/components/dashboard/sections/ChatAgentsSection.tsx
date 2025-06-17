@@ -31,7 +31,7 @@ const ChatAgentsSection: React.FC = () => {
     setError(null);
     
     try {
-      const response = await fetch('https://chatwoot.totalcontact.com.mx//platform/api/v1/agent_bots', {
+      const response = await fetch('https://chatwoot.totalcontact.com.mx/platform/api/v1/agent_bots', {
         method: 'GET',
         headers: {
           'api_access_token': 'C4dZzmKiWBTcXrvyWSxj5dLw',
