@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import AgentsSection from './sections/AgentsSection';
 import ChatAgentsSection from './sections/ChatAgentsSection';
 import { useLanguage } from '@/context/LanguageContext';
-import { Users, BookText, Phone, Upload, History, BarChart3, CreditCard, Key, Webhook, UserCircle, HelpCircle, ChevronLeft, Kanban, MessageCircle } from "lucide-react";
 
-const DashboardContent: React.FC = () => {
-  const [activeSection, setActiveSection] = useState('agents');
+interface DashboardContentProps {
+  activeSection: string;
+}
 
+const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection }) => {
   const renderContent = () => {
     switch (activeSection) {
       case 'agents':
