@@ -14,6 +14,7 @@ import {
   HelpCircle,
   ChevronLeft,
   Kanban,
+  MessageCircle,
 } from "lucide-react";
 import SidebarMenuItem from "./SidebarMenuItem";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,11 @@ const SidebarMenu = ({
       icon: Users,
       title: t('agents'),
       id: "agents",
+    },
+    {
+      icon: MessageCircle,
+      title: t('Chat Agents'),
+      id: "chat-agents",
     },
     {
       icon: BookText,
