@@ -186,15 +186,6 @@ const ChatAgentsSection: React.FC = () => {
         </span>
       ),
     },
-    {
-      key: 'messagesCount',
-      header: 'Messages',
-      cell: (agent: any) => (
-        <span className="text-sm text-gray-900 dark:text-white">
-          {agent.messagesCount.toLocaleString()}
-        </span>
-      ),
-    },
   ];
 
   return (
