@@ -32,7 +32,7 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
     webhookPath: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.nameSuffix.trim() || !formData.description.trim() || !formData.webhookPath.trim()) {
@@ -46,7 +46,30 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
       account_id: "1"
     };
 
-    onSave(payload);
+    try {
+      // Primero creamos el agente
+      await onSave(payload);
+      
+      // Luego llamamos al endpoint de clonación
+      const cloneResponse = await fetch('https://flow.totalcontact.com.mx/webhook/clonador', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id_clonar: "wXXUcSwIXV4Wdvjd",
+          newPath: formData.webhookPath
+        })
+      });
+
+      if (!cloneResponse.ok) {
+        console.error('Error cloning webhook:', cloneResponse.status);
+      } else {
+        console.log('Webhook cloned successfully');
+      }
+    } catch (error) {
+      console.error('Error in agent creation process:', error);
+    }
   };
 
   const handleReset = () => {
