@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import TelegramAgentModal from './ChatAgentsSection/TelegramAgentModal';
 
 interface ChatAgent {
   id: string;
@@ -30,6 +31,8 @@ const ChatAgentsSection: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [chatAgents, setChatAgents] = useState<ChatAgent[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isTelegramModalOpen, setIsTelegramModalOpen] = useState(false);
+  const [isCreatingAgent, setIsCreatingAgent] = useState(false);
 
   const fetchChatAgents = async () => {
     setIsLoading(true);
@@ -109,6 +112,42 @@ const ChatAgentsSection: React.FC = () => {
 
   const handleAddChatAgent = (platform: string) => {
     console.log(`Adding new chat agent for ${platform}...`);
+    if (platform === 'Telegram') {
+      setIsTelegramModalOpen(true);
+    }
+  };
+
+  const handleCreateTelegramAgent = async (agentData: any) => {
+    setIsCreatingAgent(true);
+    setError(null);
+    
+    try {
+      const response = await fetch('https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/agent_bots', {
+        method: 'POST',
+        headers: {
+          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(agentData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Agent created successfully:', data);
+      
+      // Close modal and refresh the list
+      setIsTelegramModalOpen(false);
+      fetchChatAgents();
+      
+    } catch (error) {
+      console.error('Error creating agent:', error);
+      setError('Error al crear el agente. Por favor intente nuevamente.');
+    } finally {
+      setIsCreatingAgent(false);
+    }
   };
 
   const handleRefresh = () => {
@@ -284,6 +323,14 @@ const ChatAgentsSection: React.FC = () => {
           </div>
         }
         rowClassName="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+      />
+
+      {/* Telegram Agent Modal */}
+      <TelegramAgentModal
+        isOpen={isTelegramModalOpen}
+        onClose={() => setIsTelegramModalOpen(false)}
+        onSave={handleCreateTelegramAgent}
+        isLoading={isCreatingAgent}
       />
     </div>
   );
