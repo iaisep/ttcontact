@@ -101,7 +101,7 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="webhookPath">Webhook Path</Label>
+              <Label htmlFor="webhookPath">Texto de comunicación</Label>
               <Input
                 id="webhookPath"
                 value={formData.webhookPath}
