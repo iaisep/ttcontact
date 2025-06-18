@@ -83,7 +83,7 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
                 id="nameSuffix"
                 value={formData.nameSuffix}
                 onChange={(e) => setFormData(prev => ({...prev, nameSuffix: e.target.value}))}
-                placeholder="ventas"
+                placeholder="funcion que describe al agente"
                 required
               />
             </div>
