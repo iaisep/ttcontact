@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, RefreshCw, MessageCircle, MessageSquare } from 'lucide-react';
+import { Plus, Search, RefreshCw, MessageCircle } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 
@@ -195,35 +194,6 @@ const ChatAgentsSection: React.FC = () => {
           {agent.messagesCount.toLocaleString()}
         </span>
       ),
-    },
-    {
-      key: 'actions',
-      header: <div className="text-right">{t('actions')}</div>,
-      cell: (agent: any) => (
-        <div className="flex justify-end space-x-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              handleEditAgent(agent);
-            }}
-          >
-            <MessageSquare size={16} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              handleDeleteAgent(agent.id);
-            }}
-          >
-            <MessageCircle size={16} />
-          </Button>
-        </div>
-      ),
-      className: "text-right",
     },
   ];
 
