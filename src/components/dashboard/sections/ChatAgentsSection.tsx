@@ -1,10 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, RefreshCw, MessageCircle } from 'lucide-react';
+import { Plus, Search, RefreshCw, MessageCircle, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface ChatAgent {
   id: string;
@@ -102,8 +107,8 @@ const ChatAgentsSection: React.FC = () => {
         agent.platform.toLowerCase().includes(searchQuery.toLowerCase())
       );
 
-  const handleAddChatAgent = () => {
-    console.log('Adding new chat agent...');
+  const handleAddChatAgent = (platform: string) => {
+    console.log(`Adding new chat agent for ${platform}...`);
   };
 
   const handleRefresh = () => {
@@ -195,10 +200,38 @@ const ChatAgentsSection: React.FC = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Chat Agents</h1>
         <div className="flex gap-2">
-          <Button onClick={handleAddChatAgent}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Chat Agent
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Chat Agent
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg z-50">
+              <DropdownMenuItem 
+                onClick={() => handleAddChatAgent('Telegram')}
+                className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <span className="mr-2">✈️</span>
+                Telegram
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                disabled
+                className="cursor-not-allowed opacity-50"
+              >
+                <span className="mr-2">📷</span>
+                Instagram
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                disabled
+                className="cursor-not-allowed opacity-50"
+              >
+                <span className="mr-2">💬</span>
+                WhatsApp
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button variant="ghost" size="icon" onClick={handleRefresh} title="Refresh" disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
