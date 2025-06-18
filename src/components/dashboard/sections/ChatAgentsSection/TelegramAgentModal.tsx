@@ -79,16 +79,13 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="nameSuffix">Nombre del Agente</Label>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500 whitespace-nowrap">Agente_mensajeria_telegram_</span>
-                <Input
-                  id="nameSuffix"
-                  value={formData.nameSuffix}
-                  onChange={(e) => setFormData(prev => ({...prev, nameSuffix: e.target.value}))}
-                  placeholder="ventas"
-                  required
-                />
-              </div>
+              <Input
+                id="nameSuffix"
+                value={formData.nameSuffix}
+                onChange={(e) => setFormData(prev => ({...prev, nameSuffix: e.target.value}))}
+                placeholder="ventas"
+                required
+              />
             </div>
 
             <div className="grid gap-2">
@@ -105,16 +102,13 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
 
             <div className="grid gap-2">
               <Label htmlFor="webhookPath">Webhook Path</Label>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500 whitespace-nowrap">http://n8n:5678/webhook/</span>
-                <Input
-                  id="webhookPath"
-                  value={formData.webhookPath}
-                  onChange={(e) => setFormData(prev => ({...prev, webhookPath: e.target.value}))}
-                  placeholder="telegram1"
-                  required
-                />
-              </div>
+              <Input
+                id="webhookPath"
+                value={formData.webhookPath}
+                onChange={(e) => setFormData(prev => ({...prev, webhookPath: e.target.value}))}
+                placeholder="telegram1"
+                required
+              />
             </div>
           </div>
 
