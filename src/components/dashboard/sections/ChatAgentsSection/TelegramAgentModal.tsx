@@ -57,7 +57,7 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          id_clonar: "wXXUcSwIXV4Wdvjd",
+          id_clonar: "ESbW48HlmIagrWup",
           newPath: formData.webhookPath
         })
       });
