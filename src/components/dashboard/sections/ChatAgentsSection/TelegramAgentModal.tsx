@@ -48,24 +48,39 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
 
     try {
       // Primero creamos el agente
-      await onSave(payload);
+      const agentResponse = await onSave(payload);
+      console.log('Agent created response:', agentResponse);
       
-      // Luego llamamos al endpoint de clonación
-      const cloneResponse = await fetch('https://flow.totalcontact.com.mx/webhook/clonador', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          id_clonar: "ESbW48HlmIagrWup",
-          newPath: formData.webhookPath
-        })
-      });
+      // Extraemos el ID del agente creado
+      let agentId = null;
+      if (agentResponse && agentResponse.id) {
+        agentId = agentResponse.id;
+      } else if (agentResponse && agentResponse.data && agentResponse.data.id) {
+        agentId = agentResponse.data.id;
+      }
 
-      if (!cloneResponse.ok) {
-        console.error('Error cloning webhook:', cloneResponse.status);
+      if (agentId) {
+        console.log('Using agent ID for cloning:', agentId);
+        
+        // Luego llamamos al endpoint de clonación con el ID del agente creado
+        const cloneResponse = await fetch('https://flow.totalcontact.com.mx/webhook/clonador', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            id_clonar: agentId,
+            newPath: formData.webhookPath
+          })
+        });
+
+        if (!cloneResponse.ok) {
+          console.error('Error cloning webhook:', cloneResponse.status);
+        } else {
+          console.log('Webhook cloned successfully with agent ID:', agentId);
+        }
       } else {
-        console.log('Webhook cloned successfully');
+        console.error('No agent ID found in response:', agentResponse);
       }
     } catch (error) {
       console.error('Error in agent creation process:', error);
