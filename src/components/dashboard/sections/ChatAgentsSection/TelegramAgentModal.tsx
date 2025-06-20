@@ -48,26 +48,9 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
 
     try {
       // Primero creamos el agente
-      const agentResponse = await fetch('https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/agent_bots', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!agentResponse.ok) {
-        console.error('Error creating agent:', agentResponse.status);
-        return;
-      }
-
-      const agentData = await agentResponse.json();
-      console.log('Agent created successfully:', agentData);
+      await onSave(payload);
       
-      // Obtenemos el ID del agente creado
-      const agentId = agentData.id;
-      
-      // Llamamos al endpoint de clonación con ambos IDs
+      // Luego llamamos al endpoint de clonación
       const cloneResponse = await fetch('https://flow.totalcontact.com.mx/webhook/clonador', {
         method: 'POST',
         headers: {
@@ -75,7 +58,6 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
         },
         body: JSON.stringify({
           id_clonar: "ESbW48HlmIagrWup",
-          id_prompt: agentId,
           newPath: formData.webhookPath
         })
       });
@@ -85,10 +67,6 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
       } else {
         console.log('Webhook cloned successfully');
       }
-
-      // Llamamos al callback onSave con los datos del agente
-      await onSave(agentData);
-      
     } catch (error) {
       console.error('Error in agent creation process:', error);
     }
