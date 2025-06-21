@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, RefreshCw, MessageCircle, ChevronDown } from 'lucide-react';
+import { Plus, Search, RefreshCw, MessageCircle, ChevronDown, Edit, Trash } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import {
@@ -11,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import TelegramAgentModal from './ChatAgentsSection/TelegramAgentModal';
+import { toast } from 'sonner';
 
 interface ChatAgent {
   id: string;
@@ -154,12 +156,39 @@ const ChatAgentsSection: React.FC = () => {
     fetchChatAgents();
   };
 
-  const handleEditAgent = (agent: any) => {
+  const handleEditAgent = (agent: ChatAgent) => {
     console.log('Editing chat agent:', agent);
+    // TODO: Implement edit functionality
+    toast.info('Funcionalidad de edición próximamente disponible');
   };
 
-  const handleDeleteAgent = (agentId: string) => {
-    console.log('Deleting chat agent:', agentId);
+  const handleDeleteAgent = async (agentId: string) => {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar este agente?')) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`https://chatwoot.totalcontact.com.mx/platform/api/v1/agent_bots/${agentId}`, {
+        method: 'DELETE',
+        headers: {
+          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      toast.success('Agente eliminado exitosamente');
+      fetchChatAgents(); // Refresh the list
+    } catch (error) {
+      console.error('Error deleting agent:', error);
+      toast.error('Error al eliminar el agente. Por favor intente nuevamente.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getPlatformIcon = (platform: string) => {
@@ -230,6 +259,39 @@ const ChatAgentsSection: React.FC = () => {
           {agent.status}
         </span>
       ),
+    },
+    {
+      key: 'actions',
+      header: <div className="text-right">Acciones</div>,
+      cell: (agent: any) => (
+        <div className="flex justify-end space-x-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleEditAgent(agent);
+            }}
+            title="Editar"
+          >
+            <Edit size={16} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleDeleteAgent(agent.id);
+            }}
+            title="Eliminar"
+          >
+            <Trash size={16} />
+          </Button>
+        </div>
+      ),
+      className: "text-right",
     },
   ];
 
