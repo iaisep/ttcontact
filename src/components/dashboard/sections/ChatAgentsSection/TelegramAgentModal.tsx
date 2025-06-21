@@ -32,6 +32,13 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
     webhookPath: ''
   });
 
+  const handleWebhookPathChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Solo permitir letras y números (sin espacios ni caracteres especiales)
+    const filteredValue = value.replace(/[^a-zA-Z0-9]/g, '');
+    setFormData(prev => ({...prev, webhookPath: filteredValue}));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -128,10 +135,13 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
               <Input
                 id="webhookPath"
                 value={formData.webhookPath}
-                onChange={(e) => setFormData(prev => ({...prev, webhookPath: e.target.value}))}
+                onChange={handleWebhookPathChange}
                 placeholder="telegram1"
                 required
               />
+              <p className="text-sm text-muted-foreground">
+                Solo se permiten letras y números (sin espacios ni caracteres especiales)
+              </p>
             </div>
           </div>
 
