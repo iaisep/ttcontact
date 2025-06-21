@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -172,7 +171,7 @@ const ChatAgentsSection: React.FC = () => {
       const response = await fetch(`https://chatwoot.totalcontact.com.mx/platform/api/v1/agent_bots/${agentId}`, {
         method: 'DELETE',
         headers: {
-          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          'api_access_token': 'C4dZzmKiWBTcXrvyWSxj5dLw',
           'Content-Type': 'application/json'
         }
       });
