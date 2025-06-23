@@ -11,6 +11,11 @@ const ChatAgentConfigPage: React.FC = () => {
   const navigate = useNavigate();
   const { agent, isLoading, error } = useChatAgentDetails(agentId);
 
+  console.log('ChatAgentConfigPage - agentId:', agentId);
+  console.log('ChatAgentConfigPage - agent:', agent);
+  console.log('ChatAgentConfigPage - isLoading:', isLoading);
+  console.log('ChatAgentConfigPage - error:', error);
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-96">
@@ -30,7 +35,9 @@ const ChatAgentConfigPage: React.FC = () => {
         </div>
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">Error</h2>
-          <p className="text-muted-foreground">No se pudo cargar la información del agente.</p>
+          <p className="text-muted-foreground">
+            {error || 'No se pudo cargar la información del agente.'}
+          </p>
         </div>
       </div>
     );

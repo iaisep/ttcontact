@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,35 +22,52 @@ const ChatAgentConfig: React.FC<ChatAgentConfigProps> = ({ agent }) => {
   const [prompt, setPrompt] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
 
+  console.log('ChatAgentConfig - agent data:', agent);
+
   const handlePromptUpdate = async () => {
     if (!prompt.trim()) {
       toast.error('El prompt no puede estar vacío');
       return;
     }
 
+    console.log('Updating prompt for agent:', agent.name);
+    console.log('Prompt content:', prompt);
+    console.log('Webhook URL:', agent.outgoing_url);
+
     setIsUpdating(true);
     
     try {
+      const payload = {
+        name: agent.name,
+        prompt: prompt,
+        path_url_large: agent.outgoing_url
+      };
+
+      console.log('Sending payload:', payload);
+
       const response = await fetch('https://flow.totalcontact.com.mx/webhook/prompts_updates', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          name: agent.name,
-          prompt: prompt,
-          path_url_large: agent.outgoing_url
-        })
+        body: JSON.stringify(payload)
       });
 
+      console.log('Prompt update response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.status === 429) {
+          throw new Error('Demasiadas solicitudes. Por favor intenta nuevamente en unos momentos.');
+        }
+        throw new Error(`Error del servidor: ${response.status}`);
       }
 
       toast.success('Prompt actualizado exitosamente');
+      console.log('Prompt updated successfully');
     } catch (error) {
       console.error('Error updating prompt:', error);
-      toast.error('Error al actualizar el prompt');
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      toast.error(`Error al actualizar el prompt: ${errorMessage}`);
     } finally {
       setIsUpdating(false);
     }
