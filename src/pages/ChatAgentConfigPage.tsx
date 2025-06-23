@@ -1,0 +1,258 @@
+
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+interface ChatAgent {
+  id: string;
+  name: string;
+  platform: string;
+  status: string;
+  description: string;
+  lastActivity: string;
+  messagesCount: number;
+  avatar: string;
+  prompt?: string;
+  path_url_large?: string;
+}
+
+const ChatAgentConfigPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [agent, setAgent] = useState<ChatAgent | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [prompt, setPrompt] = useState('');
+  const [pathUrl, setPathUrl] = useState('');
+
+  useEffect(() => {
+    fetchAgentDetails();
+  }, [id]);
+
+  const fetchAgentDetails = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/agent_bots', {
+        method: 'GET',
+        headers: {
+          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const agents = data.payload || data || [];
+      const selectedAgent = agents.find((a: any) => a.id?.toString() === id);
+      
+      if (selectedAgent) {
+        const transformedAgent: ChatAgent = {
+          id: selectedAgent.id?.toString() || id || '',
+          name: selectedAgent.name || selectedAgent.bot_name || 'Unknown Agent',
+          platform: selectedAgent.platform || selectedAgent.channel_type || 'Unknown',
+          status: selectedAgent.status || (selectedAgent.active ? 'active' : 'inactive'),
+          description: selectedAgent.description || selectedAgent.bot_description || 'No description available',
+          lastActivity: selectedAgent.updated_at || selectedAgent.last_activity || new Date().toISOString(),
+          messagesCount: selectedAgent.messages_count || selectedAgent.conversation_count || 0,
+          avatar: getPlatformIcon(selectedAgent.platform || selectedAgent.channel_type || 'Unknown'),
+          prompt: selectedAgent.prompt || '',
+          path_url_large: selectedAgent.path_url_large || ''
+        };
+        
+        setAgent(transformedAgent);
+        setPrompt(transformedAgent.prompt || '');
+        setPathUrl(transformedAgent.path_url_large || '');
+      }
+    } catch (error) {
+      console.error('Error fetching agent details:', error);
+      toast.error('Error al cargar los detalles del agente');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getPlatformIcon = (platform: string) => {
+    switch (platform?.toLowerCase()) {
+      case 'whatsapp':
+        return '💬';
+      case 'telegram':
+        return '✈️';
+      case 'sms':
+        return '📱';
+      case 'facebook messenger':
+      case 'facebook':
+        return '📘';
+      case 'discord':
+        return '🎮';
+      case 'instagram':
+        return '📷';
+      case 'twitter':
+        return '🐦';
+      default:
+        return '🤖';
+    }
+  };
+
+  const handleSavePrompt = async () => {
+    if (!agent) return;
+
+    setIsSaving(true);
+    try {
+      const payload = {
+        name: agent.name,
+        prompt: prompt,
+        path_url_large: pathUrl
+      };
+
+      const response = await fetch('https://flow.totalcontact.com.mx/webhook/prompts_updates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      toast.success('Prompt actualizado exitosamente');
+    } catch (error) {
+      console.error('Error updating prompt:', error);
+      toast.error('Error al actualizar el prompt');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleBack = () => {
+    navigate('/dashboard', { state: { activeSection: 'chat-agents' } });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!agent) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-4">Agente no encontrado</h2>
+          <Button onClick={handleBack}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" onClick={handleBack}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Volver a Chat Agents
+        </Button>
+      </div>
+
+      {/* Agent Info Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3">
+            <span className="text-2xl">{agent.avatar}</span>
+            <div>
+              <h1 className="text-2xl font-bold">{agent.name}</h1>
+              <p className="text-sm text-gray-500">{agent.platform} • {agent.status}</p>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <span className="font-medium">Descripción:</span>
+              <p className="text-gray-600">{agent.description}</p>
+            </div>
+            <div>
+              <span className="font-medium">Mensajes:</span>
+              <p className="text-gray-600">{agent.messagesCount}</p>
+            </div>
+            <div>
+              <span className="font-medium">Última actividad:</span>
+              <p className="text-gray-600">{new Date(agent.lastActivity).toLocaleDateString()}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Prompt Configuration */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Configuración del Prompt</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Prompt del Agente
+            </label>
+            <Textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Ingresa el prompt para el agente..."
+              rows={8}
+              className="resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              URL del Webhook
+            </label>
+            <Input
+              value={pathUrl}
+              onChange={(e) => setPathUrl(e.target.value)}
+              placeholder="http://n8n:5678/webhook/..."
+            />
+          </div>
+
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleSavePrompt} 
+              disabled={isSaving}
+              className="min-w-32"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Guardar Prompt
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default ChatAgentConfigPage;
