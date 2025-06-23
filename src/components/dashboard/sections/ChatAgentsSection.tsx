@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, RefreshCw, MessageCircle, ChevronDown, Edit, Trash } from 'lucide-react';
@@ -27,7 +26,6 @@ interface ChatAgent {
 
 const ChatAgentsSection: React.FC = () => {
   const { t } = useLanguage();
-  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -112,10 +110,6 @@ const ChatAgentsSection: React.FC = () => {
         agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         agent.platform.toLowerCase().includes(searchQuery.toLowerCase())
       );
-
-  const handleRowClick = (agent: ChatAgent) => {
-    navigate(`/chat-agents/${agent.id}/config`);
-  };
 
   const handleAddChatAgent = (platform: string) => {
     console.log(`Adding new chat agent for ${platform}...`);
@@ -374,7 +368,7 @@ const ChatAgentsSection: React.FC = () => {
         onPageSizeChange={setPageSize}
         initialPageSize={pageSize}
         pageSizeOptions={[5, 10, 25, 50]}
-        onRowClick={handleRowClick}
+        onRowClick={(agent) => console.log('View chat agent:', agent)}
         emptyState={
           <div className="p-8 text-center">
             <MessageCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />

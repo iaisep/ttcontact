@@ -1,55 +1,43 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { LanguageProvider } from "./context/LanguageContext";
-import { ApiProvider } from "./context/ApiContext";
-import { HelmetProvider } from 'react-helmet-async';
-import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
-import AgentDetailPage from "./pages/AgentDetailPage";
-import AgentEditPage from "./pages/AgentEditPage";
-import AgentsPage from "./pages/AgentsPage";
-import AgentsListPage from "./pages/AgentsListPage";
-import ChatAgentConfigPage from "./pages/ChatAgentConfigPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import HelpCenterPage from "./pages/HelpCenterPage";
-import CRMPage from "./pages/CRMPage";
-import NotFound from "./pages/NotFound";
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Dashboard from './pages/Dashboard';
+import NotFound from './pages/NotFound';
+import AgentEditPage from './pages/AgentEditPage';
+import AgentsListPage from './pages/AgentsListPage';
+import AgentDetailPage from './pages/AgentDetailPage';
+import { useLanguage } from '@/context/LanguageContext';
+import LandingPage from './pages/LandingPage';
+import Index from './pages/Index';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import HelpCenterPage from './pages/HelpCenterPage';
+import DocumentationPage from './pages/DocumentationPage';
+import GuidesPage from './pages/GuidesPage';
+import BlogPage from './pages/BlogPage';
+import ExamplesPage from './pages/ExamplesPage';
+import CRMPage from './pages/CRMPage';
 
-const queryClient = new QueryClient();
-
-function App() {
+const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
-        <LanguageProvider>
-          <ApiProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/agentes" element={<AgentsListPage />} />
-                  <Route path="/agentes/:agentId" element={<AgentDetailPage />} />
-                  <Route path="/agentes/:agentId/edit" element={<AgentEditPage />} />
-                  <Route path="/chat-agents/:agentId/config" element={<ChatAgentConfigPage />} />
-                  <Route path="/reset-password" element={<ResetPasswordPage />} />
-                  <Route path="/help-center" element={<HelpCenterPage />} />
-                  <Route path="/crm" element={<CRMPage />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </TooltipProvider>
-          </ApiProvider>
-        </LanguageProvider>
-      </HelmetProvider>
-    </QueryClientProvider>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<Index />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/agentes" element={<AgentsListPage />} />
+      <Route path="/agentes/:slug/edit" element={<AgentEditPage />} />
+      <Route path="/agentes/:slug" element={<AgentDetailPage />} />
+      <Route path="/agentes/new" element={<AgentEditPage />} />
+      <Route path="/help-center" element={<HelpCenterPage />} />
+      <Route path="/docs" element={<Navigate to="/help-center" replace />} />
+      <Route path="/documentation" element={<DocumentationPage />} />
+      <Route path="/guides" element={<GuidesPage />} />
+      <Route path="/blog" element={<BlogPage />} />
+      <Route path="/examples" element={<ExamplesPage />} />
+      <Route path="/crm" element={<CRMPage />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
-}
+};
 
 export default App;
