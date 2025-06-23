@@ -16,6 +16,10 @@ const ChatAgentConfigPage: React.FC = () => {
   console.log('ChatAgentConfigPage - isLoading:', isLoading);
   console.log('ChatAgentConfigPage - error:', error);
 
+  const handleBack = () => {
+    navigate('/dashboard', { state: { activeSection: 'chat-agents' } });
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-96">
@@ -28,7 +32,7 @@ const ChatAgentConfigPage: React.FC = () => {
     return (
       <div className="p-6">
         <div className="flex items-center mb-4">
-          <Button variant="ghost" onClick={() => navigate('/dashboard')} className="mr-2">
+          <Button variant="ghost" onClick={handleBack} className="mr-2">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver
           </Button>
@@ -46,7 +50,7 @@ const ChatAgentConfigPage: React.FC = () => {
   return (
     <div className="p-6">
       <div className="flex items-center mb-4">
-        <Button variant="ghost" onClick={() => navigate('/dashboard')} className="mr-2">
+        <Button variant="ghost" onClick={handleBack} className="mr-2">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Volver
         </Button>
