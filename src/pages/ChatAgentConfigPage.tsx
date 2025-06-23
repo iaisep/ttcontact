@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ const ChatAgentConfigPage = () => {
   const [agent, setAgent] = useState<ChatAgent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingPrompt, setIsLoadingPrompt] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [pathUrl, setPathUrl] = useState('');
 
@@ -63,18 +65,54 @@ const ChatAgentConfigPage = () => {
           messagesCount: selectedAgent.messages_count || selectedAgent.conversation_count || 0,
           avatar: getPlatformIcon(selectedAgent.platform || selectedAgent.channel_type || 'Unknown'),
           prompt: selectedAgent.prompt || '',
-          path_url_large: selectedAgent.path_url_large || ''
+          path_url_large: selectedAgent.outgoing_url || selectedAgent.path_url_large || ''
         };
         
         setAgent(transformedAgent);
-        setPrompt(transformedAgent.prompt || '');
         setPathUrl(transformedAgent.path_url_large || '');
+        
+        // Fetch the current prompt from the webhook endpoint
+        if (transformedAgent.path_url_large) {
+          await fetchCurrentPrompt(transformedAgent.path_url_large);
+        } else {
+          setPrompt(transformedAgent.prompt || '');
+        }
       }
     } catch (error) {
       console.error('Error fetching agent details:', error);
       toast.error('Error al cargar los detalles del agente');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchCurrentPrompt = async (webhookUrl: string) => {
+    setIsLoadingPrompt(true);
+    try {
+      const response = await fetch('https://flow.totalcontact.com.mx/webhook/get_propmt_agent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          url: webhookUrl
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.prompt_final) {
+        setPrompt(data.prompt_final);
+      }
+    } catch (error) {
+      console.error('Error fetching current prompt:', error);
+      // Si falla, usar el prompt básico del agente
+      setPrompt(agent?.prompt || '');
+    } finally {
+      setIsLoadingPrompt(false);
     }
   };
 
@@ -209,19 +247,26 @@ const ChatAgentConfigPage = () => {
             <label className="block text-sm font-medium mb-2">
               Prompt del Agente
             </label>
-            <Textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Ingresa el prompt para el agente..."
-              rows={8}
-              className="resize-none"
-            />
+            {isLoadingPrompt ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                <span>Cargando prompt actual...</span>
+              </div>
+            ) : (
+              <Textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Ingresa el prompt para el agente..."
+                rows={8}
+                className="resize-none"
+              />
+            )}
           </div>
 
           <div className="flex justify-end">
             <Button 
               onClick={handleSavePrompt} 
-              disabled={isSaving}
+              disabled={isSaving || isLoadingPrompt}
               className="min-w-32"
             >
               {isSaving ? (
