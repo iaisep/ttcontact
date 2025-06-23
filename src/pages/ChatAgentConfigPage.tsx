@@ -17,7 +17,16 @@ const ChatAgentConfigPage: React.FC = () => {
   console.log('ChatAgentConfigPage - error:', error);
 
   const handleBack = () => {
-    navigate('/dashboard', { state: { activeSection: 'chat-agents' } });
+    // Navigate to dashboard and ensure Chat Agents section is active
+    navigate('/dashboard', { 
+      state: { activeSection: 'chat-agents' }, 
+      replace: true 
+    });
+    
+    // Also trigger a page refresh to ensure the section loads properly
+    setTimeout(() => {
+      window.location.hash = '#chat-agents';
+    }, 100);
   };
 
   if (isLoading) {
