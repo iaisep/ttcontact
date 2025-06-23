@@ -23,7 +23,6 @@ export const useChatAgentDetails = (agentId?: string) => {
     }
 
     const fetchAgentDetails = async () => {
-      console.log('Fetching agent details for ID:', agentId);
       setIsLoading(true);
       setError(null);
       
@@ -36,31 +35,23 @@ export const useChatAgentDetails = (agentId?: string) => {
           }
         });
 
-        console.log('API Response status:', response.status);
-
         if (!response.ok) {
-          if (response.status === 429) {
-            throw new Error('Demasiadas solicitudes. Por favor intenta nuevamente en unos momentos.');
-          }
-          throw new Error(`Error del servidor: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('Agent details received:', data);
+        console.log('Agent details:', data);
         
         setAgent(data);
       } catch (error) {
         console.error('Error fetching agent details:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Error desconocido al cargar el agente';
-        setError(errorMessage);
+        setError('Failed to fetch agent details');
       } finally {
         setIsLoading(false);
       }
     };
 
-    // Add a small delay to help with rate limiting
-    const timeoutId = setTimeout(fetchAgentDetails, 100);
-    return () => clearTimeout(timeoutId);
+    fetchAgentDetails();
   }, [agentId]);
 
   return { agent, isLoading, error };

@@ -11,24 +11,6 @@ const ChatAgentConfigPage: React.FC = () => {
   const navigate = useNavigate();
   const { agent, isLoading, error } = useChatAgentDetails(agentId);
 
-  console.log('ChatAgentConfigPage - agentId:', agentId);
-  console.log('ChatAgentConfigPage - agent:', agent);
-  console.log('ChatAgentConfigPage - isLoading:', isLoading);
-  console.log('ChatAgentConfigPage - error:', error);
-
-  const handleBack = () => {
-    // Navigate to dashboard and ensure Chat Agents section is active
-    navigate('/dashboard', { 
-      state: { activeSection: 'chat-agents' }, 
-      replace: true 
-    });
-    
-    // Also trigger a page refresh to ensure the section loads properly
-    setTimeout(() => {
-      window.location.hash = '#chat-agents';
-    }, 100);
-  };
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-96">
@@ -41,16 +23,14 @@ const ChatAgentConfigPage: React.FC = () => {
     return (
       <div className="p-6">
         <div className="flex items-center mb-4">
-          <Button variant="ghost" onClick={handleBack} className="mr-2">
+          <Button variant="ghost" onClick={() => navigate('/dashboard')} className="mr-2">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver
           </Button>
         </div>
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-2">Error</h2>
-          <p className="text-muted-foreground">
-            {error || 'No se pudo cargar la información del agente.'}
-          </p>
+          <p className="text-muted-foreground">No se pudo cargar la información del agente.</p>
         </div>
       </div>
     );
@@ -59,7 +39,7 @@ const ChatAgentConfigPage: React.FC = () => {
   return (
     <div className="p-6">
       <div className="flex items-center mb-4">
-        <Button variant="ghost" onClick={handleBack} className="mr-2">
+        <Button variant="ghost" onClick={() => navigate('/dashboard')} className="mr-2">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Volver
         </Button>

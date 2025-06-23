@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./context/LanguageContext";
 import { ApiProvider } from "./context/ApiContext";
 import { HelmetProvider } from 'react-helmet-async';
@@ -30,18 +30,20 @@ function App() {
             <TooltipProvider>
               <Toaster />
               <Sonner />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/agentes" element={<AgentsListPage />} />
-                <Route path="/agentes/:agentId" element={<AgentDetailPage />} />
-                <Route path="/agentes/:agentId/edit" element={<AgentEditPage />} />
-                <Route path="/chat-agents/:agentId/config" element={<ChatAgentConfigPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="/help-center" element={<HelpCenterPage />} />
-                <Route path="/crm" element={<CRMPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/agentes" element={<AgentsListPage />} />
+                  <Route path="/agentes/:agentId" element={<AgentDetailPage />} />
+                  <Route path="/agentes/:agentId/edit" element={<AgentEditPage />} />
+                  <Route path="/chat-agents/:agentId/config" element={<ChatAgentConfigPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
+                  <Route path="/help-center" element={<HelpCenterPage />} />
+                  <Route path="/crm" element={<CRMPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
             </TooltipProvider>
           </ApiProvider>
         </LanguageProvider>
