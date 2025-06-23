@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -216,17 +215,6 @@ const ChatAgentConfigPage = () => {
               placeholder="Ingresa el prompt para el agente..."
               rows={8}
               className="resize-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              URL del Webhook
-            </label>
-            <Input
-              value={pathUrl}
-              onChange={(e) => setPathUrl(e.target.value)}
-              placeholder="http://n8n:5678/webhook/..."
             />
           </div>
 
