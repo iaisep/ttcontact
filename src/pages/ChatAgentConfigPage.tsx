@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -65,7 +66,7 @@ const ChatAgentConfigPage = () => {
           messagesCount: selectedAgent.messages_count || selectedAgent.conversation_count || 0,
           avatar: getPlatformIcon(selectedAgent.platform || selectedAgent.channel_type || 'Unknown'),
           prompt: selectedAgent.prompt || '',
-          path_url_large: selectedAgent.outgoing_url || selectedAgent.path_url_large || ''
+          path_url_large: selectedAgent.outgoing_url || ''
         };
         
         setAgent(transformedAgent);
@@ -289,3 +290,4 @@ const ChatAgentConfigPage = () => {
 };
 
 export default ChatAgentConfigPage;
+
