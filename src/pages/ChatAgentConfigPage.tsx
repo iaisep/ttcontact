@@ -1,10 +1,12 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Save, Loader2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ChatAgent {
@@ -173,12 +175,6 @@ const ChatAgentConfigPage = () => {
     navigate('/dashboard', { state: { activeSection: 'chat-agents' } });
   };
 
-  const handleOpenInNewWindow = () => {
-    const currentUrl = window.location.href;
-    window.open(currentUrl, '_blank');
-    toast.success('Abriendo configuración en nueva ventana');
-  };
-
   if (isLoading) {
     return (
       <div className="container mx-auto p-6">
@@ -206,19 +202,10 @@ const ChatAgentConfigPage = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={handleBack}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a Chat Agents
-          </Button>
-        </div>
-        <Button 
-          variant="outline" 
-          onClick={handleOpenInNewWindow}
-          title="Abrir en nueva ventana"
-        >
-          <ExternalLink className="h-4 w-4" />
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" onClick={handleBack}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Volver a Chat Agents
         </Button>
       </div>
 
@@ -303,3 +290,4 @@ const ChatAgentConfigPage = () => {
 };
 
 export default ChatAgentConfigPage;
+
