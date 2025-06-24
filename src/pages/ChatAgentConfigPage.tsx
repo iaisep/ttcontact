@@ -1,12 +1,11 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ArrowLeft, Save, Loader2, Maximize2, Minimize2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ChatAgent {
@@ -29,6 +28,7 @@ const ChatAgentConfigPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingPrompt, setIsLoadingPrompt] = useState(false);
+  const [isExpandedView, setIsExpandedView] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [pathUrl, setPathUrl] = useState('');
 
@@ -175,6 +175,10 @@ const ChatAgentConfigPage = () => {
     navigate('/dashboard', { state: { activeSection: 'chat-agents' } });
   };
 
+  const toggleExpandedView = () => {
+    setIsExpandedView(!isExpandedView);
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto p-6">
@@ -200,94 +204,170 @@ const ChatAgentConfigPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={handleBack}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Volver a Chat Agents
-        </Button>
+    <>
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={handleBack}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver a Chat Agents
+          </Button>
+        </div>
+
+        {/* Agent Info Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <span className="text-2xl">{agent.avatar}</span>
+              <div>
+                <h1 className="text-2xl font-bold">{agent.name}</h1>
+                <p className="text-sm text-gray-500">{agent.platform} • {agent.status}</p>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <span className="font-medium">Descripción:</span>
+                <p className="text-gray-600">{agent.description}</p>
+              </div>
+              <div>
+                <span className="font-medium">Mensajes:</span>
+                <p className="text-gray-600">{agent.messagesCount}</p>
+              </div>
+              <div>
+                <span className="font-medium">Última actividad:</span>
+                <p className="text-gray-600">{new Date(agent.lastActivity).toLocaleDateString()}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Prompt Configuration */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Configuración del Prompt</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleExpandedView}
+                className="flex items-center gap-2"
+              >
+                <Maximize2 className="h-4 w-4" />
+                Ampliar Vista
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Prompt del Agente
+              </label>
+              {isLoadingPrompt ? (
+                <div className="flex items-center justify-center p-8">
+                  <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                  <span>Cargando prompt actual...</span>
+                </div>
+              ) : (
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Ingresa el prompt para el agente..."
+                  rows={8}
+                  className="resize-none"
+                />
+              )}
+            </div>
+
+            <div className="flex justify-end">
+              <Button 
+                onClick={handleSavePrompt} 
+                disabled={isSaving || isLoadingPrompt}
+                className="min-w-32"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Guardar Prompt
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Agent Info Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <span className="text-2xl">{agent.avatar}</span>
-            <div>
-              <h1 className="text-2xl font-bold">{agent.name}</h1>
-              <p className="text-sm text-gray-500">{agent.platform} • {agent.status}</p>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span className="font-medium">Descripción:</span>
-              <p className="text-gray-600">{agent.description}</p>
-            </div>
-            <div>
-              <span className="font-medium">Mensajes:</span>
-              <p className="text-gray-600">{agent.messagesCount}</p>
-            </div>
-            <div>
-              <span className="font-medium">Última actividad:</span>
-              <p className="text-gray-600">{new Date(agent.lastActivity).toLocaleDateString()}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Prompt Configuration */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Configuración del Prompt</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Prompt del Agente
-            </label>
-            {isLoadingPrompt ? (
-              <div className="flex items-center justify-center p-8">
-                <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                <span>Cargando prompt actual...</span>
-              </div>
-            ) : (
-              <Textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Ingresa el prompt para el agente..."
-                rows={8}
-                className="resize-none"
-              />
-            )}
-          </div>
-
-          <div className="flex justify-end">
-            <Button 
-              onClick={handleSavePrompt} 
-              disabled={isSaving || isLoadingPrompt}
-              className="min-w-32"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Guardando...
-                </>
+      {/* Expanded View Modal */}
+      <Dialog open={isExpandedView} onOpenChange={setIsExpandedView}>
+        <DialogContent className="max-w-6xl h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="flex items-center justify-between">
+              <span>Prompt del Agente - {agent.name}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleExpandedView}
+                className="flex items-center gap-2"
+              >
+                <Minimize2 className="h-4 w-4" />
+                Cerrar Vista Ampliada
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 flex flex-col space-y-4 min-h-0">
+            <div className="flex-1 flex flex-col">
+              <label className="block text-sm font-medium mb-2">
+                Prompt del Agente
+              </label>
+              {isLoadingPrompt ? (
+                <div className="flex items-center justify-center flex-1">
+                  <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                  <span>Cargando prompt actual...</span>
+                </div>
               ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Guardar Prompt
-                </>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Ingresa el prompt para el agente..."
+                  className="flex-1 resize-none min-h-[500px] font-mono text-sm"
+                />
               )}
-            </Button>
+            </div>
+
+            <div className="flex justify-end gap-2 flex-shrink-0">
+              <Button variant="outline" onClick={toggleExpandedView}>
+                Cerrar
+              </Button>
+              <Button 
+                onClick={handleSavePrompt} 
+                disabled={isSaving || isLoadingPrompt}
+                className="min-w-32"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Guardar Prompt
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
 export default ChatAgentConfigPage;
-
