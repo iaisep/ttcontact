@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, RefreshCw, MessageCircle, ChevronDown, Edit, Trash } from 'lucide-react';
+import { Plus, Search, RefreshCw, MessageCircle, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { TableWithPagination } from '@/components/ui/table-with-pagination';
 import {
@@ -280,7 +280,7 @@ const ChatAgentsSection: React.FC = () => {
             }}
             title="Editar"
           >
-            <Edit size={16} />
+            Editar
           </Button>
           <Button
             variant="ghost"
@@ -292,7 +292,7 @@ const ChatAgentsSection: React.FC = () => {
             }}
             title="Eliminar"
           >
-            <Trash size={16} />
+            Eliminar
           </Button>
         </div>
       ),
