@@ -47,7 +47,7 @@ const TelegramAgentModal: React.FC<TelegramAgentModalProps> = ({
     }
 
     const payload = {
-      name: `Agente_mensajeria_telegram_${formData.nameSuffix}`,
+      name: formData.nameSuffix,
       description: formData.description,
       outgoing_url: `http://n8n:5678/webhook/${formData.webhookPath}`,
       account_id: "1"
