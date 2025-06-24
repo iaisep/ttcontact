@@ -157,12 +157,6 @@ const ChatAgentsSection: React.FC = () => {
     fetchChatAgents();
   };
 
-  const handleEditAgent = (agent: ChatAgent) => {
-    console.log('Editing chat agent:', agent);
-    // TODO: Implement edit functionality
-    toast.info('Funcionalidad de edición próximamente disponible');
-  };
-
   const handleDeleteAgent = async (agentId: string) => {
     if (!window.confirm('¿Estás seguro de que quieres eliminar este agente?')) {
       return;
@@ -269,19 +263,7 @@ const ChatAgentsSection: React.FC = () => {
       key: 'actions',
       header: <div className="text-right">Acciones</div>,
       cell: (agent: any) => (
-        <div className="flex justify-end space-x-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e: React.MouseEvent) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleEditAgent(agent);
-            }}
-            title="Editar"
-          >
-            <Edit size={16} />
-          </Button>
+        <div className="flex justify-end">
           <Button
             variant="ghost"
             size="sm"
