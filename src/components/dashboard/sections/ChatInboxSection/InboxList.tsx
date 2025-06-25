@@ -6,9 +6,10 @@ import type { Inbox } from './types';
 
 interface InboxListProps {
   inboxes: Inbox[];
+  onConfigureInbox?: (inbox: Inbox) => void;
 }
 
-const InboxList: React.FC<InboxListProps> = ({ inboxes }) => {
+const InboxList: React.FC<InboxListProps> = ({ inboxes, onConfigureInbox }) => {
   const getPlatformColor = (platform: string) => {
     switch (platform.toLowerCase()) {
       case 'telegram':
@@ -19,6 +20,12 @@ const InboxList: React.FC<InboxListProps> = ({ inboxes }) => {
         return 'text-gray-600';
       default:
         return 'text-gray-600';
+    }
+  };
+
+  const handleConfigureClick = (inbox: Inbox) => {
+    if (onConfigureInbox) {
+      onConfigureInbox(inbox);
     }
   };
 
@@ -63,7 +70,12 @@ const InboxList: React.FC<InboxListProps> = ({ inboxes }) => {
 
           {/* Right side - Action buttons */}
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-600">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-gray-400 hover:text-gray-600"
+              onClick={() => handleConfigureClick(inbox)}
+            >
               <Settings className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-600">
