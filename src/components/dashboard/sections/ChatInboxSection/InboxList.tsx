@@ -7,9 +7,14 @@ import type { Inbox } from './types';
 interface InboxListProps {
   inboxes: Inbox[];
   onConfigureInbox?: (inbox: Inbox) => void;
+  onDeleteInbox?: (inbox: Inbox) => void;
 }
 
-const InboxList: React.FC<InboxListProps> = ({ inboxes, onConfigureInbox }) => {
+const InboxList: React.FC<InboxListProps> = ({ 
+  inboxes, 
+  onConfigureInbox, 
+  onDeleteInbox 
+}) => {
   const getPlatformColor = (platform: string) => {
     switch (platform.toLowerCase()) {
       case 'telegram':
@@ -26,6 +31,12 @@ const InboxList: React.FC<InboxListProps> = ({ inboxes, onConfigureInbox }) => {
   const handleConfigureClick = (inbox: Inbox) => {
     if (onConfigureInbox) {
       onConfigureInbox(inbox);
+    }
+  };
+
+  const handleDeleteClick = (inbox: Inbox) => {
+    if (onDeleteInbox) {
+      onDeleteInbox(inbox);
     }
   };
 
@@ -62,9 +73,17 @@ const InboxList: React.FC<InboxListProps> = ({ inboxes, onConfigureInbox }) => {
               <h3 className="text-sm font-medium text-gray-900 dark:text-white">
                 {inbox.name}
               </h3>
-              <p className={`text-sm ${getPlatformColor(inbox.platform)}`}>
-                {inbox.platform}
-              </p>
+              <div className="flex items-center space-x-2">
+                <p className={`text-sm ${getPlatformColor(inbox.platform)}`}>
+                  {inbox.platform}
+                </p>
+                {inbox.url && (
+                  <span className="text-xs text-gray-500">• {inbox.url}</span>
+                )}
+                {inbox.phoneNumber && (
+                  <span className="text-xs text-gray-500">• {inbox.phoneNumber}</span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -78,7 +97,12 @@ const InboxList: React.FC<InboxListProps> = ({ inboxes, onConfigureInbox }) => {
             >
               <Settings className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-600">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-gray-400 hover:text-red-600"
+              onClick={() => handleDeleteClick(inbox)}
+            >
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>

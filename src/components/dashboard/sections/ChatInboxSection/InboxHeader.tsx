@@ -1,32 +1,48 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Search } from 'lucide-react';
 
 interface InboxHeaderProps {
   onAddInbox: () => void;
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
 }
 
-const InboxHeader: React.FC<InboxHeaderProps> = ({ onAddInbox }) => {
+const InboxHeader: React.FC<InboxHeaderProps> = ({ 
+  onAddInbox, 
+  searchQuery = '',
+  setSearchQuery 
+}) => {
   return (
-    <div className="flex justify-between items-start">
+    <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
       <div>
-        <h1 className="text-2xl font-bold mb-2">Inboxes</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl">
-          A channel is the mode of communication your customer chooses to interact with you. An inbox is where you
-          manage interactions for a specific channel. It can include communications from various sources such as email, live
-          chat, and social media.
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Inboxes</h1>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Manage your communication channels
         </p>
-        <div className="mt-2">
-          <button className="text-blue-600 text-sm hover:underline">
-            Learn more about inboxes →
-          </button>
-        </div>
       </div>
-      <Button className="bg-blue-600 hover:bg-blue-700" onClick={onAddInbox}>
-        <Plus className="mr-2 h-4 w-4" />
-        Add Inbox
-      </Button>
+      
+      <div className="flex items-center space-x-4">
+        {setSearchQuery && (
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Search inboxes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 w-64"
+            />
+          </div>
+        )}
+        
+        <Button onClick={onAddInbox} className="bg-blue-600 hover:bg-blue-700">
+          <Plus className="mr-2 h-4 w-4" />
+          Add Inbox
+        </Button>
+      </div>
     </div>
   );
 };

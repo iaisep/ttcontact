@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useInboxManager } from './ChatInboxSection/useInboxManager';
+import { useChatwootInboxManager } from './ChatInboxSection/useChatwootInboxManager';
 import InboxHeader from './ChatInboxSection/InboxHeader';
 import InboxList from './ChatInboxSection/InboxList';
 import type { ChatInboxSectionProps } from './ChatInboxSection/types';
@@ -10,11 +10,15 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
   const [selectedInbox, setSelectedInbox] = useState<Inbox | null>(null);
   
   const {
-    staticInboxes,
-    dynamicInboxes,
-    allInboxes,
-    filteredInboxes
-  } = useInboxManager(onInboxCreated);
+    searchQuery,
+    setSearchQuery,
+    inboxes,
+    filteredInboxes,
+    loading,
+    error,
+    loadInboxes,
+    deleteInbox,
+  } = useChatwootInboxManager(onInboxCreated);
 
   const handleAddInbox = () => {
     if (onNavigateToAddInbox) {
@@ -28,6 +32,16 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
 
   const handleBackFromConfig = () => {
     setSelectedInbox(null);
+  };
+
+  const handleDeleteInbox = async (inbox: Inbox) => {
+    if (confirm(`Are you sure you want to delete the inbox "${inbox.name}"?`)) {
+      try {
+        await deleteInbox(inbox.id);
+      } catch (error) {
+        console.error('Failed to delete inbox:', error);
+      }
+    }
   };
 
   // Si hay un inbox seleccionado, mostrar su configuración
@@ -131,18 +145,54 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
     );
   }
 
+  if (loading) {
+    return (
+      <div className="p-6 space-y-6">
+        <InboxHeader onAddInbox={handleAddInbox} />
+        <div className="animate-pulse space-y-4">
+          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-20 bg-gray-200 rounded"></div>
+          <div className="h-20 bg-gray-200 rounded"></div>
+          <div className="h-20 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 space-y-6">
+        <InboxHeader onAddInbox={handleAddInbox} />
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-red-800 font-medium mb-2">Error loading inboxes</h3>
+          <p className="text-red-600 text-sm mb-4">{error}</p>
+          <button
+            onClick={loadInboxes}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-6">
-      <InboxHeader onAddInbox={handleAddInbox} />
+      <InboxHeader 
+        onAddInbox={handleAddInbox}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
 
-      {/* Debug info */}
       <div className="text-xs text-gray-500">
-        Static inboxes: {staticInboxes.length}, Dynamic inboxes: {dynamicInboxes.length}, Total: {allInboxes.length}
+        Total inboxes: {inboxes.length}, Showing: {filteredInboxes.length}
       </div>
 
       <InboxList 
         inboxes={filteredInboxes} 
         onConfigureInbox={handleConfigureInbox}
+        onDeleteInbox={handleDeleteInbox}
       />
     </div>
   );

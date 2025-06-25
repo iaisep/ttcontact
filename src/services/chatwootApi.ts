@@ -1,0 +1,198 @@
+
+const CHATWOOT_API_KEY = 'YZEKfqAJsnEWoshpdRCq9yZn';
+const CHATWOOT_BASE_URL = 'https://app.chatwoot.com/api/v1/accounts/1'; // Replace 1 with actual account ID
+
+interface ChatwootInbox {
+  id: number;
+  name: string;
+  channel_type: string;
+  website_url?: string;
+  welcome_title?: string;
+  welcome_tagline?: string;
+  greeting_enabled?: boolean;
+  greeting_message?: string;
+  phone_number?: string;
+  provider_config?: any;
+  avatar_url?: string;
+}
+
+interface CreateInboxRequest {
+  name: string;
+  channel: {
+    type: 'web_widget' | 'whatsapp' | 'telegram';
+    website_url?: string;
+    welcome_title?: string;
+    welcome_tagline?: string;
+    phone_number?: string;
+    provider?: string;
+    provider_config?: any;
+  };
+}
+
+interface Agent {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+class ChatwootApiService {
+  private baseUrl = CHATWOOT_BASE_URL;
+  private apiKey = CHATWOOT_API_KEY;
+
+  private async makeRequest(endpoint: string, options: RequestInit = {}) {
+    const url = `${this.baseUrl}${endpoint}`;
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${this.apiKey}`,
+      ...options.headers,
+    };
+
+    console.log('Making Chatwoot API request:', { url, method: options.method || 'GET' });
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Chatwoot API error: ${response.status} - ${errorText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Chatwoot API request failed:', error);
+      throw error;
+    }
+  }
+
+  // Get all inboxes
+  async getInboxes(): Promise<ChatwootInbox[]> {
+    const response = await this.makeRequest('/inboxes');
+    return response.payload || [];
+  }
+
+  // Create a new inbox
+  async createInbox(data: CreateInboxRequest): Promise<ChatwootInbox> {
+    const response = await this.makeRequest('/inboxes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.payload;
+  }
+
+  // Update an inbox
+  async updateInbox(inboxId: number, data: Partial<CreateInboxRequest>): Promise<ChatwootInbox> {
+    const response = await this.makeRequest(`/inboxes/${inboxId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    return response.payload;
+  }
+
+  // Delete an inbox
+  async deleteInbox(inboxId: number): Promise<void> {
+    await this.makeRequest(`/inboxes/${inboxId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Get inbox details
+  async getInboxDetails(inboxId: number): Promise<ChatwootInbox> {
+    const response = await this.makeRequest(`/inboxes/${inboxId}`);
+    return response.payload;
+  }
+
+  // Get agents for an inbox
+  async getInboxAgents(inboxId: number): Promise<Agent[]> {
+    const response = await this.makeRequest(`/inboxes/${inboxId}/agents`);
+    return response.payload || [];
+  }
+
+  // Add agent to inbox
+  async addAgentToInbox(inboxId: number, agentIds: number[]): Promise<void> {
+    await this.makeRequest(`/inboxes/${inboxId}/agents`, {
+      method: 'POST',
+      body: JSON.stringify({ agent_ids: agentIds }),
+    });
+  }
+
+  // Remove agent from inbox
+  async removeAgentFromInbox(inboxId: number, agentIds: number[]): Promise<void> {
+    await this.makeRequest(`/inboxes/${inboxId}/agents`, {
+      method: 'DELETE',
+      body: JSON.stringify({ agent_ids: agentIds }),
+    });
+  }
+
+  // Update agent role in inbox
+  async updateAgentRole(inboxId: number, agentId: number, role: string): Promise<void> {
+    await this.makeRequest(`/inboxes/${inboxId}/agents/${agentId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
+    });
+  }
+
+  // Get all agents
+  async getAgents(): Promise<Agent[]> {
+    const response = await this.makeRequest('/agents');
+    return response.payload || [];
+  }
+
+  // Create WhatsApp inbox
+  async createWhatsAppInbox(data: {
+    name: string;
+    phone_number: string;
+    provider?: string;
+    provider_config?: any;
+  }): Promise<ChatwootInbox> {
+    return this.createInbox({
+      name: data.name,
+      channel: {
+        type: 'whatsapp',
+        phone_number: data.phone_number,
+        provider: data.provider,
+        provider_config: data.provider_config,
+      },
+    });
+  }
+
+  // Create Telegram inbox
+  async createTelegramInbox(data: {
+    name: string;
+    bot_token: string;
+  }): Promise<ChatwootInbox> {
+    return this.createInbox({
+      name: data.name,
+      channel: {
+        type: 'telegram',
+        provider_config: {
+          bot_token: data.bot_token,
+        },
+      },
+    });
+  }
+
+  // Create Website inbox
+  async createWebsiteInbox(data: {
+    name: string;
+    website_url: string;
+    welcome_title?: string;
+    welcome_tagline?: string;
+  }): Promise<ChatwootInbox> {
+    return this.createInbox({
+      name: data.name,
+      channel: {
+        type: 'web_widget',
+        website_url: data.website_url,
+        welcome_title: data.welcome_title,
+        welcome_tagline: data.welcome_tagline,
+      },
+    });
+  }
+}
+
+export const chatwootApi = new ChatwootApiService();
+export type { ChatwootInbox, Agent, CreateInboxRequest };

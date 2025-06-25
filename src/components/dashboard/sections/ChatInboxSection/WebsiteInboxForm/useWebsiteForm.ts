@@ -82,22 +82,27 @@ export const useWebsiteForm = () => {
     setIsCreating(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Creating Website inbox with data:', { formData, selectedAgents });
       
-      // Add the new inbox to the global list
-      if ((window as any).addNewInbox) {
-        (window as any).addNewInbox({
+      // Use the Chatwoot API to create the inbox
+      if ((window as any).createWebsiteInbox) {
+        await (window as any).createWebsiteInbox({
           name: formData.websiteName,
-          platform: 'Website',
-          url: formData.websiteDomain
+          websiteUrl: formData.websiteDomain,
+          welcomeTitle: formData.welcomeHeading,
+          welcomeTagline: formData.welcomeTagline,
         });
+        
+        console.log('Website inbox created successfully');
+        onComplete();
+      } else {
+        console.error('createWebsiteInbox function not found on window');
+        throw new Error('Website inbox creation function not available');
       }
       
-      console.log('Website channel created successfully');
-      onComplete();
     } catch (error) {
-      console.error('Error creating website channel:', error);
+      console.error('Error creating Website inbox:', error);
+      throw error;
     } finally {
       setIsCreating(false);
     }

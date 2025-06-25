@@ -58,33 +58,23 @@ export const useTelegramForm = () => {
     try {
       console.log('Creating Telegram inbox with data:', { formData, selectedAgents });
       
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Add the new inbox to the ChatInboxSection
-      const inboxData = {
-        name: formData.inboxName,
-        platform: 'Telegram',
-        botToken: formData.botToken
-      };
-      
-      console.log('Calling addNewInbox with:', inboxData);
-      
-      if ((window as any).addNewInbox) {
-        (window as any).addNewInbox(inboxData);
-        console.log('addNewInbox called successfully');
-      } else {
-        console.error('addNewInbox function not found on window');
-      }
-      
-      // Small delay to ensure state update
-      setTimeout(() => {
-        console.log('Completing form and navigating back');
+      // Use the Chatwoot API to create the inbox
+      if ((window as any).createTelegramInbox) {
+        await (window as any).createTelegramInbox({
+          name: formData.inboxName,
+          botToken: formData.botToken,
+        });
+        
+        console.log('Telegram inbox created successfully');
         onComplete();
-      }, 100);
+      } else {
+        console.error('createTelegramInbox function not found on window');
+        throw new Error('Telegram inbox creation function not available');
+      }
       
     } catch (error) {
       console.error('Error creating Telegram inbox:', error);
+      throw error;
     } finally {
       setIsCreating(false);
     }
