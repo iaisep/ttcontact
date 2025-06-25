@@ -1,11 +1,9 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
+import AgentSelector from '../components/AgentSelector';
 import type { WhatsAppConfigData } from '../types';
 
 interface WhatsAppCollaboratorsTabProps {
@@ -21,9 +19,8 @@ const WhatsAppCollaboratorsTab: React.FC<WhatsAppCollaboratorsTabProps> = ({
   saving,
   onSave
 }) => {
-  const removeAgent = (agentToRemove: string) => {
-    const updatedAgents = configData.agents.filter(agent => agent !== agentToRemove);
-    updateConfigData('agents', updatedAgents);
+  const handleAgentsChange = (agents: string[]) => {
+    updateConfigData('agents', agents);
   };
 
   return (
@@ -35,26 +32,14 @@ const WhatsAppCollaboratorsTab: React.FC<WhatsAppCollaboratorsTabProps> = ({
         </p>
 
         <div className="space-y-6">
-          <div>
-            <Label>Agents</Label>
-            <div className="mt-2 space-y-2">
-              {configData.agents.map((agent, index) => (
-                <div key={index} className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded">
-                  <span className="text-sm">{agent}</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeAgent(agent)}
-                    className="h-6 w-6 p-0"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
+          <AgentSelector
+            selectedAgents={configData.agents}
+            onAgentsChange={handleAgentsChange}
+            onSave={onSave}
+            saving={saving}
+          />
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pt-6 border-t">
             <div>
               <Label htmlFor="auto-assignment">Enable auto assignment</Label>
               <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -84,12 +69,6 @@ const WhatsAppCollaboratorsTab: React.FC<WhatsAppCollaboratorsTabProps> = ({
               </p>
             </div>
           )}
-        </div>
-
-        <div className="mt-6 pt-6 border-t">
-          <Button onClick={onSave} disabled={saving}>
-            {saving ? 'Updating...' : 'Update'}
-          </Button>
         </div>
       </div>
     </div>

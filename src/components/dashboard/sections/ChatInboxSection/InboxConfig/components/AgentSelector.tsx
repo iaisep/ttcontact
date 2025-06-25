@@ -1,0 +1,115 @@
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { X } from 'lucide-react';
+
+interface Agent {
+  id: string;
+  name: string;
+  email?: string;
+}
+
+interface AgentSelectorProps {
+  selectedAgents: string[];
+  onAgentsChange: (agents: string[]) => void;
+  onSave: () => void;
+  saving?: boolean;
+}
+
+const AgentSelector: React.FC<AgentSelectorProps> = ({
+  selectedAgents,
+  onAgentsChange,
+  onSave,
+  saving = false
+}) => {
+  const [selectedAgentId, setSelectedAgentId] = useState<string>('');
+
+  // Mock agents data - this would come from your actual data source
+  const availableAgents: Agent[] = [
+    { id: '1', name: 'Maikel Guzman', email: 'maikel@company.com' },
+    { id: '2', name: 'Agent Smith', email: 'smith@company.com' },
+    { id: '3', name: 'Agent Johnson', email: 'johnson@company.com' },
+    { id: '4', name: 'Agent Brown', email: 'brown@company.com' }
+  ];
+
+  const handleAddAgent = () => {
+    if (selectedAgentId && !selectedAgents.includes(selectedAgentId)) {
+      onAgentsChange([...selectedAgents, selectedAgentId]);
+      setSelectedAgentId('');
+    }
+  };
+
+  const handleRemoveAgent = (agentId: string) => {
+    onAgentsChange(selectedAgents.filter(id => id !== agentId));
+  };
+
+  const getAgentName = (agentId: string) => {
+    const agent = availableAgents.find(a => a.id === agentId);
+    return agent?.name || agentId;
+  };
+
+  const getAvailableAgents = () => {
+    return availableAgents.filter(agent => !selectedAgents.includes(agent.id));
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label>Agents</Label>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+          Add or remove agents from this inbox
+        </p>
+        
+        <div className="flex gap-2 mb-4">
+          <Select value={selectedAgentId} onValueChange={setSelectedAgentId}>
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="Select an agent to add" />
+            </SelectTrigger>
+            <SelectContent>
+              {getAvailableAgents().map((agent) => (
+                <SelectItem key={agent.id} value={agent.id}>
+                  {agent.name} {agent.email && `(${agent.email})`}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button 
+            onClick={handleAddAgent} 
+            disabled={!selectedAgentId}
+            variant="outline"
+          >
+            Add
+          </Button>
+        </div>
+
+        {selectedAgents.length > 0 && (
+          <div className="space-y-2">
+            {selectedAgents.map((agentId) => (
+              <div key={agentId} className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-md border border-blue-200 dark:border-blue-800">
+                <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  {getAgentName(agentId)}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemoveAgent(agentId)}
+                  className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-200"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Button onClick={onSave} disabled={saving}>
+        {saving ? 'Updating...' : 'Update'}
+      </Button>
+    </div>
+  );
+};
+
+export default AgentSelector;
