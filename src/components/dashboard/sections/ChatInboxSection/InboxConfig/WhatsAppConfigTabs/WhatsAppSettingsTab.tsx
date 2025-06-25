@@ -48,11 +48,17 @@ const WhatsAppSettingsTab: React.FC<WhatsAppSettingsTabProps> = ({
         <div className="space-y-6">
           <div>
             <Label htmlFor="channel-avatar">Channel Avatar</Label>
-            <div className="mt-2 flex items-center space-x-4">
-              <Button variant="outline" size="sm">
-                Seleccionar archivo
-              </Button>
-              <span className="text-sm text-gray-500">Ningún archivo seleccionado</span>
+            <div className="mt-1 flex items-center space-x-2">
+              <Input
+                id="channel-avatar"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              <span className="text-sm text-gray-500">
+                {configData.channelAvatar ? `Selected: ${configData.channelAvatar}` : 'Ningún archivo seleccionado'}
+              </span>
             </div>
           </div>
 
