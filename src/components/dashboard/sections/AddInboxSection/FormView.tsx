@@ -39,6 +39,17 @@ const FormView: React.FC<FormViewProps> = ({
     );
   }
   
+  if (currentView === 'website-form') {
+    return (
+      <div className="p-6">
+        <WebsiteInboxForm 
+          onBack={onBack}
+          onComplete={onComplete}
+        />
+      </div>
+    );
+  }
+  
   // Placeholder for other forms
   return (
     <div className="p-6">
