@@ -32,8 +32,9 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
 
   // Si hay un inbox seleccionado, mostrar su configuración
   if (selectedInbox) {
-    // Por ahora solo manejamos WhatsApp
-    if (selectedInbox.platform.toLowerCase() === 'whatsapp') {
+    const platform = selectedInbox.platform.toLowerCase();
+    
+    if (platform === 'whatsapp') {
       const WhatsAppConfigSection = React.lazy(() => 
         import('./ChatInboxSection/InboxConfig/WhatsAppConfigSection')
       );
@@ -52,6 +53,32 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
           </div>
         }>
           <WhatsAppConfigSection 
+            inboxId={selectedInbox.id}
+            onBack={handleBackFromConfig}
+          />
+        </React.Suspense>
+      );
+    }
+
+    if (platform === 'telegram') {
+      const TelegramConfigSection = React.lazy(() => 
+        import('./ChatInboxSection/InboxConfig/TelegramConfigSection')
+      );
+      
+      return (
+        <React.Suspense fallback={
+          <div className="p-6">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+              <div className="h-10 bg-gray-200 rounded mb-4"></div>
+              <div className="space-y-4">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            </div>
+          </div>
+        }>
+          <TelegramConfigSection 
             inboxId={selectedInbox.id}
             onBack={handleBackFromConfig}
           />
