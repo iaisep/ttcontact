@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +28,15 @@ const WebsiteSettingsTab: React.FC<WebsiteSettingsTabProps> = ({
   const [showBusinessNameConfig, setShowBusinessNameConfig] = useState(false);
   const [businessName, setBusinessName] = useState('');
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Handle file upload logic here
+      console.log('Selected file:', file);
+      updateConfigData('channelAvatar', file.name);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
@@ -41,15 +49,16 @@ const WebsiteSettingsTab: React.FC<WebsiteSettingsTabProps> = ({
           <div>
             <Label htmlFor="channel-avatar">Channel Avatar</Label>
             <div className="mt-1 flex items-center space-x-2">
-              <Select value="select" onValueChange={() => {}}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar archivo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="select">Seleccionar archivo</SelectItem>
-                </SelectContent>
-              </Select>
-              <span className="text-sm text-gray-500">Ningun archivo seleccionado</span>
+              <Input
+                id="channel-avatar"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              <span className="text-sm text-gray-500">
+                {configData.channelAvatar ? `Selected: ${configData.channelAvatar}` : 'Ningun archivo seleccionado'}
+              </span>
             </div>
           </div>
 
