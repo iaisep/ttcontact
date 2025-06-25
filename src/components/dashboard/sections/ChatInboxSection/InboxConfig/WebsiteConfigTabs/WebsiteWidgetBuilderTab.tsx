@@ -1,8 +1,10 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MessageCircle, X, Send } from 'lucide-react';
 import type { WebsiteConfigData } from '../WebsiteConfigTypes';
 
 interface WebsiteWidgetBuilderTabProps {
@@ -18,18 +20,160 @@ const WebsiteWidgetBuilderTab: React.FC<WebsiteWidgetBuilderTabProps> = ({
   saving,
   onSave
 }) => {
+  const [previewMode, setPreviewMode] = useState<'preview' | 'script'>('preview');
+  const [chatState, setChatState] = useState<'default' | 'chat'>('default');
+  const [isWidgetOpen, setIsWidgetOpen] = useState(false);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       console.log('Selected file:', file);
-      // You can handle the file upload here
-      // For now, we'll just store the file name
       updateConfigData('channelAvatar', file.name);
     }
   };
 
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     updateConfigData('widgetColor', event.target.value);
+  };
+
+  const renderPreview = () => {
+    if (previewMode === 'script') {
+      return (
+        <div className="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm h-96 overflow-auto">
+          <div className="text-gray-500">{'<script>'}</div>
+          <div className="ml-2">
+            <div>window.chatwootSettings = {'{'}</div>
+            <div className="ml-2">
+              <div>position: "right",</div>
+              <div>type: "standard",</div>
+              <div>launcherTitle: "{configData.widgetBubbleLauncherTitle}",</div>
+              <div>color: "{configData.widgetColor}"</div>
+            </div>
+            <div>{'}'}</div>
+            <div>var s = document.createElement("script");</div>
+            <div>s.src = "https://app.chatwoot.com/packs/js/sdk.js";</div>
+            <div>s.async = true;</div>
+            <div>document.head.appendChild(s);</div>
+          </div>
+          <div className="text-gray-500">{'</script>'}</div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-gray-100 rounded-lg p-4 min-h-96 relative">
+        {/* Widget when closed */}
+        {!isWidgetOpen && (
+          <div 
+            className={`absolute bottom-4 ${configData.widgetBubblePosition === 'left' ? 'left-4' : 'right-4'}`}
+          >
+            {configData.widgetBubbleType === 'expanded' ? (
+              <div 
+                className="bg-white rounded-lg shadow-lg p-3 cursor-pointer hover:shadow-xl transition-shadow"
+                onClick={() => setIsWidgetOpen(true)}
+              >
+                <div className="flex items-center space-x-3">
+                  <div 
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white"
+                    style={{ backgroundColor: configData.widgetColor }}
+                  >
+                    <MessageCircle size={20} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">We are Online</div>
+                    <div className="text-xs text-gray-500">{configData.setReplyTime}</div>
+                    <div className="text-xs text-blue-500">Start Conversation →</div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div 
+                className="w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                style={{ backgroundColor: configData.widgetColor }}
+                onClick={() => setIsWidgetOpen(true)}
+              >
+                <MessageCircle size={24} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Widget when open */}
+        {isWidgetOpen && (
+          <div 
+            className={`absolute bottom-4 ${configData.widgetBubblePosition === 'left' ? 'left-4' : 'right-4'} w-80`}
+          >
+            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+              {/* Header */}
+              <div 
+                className="p-4 text-white flex items-center justify-between"
+                style={{ backgroundColor: configData.widgetColor }}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <MessageCircle size={16} />
+                  </div>
+                  <div>
+                    <div className="font-medium">{configData.websiteName}</div>
+                    <div className="text-xs opacity-90">{configData.setReplyTime}</div>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsWidgetOpen(false)}
+                  className="text-white hover:bg-white hover:bg-opacity-20 rounded p-1"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-4 h-64 overflow-y-auto">
+                {chatState === 'default' ? (
+                  <div className="text-center">
+                    <div className="text-lg font-medium text-gray-900 mb-2">
+                      {configData.welcomeHeading}
+                    </div>
+                    <div className="text-sm text-gray-600 mb-4">
+                      {configData.welcomeTagline}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="bg-gray-100 rounded-lg p-3 max-w-xs">
+                      <div className="text-sm text-gray-800">Hello</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Input */}
+              <div className="p-4 border-t bg-gray-50">
+                <div className="flex items-center space-x-2">
+                  <input 
+                    type="text" 
+                    placeholder="Type your message..."
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button 
+                    className="p-2 rounded-lg text-white"
+                    style={{ backgroundColor: configData.widgetColor }}
+                  >
+                    <Send size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-4 pb-2">
+                <div className="text-xs text-gray-500 text-center">
+                  Powered by Chatwoot
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -200,49 +344,57 @@ const WebsiteWidgetBuilderTab: React.FC<WebsiteWidgetBuilderTabProps> = ({
         <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
           <div className="flex space-x-4 mb-4">
             <label className="flex items-center">
-              <input type="radio" name="preview" value="preview" defaultChecked className="mr-2" />
+              <input 
+                type="radio" 
+                name="preview" 
+                value="preview" 
+                checked={previewMode === 'preview'}
+                onChange={(e) => setPreviewMode('preview')}
+                className="mr-2" 
+              />
               Preview
             </label>
             <label className="flex items-center">
-              <input type="radio" name="preview" value="script" className="mr-2" />
+              <input 
+                type="radio" 
+                name="preview" 
+                value="script" 
+                checked={previewMode === 'script'}
+                onChange={(e) => setPreviewMode('script')}
+                className="mr-2" 
+              />
               Script
             </label>
           </div>
           
-          <div className="flex space-x-4 mb-4">
-            <label className="flex items-center">
-              <input type="radio" name="mode" value="default" defaultChecked className="mr-2" />
-              Default
-            </label>
-            <label className="flex items-center">
-              <input type="radio" name="mode" value="chat" className="mr-2" />
-              Chat
-            </label>
-          </div>
+          {previewMode === 'preview' && (
+            <div className="flex space-x-4 mb-4">
+              <label className="flex items-center">
+                <input 
+                  type="radio" 
+                  name="mode" 
+                  value="default" 
+                  checked={chatState === 'default'}
+                  onChange={(e) => setChatState('default')}
+                  className="mr-2" 
+                />
+                Default
+              </label>
+              <label className="flex items-center">
+                <input 
+                  type="radio" 
+                  name="mode" 
+                  value="chat" 
+                  checked={chatState === 'chat'}
+                  onChange={(e) => setChatState('chat')}
+                  className="mr-2" 
+                />
+                Chat
+              </label>
+            </div>
+          )}
 
-          <div className="bg-white rounded-lg p-4 min-h-96 relative">
-            <div className="text-center text-blue-500 text-sm">
-              {configData.websiteName} ●
-              <br />
-              <span className="text-xs text-gray-500">Typically replies in a few minutes</span>
-            </div>
-            
-            <div className="absolute bottom-4 right-4">
-              <div className="bg-gray-200 rounded-full p-2 text-sm">
-                We are Online
-                <br />
-                <span className="text-xs">Typically replies in a few hours</span>
-                <br />
-                <span className="text-blue-500 text-xs cursor-pointer">Start Conversation →</span>
-              </div>
-            </div>
-
-            <div className="absolute bottom-4 right-4">
-              <div className="bg-blue-500 rounded-full p-3 text-white">
-                ✕
-              </div>
-            </div>
-          </div>
+          {renderPreview()}
         </div>
       </div>
     </div>
