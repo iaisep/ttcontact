@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import AddInboxModal from './ChatInboxSection/AddInboxModal';
 
 interface Inbox {
   id: string;
@@ -23,6 +24,7 @@ interface Inbox {
 const ChatInboxSection: React.FC = () => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isAddInboxModalOpen, setIsAddInboxModalOpen] = useState(false);
 
   // Mock data for inboxes based on the image
   const inboxes: Inbox[] = [
@@ -86,6 +88,16 @@ const ChatInboxSection: React.FC = () => {
         inbox.platform.toLowerCase().includes(searchQuery.toLowerCase())
       );
 
+  const handleAddInbox = () => {
+    setIsAddInboxModalOpen(true);
+  };
+
+  const handleChannelSelect = (channel: string) => {
+    console.log(`Selected channel: ${channel}`);
+    setIsAddInboxModalOpen(false);
+    // Handle channel selection logic here
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -103,7 +115,7 @@ const ChatInboxSection: React.FC = () => {
             </button>
           </div>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700">
+        <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAddInbox}>
           <Plus className="mr-2 h-4 w-4" />
           Add Inbox
         </Button>
@@ -156,6 +168,13 @@ const ChatInboxSection: React.FC = () => {
           ))
         )}
       </div>
+
+      {/* Add Inbox Modal */}
+      <AddInboxModal
+        isOpen={isAddInboxModalOpen}
+        onClose={() => setIsAddInboxModalOpen(false)}
+        onChannelSelect={handleChannelSelect}
+      />
     </div>
   );
 };
