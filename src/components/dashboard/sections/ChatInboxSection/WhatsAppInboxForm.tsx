@@ -54,13 +54,15 @@ const WhatsAppInboxForm: React.FC<WhatsAppInboxFormProps> = ({ onBack, onComplet
     }
 
     if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Please provide a valid phone number that starts with a "+" sign and does not contain any spaces.';
+      newErrors.phoneNumber = 'Please provide a valid phone number that starts with a "+" sign and contains only numbers.';
     } else if (!formData.phoneNumber.startsWith('+')) {
-      newErrors.phoneNumber = 'Please provide a valid phone number that starts with a "+" sign and does not contain any spaces.';
+      newErrors.phoneNumber = 'Please provide a valid phone number that starts with a "+" sign and contains only numbers.';
     } else if (formData.phoneNumber.includes(' ')) {
-      newErrors.phoneNumber = 'Please provide a valid phone number that starts with a "+" sign and does not contain any spaces.';
+      newErrors.phoneNumber = 'Please provide a valid phone number that starts with a "+" sign and contains only numbers.';
     } else if (formData.phoneNumber.length < 8 || formData.phoneNumber.length > 15) {
-      newErrors.phoneNumber = 'Please provide a valid phone number that starts with a "+" sign and does not contain any spaces.';
+      newErrors.phoneNumber = 'Please provide a valid phone number that starts with a "+" sign and contains only numbers.';
+    } else if (!/^\+\d+$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = 'Please provide a valid phone number that starts with a "+" sign and contains only numbers.';
     }
 
     if (!formData.phoneNumberId.trim()) {
@@ -80,14 +82,20 @@ const WhatsAppInboxForm: React.FC<WhatsAppInboxFormProps> = ({ onBack, onComplet
   };
 
   const handleInputChange = (field: keyof FormData, value: string) => {
-    // Special handling for phone number to auto-add + if missing
+    // Special handling for phone number to auto-add + if missing and allow only numbers
     if (field === 'phoneNumber') {
-      // Remove any spaces
+      // Remove any spaces and non-numeric characters (except + at the beginning)
       value = value.replace(/\s/g, '');
       
       // If user starts typing without +, add it automatically
       if (value && !value.startsWith('+')) {
         value = '+' + value;
+      }
+      
+      // Validate that after the + sign, only numbers are allowed
+      if (value.length > 1) {
+        const numbersOnly = value.slice(1).replace(/\D/g, ''); // Remove non-digits after +
+        value = '+' + numbersOnly;
       }
     }
     
@@ -184,7 +192,7 @@ const WhatsAppInboxForm: React.FC<WhatsAppInboxFormProps> = ({ onBack, onComplet
             <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>
           )}
           <p className="text-xs text-gray-500 mt-1">
-            Please enter the phone number from which message will be sent.
+            Please enter the phone number from which message will be sent. Only numbers allowed after the + sign.
           </p>
         </div>
 
