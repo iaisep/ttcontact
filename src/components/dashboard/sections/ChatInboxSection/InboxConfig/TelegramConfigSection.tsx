@@ -6,8 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTelegramConfig } from './useTelegramConfig';
 import TelegramSettingsTab from './TelegramConfigTabs/TelegramSettingsTab';
 import TelegramCollaboratorsTab from './TelegramConfigTabs/TelegramCollaboratorsTab';
-import WhatsAppBusinessHoursTab from './WhatsAppConfigTabs/WhatsAppBusinessHoursTab';
-import WhatsAppCSATTab from './WhatsAppConfigTabs/WhatsAppCSATTab';
+import TelegramBusinessHoursTab from './TelegramConfigTabs/TelegramBusinessHoursTab';
+import TelegramCSATTab from './TelegramConfigTabs/TelegramCSATTab';
 import TelegramBotConfigTab from './TelegramConfigTabs/TelegramBotConfigTab';
 import type { TelegramConfigSectionProps } from './TelegramConfigTypes';
 
@@ -88,7 +88,7 @@ const TelegramConfigSection: React.FC<TelegramConfigSectionProps> = ({ inboxId, 
           </TabsContent>
 
           <TabsContent value="business-hours">
-            <WhatsAppBusinessHoursTab
+            <TelegramBusinessHoursTab
               configData={configData}
               updateConfigData={updateConfigData}
               updateWeeklyHours={updateWeeklyHours}
@@ -98,7 +98,7 @@ const TelegramConfigSection: React.FC<TelegramConfigSectionProps> = ({ inboxId, 
           </TabsContent>
 
           <TabsContent value="csat">
-            <WhatsAppCSATTab
+            <TelegramCSATTab
               configData={configData}
               updateConfigData={updateConfigData}
               saving={saving}
