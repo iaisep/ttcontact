@@ -103,6 +103,8 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
 
   // Function to add a new inbox to the list
   const addNewInbox = (inboxData: { name: string; platform: string; phoneNumber?: string }) => {
+    console.log('Adding new inbox:', inboxData);
+    
     const newInbox: Inbox = {
       id: Date.now().toString(),
       name: inboxData.name,
@@ -112,7 +114,13 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
       status: 'active'
     };
     
-    setDynamicInboxes(prev => [...prev, newInbox]);
+    console.log('New inbox created:', newInbox);
+    
+    setDynamicInboxes(prev => {
+      const updated = [...prev, newInbox];
+      console.log('Updated dynamic inboxes:', updated);
+      return updated;
+    });
     
     if (onInboxCreated) {
       onInboxCreated(newInbox);
@@ -122,6 +130,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
   // Expose the addNewInbox function globally so it can be called from WhatsAppInboxForm
   React.useEffect(() => {
     (window as any).addNewInbox = addNewInbox;
+    console.log('addNewInbox function exposed to window');
     
     return () => {
       delete (window as any).addNewInbox;
@@ -149,6 +158,11 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
           <Plus className="mr-2 h-4 w-4" />
           Add Inbox
         </Button>
+      </div>
+
+      {/* Debug info */}
+      <div className="text-xs text-gray-500">
+        Static inboxes: {staticInboxes.length}, Dynamic inboxes: {dynamicInboxes.length}, Total: {allInboxes.length}
       </div>
 
       {/* Inbox List */}

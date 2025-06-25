@@ -120,23 +120,33 @@ const WhatsAppInboxForm: React.FC<WhatsAppInboxFormProps> = ({ onBack, onComplet
   const handleCreateWhatsAppChannel = async () => {
     setIsCreating(true);
     try {
-      // Aquí iría la llamada a la API para crear el inbox
-      console.log('Creating WhatsApp inbox:', { formData, selectedAgents });
+      console.log('Creating WhatsApp inbox with data:', { formData, selectedAgents });
       
       // Simular llamada a API
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Add the new inbox to the ChatInboxSection
+      const inboxData = {
+        name: formData.inboxName,
+        platform: 'WhatsApp',
+        phoneNumber: formData.phoneNumber
+      };
+      
+      console.log('Calling addNewInbox with:', inboxData);
+      
       if ((window as any).addNewInbox) {
-        (window as any).addNewInbox({
-          name: formData.inboxName,
-          platform: 'WhatsApp',
-          phoneNumber: formData.phoneNumber
-        });
+        (window as any).addNewInbox(inboxData);
+        console.log('addNewInbox called successfully');
+      } else {
+        console.error('addNewInbox function not found on window');
       }
       
-      // Redirigir a la vista de inboxes
-      onComplete();
+      // Small delay to ensure state update
+      setTimeout(() => {
+        console.log('Completing form and navigating back');
+        onComplete();
+      }, 100);
+      
     } catch (error) {
       console.error('Error creating WhatsApp inbox:', error);
     } finally {
