@@ -12,7 +12,7 @@ export const useWhatsAppConfig = (inboxId: string) => {
     channelAvatar: '',
     apiProvider: 'WhatsApp Cloud',
     enableChannelGreeting: false,
-    helpCenter: '',
+    helpCenter: 'none',
     lockToSingleConversation: false,
 
     // Collaborators

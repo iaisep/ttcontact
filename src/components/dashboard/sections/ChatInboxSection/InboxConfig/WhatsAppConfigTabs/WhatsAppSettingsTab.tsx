@@ -84,7 +84,7 @@ const WhatsAppSettingsTab: React.FC<WhatsAppSettingsTabProps> = ({
                 <SelectValue placeholder="Select Help Center" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Select Help Center</SelectItem>
+                <SelectItem value="none">No Help Center</SelectItem>
                 <SelectItem value="default">Default Help Center</SelectItem>
               </SelectContent>
             </Select>
