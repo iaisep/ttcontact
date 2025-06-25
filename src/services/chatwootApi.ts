@@ -44,7 +44,7 @@ class ChatwootApiService {
     const url = `${this.baseUrl}${endpoint}`;
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.apiKey}`,
+      'api_access_token': this.apiKey,
       ...options.headers,
     };
 
@@ -58,7 +58,7 @@ class ChatwootApiService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Chatwoot API error: ${response.status} - ${errorText}`);
+        throw new Error(`Chatwout API error: ${response.status} - ${errorText}`);
       }
 
       return await response.json();
