@@ -1,11 +1,10 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import DraggableFormFieldsList from './components/DraggableFormFieldsList';
 import type { WebsiteConfigData } from '../WebsiteConfigTypes';
 
 interface WebsitePreChatFormTabProps {
@@ -23,6 +22,10 @@ const WebsitePreChatFormTab: React.FC<WebsitePreChatFormTabProps> = ({
   saving,
   onSave
 }) => {
+  const handleReorderFields = (newFields: any[]) => {
+    updateConfigData('preFormFields', newFields);
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
@@ -63,52 +66,11 @@ const WebsitePreChatFormTab: React.FC<WebsitePreChatFormTabProps> = ({
               <div>
                 <Label>Pre chat form fields</Label>
                 <div className="mt-2">
-                  <div className="grid grid-cols-6 gap-2 text-sm font-medium text-gray-700 mb-2">
-                    <div></div>
-                    <div>KEY</div>
-                    <div>TYPE</div>
-                    <div>REQUIRED</div>
-                    <div>LABEL</div>
-                    <div>PLACEHOLDER</div>
-                  </div>
-                  
-                  {configData.preFormFields.map((field, index) => (
-                    <div key={field.key} className="grid grid-cols-6 gap-2 items-center py-2 border-b">
-                      <div className="flex items-center justify-center">
-                        <button className="text-gray-400 hover:text-gray-600">
-                          ⋮⋮
-                        </button>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          checked={field.enabled}
-                          onCheckedChange={(checked) => updatePreFormField(index, { enabled: checked })}
-                        />
-                        <span className="text-sm">{field.key}</span>
-                      </div>
-                      <div className="text-sm">{field.type}</div>
-                      <div className="flex justify-center">
-                        <Switch
-                          checked={field.required}
-                          onCheckedChange={(checked) => updatePreFormField(index, { required: checked })}
-                        />
-                      </div>
-                      <div>
-                        <Input
-                          value={field.label}
-                          onChange={(e) => updatePreFormField(index, { label: e.target.value })}
-                          className="text-sm"
-                        />
-                      </div>
-                      <div>
-                        <Input
-                          value={field.placeholder}
-                          onChange={(e) => updatePreFormField(index, { placeholder: e.target.value })}
-                          className="text-sm"
-                        />
-                      </div>
-                    </div>
-                  ))}
+                  <DraggableFormFieldsList
+                    fields={configData.preFormFields}
+                    updatePreFormField={updatePreFormField}
+                    onReorderFields={handleReorderFields}
+                  />
                 </div>
               </div>
             </>
