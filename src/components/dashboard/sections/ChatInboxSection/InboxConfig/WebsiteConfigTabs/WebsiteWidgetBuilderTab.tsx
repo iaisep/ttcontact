@@ -28,6 +28,10 @@ const WebsiteWidgetBuilderTab: React.FC<WebsiteWidgetBuilderTabProps> = ({
     }
   };
 
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    updateConfigData('widgetColor', event.target.value);
+  };
+
   return (
     <div className="grid grid-cols-2 gap-6">
       {/* Left Column - Configuration */}
@@ -105,6 +109,14 @@ const WebsiteWidgetBuilderTab: React.FC<WebsiteWidgetBuilderTabProps> = ({
                   className="w-8 h-8 rounded border border-gray-300"
                   style={{ backgroundColor: configData.widgetColor }}
                 ></div>
+                <Input
+                  id="widget-color-builder"
+                  type="color"
+                  value={configData.widgetColor}
+                  onChange={handleColorChange}
+                  className="w-16 h-8 p-1 border border-gray-300 rounded cursor-pointer"
+                />
+                <span className="text-sm text-gray-500">{configData.widgetColor}</span>
               </div>
             </div>
 
