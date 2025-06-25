@@ -3,22 +3,24 @@ import React from 'react';
 import AgentsSection from './sections/AgentsSection';
 import ChatAgentsSection from './sections/ChatAgentsSection';
 import ChatInboxSection from './sections/ChatInboxSection';
+import AddInboxSection from './sections/AddInboxSection';
 import KnowledgeBaseSection from './sections/knowledge-base/KnowledgeBaseSection';
 import PhoneNumbersSection from './sections/PhoneNumbersSection';
 import BatchCallSection from './sections/BatchCallSection';
 import CallHistorySection from './sections/CallHistorySection';
 import AnalyticsSection from './sections/AnalyticsSection';
 import BillingSection from './sections/BillingSection';
-import ApiKeysSection from './sections/api-keys/ApiKeysSection';
+import ApiKeysSection from './sections/sections/api-keys/ApiKeysSection';
 import WebhooksSection from './sections/WebhooksSection';
 import AccountInfoSection from './sections/AccountInfoSection';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface DashboardContentProps {
   activeSection: string;
+  setActiveSection: (section: string) => void;
 }
 
-const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection }) => {
+const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection, setActiveSection }) => {
   const renderContent = () => {
     switch (activeSection) {
       case 'agents':
@@ -26,7 +28,18 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection }) =>
       case 'chat-agents':
         return <ChatAgentsSection />;
       case 'chat-inbox':
-        return <ChatInboxSection />;
+        return (
+          <ChatInboxSection 
+            onNavigateToAddInbox={() => setActiveSection('add-inbox')}
+          />
+        );
+      case 'add-inbox':
+        return (
+          <AddInboxSection 
+            onBack={() => setActiveSection('chat-inbox')}
+            onComplete={() => setActiveSection('chat-inbox')}
+          />
+        );
       case 'knowledge-base':
         return <KnowledgeBaseSection />;
       case 'phone-numbers':

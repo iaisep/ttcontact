@@ -27,7 +27,10 @@ const Dashboard = () => {
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
       >
-        <DashboardContent activeSection={activeSection} />
+        <DashboardContent 
+          activeSection={activeSection} 
+          setActiveSection={setActiveSection}
+        />
       </SidebarWrapper>
     </div>
   );
