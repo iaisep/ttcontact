@@ -65,7 +65,7 @@ const WebsiteWidgetBuilderTab: React.FC<WebsiteWidgetBuilderTabProps> = ({
         {/* Widget when closed */}
         {!isWidgetOpen && (
           <div 
-            className={`absolute bottom-4 ${configData.widgetBubblePosition === 'left' ? 'left-4' : 'right-4'}`}
+            className={`absolute bottom-6 ${configData.widgetBubblePosition === 'left' ? 'left-4' : 'right-4'}`}
           >
             {configData.widgetBubbleType === 'expanded' ? (
               <div 
@@ -101,7 +101,7 @@ const WebsiteWidgetBuilderTab: React.FC<WebsiteWidgetBuilderTabProps> = ({
         {/* Widget when open */}
         {isWidgetOpen && (
           <div 
-            className={`absolute bottom-4 ${configData.widgetBubblePosition === 'left' ? 'left-4' : 'right-4'} w-80`}
+            className={`absolute bottom-6 ${configData.widgetBubblePosition === 'left' ? 'left-4' : 'right-4'} w-80`}
           >
             <div className="bg-white rounded-lg shadow-xl overflow-hidden">
               {/* Header */}
@@ -368,7 +368,7 @@ const WebsiteWidgetBuilderTab: React.FC<WebsiteWidgetBuilderTabProps> = ({
           </div>
           
           {previewMode === 'preview' && (
-            <div className="flex space-x-4 mb-4">
+            <div className="flex space-x-4 mb-6">
               <label className="flex items-center">
                 <input 
                   type="radio" 
