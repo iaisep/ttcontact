@@ -47,14 +47,6 @@ export const useWebsiteForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNextStep = () => {
-    if (currentStep === 2 && validateForm()) {
-      setCurrentStep(3);
-    } else if (currentStep === 3) {
-      setCurrentStep(4);
-    }
-  };
-
   const generateScript = () => {
     const script = `<script>
   (function(d,t) {
@@ -75,14 +67,21 @@ export const useWebsiteForm = () => {
     return script;
   };
 
+  const handleNextStep = () => {
+    if (currentStep === 2 && validateForm()) {
+      setCurrentStep(3);
+    } else if (currentStep === 3) {
+      // Generate script after selecting agents
+      const script = generateScript();
+      setGeneratedScript(script);
+      setCurrentStep(4);
+    }
+  };
+
   const handleCreateWebsiteChannel = async (onComplete: () => void) => {
     setIsCreating(true);
     
     try {
-      // Generate the script
-      const script = generateScript();
-      setGeneratedScript(script);
-      
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
       
