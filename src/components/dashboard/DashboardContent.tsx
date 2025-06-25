@@ -10,7 +10,7 @@ import BatchCallSection from './sections/BatchCallSection';
 import CallHistorySection from './sections/CallHistorySection';
 import AnalyticsSection from './sections/AnalyticsSection';
 import BillingSection from './sections/BillingSection';
-import ApiKeysSection from './sections/sections/api-keys/ApiKeysSection';
+import ApiKeysSection from './sections/api-keys/ApiKeysSection';
 import WebhooksSection from './sections/WebhooksSection';
 import AccountInfoSection from './sections/AccountInfoSection';
 import { useLanguage } from '@/context/LanguageContext';
