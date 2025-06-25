@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +26,9 @@ const WebsiteSettingsTab: React.FC<WebsiteSettingsTabProps> = ({
   saving,
   onSave
 }) => {
+  const [showBusinessNameConfig, setShowBusinessNameConfig] = useState(false);
+  const [businessName, setBusinessName] = useState('');
+
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
@@ -308,10 +311,29 @@ const WebsiteSettingsTab: React.FC<WebsiteSettingsTabProps> = ({
               </div>
             </div>
             <div className="mt-4">
-              <Button variant="link" className="text-blue-600 p-0">
-                + Configure your business name
+              <Button 
+                variant="link" 
+                className="text-blue-600 p-0"
+                onClick={() => setShowBusinessNameConfig(!showBusinessNameConfig)}
+              >
+                {showBusinessNameConfig ? '- Hide business name configuration' : '+ Configure your business name'}
               </Button>
             </div>
+            
+            {showBusinessNameConfig && (
+              <div className="mt-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-900">
+                <div>
+                  <Label htmlFor="business-name">Enter your business name</Label>
+                  <Input
+                    id="business-name"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    placeholder="Enter your business name"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
