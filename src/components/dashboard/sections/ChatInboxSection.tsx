@@ -102,7 +102,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
   };
 
   // Function to add a new inbox to the list
-  const addNewInbox = (inboxData: { name: string; platform: string; phoneNumber?: string }) => {
+  const addNewInbox = (inboxData: { name: string; platform: string; phoneNumber?: string; botToken?: string }) => {
     console.log('Adding new inbox:', inboxData);
     
     const newInbox: Inbox = {
@@ -127,7 +127,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
     }
   };
 
-  // Expose the addNewInbox function globally so it can be called from WhatsAppInboxForm
+  // Expose the addNewInbox function globally so it can be called from forms
   React.useEffect(() => {
     (window as any).addNewInbox = addNewInbox;
     console.log('addNewInbox function exposed to window');

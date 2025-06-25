@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import WhatsAppInboxForm from './ChatInboxSection/WhatsAppInboxForm';
+import TelegramInboxForm from './ChatInboxSection/TelegramInboxForm';
 
 type InboxView = 'channel-selection' | 'whatsapp-form' | 'telegram-form' | 'website-form';
 
@@ -185,6 +185,17 @@ const AddInboxSection: React.FC<AddInboxSectionProps> = ({ onBack, onComplete })
       return (
         <div className="p-6">
           <WhatsAppInboxForm 
+            onBack={handleBackToChannelSelection}
+            onComplete={handleFormComplete}
+          />
+        </div>
+      );
+    }
+    
+    if (currentView === 'telegram-form') {
+      return (
+        <div className="p-6">
+          <TelegramInboxForm 
             onBack={handleBackToChannelSelection}
             onComplete={handleFormComplete}
           />
