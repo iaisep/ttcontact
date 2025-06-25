@@ -6,6 +6,8 @@ export interface Inbox {
   url?: string;
   icon: string;
   status: 'active' | 'inactive';
+  phoneNumber?: string;
+  avatarUrl?: string;
 }
 
 export interface ChatInboxSectionProps {
