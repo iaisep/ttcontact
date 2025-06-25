@@ -1,6 +1,5 @@
-
 const CHATWOOT_API_KEY = 'YZEKfqAJsnEWoshpdRCq9yZn';
-const CHATWOOT_BASE_URL = 'https://app.chatwoot.com/api/v1/accounts/1'; // Replace 1 with actual account ID
+const CHATWOOT_BASE_URL = 'https://chatwoot.totalcontact.com.mx/api/v1/accounts/1'; // Replace 1 with actual account ID
 
 interface ChatwootInbox {
   id: number;
