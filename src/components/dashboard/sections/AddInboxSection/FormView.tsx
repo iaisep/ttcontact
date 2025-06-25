@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import WhatsAppInboxForm from '../ChatInboxSection/WhatsAppInboxForm';
 import TelegramInboxForm from '../ChatInboxSection/TelegramInboxForm';
+import WebsiteInboxForm from '../ChatInboxSection/WebsiteInboxForm';
 import type { InboxView } from './types';
 
 interface FormViewProps {
