@@ -2,6 +2,7 @@
 import React from 'react';
 import AgentsSection from './sections/AgentsSection';
 import ChatAgentsSection from './sections/ChatAgentsSection';
+import ChatInboxSection from './sections/ChatInboxSection';
 import KnowledgeBaseSection from './sections/knowledge-base/KnowledgeBaseSection';
 import PhoneNumbersSection from './sections/PhoneNumbersSection';
 import BatchCallSection from './sections/BatchCallSection';
@@ -24,6 +25,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection }) =>
         return <AgentsSection />;
       case 'chat-agents':
         return <ChatAgentsSection />;
+      case 'chat-inbox':
+        return <ChatInboxSection />;
       case 'knowledge-base':
         return <KnowledgeBaseSection />;
       case 'phone-numbers':
