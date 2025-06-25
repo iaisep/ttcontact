@@ -22,14 +22,16 @@ interface Inbox {
 
 interface ChatInboxSectionProps {
   onNavigateToAddInbox?: () => void;
+  onInboxCreated?: (inbox: Inbox) => void;
 }
 
-const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbox }) => {
+const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbox, onInboxCreated }) => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  const [dynamicInboxes, setDynamicInboxes] = useState<Inbox[]>([]);
 
   // Mock data for inboxes based on the image
-  const inboxes: Inbox[] = [
+  const staticInboxes: Inbox[] = [
     {
       id: '1',
       name: 'Maikelcontactbot',
@@ -70,6 +72,9 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
     }
   ];
 
+  // Combine static and dynamic inboxes
+  const allInboxes = [...staticInboxes, ...dynamicInboxes];
+
   const getPlatformColor = (platform: string) => {
     switch (platform.toLowerCase()) {
       case 'telegram':
@@ -84,8 +89,8 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
   };
 
   const filteredInboxes = searchQuery.trim() === '' 
-    ? inboxes 
-    : inboxes.filter(inbox => 
+    ? allInboxes 
+    : allInboxes.filter(inbox => 
         inbox.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         inbox.platform.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -95,6 +100,33 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
       onNavigateToAddInbox();
     }
   };
+
+  // Function to add a new inbox to the list
+  const addNewInbox = (inboxData: { name: string; platform: string; phoneNumber?: string }) => {
+    const newInbox: Inbox = {
+      id: Date.now().toString(),
+      name: inboxData.name,
+      platform: inboxData.platform,
+      icon: inboxData.platform === 'WhatsApp' ? '💬' : 
+            inboxData.platform === 'Telegram' ? '✈️' : '🌐',
+      status: 'active'
+    };
+    
+    setDynamicInboxes(prev => [...prev, newInbox]);
+    
+    if (onInboxCreated) {
+      onInboxCreated(newInbox);
+    }
+  };
+
+  // Expose the addNewInbox function globally so it can be called from WhatsAppInboxForm
+  React.useEffect(() => {
+    (window as any).addNewInbox = addNewInbox;
+    
+    return () => {
+      delete (window as any).addNewInbox;
+    };
+  }, []);
 
   return (
     <div className="p-6 space-y-6">

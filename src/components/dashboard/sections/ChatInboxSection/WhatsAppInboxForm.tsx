@@ -118,6 +118,15 @@ const WhatsAppInboxForm: React.FC<WhatsAppInboxFormProps> = ({ onBack, onComplet
       // Simular llamada a API
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      // Add the new inbox to the ChatInboxSection
+      if ((window as any).addNewInbox) {
+        (window as any).addNewInbox({
+          name: formData.inboxName,
+          platform: 'WhatsApp',
+          phoneNumber: formData.phoneNumber
+        });
+      }
+      
       // Redirigir a la vista de inboxes
       onComplete();
     } catch (error) {
