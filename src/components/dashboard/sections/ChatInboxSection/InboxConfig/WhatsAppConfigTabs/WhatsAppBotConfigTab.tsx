@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Bot } from 'lucide-react';
+import { chatwootApi } from '@/services/chatwootApi';
 import type { WhatsAppConfigData } from '../types';
 
 interface WhatsAppBotConfigTabProps {
@@ -14,18 +15,63 @@ interface WhatsAppBotConfigTabProps {
   onSave: () => void;
 }
 
+interface AgentBot {
+  id: number;
+  name: string;
+  description?: string;
+  [key: string]: any;
+}
+
 const WhatsAppBotConfigTab: React.FC<WhatsAppBotConfigTabProps> = ({
   configData,
   updateConfigData,
   saving,
   onSave
 }) => {
-  const availableBots = [
-    'Agente_mensajeria_telegram_inmensa',
-    'Customer_Support_Bot',
-    'Sales_Assistant_Bot',
-    'Technical_Support_Bot'
-  ];
+  const [availableBots, setAvailableBots] = useState<AgentBot[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAgentBots = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('Fetching agent bots from Chatwoot API...');
+        const bots = await chatwootApi.getAgentBots();
+        console.log('Agent bots fetched:', bots);
+        setAvailableBots(bots);
+      } catch (err) {
+        console.error('Failed to fetch agent bots:', err);
+        setError('Failed to load agent bots. Please try again.');
+        // Fallback to mock data if API fails
+        setAvailableBots([
+          { id: 1, name: 'Agente_mensajeria_telegram_inmensa' },
+          { id: 2, name: 'Customer_Support_Bot' },
+          { id: 3, name: 'Sales_Assistant_Bot' },
+          { id: 4, name: 'Technical_Support_Bot' }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAgentBots();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
+          <div className="animate-pulse">
+            <div className="h-6 bg-gray-200 rounded w-48 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-96 mb-6"></div>
+            <div className="h-10 bg-gray-200 rounded mb-4"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -34,6 +80,12 @@ const WhatsAppBotConfigTab: React.FC<WhatsAppBotConfigTabProps> = ({
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
           Configure automated bot responses for this inbox
         </p>
+
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mb-6">
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
 
         <div className="space-y-6">
           <div>
@@ -46,14 +98,20 @@ const WhatsAppBotConfigTab: React.FC<WhatsAppBotConfigTabProps> = ({
                 <SelectValue placeholder="Choose a bot for this inbox" />
               </SelectTrigger>
               <SelectContent>
-                {availableBots.map((bot) => (
-                  <SelectItem key={bot} value={bot}>
-                    <div className="flex items-center space-x-2">
-                      <Bot className="h-4 w-4" />
-                      <span>{bot}</span>
-                    </div>
+                {availableBots.length > 0 ? (
+                  availableBots.map((bot) => (
+                    <SelectItem key={bot.id} value={bot.name}>
+                      <div className="flex items-center space-x-2">
+                        <Bot className="h-4 w-4" />
+                        <span>{bot.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="no-bots" disabled>
+                    No bots available
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">

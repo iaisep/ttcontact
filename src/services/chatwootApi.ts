@@ -213,6 +213,12 @@ class ChatwootApiService {
       },
     });
   }
+
+  // Get agent bots
+  async getAgentBots(): Promise<any[]> {
+    const response = await this.makeRequest('/agent_bots');
+    return Array.isArray(response) ? response : (response.payload || []);
+  }
 }
 
 export const chatwootApi = new ChatwootApiService();
