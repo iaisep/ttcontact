@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -61,6 +62,34 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
 
     fetchAgents();
   }, []);
+
+  useEffect(() => {
+    const fetchInboxMembers = async () => {
+      if (!inboxId) {
+        console.log('No inbox ID provided, skipping inbox members fetch');
+        return;
+      }
+
+      try {
+        console.log('Fetching inbox members for inbox:', inboxId);
+        const members = await chatwootApi.getInboxMembers(inboxId);
+        console.log('Inbox members:', members);
+        
+        // Convert member IDs to strings and update selected agents
+        const memberIds = members.map(member => member.id.toString());
+        console.log('Member IDs:', memberIds);
+        onAgentsChange(memberIds);
+        
+      } catch (err) {
+        console.error('Failed to fetch inbox members:', err);
+        setError('Failed to load inbox members. Please try again.');
+      }
+    };
+
+    if (inboxId && availableAgents.length > 0) {
+      fetchInboxMembers();
+    }
+  }, [inboxId, availableAgents, onAgentsChange]);
 
   const handleAddAgent = () => {
     if (selectedAgentId && !selectedAgents.includes(selectedAgentId)) {
