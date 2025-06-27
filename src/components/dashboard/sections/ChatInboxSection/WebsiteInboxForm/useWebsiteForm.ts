@@ -7,6 +7,7 @@ export const useWebsiteForm = () => {
   const [currentStep, setCurrentStep] = useState(2);
   const [isCreating, setIsCreating] = useState(false);
   const [loadingAgents, setLoadingAgents] = useState(false);
+  const [inboxCreated, setInboxCreated] = useState(false); // Track if inbox was created
   const [formData, setFormData] = useState<WebsiteFormData>({
     websiteName: '',
     websiteDomain: '',
@@ -73,6 +74,7 @@ export const useWebsiteForm = () => {
       console.log('Website inbox created successfully:', result);
       
       setCreatedInboxId(result.payload?.id?.toString() || null);
+      setInboxCreated(true); // Mark inbox as created
       toast.success('Website inbox created successfully');
       
       return result;
@@ -191,6 +193,7 @@ export const useWebsiteForm = () => {
     setCurrentStep,
     isCreating,
     loadingAgents,
+    inboxCreated, // Export the inbox created state
     formData,
     selectedAgents,
     setSelectedAgents,

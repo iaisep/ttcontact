@@ -13,6 +13,7 @@ const WebsiteInboxForm: React.FC<WebsiteInboxFormProps> = ({ onBack, onComplete 
     setCurrentStep,
     isCreating,
     loadingAgents,
+    inboxCreated,
     formData,
     selectedAgents,
     setSelectedAgents,
@@ -43,7 +44,7 @@ const WebsiteInboxForm: React.FC<WebsiteInboxFormProps> = ({ onBack, onComplete 
             agents={agents}
             selectedAgents={selectedAgents}
             onAgentSelect={setSelectedAgents}
-            onBack={() => setCurrentStep(2)}
+            onBack={inboxCreated ? undefined : () => setCurrentStep(2)} // Disable back if inbox was created
             onNext={handleNextStep}
             loading={loadingAgents}
           />

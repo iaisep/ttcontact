@@ -14,7 +14,7 @@ interface AgentsSelectionStepProps {
   agents: Agent[];
   selectedAgents: string[];
   onAgentSelect: (agentIds: string[]) => void;
-  onBack: () => void;
+  onBack?: () => void; // Make onBack optional
   onNext: () => void;
   loading?: boolean;
 }
@@ -50,10 +50,13 @@ const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
         </div>
 
         <div className="flex justify-between">
-          <Button variant="outline" onClick={onBack}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
+          {onBack && (
+            <Button variant="outline" onClick={onBack}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          )}
+          {!onBack && <div />} {/* Empty div to maintain spacing */}
           <Button disabled>
             Continue
             <ArrowRight className="ml-2 h-4 w-4" />
@@ -100,10 +103,13 @@ const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
       </div>
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
+        {onBack && (
+          <Button variant="outline" onClick={onBack}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+        )}
+        {!onBack && <div />} {/* Empty div to maintain spacing when no back button */}
         <Button 
           onClick={onNext}
           className="bg-blue-600 hover:bg-blue-700"
