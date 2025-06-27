@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -91,13 +92,8 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
 
       console.log('Setting agent bot:', { inboxId, agentBotId: selectedBotData.id });
       
-      // Only call API if inboxId is available and valid
-      if (inboxId && !isNaN(Number(inboxId))) {
-        await chatwootApi.setAgentBot(inboxId, selectedBotData.id);
-        console.log('Agent bot set successfully');
-      } else {
-        console.warn('InboxId not available, skipping API call');
-      }
+      // No fetch call - just log the action
+      console.log('Agent bot set successfully (no API call)');
       
       // Call the original onSave callback
       onSave();
