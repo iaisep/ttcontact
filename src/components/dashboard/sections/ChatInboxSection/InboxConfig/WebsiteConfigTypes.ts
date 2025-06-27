@@ -115,6 +115,6 @@ export interface WebsiteConfigData {
 
 export interface WebsiteConfigSectionProps {
   inboxId: string;
+  inboxDetails?: any;
   onBack: () => void;
 }
-

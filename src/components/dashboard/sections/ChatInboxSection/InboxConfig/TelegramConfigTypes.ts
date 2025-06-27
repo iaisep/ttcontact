@@ -4,7 +4,6 @@ export interface TelegramConfigData {
   inboxName: string;
   channelAvatar: string;
   enableChannelGreeting: boolean;
-  greetingType: 'disabled' | 'enabled';
   helpCenter: string;
 
   // Collaborators tab
@@ -40,5 +39,6 @@ export interface TelegramConfigData {
 
 export interface TelegramConfigSectionProps {
   inboxId: string;
+  inboxDetails?: any;
   onBack: () => void;
 }

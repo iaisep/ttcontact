@@ -45,5 +45,6 @@ export interface WhatsAppConfigData {
 
 export interface InboxConfigSectionProps {
   inboxId: string;
+  inboxDetails?: any;
   onBack: () => void;
 }
