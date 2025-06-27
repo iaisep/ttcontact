@@ -209,28 +209,55 @@ export const useWebsiteConfig = (inboxId: string) => {
     console.log('Saving Website configuration:', configData);
     
     try {
+      // Create FormData to match the expected format
+      const formData = new FormData();
+      
+      // Basic fields
+      formData.append('name', configData.inboxName);
+      formData.append('enable_email_collect', configData.enableEmailCollectBox.toString());
+      formData.append('allow_messages_after_resolved', configData.allowMessagesAfterResolved.toString());
+      formData.append('greeting_enabled', configData.enableChannelGreeting.toString());
+      formData.append('greeting_message', '');
+      formData.append('portal_id', 'null');
+      formData.append('lock_to_single_conversation', (!configData.enableConversationContinuity).toString());
+      formData.append('sender_name_type', configData.senderName.type);
+      formData.append('business_name', 'null');
+      
+      // Channel feature flags
+      if (configData.features.displayFilePicker) {
+        formData.append('channel[selected_feature_flags][]', 'attachments');
+      }
+      if (configData.features.displayEmojiPicker) {
+        formData.append('channel[selected_feature_flags][]', 'emoji_picker');
+      }
+      if (configData.features.allowUsersToEndConversation) {
+        formData.append('channel[selected_feature_flags][]', 'end_conversation');
+      }
+      
+      // Channel settings
+      formData.append('channel[widget_color]', configData.widgetColor);
+      formData.append('channel[website_url]', configData.websiteDomain);
+      formData.append('channel[webhook_url]', 'undefined');
+      formData.append('channel[welcome_title]', configData.welcomeHeading);
+      formData.append('channel[welcome_tagline]', configData.welcomeTagline);
+      formData.append('channel[reply_time]', 'in_a_few_minutes');
+      formData.append('channel[continuity_via_email]', configData.enableConversationContinuity.toString());
+
       const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${inboxId}`, {
         method: 'PATCH',
         headers: {
           'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: configData.inboxName,
-          channel: {
-            website_url: configData.websiteDomain,
-            welcome_title: configData.welcomeHeading,
-            welcome_tagline: configData.welcomeTagline,
-            widget_color: configData.widgetColor,
-          },
-          greeting_enabled: configData.enableChannelGreeting,
-        }),
+        body: formData,
       });
 
       if (!response.ok) {
-        throw new Error(`Error updating inbox: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`Error updating inbox: ${response.status} - ${errorText}`);
       }
 
+      const result = await response.json();
+      console.log('Configuration saved successfully:', result);
       toast.success('Configuration saved successfully');
     } catch (error) {
       console.error('Error saving configuration:', error);
