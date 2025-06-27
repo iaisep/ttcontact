@@ -1,5 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -32,6 +33,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
   const [availableAgents, setAvailableAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const fetchedInboxId = useRef<number | null>(null);
 
   useEffect(() => {
     const fetchAgents = async () => {
@@ -65,8 +67,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
 
   useEffect(() => {
     const fetchInboxMembers = async () => {
-      if (!inboxId) {
-        console.log('No inbox ID provided, skipping inbox members fetch');
+      if (!inboxId || fetchedInboxId.current === inboxId) {
         return;
       }
 
@@ -79,6 +80,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
         const memberIds = members.map(member => member.id.toString());
         console.log('Member IDs:', memberIds);
         onAgentsChange(memberIds);
+        fetchedInboxId.current = inboxId;
         
       } catch (err) {
         console.error('Failed to fetch inbox members:', err);
@@ -89,7 +91,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
     if (inboxId && availableAgents.length > 0) {
       fetchInboxMembers();
     }
-  }, [inboxId, availableAgents, onAgentsChange]);
+  }, [inboxId, availableAgents.length]);
 
   const handleAddAgent = () => {
     if (selectedAgentId && !selectedAgents.includes(selectedAgentId)) {
@@ -248,3 +250,4 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
 };
 
 export default AgentSelector;
+
