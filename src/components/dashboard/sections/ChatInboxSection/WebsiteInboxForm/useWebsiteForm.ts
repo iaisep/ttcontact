@@ -73,8 +73,14 @@ export const useWebsiteForm = () => {
       const result = await response.json();
       console.log('Website inbox created successfully:', result);
       
-      setCreatedInboxId(result.payload?.id?.toString() || null);
+      setCreatedInboxId(result.id?.toString() || null);
       setInboxCreated(true); // Mark inbox as created
+      
+      // Set the web_widget_script from the API response
+      if (result.web_widget_script) {
+        setGeneratedScript(result.web_widget_script);
+      }
+      
       toast.success('Website inbox created successfully');
       
       return result;
@@ -162,9 +168,7 @@ export const useWebsiteForm = () => {
         setIsCreating(false);
       }
     } else if (currentStep === 3) {
-      // Generate script after selecting agents
-      const script = generateScript();
-      setGeneratedScript(script);
+      // No need to generate script here since we already have it from API
       setCurrentStep(4);
     }
   };
