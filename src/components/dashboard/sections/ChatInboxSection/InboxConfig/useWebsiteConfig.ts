@@ -135,45 +135,150 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     const loadConfig = async () => {
       setLoading(true);
       
+      console.log('useWebsiteConfig - Raw inboxDetails received:', inboxDetails);
+      
       // Si tenemos datos de la API, usarlos para poblar el estado
       if (inboxDetails) {
-        console.log('Using inbox details from API:', inboxDetails);
+        console.log('useWebsiteConfig - Processing inbox details:', {
+          name: inboxDetails.name,
+          website_url: inboxDetails.website_url,
+          welcome_title: inboxDetails.welcome_title,
+          welcome_tagline: inboxDetails.welcome_tagline,
+          widget_color: inboxDetails.widget_color,
+          greeting_enabled: inboxDetails.greeting_enabled,
+          greeting_message: inboxDetails.greeting_message
+        });
         
-        setConfigData(prev => ({
-          ...prev,
-          // Map API data using exact field names from API response
-          websiteName: inboxDetails.name || prev.websiteName,
-          websiteUrl: inboxDetails.website_url || prev.websiteUrl,
+        const newConfigData = {
+          // Settings - Direct API field mapping
+          websiteName: inboxDetails.name || 'Website Chat',
+          websiteUrl: inboxDetails.website_url || 'https://example.com',
           websiteDomain: inboxDetails.website_url ? 
             (() => {
               try {
                 return new URL(inboxDetails.website_url).hostname;
               } catch {
-                return inboxDetails.website_url;
+                return inboxDetails.website_url.replace(/^https?:\/\//, '');
               }
-            })() : prev.websiteDomain,
-          channelAvatar: inboxDetails.avatar_url || prev.channelAvatar,
-          enableChannelGreeting: inboxDetails.greeting_enabled || prev.enableChannelGreeting,
-          greetingMessage: inboxDetails.greeting_message || prev.greetingMessage,
+            })() : 'example.com',
+          channelAvatar: inboxDetails.avatar_url || '',
+          enableChannelGreeting: Boolean(inboxDetails.greeting_enabled),
+          greetingMessage: inboxDetails.greeting_message || '',
           
-          // Map welcome/widget settings if available
-          welcomeHeading: inboxDetails.welcome_title || inboxDetails.widget_config?.welcome_title || prev.welcomeHeading,
-          welcomeTagline: inboxDetails.welcome_tagline || inboxDetails.widget_config?.welcome_tagline || prev.welcomeTagline,
-          launcherTitle: inboxDetails.welcome_title || inboxDetails.widget_config?.launcher_title || prev.launcherTitle,
-          widgetBubbleLauncherTitle: inboxDetails.welcome_title || inboxDetails.widget_config?.launcher_title || prev.widgetBubbleLauncherTitle,
-          
-          // Map widget color if available
-          widgetColor: inboxDetails.widget_config?.color || inboxDetails.color || prev.widgetColor,
-          
-          // Map features from API if available
+          // Widget settings - Check multiple possible API fields
+          welcomeHeading: inboxDetails.welcome_title || inboxDetails.widget_config?.welcome_title || 'Welcome to our website',
+          welcomeTagline: inboxDetails.welcome_tagline || inboxDetails.widget_config?.welcome_tagline || 'How can we help you today?',
+          widgetColor: inboxDetails.widget_color || inboxDetails.color || '#1f93ff',
+          launcherTitle: inboxDetails.welcome_title || 'Chat with us',
+          widgetBubbleLauncherTitle: inboxDetails.welcome_title || 'Chat with us',
+
+          // Keep existing values for other fields
+          greetingType: inboxDetails.greeting_enabled ? 'enabled' : 'disabled',
+          helpCenter: 'none',
+          setReplyTime: 'In a few minutes',
+          enableEmailCollectBox: true,
+          allowMessagesAfterResolved: true,
+          enableConversationContinuity: true,
+
+          // Features
           features: {
-            ...prev.features,
-            enableFileUpload: inboxDetails.enable_file_upload ?? prev.features.enableFileUpload,
-            enableCSAT: inboxDetails.enable_csat ?? prev.features.enableCSAT,
-            enablePreChatForm: inboxDetails.enable_pre_chat_form ?? prev.features.enablePreChatForm,
-            enableBusinessHours: inboxDetails.enable_business_hours ?? prev.features.enableBusinessHours,
-          }
-        }));
+            enableFileUpload: inboxDetails.enable_file_upload ?? true,
+            enableConversationNoteEmail: true,
+            enableCSATSubtitle: false,
+            enableTypingIndicator: true,
+            enableBusinessHours: inboxDetails.enable_business_hours ?? true,
+            enableCSAT: inboxDetails.enable_csat ?? false,
+            enablePreChatForm: inboxDetails.enable_pre_chat_form ?? false,
+            enablePreChatMessage: false,
+            enableReplyTime: true,
+            enableConversationContinuity: true,
+            enableContactInformation: true,
+            enableEmailCollect: true,
+            enablePhoneNumberCollect: true,
+            enableFullNameCollect: true,
+            displayFilePicker: true,
+            displayEmojiPicker: true,
+            allowUsersToEndConversation: false,
+            useInboxNameAndAvatar: false,
+          },
+
+          // Keep existing values for complex objects
+          preChatFormEnabled: false,
+          enablePreChatForm: false,
+          preChatMessage: 'Please provide your contact details',
+          requireEmail: true,
+          requireFullName: true,
+          requirePhoneNumber: false,
+          preChatFormFields: [
+            {
+              key: 'fullName',
+              name: 'fullName',
+              placeholder: 'Full Name',
+              type: 'text',
+              required: true,
+              enabled: true,
+              field_type: 'standard',
+              label: 'Full Name',
+              values: []
+            },
+            {
+              key: 'emailAddress',
+              name: 'emailAddress',
+              placeholder: 'Email Address',
+              type: 'email',
+              required: true,
+              enabled: true,  
+              field_type: 'standard',
+              label: 'Email Address',
+              values: []
+            }
+          ],
+
+          agents: ['Maikel Guzman'],
+          enableAutoAssignment: true,
+          autoAssignmentLimit: 10,
+
+          enableBusinessAvailability: true,
+          unavailableMessage: '',
+          timezone: 'Pacific Time (US & Canada) (GMT-07:00)',
+          weeklyHours: {
+            sunday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' },
+            monday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
+            tuesday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
+            wednesday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
+            thursday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
+            friday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
+            saturday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' }
+          },
+
+          enableCSAT: false,
+          displayType: 'emoji' as const,
+          csatMessage: 'Please enter a message to show users with the form',
+          surveyRule: {
+            condition: 'contains',
+            labels: []
+          },
+
+          position: 'right' as const,
+          widgetStyle: 'standard' as const,
+          widgetBubblePosition: 'right' as const,
+          widgetBubbleType: 'standard' as const,
+
+          userIdentityValidation: 'HzPShsUbLrckiXnUQzMSWr35',
+          enforceUserIdentityValidation: false,
+
+          senderNames: [
+            { name: 'Support Team', email: 'support@example.com' }
+          ],
+          senderName: {
+            type: 'friendly' as const
+          },
+
+          selectedBot: 'Agente_mensajeria_telegram_agente de ventas nuevo'
+        };
+
+        console.log('useWebsiteConfig - Setting new config data:', newConfigData);
+        setConfigData(newConfigData);
       }
       
       setLoading(false);
@@ -182,7 +287,20 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     loadConfig();
   }, [inboxId, inboxDetails]);
 
+  // Log current configData for debugging
+  useEffect(() => {
+    console.log('useWebsiteConfig - Current configData state:', {
+      websiteName: configData.websiteName,
+      websiteUrl: configData.websiteUrl,
+      websiteDomain: configData.websiteDomain,
+      welcomeHeading: configData.welcomeHeading,
+      welcomeTagline: configData.welcomeTagline,
+      widgetColor: configData.widgetColor
+    });
+  }, [configData]);
+
   const updateConfigData = (field: keyof WebsiteConfigData, value: any) => {
+    console.log('useWebsiteConfig - Updating field:', field, 'with value:', value);
     setConfigData(prev => ({ ...prev, [field]: value }));
   };
 
