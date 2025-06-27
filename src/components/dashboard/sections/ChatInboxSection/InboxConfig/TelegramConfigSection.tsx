@@ -22,13 +22,15 @@ const TelegramConfigSection: React.FC<TelegramConfigSectionProps> = ({ inboxId, 
     saveConfiguration
   } = useTelegramConfig(inboxId);
 
-  // Convert inboxId to number
-  const numericInboxId = parseInt(inboxId);
+  // Convert inboxId to number and validate it
+  const numericInboxId = typeof inboxId === 'string' ? parseInt(inboxId) : inboxId;
+  const validInboxId = !isNaN(numericInboxId) ? numericInboxId : undefined;
 
-  console.log('TelegramConfigSection - inboxId:', { 
+  console.log('TelegramConfigSection - inboxId processing:', { 
     original: inboxId, 
     parsed: numericInboxId,
-    isValid: !isNaN(numericInboxId)
+    valid: validInboxId,
+    isValid: !!validInboxId
   });
 
   if (loading) {
@@ -92,7 +94,7 @@ const TelegramConfigSection: React.FC<TelegramConfigSectionProps> = ({ inboxId, 
               updateConfigData={updateConfigData}
               saving={saving}
               onSave={saveConfiguration}
-              inboxId={numericInboxId}
+              inboxId={validInboxId}
             />
           </TabsContent>
 
@@ -121,7 +123,7 @@ const TelegramConfigSection: React.FC<TelegramConfigSectionProps> = ({ inboxId, 
               updateConfigData={updateConfigData}
               saving={saving}
               onSave={saveConfiguration}
-              inboxId={numericInboxId}
+              inboxId={validInboxId}
             />
           </TabsContent>
         </div>

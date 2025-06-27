@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -35,14 +34,36 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [setBotLoading, setSetBotLoading] = useState(false);
 
+  // Get the actual inbox ID from URL if not provided as prop
+  const getInboxId = (): number => {
+    if (inboxId && !isNaN(inboxId)) {
+      return inboxId;
+    }
+    
+    // Extract inbox ID from URL path
+    const pathParts = window.location.pathname.split('/');
+    const urlInboxId = pathParts[pathParts.length - 1];
+    const parsedId = parseInt(urlInboxId);
+    
+    console.log('Extracting inbox ID:', {
+      inboxIdProp: inboxId,
+      urlInboxId,
+      parsedId,
+      isValidParsedId: !isNaN(parsedId)
+    });
+    
+    return !isNaN(parsedId) ? parsedId : 0;
+  };
+
+  const actualInboxId = getInboxId();
+
   // Debug logs to check the state
   console.log('TelegramBotConfigTab - Debug:', {
-    inboxId,
+    inboxIdProp: inboxId,
+    actualInboxId,
     selectedBot: configData.selectedBot,
     setBotLoading,
-    availableBots: availableBots.length,
-    inboxIdType: typeof inboxId,
-    inboxIdValid: !isNaN(Number(inboxId)) && inboxId !== undefined
+    availableBots: availableBots.length
   });
 
   useEffect(() => {
@@ -85,17 +106,20 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
       return;
     }
 
+    if (!actualInboxId || actualInboxId === 0) {
+      console.error('Valid inbox ID is required', { actualInboxId, inboxIdProp: inboxId });
+      setError('Unable to determine inbox ID. Please reload the page.');
+      return;
+    }
+
     // Use the bot ID from the selected bot data
     const botId = selectedBotData.id;
-    
-    // If inboxId is not available, we'll use the one from URL or fallback
-    const targetInboxId = inboxId || parseInt(window.location.pathname.split('/').pop() || '');
     
     console.log('Setting agent bot with details:', {
       selectedBotName: configData.selectedBot,
       botId: botId,
       selectedBotData,
-      inboxId: targetInboxId,
+      actualInboxId,
       originalInboxId: inboxId
     });
 
@@ -107,11 +131,11 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
         botId,
         selectedBot: configData.selectedBot,
         agentBotId: botId,
-        inboxId: targetInboxId 
+        inboxId: actualInboxId 
       });
       
       // Make the API call to set the agent bot
-      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${targetInboxId}/set_agent_bot`, {
+      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${actualInboxId}/set_agent_bot`, {
         method: 'POST',
         headers: {
           'accept': 'application/json, text/plain, */*',
@@ -138,13 +162,13 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
     }
   };
 
-  // Button should only be disabled when loading
-  const isButtonDisabled = setBotLoading;
+  // Button should only be disabled when loading or if we don't have a valid inbox ID
+  const isButtonDisabled = setBotLoading || !actualInboxId || actualInboxId === 0;
   
   console.log('Button disabled check:', {
     setBotLoading,
+    actualInboxId,
     hasSelectedBot: !!configData.selectedBot,
-    hasInboxId: !!inboxId,
     isDisabled: isButtonDisabled
   });
 
@@ -173,6 +197,14 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mb-6">
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
+
+        {!actualInboxId && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg mb-6">
+            <p className="text-sm text-yellow-600 dark:text-yellow-400">
+              Unable to determine inbox ID. Please reload the page or go back and try again.
+            </p>
           </div>
         )}
 
