@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -18,13 +17,15 @@ interface AgentSelectorProps {
   onAgentsChange: (agents: string[]) => void;
   onSave: () => void;
   saving?: boolean;
+  inboxId?: number;
 }
 
 const AgentSelector: React.FC<AgentSelectorProps> = ({
   selectedAgents,
   onAgentsChange,
   onSave,
-  saving = false
+  saving = false,
+  inboxId
 }) => {
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
   const [availableAgents, setAvailableAgents] = useState<Agent[]>([]);
@@ -79,6 +80,38 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
 
   const getAvailableAgents = () => {
     return availableAgents.filter(agent => !selectedAgents.includes(agent.id));
+  };
+
+  const handleSave = async () => {
+    if (!inboxId) {
+      console.error('No inbox ID provided');
+      return;
+    }
+
+    try {
+      // Convert string IDs to numbers for the API call
+      const userIds = selectedAgents.map(id => parseInt(id, 10));
+      
+      console.log('Updating inbox members:', { inboxId, userIds });
+      
+      // Update inbox members
+      await chatwootApi.updateInboxMembers(inboxId, userIds);
+      
+      // Fetch updated inbox members
+      const updatedMembers = await chatwootApi.getInboxMembers(inboxId);
+      console.log('Updated inbox members:', updatedMembers);
+      
+      // Update the selected agents with the fresh data
+      const memberIds = updatedMembers.map(member => member.id.toString());
+      onAgentsChange(memberIds);
+      
+      // Call the original onSave callback
+      onSave();
+      
+    } catch (error) {
+      console.error('Failed to update inbox members:', error);
+      setError('Failed to update inbox members. Please try again.');
+    }
   };
 
   if (loading) {
@@ -178,7 +211,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
         )}
       </div>
 
-      <Button onClick={onSave} disabled={saving}>
+      <Button onClick={handleSave} disabled={saving}>
         {saving ? 'Updating...' : 'Update'}
       </Button>
     </div>

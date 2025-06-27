@@ -11,13 +11,15 @@ interface WhatsAppCollaboratorsTabProps {
   updateConfigData: (field: keyof WhatsAppConfigData, value: any) => void;
   saving: boolean;
   onSave: () => void;
+  inboxId: number;
 }
 
 const WhatsAppCollaboratorsTab: React.FC<WhatsAppCollaboratorsTabProps> = ({
   configData,
   updateConfigData,
   saving,
-  onSave
+  onSave,
+  inboxId
 }) => {
   const handleAgentsChange = (agents: string[]) => {
     updateConfigData('agents', agents);
@@ -37,6 +39,7 @@ const WhatsAppCollaboratorsTab: React.FC<WhatsAppCollaboratorsTabProps> = ({
             onAgentsChange={handleAgentsChange}
             onSave={onSave}
             saving={saving}
+            inboxId={inboxId}
           />
 
           <div className="flex items-center justify-between pt-6 border-t">

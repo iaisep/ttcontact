@@ -1,4 +1,3 @@
-
 const CHATWOOT_API_KEY = 'YZEKfqAJsnEWoshpdRCq9yZn';
 const CHATWOOT_BASE_URL = 'https://chatwoot.totalcontact.com.mx/api/v1/accounts/1'; // Replace 1 with actual account ID
 
@@ -146,6 +145,20 @@ class ChatwootApiService {
   async getAgents(): Promise<Agent[]> {
     const response = await this.makeRequest('/agents');
     // The API returns the agents array directly, not wrapped in a payload
+    return Array.isArray(response) ? response : (response.payload || []);
+  }
+
+  // Update inbox members
+  async updateInboxMembers(inboxId: number, userIds: number[]): Promise<void> {
+    await this.makeRequest('/inbox_members', {
+      method: 'PATCH',
+      body: JSON.stringify({ inbox_id: inboxId, user_ids: userIds }),
+    });
+  }
+
+  // Get inbox members
+  async getInboxMembers(inboxId: number): Promise<Agent[]> {
+    const response = await this.makeRequest(`/inbox_members/${inboxId}`);
     return Array.isArray(response) ? response : (response.payload || []);
   }
 
