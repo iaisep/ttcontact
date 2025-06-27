@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -23,6 +22,17 @@ const WhatsAppConfigSection: React.FC<InboxConfigSectionProps> = ({ inboxId, onB
     updateWeeklyHours,
     saveConfiguration
   } = useWhatsAppConfig(inboxId);
+
+  // Convert inboxId to number and validate it
+  const numericInboxId = typeof inboxId === 'string' ? parseInt(inboxId) : inboxId;
+  const validInboxId = !isNaN(numericInboxId) ? numericInboxId : undefined;
+
+  console.log('WhatsAppConfigSection - inboxId processing:', { 
+    original: inboxId, 
+    parsed: numericInboxId,
+    valid: validInboxId,
+    isValid: !!validInboxId
+  });
 
   if (loading) {
     return (
@@ -86,7 +96,7 @@ const WhatsAppConfigSection: React.FC<InboxConfigSectionProps> = ({ inboxId, onB
               updateConfigData={updateConfigData}
               saving={saving}
               onSave={saveConfiguration}
-              inboxId={parseInt(inboxId)}
+              inboxId={validInboxId}
             />
           </TabsContent>
 
@@ -124,6 +134,7 @@ const WhatsAppConfigSection: React.FC<InboxConfigSectionProps> = ({ inboxId, onB
               updateConfigData={updateConfigData}
               saving={saving}
               onSave={saveConfiguration}
+              inboxId={validInboxId}
             />
           </TabsContent>
         </div>

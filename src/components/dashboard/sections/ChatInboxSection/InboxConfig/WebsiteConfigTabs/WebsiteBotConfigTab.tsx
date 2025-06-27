@@ -6,11 +6,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Bot } from 'lucide-react';
 import { chatwootApi } from '@/services/chatwootApi';
-import type { WhatsAppConfigData } from '../types';
+import type { WebsiteConfigData } from '../WebsiteConfigTypes';
 
-interface WhatsAppBotConfigTabProps {
-  configData: WhatsAppConfigData;
-  updateConfigData: (field: keyof WhatsAppConfigData, value: any) => void;
+interface WebsiteBotConfigTabProps {
+  configData: WebsiteConfigData;
+  updateConfigData: (field: keyof WebsiteConfigData, value: any) => void;
   saving: boolean;
   onSave: () => void;
   inboxId?: number;
@@ -23,7 +23,7 @@ interface AgentBot {
   [key: string]: any;
 }
 
-const WhatsAppBotConfigTab: React.FC<WhatsAppBotConfigTabProps> = ({
+const WebsiteBotConfigTab: React.FC<WebsiteBotConfigTabProps> = ({
   configData,
   updateConfigData,
   saving,
@@ -59,7 +59,7 @@ const WhatsAppBotConfigTab: React.FC<WhatsAppBotConfigTabProps> = ({
   const actualInboxId = getInboxId();
 
   // Debug logs to check the state
-  console.log('WhatsAppBotConfigTab - Debug:', {
+  console.log('WebsiteBotConfigTab - Debug:', {
     inboxIdProp: inboxId,
     actualInboxId,
     selectedBot: configData.selectedBot,
@@ -128,7 +128,7 @@ const WhatsAppBotConfigTab: React.FC<WhatsAppBotConfigTabProps> = ({
       setSetBotLoading(true);
       setError(null);
       
-      console.log('Setting agent bot for WhatsApp inbox:', { 
+      console.log('Setting agent bot for Website inbox:', { 
         botId,
         selectedBot: configData.selectedBot,
         agentBotId: botId,
@@ -148,12 +148,12 @@ const WhatsAppBotConfigTab: React.FC<WhatsAppBotConfigTabProps> = ({
         })
       });
 
-      if (!response.ok) {
+      if !response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to set agent bot: ${response.status} - ${errorText}`);
       }
       
-      console.log('WhatsApp agent bot configuration completed successfully');
+      console.log('Website agent bot configuration completed successfully');
       
     } catch (err) {
       console.error('Failed to set agent bot:', err);
@@ -277,4 +277,4 @@ const WhatsAppBotConfigTab: React.FC<WhatsAppBotConfigTabProps> = ({
   );
 };
 
-export default WhatsAppBotConfigTab;
+export default WebsiteBotConfigTab;

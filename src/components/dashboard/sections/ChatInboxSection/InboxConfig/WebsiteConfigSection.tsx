@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -8,10 +7,10 @@ import WebsiteSettingsTab from './WebsiteConfigTabs/WebsiteSettingsTab';
 import WebsitePreChatFormTab from './WebsiteConfigTabs/WebsitePreChatFormTab';
 import WebsiteWidgetBuilderTab from './WebsiteConfigTabs/WebsiteWidgetBuilderTab';  
 import WebsiteConfigurationTab from './WebsiteConfigTabs/WebsiteConfigurationTab';
+import WebsiteBotConfigTab from './WebsiteConfigTabs/WebsiteBotConfigTab';
 import TelegramCollaboratorsTab from './TelegramConfigTabs/TelegramCollaboratorsTab';
 import TelegramBusinessHoursTab from './TelegramConfigTabs/TelegramBusinessHoursTab';
 import TelegramCSATTab from './TelegramConfigTabs/TelegramCSATTab';
-import TelegramBotConfigTab from './TelegramConfigTabs/TelegramBotConfigTab';
 import type { WebsiteConfigSectionProps } from './WebsiteConfigTypes';
 
 const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = ({ inboxId, onBack }) => {
@@ -28,6 +27,17 @@ const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = ({ inboxId, on
     updateSenderName,
     saveConfiguration
   } = useWebsiteConfig(inboxId);
+
+  // Convert inboxId to number and validate it
+  const numericInboxId = typeof inboxId === 'string' ? parseInt(inboxId) : inboxId;
+  const validInboxId = !isNaN(numericInboxId) ? numericInboxId : undefined;
+
+  console.log('WebsiteConfigSection - inboxId processing:', { 
+    original: inboxId, 
+    parsed: numericInboxId,
+    valid: validInboxId,
+    isValid: !!validInboxId
+  });
 
   if (loading) {
     return (
@@ -95,7 +105,7 @@ const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = ({ inboxId, on
               updateConfigData={updateConfigData as any}
               saving={saving}
               onSave={saveConfiguration}
-              inboxId={parseInt(inboxId)}
+              inboxId={validInboxId}
             />
           </TabsContent>
 
@@ -147,11 +157,12 @@ const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = ({ inboxId, on
           </TabsContent>
 
           <TabsContent value="bot-configuration">
-            <TelegramBotConfigTab
-              configData={configData as any}
-              updateConfigData={updateConfigData as any}
+            <WebsiteBotConfigTab
+              configData={configData}
+              updateConfigData={updateConfigData}
               saving={saving}
               onSave={saveConfiguration}
+              inboxId={validInboxId}
             />
           </TabsContent>
         </div>

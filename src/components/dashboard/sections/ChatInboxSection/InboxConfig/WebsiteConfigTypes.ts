@@ -1,38 +1,54 @@
-
 export interface WebsiteConfigData {
-  // Settings tab
-  inboxName: string;
-  channelAvatar: string;
+  // Settings
   websiteName: string;
-  websiteDomain: string;
-  welcomeHeading: string;
-  welcomeTagline: string;
-  widgetColor: string;
+  websiteUrl: string;
+  channelAvatar: string;
   enableChannelGreeting: boolean;
+  greetingType: 'disabled' | 'custom';
   greetingMessage: string;
-  setReplyTime: string;
-  enableEmailCollectBox: boolean;
-  allowMessagesAfterResolved: boolean;
-  enableConversationContinuity: boolean;
   helpCenter: string;
+
+  // Features
   features: {
-    displayFilePicker: boolean;
-    displayEmojiPicker: boolean;
-    allowUsersToEndConversation: boolean;
-    useInboxNameAndAvatar: boolean;
-  };
-  senderName: {
-    type: 'friendly' | 'professional';
-    friendlyName: string;
-    professionalName: string;
+    enableFileUpload: boolean;
+    enableConversationNoteEmail: boolean;
+    enableCSATSubtitle: boolean;
+    enableTypingIndicator: boolean;
+    enableBusinessHours: boolean;
+    enableCSAT: boolean;
+    enablePreChatForm: boolean;
+    enablePreChatMessage: boolean;
+    enableReplyTime: boolean;
+    enableConversationContinuity: boolean;
+    enableContactInformation: boolean;
+    enableEmailCollect: boolean;
+    enablePhoneNumberCollect: boolean;
+    enableFullNameCollect: boolean;
   };
 
-  // Collaborators tab
+  // Pre Chat Form
+  preChatFormEnabled: boolean;
+  preChatMessage: string;
+  requireEmail: boolean;
+  requireFullName: boolean;
+  requirePhoneNumber: boolean;
+  preChatFormFields: Array<{
+    name: string;
+    placeholder: string;
+    type: string;
+    required: boolean;
+    enabled: boolean;
+    field_type: string;
+    label: string;
+    values: any[];
+  }>;
+
+  // Agents/Collaborators
   agents: string[];
   enableAutoAssignment: boolean;
   autoAssignmentLimit: number;
 
-  // Business Hours tab
+  // Business Hours  
   enableBusinessAvailability: boolean;
   unavailableMessage: string;
   timezone: string;
@@ -45,39 +61,29 @@ export interface WebsiteConfigData {
     };
   };
 
-  // CSAT tab
+  // CSAT
   enableCSAT: boolean;
-  displayType: 'emoji' | 'star';
+  displayType: 'emoji' | 'thumbs';
   csatMessage: string;
   surveyRule: {
     condition: string;
     labels: string[];
   };
 
-  // Pre Chat Form tab
-  enablePreChatForm: boolean;
-  preChatMessage: string;
-  preFormFields: Array<{
-    key: string;
-    type: string;
-    required: boolean;
-    label: string;
-    placeholder: string;
-    enabled: boolean;
+  // Appearance/Widget Builder
+  widgetColor: string;
+  position: 'left' | 'right';
+  launcherTitle: string;
+  widgetStyle: 'standard' | 'expanded_bubble';
+
+  // Sender Names
+  senderNames: Array<{
+    name: string;
+    email: string;
   }>;
 
-  // Widget Builder tab
-  widgetBubblePosition: 'left' | 'right';
-  widgetBubbleType: 'standard' | 'expanded';
-  widgetBubbleLauncherTitle: string;
-
-  // Configuration tab
-  messengerScript: string;
-  userIdentityValidation: string;
-  enforceUserIdentityValidation: boolean;
-
-  // Bot Configuration tab
-  selectedBot: string;
+  // Bot Configuration
+  selectedBot?: string;
 }
 
 export interface WebsiteConfigSectionProps {
