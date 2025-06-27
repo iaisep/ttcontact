@@ -9,6 +9,7 @@ export interface WebsiteConfigData {
   welcomeTagline: string;
   widgetColor: string;
   enableChannelGreeting: boolean;
+  greetingMessage: string;
   setReplyTime: string;
   enableEmailCollectBox: boolean;
   allowMessagesAfterResolved: boolean;

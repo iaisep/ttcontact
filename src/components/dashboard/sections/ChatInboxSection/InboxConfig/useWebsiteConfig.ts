@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
@@ -18,6 +17,7 @@ export const useWebsiteConfig = (inboxId: string) => {
     welcomeTagline: '',
     widgetColor: '#00bcd4',
     enableChannelGreeting: false,
+    greetingMessage: '',
     setReplyTime: 'In a few minutes',
     enableEmailCollectBox: true,
     allowMessagesAfterResolved: true,
@@ -140,6 +140,7 @@ export const useWebsiteConfig = (inboxId: string) => {
         welcomeTagline: inboxData.welcome_tagline || 'Welcome',
         widgetColor: inboxData.widget_color || '#00bcd4',
         enableChannelGreeting: inboxData.greeting_enabled || false,
+        greetingMessage: inboxData.greeting_message || '',
         channelAvatar: inboxData.avatar_url || '',
         messengerScript: inboxData.web_widget_script || '',
       }));
@@ -217,7 +218,7 @@ export const useWebsiteConfig = (inboxId: string) => {
       formData.append('enable_email_collect', configData.enableEmailCollectBox.toString());
       formData.append('allow_messages_after_resolved', configData.allowMessagesAfterResolved.toString());
       formData.append('greeting_enabled', configData.enableChannelGreeting.toString());
-      formData.append('greeting_message', '');
+      formData.append('greeting_message', configData.greetingMessage || '');
       formData.append('portal_id', 'null');
       formData.append('lock_to_single_conversation', (!configData.enableConversationContinuity).toString());
       formData.append('sender_name_type', configData.senderName.type);

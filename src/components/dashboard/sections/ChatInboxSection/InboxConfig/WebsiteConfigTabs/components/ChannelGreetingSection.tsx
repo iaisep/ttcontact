@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -16,7 +16,9 @@ const ChannelGreetingSection: React.FC<ChannelGreetingSectionProps> = ({
   configData,
   updateConfigData
 }) => {
-  const [greetingMessage, setGreetingMessage] = useState('Acme Inc typically replies in a few hours.');
+  const handleGreetingMessageChange = (value: string) => {
+    updateConfigData('greetingMessage', value);
+  };
 
   return (
     <div className="space-y-4">
@@ -57,8 +59,8 @@ const ChannelGreetingSection: React.FC<ChannelGreetingSectionProps> = ({
               </Button>
             </div>
             <Textarea
-              value={greetingMessage}
-              onChange={(e) => setGreetingMessage(e.target.value)}
+              value={configData.greetingMessage || ''}
+              onChange={(e) => handleGreetingMessageChange(e.target.value)}
               className="min-h-[80px] border-0 bg-transparent resize-none focus:ring-0"
               placeholder="Enter greeting message..."
             />
