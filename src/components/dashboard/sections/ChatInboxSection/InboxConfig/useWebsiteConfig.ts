@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
@@ -115,7 +116,11 @@ export const useWebsiteConfig = (inboxId: string) => {
       const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${inboxId}`, {
         method: 'GET',
         headers: {
-          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          'access-token': 'wmDtJ0t2DgxjIEguvQEPRQ',
+          'client': '0SDfpWS8m4nKWyymjSosPA',
+          'expiry': '1755730098',
+          'token-type': 'Bearer',
+          'uid': 'iallamadas@universidadisep.com',
           'Content-Type': 'application/json',
         },
       });
@@ -251,7 +256,11 @@ export const useWebsiteConfig = (inboxId: string) => {
       const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${inboxId}`, {
         method: 'PATCH',
         headers: {
-          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          'access-token': 'wmDtJ0t2DgxjIEguvQEPRQ',
+          'client': '0SDfpWS8m4nKWyymjSosPA',
+          'expiry': '1755730098',
+          'token-type': 'Bearer',
+          'uid': 'iallamadas@universidadisep.com',
           // Don't set Content-Type for FormData, let browser set it with boundary
         },
         body: formData,
@@ -288,3 +297,4 @@ export const useWebsiteConfig = (inboxId: string) => {
     saveConfiguration
   };
 };
+
