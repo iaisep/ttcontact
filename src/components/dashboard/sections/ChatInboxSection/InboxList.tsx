@@ -29,8 +29,6 @@ const InboxList: React.FC<InboxListProps> = ({
   };
 
   const handleConfigureClick = (inbox: Inbox) => {
-    console.log('Configuring inbox:', inbox.id);
-    // This will trigger the useAgentsAndBots hook when the config components mount
     if (onConfigureInbox) {
       onConfigureInbox(inbox);
     }
