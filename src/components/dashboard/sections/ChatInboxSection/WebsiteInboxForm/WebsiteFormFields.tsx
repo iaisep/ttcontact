@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, ArrowRight, Loader2, Bold, Italic, List, ListOrdered, Code } from 'lucide-react';
 import type { WebsiteFormData, FormErrors } from './types';
 
 interface WebsiteFormFieldsProps {
@@ -24,6 +25,7 @@ const WebsiteFormFields: React.FC<WebsiteFormFieldsProps> = ({
   onBack,
   onNext
 }) => {
+  const [greetingMessage, setGreetingMessage] = useState('Acme Inc typically replies in a few hours.');
   const isFormValid = formData.websiteName.trim() && formData.websiteDomain.trim();
 
   return (
@@ -132,6 +134,39 @@ const WebsiteFormFields: React.FC<WebsiteFormFieldsProps> = ({
           <p className="text-sm text-gray-500 mt-1">
             Auto-send greeting messages when customers start a conversation and send their first message.
           </p>
+
+          {formData.enableChannelGreeting && (
+            <div className="mt-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-900">
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2 border-b pb-2">
+                  <Button variant="ghost" size="sm" className="p-1">
+                    <Bold size={16} />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="p-1">
+                    <Italic size={16} />
+                  </Button>
+                  <div className="w-px h-6 bg-gray-300 mx-1"></div>
+                  <Button variant="ghost" size="sm" className="p-1">
+                    <List size={16} />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="p-1">
+                    <ListOrdered size={16} />
+                  </Button>
+                  <div className="w-px h-6 bg-gray-300 mx-1"></div>
+                  <Button variant="ghost" size="sm" className="p-1">
+                    <Code size={16} />
+                  </Button>
+                </div>
+                <Textarea
+                  value={greetingMessage}
+                  onChange={(e) => setGreetingMessage(e.target.value)}
+                  className="min-h-[80px] border-0 bg-transparent resize-none focus:ring-0"
+                  placeholder="Enter greeting message..."
+                  disabled={isCreating}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
