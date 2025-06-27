@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -34,33 +35,9 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [setBotLoading, setSetBotLoading] = useState(false);
 
-  // Get the actual inbox ID from URL if not provided as prop
-  const getInboxId = (): number => {
-    if (inboxId && !isNaN(inboxId)) {
-      return inboxId;
-    }
-    
-    // Extract inbox ID from URL path
-    const pathParts = window.location.pathname.split('/');
-    const urlInboxId = pathParts[pathParts.length - 1];
-    const parsedId = parseInt(urlInboxId);
-    
-    console.log('Extracting inbox ID:', {
-      inboxIdProp: inboxId,
-      urlInboxId,
-      parsedId,
-      isValidParsedId: !isNaN(parsedId)
-    });
-    
-    return !isNaN(parsedId) ? parsedId : 0;
-  };
-
-  const actualInboxId = getInboxId();
-
   // Debug logs to check the state
   console.log('TelegramBotConfigTab - Debug:', {
     inboxIdProp: inboxId,
-    actualInboxId,
     selectedBot: configData.selectedBot,
     setBotLoading,
     availableBots: availableBots.length
@@ -106,21 +83,13 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
       return;
     }
 
-    if (!actualInboxId || actualInboxId === 0) {
-      console.error('Valid inbox ID is required', { actualInboxId, inboxIdProp: inboxId });
-      setError('Unable to determine inbox ID. Please reload the page.');
-      return;
-    }
-
     // Use the bot ID from the selected bot data
     const botId = selectedBotData.id;
     
     console.log('Setting agent bot with details:', {
       selectedBotName: configData.selectedBot,
       botId: botId,
-      selectedBotData,
-      actualInboxId,
-      originalInboxId: inboxId
+      selectedBotData
     });
 
     try {
@@ -130,12 +99,11 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
       console.log('Setting agent bot for Telegram inbox:', { 
         botId,
         selectedBot: configData.selectedBot,
-        agentBotId: botId,
-        inboxId: actualInboxId 
+        agentBotId: botId
       });
       
-      // Make the API call to set the agent bot
-      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${actualInboxId}/set_agent_bot`, {
+      // Make the API call to set the agent bot (without inboxId parameter)
+      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/set_agent_bot`, {
         method: 'POST',
         headers: {
           'accept': 'application/json, text/plain, */*',
@@ -162,16 +130,6 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
     }
   };
 
-  // Button should only be disabled when loading or if we don't have a valid inbox ID
-  const isButtonDisabled = setBotLoading || !actualInboxId || actualInboxId === 0;
-  
-  console.log('Button disabled check:', {
-    setBotLoading,
-    actualInboxId,
-    hasSelectedBot: !!configData.selectedBot,
-    isDisabled: isButtonDisabled
-  });
-
   if (loading) {
     return (
       <div className="space-y-6">
@@ -197,14 +155,6 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mb-6">
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-          </div>
-        )}
-
-        {!actualInboxId && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg mb-6">
-            <p className="text-sm text-yellow-600 dark:text-yellow-400">
-              Unable to determine inbox ID. Please reload the page or go back and try again.
-            </p>
           </div>
         )}
 
@@ -262,7 +212,7 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
           <div className="flex space-x-2">
             <Button 
               onClick={handleSetAgentBot} 
-              disabled={isButtonDisabled}
+              disabled={setBotLoading}
             >
               {setBotLoading ? 'Configuring Bot...' : 'Set Agent Bot'}
             </Button>
