@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useChatwootInboxManager } from './ChatInboxSection/useChatwootInboxManager';
 import InboxHeader from './ChatInboxSection/InboxHeader';
@@ -47,8 +46,10 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
   // Si hay un inbox seleccionado, mostrar su configuración
   if (selectedInbox) {
     const platform = selectedInbox.platform.toLowerCase();
+    console.log('Selected inbox platform:', platform, 'Full inbox:', selectedInbox);
     
-    if (platform === 'whatsapp') {
+    // Verificar múltiples variaciones posibles de WhatsApp
+    if (platform === 'whatsapp' || platform === 'whats app' || platform.includes('whatsapp') || selectedInbox.platform === 'WhatsApp') {
       const WhatsAppConfigSection = React.lazy(() => 
         import('./ChatInboxSection/InboxConfig/WhatsAppConfigSection')
       );
@@ -74,7 +75,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
       );
     }
 
-    if (platform === 'telegram') {
+    if (platform === 'telegram' || platform.includes('telegram')) {
       const TelegramConfigSection = React.lazy(() => 
         import('./ChatInboxSection/InboxConfig/TelegramConfigSection')
       );
@@ -100,7 +101,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
       );
     }
 
-    if (platform === 'website') {
+    if (platform === 'website' || platform === 'web_widget' || platform.includes('website')) {
       const WebsiteConfigSection = React.lazy(() => 
         import('./ChatInboxSection/InboxConfig/WebsiteConfigSection')
       );
