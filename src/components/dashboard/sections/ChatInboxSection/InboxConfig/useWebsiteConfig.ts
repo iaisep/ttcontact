@@ -141,19 +141,38 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
         
         setConfigData(prev => ({
           ...prev,
-          // Map API data to our config structure
+          // Map API data using exact field names from API response
           websiteName: inboxDetails.name || prev.websiteName,
           websiteUrl: inboxDetails.website_url || prev.websiteUrl,
-          websiteDomain: inboxDetails.website_url ? new URL(inboxDetails.website_url).hostname : prev.websiteDomain,
+          websiteDomain: inboxDetails.website_url ? 
+            (() => {
+              try {
+                return new URL(inboxDetails.website_url).hostname;
+              } catch {
+                return inboxDetails.website_url;
+              }
+            })() : prev.websiteDomain,
           channelAvatar: inboxDetails.avatar_url || prev.channelAvatar,
           enableChannelGreeting: inboxDetails.greeting_enabled || prev.enableChannelGreeting,
           greetingMessage: inboxDetails.greeting_message || prev.greetingMessage,
-          welcomeHeading: inboxDetails.welcome_title || prev.welcomeHeading,
-          welcomeTagline: inboxDetails.welcome_tagline || prev.welcomeTagline,
           
-          // Map other relevant fields from API
-          launcherTitle: inboxDetails.welcome_title || prev.launcherTitle,
-          widgetBubbleLauncherTitle: inboxDetails.welcome_title || prev.widgetBubbleLauncherTitle,
+          // Map welcome/widget settings if available
+          welcomeHeading: inboxDetails.welcome_title || inboxDetails.widget_config?.welcome_title || prev.welcomeHeading,
+          welcomeTagline: inboxDetails.welcome_tagline || inboxDetails.widget_config?.welcome_tagline || prev.welcomeTagline,
+          launcherTitle: inboxDetails.welcome_title || inboxDetails.widget_config?.launcher_title || prev.launcherTitle,
+          widgetBubbleLauncherTitle: inboxDetails.welcome_title || inboxDetails.widget_config?.launcher_title || prev.widgetBubbleLauncherTitle,
+          
+          // Map widget color if available
+          widgetColor: inboxDetails.widget_config?.color || inboxDetails.color || prev.widgetColor,
+          
+          // Map features from API if available
+          features: {
+            ...prev.features,
+            enableFileUpload: inboxDetails.enable_file_upload ?? prev.features.enableFileUpload,
+            enableCSAT: inboxDetails.enable_csat ?? prev.features.enableCSAT,
+            enablePreChatForm: inboxDetails.enable_pre_chat_form ?? prev.features.enablePreChatForm,
+            enableBusinessHours: inboxDetails.enable_business_hours ?? prev.features.enableBusinessHours,
+          }
         }));
       }
       
