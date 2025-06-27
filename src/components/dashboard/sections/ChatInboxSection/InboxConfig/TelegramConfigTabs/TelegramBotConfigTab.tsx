@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -40,7 +41,9 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
     inboxId,
     selectedBot: configData.selectedBot,
     setBotLoading,
-    availableBots: availableBots.length
+    availableBots: availableBots.length,
+    inboxIdType: typeof inboxId,
+    inboxIdValid: !isNaN(Number(inboxId)) && inboxId !== undefined
   });
 
   useEffect(() => {
@@ -71,10 +74,12 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
   }, []);
 
   const handleSetAgentBot = async () => {
-    if (!configData.selectedBot || !inboxId) {
-      console.error('No bot selected or inbox ID missing', {
+    if (!configData.selectedBot || !inboxId || isNaN(Number(inboxId))) {
+      console.error('No bot selected or inbox ID missing/invalid', {
         selectedBot: configData.selectedBot,
-        inboxId
+        inboxId,
+        inboxIdType: typeof inboxId,
+        inboxIdValid: !isNaN(Number(inboxId))
       });
       return;
     }
@@ -106,13 +111,14 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
     }
   };
 
-  // Check if button should be disabled
-  const isButtonDisabled = setBotLoading || !configData.selectedBot || !inboxId;
+  // Check if button should be disabled - Fixed logic
+  const isButtonDisabled = setBotLoading || !configData.selectedBot || !inboxId || isNaN(Number(inboxId));
   
   console.log('Button disabled check:', {
     setBotLoading,
     hasSelectedBot: !!configData.selectedBot,
     hasInboxId: !!inboxId,
+    inboxIdValid: !isNaN(Number(inboxId)),
     isDisabled: isButtonDisabled
   });
 
