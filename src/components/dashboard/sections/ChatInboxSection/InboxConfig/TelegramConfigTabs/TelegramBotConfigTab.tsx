@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -34,6 +35,14 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [setBotLoading, setSetBotLoading] = useState(false);
 
+  // Debug logs to check the state
+  console.log('TelegramBotConfigTab - Debug:', {
+    inboxId,
+    selectedBot: configData.selectedBot,
+    setBotLoading,
+    availableBots: availableBots.length
+  });
+
   useEffect(() => {
     const fetchAgentBots = async () => {
       try {
@@ -63,7 +72,10 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
 
   const handleSetAgentBot = async () => {
     if (!configData.selectedBot || !inboxId) {
-      console.error('No bot selected or inbox ID missing');
+      console.error('No bot selected or inbox ID missing', {
+        selectedBot: configData.selectedBot,
+        inboxId
+      });
       return;
     }
 
@@ -93,6 +105,16 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
       setSetBotLoading(false);
     }
   };
+
+  // Check if button should be disabled
+  const isButtonDisabled = setBotLoading || !configData.selectedBot || !inboxId;
+  
+  console.log('Button disabled check:', {
+    setBotLoading,
+    hasSelectedBot: !!configData.selectedBot,
+    hasInboxId: !!inboxId,
+    isDisabled: isButtonDisabled
+  });
 
   if (loading) {
     return (
@@ -126,8 +148,11 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
           <div>
             <Label htmlFor="selected-bot">Agent Bot</Label>
             <Select 
-              value={configData.selectedBot} 
-              onValueChange={(value) => updateConfigData('selectedBot', value)}
+              value={configData.selectedBot || ""} 
+              onValueChange={(value) => {
+                console.log('Bot selection changed:', value);
+                updateConfigData('selectedBot', value);
+              }}
             >
               <SelectTrigger className="mt-1">
                 <SelectValue placeholder="Choose a bot for this inbox" />
@@ -173,7 +198,7 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
           <div className="flex space-x-2">
             <Button 
               onClick={handleSetAgentBot} 
-              disabled={setBotLoading || !configData.selectedBot || !inboxId}
+              disabled={isButtonDisabled}
             >
               {setBotLoading ? 'Setting Bot...' : 'Set Agent Bot'}
             </Button>
