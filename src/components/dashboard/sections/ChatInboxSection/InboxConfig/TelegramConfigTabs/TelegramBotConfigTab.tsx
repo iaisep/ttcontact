@@ -74,9 +74,10 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
   }, []);
 
   const handleSetAgentBot = async () => {
-    if (!configData.selectedBot) {
-      console.error('No bot selected', {
-        selectedBot: configData.selectedBot
+    if (!configData.selectedBot || !inboxId) {
+      console.error('No bot selected or inbox ID missing', {
+        selectedBot: configData.selectedBot,
+        inboxId
       });
       return;
     }
@@ -88,22 +89,34 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
       // Find the selected bot to get its ID
       const selectedBotData = availableBots.find(bot => bot.name === configData.selectedBot);
       if (!selectedBotData) {
-        console.log('Selected bot not found, but continuing...');
+        throw new Error('Selected bot not found');
       }
 
-      console.log('Setting agent bot for Telegram (NO API CALL - LOCAL ONLY):', { 
+      console.log('Setting agent bot for Telegram inbox:', { 
         inboxId, 
         selectedBot: configData.selectedBot,
-        agentBotId: selectedBotData?.id 
+        agentBotId: selectedBotData.id 
       });
       
-      // Just simulate the action without any API call or onSave call
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Make the API call to set the agent bot
+      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${inboxId}/set_agent_bot`, {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json, text/plain, */*',
+          'content-type': 'application/json',
+          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn'
+        },
+        body: JSON.stringify({
+          agent_bot: selectedBotData.id
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to set agent bot: ${response.status} - ${errorText}`);
+      }
       
-      console.log('Telegram agent bot configuration completed (LOCAL SIMULATION ONLY - NO API CALLS)');
-      
-      // DO NOT call onSave() to avoid API calls
-      // onSave();
+      console.log('Telegram agent bot configuration completed successfully');
       
     } catch (err) {
       console.error('Failed to set agent bot:', err);
@@ -195,7 +208,7 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
                   Ready
                 </Badge>
                 <span className="text-sm text-green-800 dark:text-green-200">
-                  Bot will be configured on save
+                  Click "Set Agent Bot" to configure this bot for the inbox
                 </span>
               </div>
             </div>
