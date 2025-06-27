@@ -10,6 +10,7 @@ interface Agent {
   id: string;
   name: string;
   email?: string;
+  role?: string;
 }
 
 interface AgentSelectorProps {
@@ -35,15 +36,19 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
       try {
         setLoading(true);
         setError(null);
+        console.log('Fetching agents from Chatwoot API...');
         const agents = await chatwootApi.getAgents();
+        console.log('Raw agents data:', agents);
         
         // Transform Chatwoot agent data to our Agent interface
         const transformedAgents: Agent[] = agents.map(agent => ({
           id: agent.id.toString(),
           name: agent.name || 'Unnamed Agent',
-          email: agent.email
+          email: agent.email,
+          role: agent.role
         }));
         
+        console.log('Transformed agents:', transformedAgents);
         setAvailableAgents(transformedAgents);
       } catch (err) {
         console.error('Failed to fetch agents:', err);
@@ -113,6 +118,9 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
     );
   }
 
+  console.log('Available agents for dropdown:', getAvailableAgents());
+  console.log('Selected agents:', selectedAgents);
+
   return (
     <div className="space-y-4">
       <div>
@@ -127,16 +135,22 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
               <SelectValue placeholder="Select an agent to add" />
             </SelectTrigger>
             <SelectContent>
-              {getAvailableAgents().map((agent) => (
-                <SelectItem key={agent.id} value={agent.id}>
-                  {agent.name} {agent.email && `(${agent.email})`}
+              {getAvailableAgents().length > 0 ? (
+                getAvailableAgents().map((agent) => (
+                  <SelectItem key={agent.id} value={agent.id}>
+                    {agent.name} {agent.email && `(${agent.email})`}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-agents" disabled>
+                  No agents available
                 </SelectItem>
-              ))}
+              )}
             </SelectContent>
           </Select>
           <Button 
             onClick={handleAddAgent} 
-            disabled={!selectedAgentId}
+            disabled={!selectedAgentId || selectedAgentId === 'no-agents'}
             variant="outline"
           >
             Add
