@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -13,6 +12,7 @@ interface TelegramBotConfigTabProps {
   updateConfigData: (field: keyof TelegramConfigData, value: any) => void;
   saving: boolean;
   onSave: () => void;
+  inboxId?: number;
 }
 
 interface AgentBot {
@@ -26,11 +26,13 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
   configData,
   updateConfigData,
   saving,
-  onSave
+  onSave,
+  inboxId
 }) => {
   const [availableBots, setAvailableBots] = useState<AgentBot[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [setBotLoading, setSetBotLoading] = useState(false);
 
   useEffect(() => {
     const fetchAgentBots = async () => {
@@ -58,6 +60,39 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
 
     fetchAgentBots();
   }, []);
+
+  const handleSetAgentBot = async () => {
+    if (!configData.selectedBot || !inboxId) {
+      console.error('No bot selected or inbox ID missing');
+      return;
+    }
+
+    try {
+      setSetBotLoading(true);
+      setError(null);
+      
+      // Find the selected bot to get its ID
+      const selectedBotData = availableBots.find(bot => bot.name === configData.selectedBot);
+      if (!selectedBotData) {
+        throw new Error('Selected bot not found');
+      }
+
+      console.log('Setting agent bot:', { inboxId, agentBotId: selectedBotData.id });
+      
+      await chatwootApi.setAgentBot(inboxId, selectedBotData.id);
+      
+      console.log('Agent bot set successfully');
+      
+      // Call the original onSave callback
+      onSave();
+      
+    } catch (err) {
+      console.error('Failed to set agent bot:', err);
+      setError('Failed to set agent bot. Please try again.');
+    } finally {
+      setSetBotLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -136,8 +171,11 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
           )}
 
           <div className="flex space-x-2">
-            <Button onClick={onSave} disabled={saving}>
-              {saving ? 'Updating...' : 'Update'}
+            <Button 
+              onClick={handleSetAgentBot} 
+              disabled={setBotLoading || !configData.selectedBot || !inboxId}
+            >
+              {setBotLoading ? 'Setting Bot...' : 'Set Agent Bot'}
             </Button>
             <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
               Disconnect bot

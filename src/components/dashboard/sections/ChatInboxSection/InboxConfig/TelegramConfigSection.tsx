@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -113,6 +112,7 @@ const TelegramConfigSection: React.FC<TelegramConfigSectionProps> = ({ inboxId, 
               updateConfigData={updateConfigData}
               saving={saving}
               onSave={saveConfiguration}
+              inboxId={parseInt(inboxId)}
             />
           </TabsContent>
         </div>

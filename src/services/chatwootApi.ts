@@ -219,6 +219,14 @@ class ChatwootApiService {
     const response = await this.makeRequest('/agent_bots');
     return Array.isArray(response) ? response : (response.payload || []);
   }
+
+  // Set agent bot for inbox
+  async setAgentBot(inboxId: number, agentBotId: number): Promise<void> {
+    await this.makeRequest(`/inboxes/${inboxId}/set_agent_bot`, {
+      method: 'POST',
+      body: JSON.stringify({ agent_bot: agentBotId }),
+    });
+  }
 }
 
 export const chatwootApi = new ChatwootApiService();
