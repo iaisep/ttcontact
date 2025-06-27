@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -90,19 +91,19 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
         console.log('Selected bot not found, but continuing...');
       }
 
-      console.log('Setting agent bot for Telegram (no API call):', { 
+      console.log('Setting agent bot for Telegram (NO API CALL - LOCAL ONLY):', { 
         inboxId, 
         selectedBot: configData.selectedBot,
         agentBotId: selectedBotData?.id 
       });
       
-      // Just simulate the action without any API call
+      // Just simulate the action without any API call or onSave call
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      console.log('Telegram agent bot configuration completed (local only)');
+      console.log('Telegram agent bot configuration completed (LOCAL SIMULATION ONLY - NO API CALLS)');
       
-      // Call the original onSave callback
-      onSave();
+      // DO NOT call onSave() to avoid API calls
+      // onSave();
       
     } catch (err) {
       console.error('Failed to set agent bot:', err);
@@ -218,3 +219,4 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
 };
 
 export default TelegramBotConfigTab;
+
