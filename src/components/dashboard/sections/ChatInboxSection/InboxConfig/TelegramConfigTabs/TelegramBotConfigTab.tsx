@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -92,8 +91,10 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
 
       console.log('Setting agent bot:', { inboxId, agentBotId: selectedBotData.id });
       
-      // No fetch call - just log the action
-      console.log('Agent bot set successfully (no API call)');
+      // Simulate processing delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log('Agent bot configured successfully (no API call made)');
       
       // Call the original onSave callback
       onSave();
