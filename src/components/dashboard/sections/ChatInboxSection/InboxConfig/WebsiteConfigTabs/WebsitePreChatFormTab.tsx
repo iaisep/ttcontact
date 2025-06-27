@@ -10,7 +10,7 @@ import type { WebsiteConfigData } from '../WebsiteConfigTypes';
 interface WebsitePreChatFormTabProps {
   configData: WebsiteConfigData;
   updateConfigData: (field: keyof WebsiteConfigData, value: any) => void;
-  updatePreFormField: (index: number, field: any) => void;
+  updatePreFormField: (field: string, value: any) => void;
   saving: boolean;
   onSave: () => void;
 }
@@ -23,7 +23,7 @@ const WebsitePreChatFormTab: React.FC<WebsitePreChatFormTabProps> = ({
   onSave
 }) => {
   const handleReorderFields = (newFields: any[]) => {
-    updateConfigData('preFormFields', newFields);
+    updateConfigData('preChatFormFields', newFields);
   };
 
   return (
@@ -67,7 +67,7 @@ const WebsitePreChatFormTab: React.FC<WebsitePreChatFormTabProps> = ({
                 <Label>Pre chat form fields</Label>
                 <div className="mt-2">
                   <DraggableFormFieldsList
-                    fields={configData.preFormFields}
+                    fields={configData.preChatFormFields}
                     updatePreFormField={updatePreFormField}
                     onReorderFields={handleReorderFields}
                   />

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
 
@@ -14,6 +15,14 @@ export const useWebsiteConfig = (inboxId: string) => {
     greetingType: 'disabled',
     greetingMessage: '',
     helpCenter: 'none',
+
+    // Additional widget settings
+    welcomeHeading: 'Welcome to our website',
+    welcomeTagline: 'How can we help you today?',
+    setReplyTime: 'In a few minutes',
+    enableEmailCollectBox: true,
+    allowMessagesAfterResolved: true,
+    enableConversationContinuity: true,
 
     // Features
     features: {
@@ -35,6 +44,7 @@ export const useWebsiteConfig = (inboxId: string) => {
 
     // Pre Chat Form
     preChatFormEnabled: false,
+    enablePreChatForm: false,
     preChatMessage: 'Please provide your contact details',
     requireEmail: true,
     requireFullName: true,
@@ -95,6 +105,13 @@ export const useWebsiteConfig = (inboxId: string) => {
     position: 'right',
     launcherTitle: 'Chat with us',
     widgetStyle: 'standard',
+    widgetBubblePosition: 'right',
+    widgetBubbleType: 'standard',
+    widgetBubbleLauncherTitle: 'Chat with us',
+
+    // Configuration
+    userIdentityValidation: 'HzPShsUbLrckiXnUQzMSWr35',
+    enforceUserIdentityValidation: false,
 
     // Sender Names
     senderNames: [
@@ -131,7 +148,7 @@ export const useWebsiteConfig = (inboxId: string) => {
     }));
   };
 
-    const updatePreFormField = (field: string, value: any) => {
+  const updatePreFormField = (field: string, value: any) => {
     setConfigData(prev => ({
       ...prev,
       preChatFormFields: prev.preChatFormFields.map(formField =>

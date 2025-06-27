@@ -13,7 +13,7 @@ interface WebsiteSettingsTabProps {
   configData: WebsiteConfigData;
   updateConfigData: (field: keyof WebsiteConfigData, value: any) => void;
   updateFeature: (feature: keyof WebsiteConfigData['features'], value: boolean) => void;
-  updateSenderName: (field: keyof WebsiteConfigData['senderName'], value: any) => void;
+  updateSenderName: (index: number, field: string, value: string) => void;
   saving: boolean;
   onSave: () => void;
 }

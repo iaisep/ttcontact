@@ -1,3 +1,4 @@
+
 export interface WebsiteConfigData {
   // Settings
   websiteName: string;
@@ -7,6 +8,14 @@ export interface WebsiteConfigData {
   greetingType: 'disabled' | 'custom';
   greetingMessage: string;
   helpCenter: string;
+
+  // Additional widget settings
+  welcomeHeading: string;
+  welcomeTagline: string;
+  setReplyTime: string;
+  enableEmailCollectBox: boolean;
+  allowMessagesAfterResolved: boolean;
+  enableConversationContinuity: boolean;
 
   // Features
   features: {
@@ -28,6 +37,7 @@ export interface WebsiteConfigData {
 
   // Pre Chat Form
   preChatFormEnabled: boolean;
+  enablePreChatForm: boolean;
   preChatMessage: string;
   requireEmail: boolean;
   requireFullName: boolean;
@@ -75,6 +85,13 @@ export interface WebsiteConfigData {
   position: 'left' | 'right';
   launcherTitle: string;
   widgetStyle: 'standard' | 'expanded_bubble';
+  widgetBubblePosition: 'left' | 'right';
+  widgetBubbleType: 'standard' | 'expanded';
+  widgetBubbleLauncherTitle: string;
+
+  // Configuration
+  userIdentityValidation: string;
+  enforceUserIdentityValidation: boolean;
 
   // Sender Names
   senderNames: Array<{
