@@ -1,5 +1,5 @@
-
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
 
 export const useWebsiteConfig = (inboxId: string) => {
@@ -9,12 +9,12 @@ export const useWebsiteConfig = (inboxId: string) => {
 
   const [configData, setConfigData] = useState<WebsiteConfigData>({
     // Settings tab
-    inboxName: 'https://totalcontact.com.mx/',
+    inboxName: '',
     channelAvatar: '',
-    websiteName: 'https://totalcontact.com.mx/',
-    websiteDomain: 'https://totalcontact.com.mx/',
-    welcomeHeading: 'Hi there!',
-    welcomeTagline: 'Welcome',
+    websiteName: '',
+    websiteDomain: '',
+    welcomeHeading: '',
+    welcomeTagline: '',
     widgetColor: '#00bcd4',
     enableChannelGreeting: false,
     setReplyTime: 'In a few minutes',
@@ -106,13 +106,56 @@ export const useWebsiteConfig = (inboxId: string) => {
     selectedBot: 'Agente_mensajeria_telegram_inmensa'
   });
 
-  useEffect(() => {
-    // Simulate loading configuration data
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+  const fetchInboxData = async () => {
+    try {
+      setLoading(true);
+      console.log('Fetching inbox data for ID:', inboxId);
+      
+      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${inboxId}`, {
+        method: 'GET',
+        headers: {
+          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          'Content-Type': 'application/json',
+        },
+      });
 
-    return () => clearTimeout(timer);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error fetching inbox: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('Inbox data fetched successfully:', result);
+      
+      // Map the API response to our config data structure
+      const inboxData = result.payload || result;
+      
+      setConfigData(prev => ({
+        ...prev,
+        inboxName: inboxData.name || '',
+        websiteName: inboxData.website_url || '',
+        websiteDomain: inboxData.website_url || '',
+        welcomeHeading: inboxData.welcome_title || 'Hi there!',
+        welcomeTagline: inboxData.welcome_tagline || 'Welcome',
+        widgetColor: inboxData.widget_color || '#00bcd4',
+        enableChannelGreeting: inboxData.greeting_enabled || false,
+        channelAvatar: inboxData.avatar_url || '',
+        messengerScript: inboxData.web_widget_script || '',
+      }));
+      
+      toast.success('Inbox configuration loaded successfully');
+    } catch (error) {
+      console.error('Error fetching inbox data:', error);
+      toast.error('Failed to load inbox configuration');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (inboxId) {
+      fetchInboxData();
+    }
   }, [inboxId]);
 
   const updateConfigData = (field: keyof WebsiteConfigData, value: any) => {
@@ -165,10 +208,36 @@ export const useWebsiteConfig = (inboxId: string) => {
     setSaving(true);
     console.log('Saving Website configuration:', configData);
     
-    // Simulate save operation
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setSaving(false);
+    try {
+      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${inboxId}`, {
+        method: 'PATCH',
+        headers: {
+          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: configData.inboxName,
+          channel: {
+            website_url: configData.websiteDomain,
+            welcome_title: configData.welcomeHeading,
+            welcome_tagline: configData.welcomeTagline,
+            widget_color: configData.widgetColor,
+          },
+          greeting_enabled: configData.enableChannelGreeting,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error updating inbox: ${response.status}`);
+      }
+
+      toast.success('Configuration saved successfully');
+    } catch (error) {
+      console.error('Error saving configuration:', error);
+      toast.error('Failed to save configuration');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return {
