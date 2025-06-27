@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import type { WebsiteConfigData } from '../../WebsiteConfigTypes';
 
 interface SenderNameSectionProps {
@@ -24,15 +23,16 @@ const SenderNameSection: React.FC<SenderNameSectionProps> = ({
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
         Select the name of the agent who sent the reply to your customer when they receive emails from your agents.
       </p>
-      
-      <RadioGroup 
-        value={configData.senderName.type} 
-        onValueChange={(value) => updateSenderName('type', value)}
-        className="grid grid-cols-2 gap-4"
-      >
+      <div className="grid grid-cols-2 gap-4">
         <div className="border rounded-lg p-4">
           <div className="flex items-center space-x-2 mb-2">
-            <RadioGroupItem value="friendly" id="friendly" />
+            <input
+              type="radio"
+              id="friendly"
+              name="senderType"
+              checked={configData.senderName.type === 'friendly'}
+              onChange={() => updateSenderName('type', 'friendly')}
+            />
             <Label htmlFor="friendly">Friendly</Label>
           </div>
           <p className="text-sm text-gray-600 mb-2">
@@ -41,15 +41,20 @@ const SenderNameSection: React.FC<SenderNameSectionProps> = ({
           <div className="space-y-2">
             <Label>For eg:</Label>
             <div className="bg-blue-50 p-2 rounded text-sm">
-              <span className="text-blue-600">S</span> {configData.senderName.friendlyName}<br />
+              <span className="text-blue-600">S</span> Singh Chatwoot<br />
               &lt;support@yourbusiness.com&gt;
             </div>
           </div>
         </div>
-        
         <div className="border rounded-lg p-4">
           <div className="flex items-center space-x-2 mb-2">
-            <RadioGroupItem value="professional" id="professional" />
+            <input
+              type="radio"
+              id="professional"
+              name="senderType"
+              checked={configData.senderName.type === 'professional'}
+              onChange={() => updateSenderName('type', 'professional')}
+            />
             <Label htmlFor="professional">Professional</Label>
           </div>
           <p className="text-sm text-gray-600 mb-2">
@@ -58,13 +63,12 @@ const SenderNameSection: React.FC<SenderNameSectionProps> = ({
           <div className="space-y-2">
             <Label>For eg:</Label>
             <div className="bg-blue-50 p-2 rounded text-sm">
-              <span className="text-blue-600">C</span> {configData.senderName.professionalName}<br />
+              <span className="text-blue-600">C</span> Chatwoot<br />
               &lt;support@yourbusiness.com&gt;
             </div>
           </div>
         </div>
-      </RadioGroup>
-      
+      </div>
       <div className="mt-4">
         <Button 
           variant="link" 
