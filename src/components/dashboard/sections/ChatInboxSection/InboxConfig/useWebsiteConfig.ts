@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
@@ -209,10 +210,9 @@ export const useWebsiteConfig = (inboxId: string) => {
     console.log('Saving Website configuration:', configData);
     
     try {
-      // Create FormData to match the expected format
       const formData = new FormData();
       
-      // Basic fields
+      // Basic inbox fields - exactly as in the working example
       formData.append('name', configData.inboxName);
       formData.append('enable_email_collect', configData.enableEmailCollectBox.toString());
       formData.append('allow_messages_after_resolved', configData.allowMessagesAfterResolved.toString());
@@ -223,7 +223,7 @@ export const useWebsiteConfig = (inboxId: string) => {
       formData.append('sender_name_type', configData.senderName.type);
       formData.append('business_name', 'null');
       
-      // Channel feature flags
+      // Channel feature flags - add all selected features
       if (configData.features.displayFilePicker) {
         formData.append('channel[selected_feature_flags][]', 'attachments');
       }
@@ -234,25 +234,32 @@ export const useWebsiteConfig = (inboxId: string) => {
         formData.append('channel[selected_feature_flags][]', 'end_conversation');
       }
       
-      // Channel settings
+      // Channel specific settings
       formData.append('channel[widget_color]', configData.widgetColor);
       formData.append('channel[website_url]', configData.websiteDomain);
-      formData.append('channel[webhook_url]', 'undefined');
+      formData.append('channel[webhook_url]', '');
       formData.append('channel[welcome_title]', configData.welcomeHeading);
       formData.append('channel[welcome_tagline]', configData.welcomeTagline);
       formData.append('channel[reply_time]', 'in_a_few_minutes');
       formData.append('channel[continuity_via_email]', configData.enableConversationContinuity.toString());
 
+      console.log('FormData contents:');
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
       const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${inboxId}`, {
         method: 'PATCH',
         headers: {
           'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          // Don't set Content-Type for FormData, let browser set it with boundary
         },
         body: formData,
       });
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('API Error Response:', errorText);
         throw new Error(`Error updating inbox: ${response.status} - ${errorText}`);
       }
 
