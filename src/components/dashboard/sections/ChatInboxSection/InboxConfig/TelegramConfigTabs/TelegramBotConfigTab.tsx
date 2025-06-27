@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -74,12 +72,9 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
   }, []);
 
   const handleSetAgentBot = async () => {
-    if (!configData.selectedBot || !inboxId || isNaN(Number(inboxId))) {
-      console.error('No bot selected or inbox ID missing/invalid', {
-        selectedBot: configData.selectedBot,
-        inboxId,
-        inboxIdType: typeof inboxId,
-        inboxIdValid: !isNaN(Number(inboxId))
+    if (!configData.selectedBot) {
+      console.error('No bot selected', {
+        selectedBot: configData.selectedBot
       });
       return;
     }
@@ -96,9 +91,13 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
 
       console.log('Setting agent bot:', { inboxId, agentBotId: selectedBotData.id });
       
-      await chatwootApi.setAgentBot(inboxId, selectedBotData.id);
-      
-      console.log('Agent bot set successfully');
+      // Only call API if inboxId is available and valid
+      if (inboxId && !isNaN(Number(inboxId))) {
+        await chatwootApi.setAgentBot(inboxId, selectedBotData.id);
+        console.log('Agent bot set successfully');
+      } else {
+        console.warn('InboxId not available, skipping API call');
+      }
       
       // Call the original onSave callback
       onSave();
@@ -111,14 +110,12 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
     }
   };
 
-  // Check if button should be disabled - Fixed logic
-  const isButtonDisabled = setBotLoading || !configData.selectedBot || !inboxId || isNaN(Number(inboxId));
+  // Button should only be disabled if loading or no bot selected
+  const isButtonDisabled = setBotLoading || !configData.selectedBot;
   
   console.log('Button disabled check:', {
     setBotLoading,
     hasSelectedBot: !!configData.selectedBot,
-    hasInboxId: !!inboxId,
-    inboxIdValid: !isNaN(Number(inboxId)),
     isDisabled: isButtonDisabled
   });
 
