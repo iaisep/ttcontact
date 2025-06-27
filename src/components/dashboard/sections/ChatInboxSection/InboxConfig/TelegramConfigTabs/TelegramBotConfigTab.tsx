@@ -140,8 +140,8 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
     }
   };
 
-  // Button should only be disabled if loading or no bot selected or no inbox ID
-  const isButtonDisabled = setBotLoading || !configData.selectedBot || !inboxId;
+  // Button should never be disabled - remove all disabling rules
+  const isButtonDisabled = setBotLoading;
   
   console.log('Button disabled check:', {
     setBotLoading,
