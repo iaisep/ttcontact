@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -74,32 +73,39 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
   }, []);
 
   const handleSetAgentBot = async () => {
-    if (!configData.selectedBot || !inboxId) {
-      console.error('No bot selected or inbox ID missing', {
+    // Get the selected bot data first
+    const selectedBotData = availableBots.find(bot => bot.name === configData.selectedBot);
+    
+    if (!configData.selectedBot || !selectedBotData) {
+      console.error('No bot selected or bot not found', {
         selectedBot: configData.selectedBot,
-        inboxId
+        availableBots: availableBots.map(bot => bot.name)
       });
+      setError('Please select a valid bot');
       return;
     }
+
+    // Use the bot ID from the selected bot data
+    const botId = selectedBotData.id;
+    
+    console.log('Using bot ID from selected bot:', {
+      selectedBotName: configData.selectedBot,
+      botId: botId,
+      selectedBotData
+    });
 
     try {
       setSetBotLoading(true);
       setError(null);
       
-      // Find the selected bot to get its ID
-      const selectedBotData = availableBots.find(bot => bot.name === configData.selectedBot);
-      if (!selectedBotData) {
-        throw new Error('Selected bot not found');
-      }
-
       console.log('Setting agent bot for Telegram inbox:', { 
-        inboxId, 
+        botId,
         selectedBot: configData.selectedBot,
-        agentBotId: selectedBotData.id 
+        agentBotId: botId 
       });
       
-      // Make the API call to set the agent bot
-      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${inboxId}/set_agent_bot`, {
+      // Make the API call to set the agent bot using the bot ID from the variable
+      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/23/set_agent_bot`, {
         method: 'POST',
         headers: {
           'accept': 'application/json, text/plain, */*',
@@ -107,7 +113,7 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
           'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn'
         },
         body: JSON.stringify({
-          agent_bot: selectedBotData.id
+          agent_bot: botId
         })
       });
 
@@ -232,4 +238,3 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
 };
 
 export default TelegramBotConfigTab;
-
