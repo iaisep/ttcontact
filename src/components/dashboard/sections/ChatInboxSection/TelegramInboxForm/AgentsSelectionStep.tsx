@@ -1,17 +1,22 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import type { Agent } from './types';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+
+interface Agent {
+  id: string;
+  name: string;
+  email: string;
+}
 
 interface AgentsSelectionStepProps {
   agents: Agent[];
   selectedAgents: string[];
-  onAgentSelect: (agents: string[]) => void;
+  onAgentSelect: (agentIds: string[]) => void;
   onBack: () => void;
   onNext: () => void;
+  loading?: boolean;
 }
 
 const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
@@ -19,38 +24,79 @@ const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
   selectedAgents,
   onAgentSelect,
   onBack,
-  onNext
+  onNext,
+  loading = false
 }) => {
+  const handleAgentToggle = (agentId: string) => {
+    if (selectedAgents.includes(agentId)) {
+      onAgentSelect(selectedAgents.filter(id => id !== agentId));
+    } else {
+      onAgentSelect([...selectedAgents, agentId]);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Add agents</h2>
+          <p className="text-gray-600 mb-6">
+            Loading available agents...
+          </p>
+        </div>
+
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        </div>
+
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={onBack}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+          <Button disabled>
+            Continue
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold mb-2">Agents</h2>
-        <p className="text-gray-600 mb-4">
-          Here you can add agents to manage your newly created inbox. Only these selected agents will have access to your inbox. 
-          Agents which are not part of this inbox will not be able to see or respond to messages in this inbox when they login.
-        </p>
-        <p className="text-sm text-gray-500 mb-6">
-          <strong>PS:</strong> As an administrator, if you need access to all inboxes, you should add yourself as agent to all inboxes that you create.
+        <h2 className="text-xl font-semibold mb-2">Add agents</h2>
+        <p className="text-gray-600 mb-6">
+          Add agents to this inbox to receive the messages.
         </p>
       </div>
 
-      <div>
-        <Label>Agents</Label>
-        <Select 
-          value={selectedAgents.length > 0 ? selectedAgents[0] : ''} 
-          onValueChange={(value) => onAgentSelect([value])}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Pick agents for the inbox" />
-          </SelectTrigger>
-          <SelectContent>
-            {agents.map((agent) => (
-              <SelectItem key={agent.id} value={agent.id}>
-                {agent.name} ({agent.email})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="space-y-4">
+        {agents.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No agents available
+          </div>
+        ) : (
+          agents.map((agent) => (
+            <div key={agent.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+              <Checkbox
+                id={`agent-${agent.id}`}
+                checked={selectedAgents.includes(agent.id)}
+                onCheckedChange={() => handleAgentToggle(agent.id)}
+              />
+              <div className="flex-1">
+                <label
+                  htmlFor={`agent-${agent.id}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {agent.name}
+                </label>
+                <p className="text-sm text-gray-500">{agent.email}</p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <div className="flex justify-between">
@@ -61,9 +107,8 @@ const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
         <Button 
           onClick={onNext}
           className="bg-blue-600 hover:bg-blue-700"
-          disabled={selectedAgents.length === 0}
         >
-          Add agents
+          Continue
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>

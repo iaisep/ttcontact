@@ -12,6 +12,7 @@ const WebsiteInboxForm: React.FC<WebsiteInboxFormProps> = ({ onBack, onComplete 
     currentStep,
     setCurrentStep,
     isCreating,
+    loadingAgents,
     formData,
     selectedAgents,
     setSelectedAgents,
@@ -30,6 +31,7 @@ const WebsiteInboxForm: React.FC<WebsiteInboxFormProps> = ({ onBack, onComplete 
           <WebsiteFormFields
             formData={formData}
             errors={errors}
+            isCreating={isCreating}
             onInputChange={handleInputChange}
             onBack={onBack}
             onNext={handleNextStep}
@@ -43,6 +45,7 @@ const WebsiteInboxForm: React.FC<WebsiteInboxFormProps> = ({ onBack, onComplete 
             onAgentSelect={setSelectedAgents}
             onBack={() => setCurrentStep(2)}
             onNext={handleNextStep}
+            loading={loadingAgents}
           />
         );
       case 4:

@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import type { WebsiteFormData, FormErrors } from './types';
 
 interface WebsiteFormFieldsProps {
   formData: WebsiteFormData;
   errors: FormErrors;
+  isCreating?: boolean;
   onInputChange: (field: keyof WebsiteFormData, value: string | boolean) => void;
   onBack: () => void;
   onNext: () => void;
@@ -18,6 +19,7 @@ interface WebsiteFormFieldsProps {
 const WebsiteFormFields: React.FC<WebsiteFormFieldsProps> = ({
   formData,
   errors,
+  isCreating = false,
   onInputChange,
   onBack,
   onNext
@@ -43,6 +45,7 @@ const WebsiteFormFields: React.FC<WebsiteFormFieldsProps> = ({
             value={formData.websiteName}
             onChange={(e) => onInputChange('websiteName', e.target.value)}
             className={errors.websiteName ? 'border-red-500' : ''}
+            disabled={isCreating}
           />
           {errors.websiteName && (
             <p className="text-red-500 text-sm mt-1">{errors.websiteName}</p>
@@ -58,6 +61,7 @@ const WebsiteFormFields: React.FC<WebsiteFormFieldsProps> = ({
             value={formData.websiteDomain}
             onChange={(e) => onInputChange('websiteDomain', e.target.value)}
             className={errors.websiteDomain ? 'border-red-500' : ''}
+            disabled={isCreating}
           />
           {errors.websiteDomain && (
             <p className="text-red-500 text-sm mt-1">{errors.websiteDomain}</p>
@@ -77,6 +81,7 @@ const WebsiteFormFields: React.FC<WebsiteFormFieldsProps> = ({
               value={formData.widgetColor}
               onChange={(e) => onInputChange('widgetColor', e.target.value)}
               className="w-20"
+              disabled={isCreating}
             />
           </div>
         </div>
@@ -88,6 +93,7 @@ const WebsiteFormFields: React.FC<WebsiteFormFieldsProps> = ({
             type="text"
             value={formData.welcomeHeading}
             onChange={(e) => onInputChange('welcomeHeading', e.target.value)}
+            disabled={isCreating}
           />
         </div>
 
@@ -96,10 +102,11 @@ const WebsiteFormFields: React.FC<WebsiteFormFieldsProps> = ({
           <div className="border rounded-md p-3 min-h-[100px]">
             <textarea
               id="welcomeTagline"
-              className="w-full h-full border-none outline-none resize-none"
+              className="w-full h-full border-none outline-none resize-none disabled:opacity-50"
               value={formData.welcomeTagline}
               onChange={(e) => onInputChange('welcomeTagline', e.target.value)}
               placeholder="Enter your welcome message..."
+              disabled={isCreating}
             />
             <div className="text-right text-sm text-gray-500 mt-2">
               {formData.welcomeTagline.length} / 255
@@ -112,6 +119,7 @@ const WebsiteFormFields: React.FC<WebsiteFormFieldsProps> = ({
           <Select 
             value={formData.enableChannelGreeting ? 'enabled' : 'disabled'}
             onValueChange={(value) => onInputChange('enableChannelGreeting', value === 'enabled')}
+            disabled={isCreating}
           >
             <SelectTrigger>
               <SelectValue />
@@ -128,17 +136,26 @@ const WebsiteFormFields: React.FC<WebsiteFormFieldsProps> = ({
       </div>
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
+        <Button variant="outline" onClick={onBack} disabled={isCreating}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
         <Button 
           onClick={onNext}
           className="bg-blue-600 hover:bg-blue-700"
-          disabled={!isFormValid}
+          disabled={!isFormValid || isCreating}
         >
-          Create Inbox
-          <ArrowRight className="ml-2 h-4 w-4" />
+          {isCreating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Creating Inbox...
+            </>
+          ) : (
+            <>
+              Create Inbox
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </>
+          )}
         </Button>
       </div>
     </div>

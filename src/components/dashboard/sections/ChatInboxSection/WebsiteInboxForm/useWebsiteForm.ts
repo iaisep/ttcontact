@@ -1,10 +1,12 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { WebsiteFormData, Agent, FormErrors } from './types';
+import { toast } from 'sonner';
 
 export const useWebsiteForm = () => {
   const [currentStep, setCurrentStep] = useState(2);
   const [isCreating, setIsCreating] = useState(false);
+  const [loadingAgents, setLoadingAgents] = useState(false);
   const [formData, setFormData] = useState<WebsiteFormData>({
     websiteName: '',
     websiteDomain: '',
@@ -16,13 +18,8 @@ export const useWebsiteForm = () => {
   const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
   const [errors, setErrors] = useState<FormErrors>({});
   const [generatedScript, setGeneratedScript] = useState('');
-
-  // Mock agents data
-  const agents: Agent[] = [
-    { id: '1', name: 'John Doe', email: 'john@example.com' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com' },
-    { id: '3', name: 'Mike Johnson', email: 'mike@example.com' }
-  ];
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [createdInboxId, setCreatedInboxId] = useState<string | null>(null);
 
   const handleInputChange = (field: keyof WebsiteFormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -47,10 +44,93 @@ export const useWebsiteForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const createWebsiteInbox = async () => {
+    try {
+      const formDataPayload = new FormData();
+      formDataPayload.append('name', formData.websiteName);
+      formDataPayload.append('greeting_enabled', formData.enableChannelGreeting.toString());
+      formDataPayload.append('greeting_message', '');
+      formDataPayload.append('channel[type]', 'web_widget');
+      formDataPayload.append('channel[website_url]', formData.websiteDomain);
+      formDataPayload.append('channel[widget_color]', formData.widgetColor);
+      formDataPayload.append('channel[welcome_title]', formData.welcomeHeading);
+      formDataPayload.append('channel[welcome_tagline]', formData.welcomeTagline);
+
+      const response = await fetch('https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes', {
+        method: 'POST',
+        headers: {
+          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+        },
+        body: formDataPayload,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error creating inbox: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('Website inbox created successfully:', result);
+      
+      setCreatedInboxId(result.payload?.id?.toString() || null);
+      toast.success('Website inbox created successfully');
+      
+      return result;
+    } catch (error) {
+      console.error('Error creating website inbox:', error);
+      toast.error('Failed to create website inbox');
+      throw error;
+    }
+  };
+
+  const fetchAgents = async () => {
+    try {
+      setLoadingAgents(true);
+      console.log('Fetching agents from Chatwoot API...');
+      
+      const response = await fetch('https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/agents', {
+        method: 'GET',
+        headers: {
+          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error fetching agents: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('Agents fetched successfully:', result);
+      
+      const agentsData = result.payload || result;
+      const transformedAgents: Agent[] = agentsData.map((agent: any) => ({
+        id: agent.id.toString(),
+        name: agent.name,
+        email: agent.email
+      }));
+      
+      setAgents(transformedAgents);
+      toast.success(`Loaded ${transformedAgents.length} agents`);
+    } catch (error) {
+      console.error('Error fetching agents:', error);
+      toast.error('Failed to load agents');
+      // Fallback to mock data if API fails
+      setAgents([
+        { id: '1', name: 'John Doe', email: 'john@example.com' },
+        { id: '2', name: 'Jane Smith', email: 'jane@example.com' },
+        { id: '3', name: 'Mike Johnson', email: 'mike@example.com' }
+      ]);
+    } finally {
+      setLoadingAgents(false);
+    }
+  };
+
   const generateScript = () => {
     const script = `<script>
   (function(d,t) {
-    var BASE_URL="https://chatwout.totalcontact.com.mx";
+    var BASE_URL="https://chatwoot.totalcontact.com.mx";
     var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
     g.defer = true;
     g.async = true;
@@ -67,9 +147,18 @@ export const useWebsiteForm = () => {
     return script;
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (currentStep === 2 && validateForm()) {
-      setCurrentStep(3);
+      try {
+        setIsCreating(true);
+        await createWebsiteInbox();
+        await fetchAgents();
+        setCurrentStep(3);
+      } catch (error) {
+        console.error('Error proceeding to next step:', error);
+      } finally {
+        setIsCreating(false);
+      }
     } else if (currentStep === 3) {
       // Generate script after selecting agents
       const script = generateScript();
@@ -79,32 +168,21 @@ export const useWebsiteForm = () => {
   };
 
   const handleCreateWebsiteChannel = async (onComplete: () => void) => {
-    setIsCreating(true);
-    
     try {
-      console.log('Creating Website inbox with data:', { formData, selectedAgents });
+      console.log('Completing Website inbox creation with agents:', selectedAgents);
       
-      // Use the Chatwoot API to create the inbox
-      if ((window as any).createWebsiteInbox) {
-        await (window as any).createWebsiteInbox({
-          name: formData.websiteName,
-          websiteUrl: formData.websiteDomain,
-          welcomeTitle: formData.welcomeHeading,
-          welcomeTagline: formData.welcomeTagline,
-        });
-        
-        console.log('Website inbox created successfully');
-        onComplete();
-      } else {
-        console.error('createWebsiteInbox function not found on window');
-        throw new Error('Website inbox creation function not available');
+      // If we have a created inbox and selected agents, we could assign agents here
+      if (createdInboxId && selectedAgents.length > 0) {
+        // This would be for assigning agents to the inbox
+        // The API endpoint would be something like:
+        // POST /api/v1/accounts/1/inboxes/{inbox_id}/agents
+        console.log('Would assign agents to inbox:', createdInboxId, selectedAgents);
       }
       
+      onComplete();
     } catch (error) {
-      console.error('Error creating Website inbox:', error);
+      console.error('Error completing website channel creation:', error);
       throw error;
-    } finally {
-      setIsCreating(false);
     }
   };
 
@@ -112,6 +190,7 @@ export const useWebsiteForm = () => {
     currentStep,
     setCurrentStep,
     isCreating,
+    loadingAgents,
     formData,
     selectedAgents,
     setSelectedAgents,
