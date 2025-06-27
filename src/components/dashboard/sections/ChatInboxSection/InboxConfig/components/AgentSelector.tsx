@@ -40,7 +40,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
         // Transform Chatwoot agent data to our Agent interface
         const transformedAgents: Agent[] = agents.map(agent => ({
           id: agent.id.toString(),
-          name: agent.name || agent.available_name || 'Unnamed Agent',
+          name: agent.name || 'Unnamed Agent',
           email: agent.email
         }));
         
