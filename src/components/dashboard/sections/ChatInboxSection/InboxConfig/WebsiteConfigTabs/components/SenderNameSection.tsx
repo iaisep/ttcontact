@@ -7,7 +7,7 @@ import type { WebsiteConfigData } from '../../WebsiteConfigTypes';
 
 interface SenderNameSectionProps {
   configData: WebsiteConfigData;
-  updateSenderName: (field: keyof WebsiteConfigData['senderName'], value: any) => void;
+  updateSenderName: (field: string | symbol, value: any) => void;
 }
 
 const SenderNameSection: React.FC<SenderNameSectionProps> = ({
@@ -100,3 +100,4 @@ const SenderNameSection: React.FC<SenderNameSectionProps> = ({
 };
 
 export default SenderNameSection;
+

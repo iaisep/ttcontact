@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect } from 'react';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
 
@@ -10,6 +11,7 @@ export const useWebsiteConfig = (inboxId: string) => {
     // Settings
     websiteName: 'Website Chat',
     websiteUrl: 'https://example.com',
+    websiteDomain: 'example.com',
     channelAvatar: '',
     enableChannelGreeting: false,
     greetingType: 'disabled',
@@ -40,6 +42,10 @@ export const useWebsiteConfig = (inboxId: string) => {
       enableEmailCollect: true,
       enablePhoneNumberCollect: true,
       enableFullNameCollect: true,
+      displayFilePicker: true,
+      displayEmojiPicker: true,
+      allowUsersToEndConversation: false,
+      useInboxNameAndAvatar: false,
     },
 
     // Pre Chat Form
@@ -51,6 +57,7 @@ export const useWebsiteConfig = (inboxId: string) => {
     requirePhoneNumber: false,
     preChatFormFields: [
       {
+        key: 'fullName',
         name: 'fullName',
         placeholder: 'Full Name',
         type: 'text',
@@ -61,11 +68,12 @@ export const useWebsiteConfig = (inboxId: string) => {
         values: []
       },
       {
+        key: 'emailAddress',
         name: 'emailAddress',
         placeholder: 'Email Address',
         type: 'email',
         required: true,
-        enabled: true,
+        enabled: true,  
         field_type: 'standard',
         label: 'Email Address',
         values: []
@@ -117,6 +125,9 @@ export const useWebsiteConfig = (inboxId: string) => {
     senderNames: [
       { name: 'Support Team', email: 'support@example.com' }
     ],
+    senderName: {
+      type: 'friendly'
+    },
 
     // Bot Configuration
     selectedBot: 'Agente_mensajeria_telegram_agente de ventas nuevo'
@@ -148,11 +159,11 @@ export const useWebsiteConfig = (inboxId: string) => {
     }));
   };
 
-  const updatePreFormField = (field: string, value: any) => {
+  const updatePreFormField = (index: number, field: any) => {
     setConfigData(prev => ({
       ...prev,
-      preChatFormFields: prev.preChatFormFields.map(formField =>
-        formField.name === field ? { ...formField, ...value } : formField
+      preChatFormFields: prev.preChatFormFields.map((formField, i) =>
+        i === index ? { ...formField, ...field } : formField
       )
     }));
   };
@@ -167,12 +178,14 @@ export const useWebsiteConfig = (inboxId: string) => {
     }));
   };
 
-  const updateSenderName = (index: number, field: string, value: string) => {
-    setConfigData(prev => {
-      const newSenderNames = [...prev.senderNames];
-      newSenderNames[index] = { ...newSenderNames[index], [field]: value };
-      return { ...prev, senderNames: newSenderNames };
-    });
+  const updateSenderName = (field: string | symbol, value: any) => {
+    setConfigData(prev => ({
+      ...prev,
+      senderName: {
+        ...prev.senderName,
+        [field]: value
+      }
+    }));
   };
 
   const saveConfiguration = async () => {
@@ -202,3 +215,4 @@ export const useWebsiteConfig = (inboxId: string) => {
     saveConfiguration
   };
 };
+

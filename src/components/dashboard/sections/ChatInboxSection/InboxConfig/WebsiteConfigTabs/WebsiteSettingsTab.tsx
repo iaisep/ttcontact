@@ -13,7 +13,7 @@ interface WebsiteSettingsTabProps {
   configData: WebsiteConfigData;
   updateConfigData: (field: keyof WebsiteConfigData, value: any) => void;
   updateFeature: (feature: keyof WebsiteConfigData['features'], value: boolean) => void;
-  updateSenderName: (index: number, field: string, value: string) => void;
+  updateSenderName: (field: string | symbol, value: any) => void;
   saving: boolean;
   onSave: () => void;
 }
@@ -77,3 +77,4 @@ const WebsiteSettingsTab: React.FC<WebsiteSettingsTabProps> = ({
 };
 
 export default WebsiteSettingsTab;
+

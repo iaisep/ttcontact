@@ -10,7 +10,7 @@ import type { WebsiteConfigData } from '../WebsiteConfigTypes';
 interface WebsitePreChatFormTabProps {
   configData: WebsiteConfigData;
   updateConfigData: (field: keyof WebsiteConfigData, value: any) => void;
-  updatePreFormField: (field: string, value: any) => void;
+  updatePreFormField: (index: number, field: any) => void;
   saving: boolean;
   onSave: () => void;
 }
@@ -88,3 +88,4 @@ const WebsitePreChatFormTab: React.FC<WebsitePreChatFormTabProps> = ({
 };
 
 export default WebsitePreChatFormTab;
+

@@ -1,8 +1,10 @@
 
+
 export interface WebsiteConfigData {
   // Settings
   websiteName: string;
   websiteUrl: string;
+  websiteDomain: string;
   channelAvatar: string;
   enableChannelGreeting: boolean;
   greetingType: 'disabled' | 'custom';
@@ -33,6 +35,10 @@ export interface WebsiteConfigData {
     enableEmailCollect: boolean;
     enablePhoneNumberCollect: boolean;
     enableFullNameCollect: boolean;
+    displayFilePicker: boolean;
+    displayEmojiPicker: boolean;
+    allowUsersToEndConversation: boolean;
+    useInboxNameAndAvatar: boolean;
   };
 
   // Pre Chat Form
@@ -43,6 +49,7 @@ export interface WebsiteConfigData {
   requireFullName: boolean;
   requirePhoneNumber: boolean;
   preChatFormFields: Array<{
+    key: string;
     name: string;
     placeholder: string;
     type: string;
@@ -98,6 +105,9 @@ export interface WebsiteConfigData {
     name: string;
     email: string;
   }>;
+  senderName: {
+    type: 'friendly' | 'professional';
+  };
 
   // Bot Configuration
   selectedBot?: string;
@@ -107,3 +117,4 @@ export interface WebsiteConfigSectionProps {
   inboxId: string;
   onBack: () => void;
 }
+
