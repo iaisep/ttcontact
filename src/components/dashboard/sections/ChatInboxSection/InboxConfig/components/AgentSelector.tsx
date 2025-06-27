@@ -1,10 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X } from 'lucide-react';
-import { chatwootApi } from '@/services/chatwootApi';
 
 interface Agent {
   id: string;
@@ -26,43 +25,14 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
   saving = false
 }) => {
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
-  const [availableAgents, setAvailableAgents] = useState<Agent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchAgents = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const agents = await chatwootApi.getAgents();
-        console.log('Fetched agents from API:', agents);
-        
-        // Transform the API response to match our interface
-        const transformedAgents = agents.map(agent => ({
-          id: agent.id.toString(),
-          name: agent.name,
-          email: agent.email
-        }));
-        
-        setAvailableAgents(transformedAgents);
-      } catch (err) {
-        console.error('Error fetching agents:', err);
-        setError('Failed to load agents');
-        // Fallback to mock data if API fails
-        setAvailableAgents([
-          { id: '1', name: 'Maikel Guzman', email: 'maikel@company.com' },
-          { id: '2', name: 'Agent Smith', email: 'smith@company.com' },
-          { id: '3', name: 'Agent Johnson', email: 'johnson@company.com' },
-          { id: '4', name: 'Agent Brown', email: 'brown@company.com' }
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAgents();
-  }, []);
+  // Mock agents data - this would come from your actual data source
+  const availableAgents: Agent[] = [
+    { id: '1', name: 'Maikel Guzman', email: 'maikel@company.com' },
+    { id: '2', name: 'Agent Smith', email: 'smith@company.com' },
+    { id: '3', name: 'Agent Johnson', email: 'johnson@company.com' },
+    { id: '4', name: 'Agent Brown', email: 'brown@company.com' }
+  ];
 
   const handleAddAgent = () => {
     if (selectedAgentId && !selectedAgents.includes(selectedAgentId)) {
@@ -84,18 +54,6 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
     return availableAgents.filter(agent => !selectedAgents.includes(agent.id));
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <Label>Agents</Label>
-        <div className="animate-pulse">
-          <div className="h-10 bg-gray-200 rounded mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       <div>
@@ -103,12 +61,6 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
           Add or remove agents from this inbox
         </p>
-        
-        {error && (
-          <div className="text-sm text-red-600 mb-3">
-            {error}
-          </div>
-        )}
         
         <div className="flex gap-2 mb-4">
           <Select value={selectedAgentId} onValueChange={setSelectedAgentId}>
