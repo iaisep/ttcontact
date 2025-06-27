@@ -1,3 +1,4 @@
+
 const CHATWOOT_API_KEY = 'YZEKfqAJsnEWoshpdRCq9yZn';
 const CHATWOOT_BASE_URL = 'https://chatwoot.totalcontact.com.mx/api/v1/accounts/1'; // Replace 1 with actual account ID
 
@@ -33,6 +34,13 @@ interface Agent {
   name: string;
   email: string;
   role: string;
+  available_name?: string;
+  account_id?: number;
+  availability_status?: string;
+  auto_offline?: boolean;
+  confirmed?: boolean;
+  thumbnail?: string;
+  custom_role_id?: number | null;
 }
 
 class ChatwootApiService {
@@ -134,10 +142,11 @@ class ChatwootApiService {
     });
   }
 
-  // Get all agents
+  // Get all agents - Fixed to return the response directly since it's an array
   async getAgents(): Promise<Agent[]> {
     const response = await this.makeRequest('/agents');
-    return response.payload || [];
+    // The API returns the agents array directly, not wrapped in a payload
+    return Array.isArray(response) ? response : (response.payload || []);
   }
 
   // Create WhatsApp inbox
