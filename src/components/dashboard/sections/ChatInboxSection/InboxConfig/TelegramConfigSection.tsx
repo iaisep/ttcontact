@@ -84,7 +84,7 @@ const TelegramConfigSection: React.FC<TelegramConfigSectionProps> = ({ inboxId, 
               updateConfigData={updateConfigData}
               saving={saving}
               onSave={saveConfiguration}
-              inboxId={inboxId}
+              inboxId={parseInt(inboxId)}
             />
           </TabsContent>
 

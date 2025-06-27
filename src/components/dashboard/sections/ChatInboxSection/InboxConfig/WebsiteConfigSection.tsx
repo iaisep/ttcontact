@@ -95,6 +95,7 @@ const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = ({ inboxId, on
               updateConfigData={updateConfigData as any}
               saving={saving}
               onSave={saveConfiguration}
+              inboxId={parseInt(inboxId)}
             />
           </TabsContent>
 

@@ -86,7 +86,7 @@ const WhatsAppConfigSection: React.FC<InboxConfigSectionProps> = ({ inboxId, onB
               updateConfigData={updateConfigData}
               saving={saving}
               onSave={saveConfiguration}
-              inboxId={inboxId}
+              inboxId={parseInt(inboxId)}
             />
           </TabsContent>
 
