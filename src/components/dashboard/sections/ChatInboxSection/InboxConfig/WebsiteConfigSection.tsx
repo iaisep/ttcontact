@@ -13,7 +13,7 @@ import TelegramBusinessHoursTab from './TelegramConfigTabs/TelegramBusinessHours
 import TelegramCSATTab from './TelegramConfigTabs/TelegramCSATTab';
 import type { WebsiteConfigSectionProps } from './WebsiteConfigTypes';
 
-const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = ({ inboxId, onBack }) => {
+const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = ({ inboxId, inboxDetails, onBack }) => {
   const {
     loading,
     saving,
@@ -26,7 +26,7 @@ const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = ({ inboxId, on
     updateFeature,
     updateSenderName,
     saveConfiguration
-  } = useWebsiteConfig(inboxId);
+  } = useWebsiteConfig(inboxId, inboxDetails);
 
   // Convert inboxId to number and validate it
   const numericInboxId = typeof inboxId === 'string' ? parseInt(inboxId) : inboxId;

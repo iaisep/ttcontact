@@ -1,9 +1,7 @@
-
-
 import { useState, useEffect } from 'react';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
 
-export const useWebsiteConfig = (inboxId: string) => {
+export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('settings');
@@ -134,16 +132,36 @@ export const useWebsiteConfig = (inboxId: string) => {
   });
 
   useEffect(() => {
-    // Simulate loading configuration data
     const loadConfig = async () => {
       setLoading(true);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Si tenemos datos de la API, usarlos para poblar el estado
+      if (inboxDetails) {
+        console.log('Using inbox details from API:', inboxDetails);
+        
+        setConfigData(prev => ({
+          ...prev,
+          // Map API data to our config structure
+          websiteName: inboxDetails.name || prev.websiteName,
+          websiteUrl: inboxDetails.website_url || prev.websiteUrl,
+          websiteDomain: inboxDetails.website_url ? new URL(inboxDetails.website_url).hostname : prev.websiteDomain,
+          channelAvatar: inboxDetails.avatar_url || prev.channelAvatar,
+          enableChannelGreeting: inboxDetails.greeting_enabled || prev.enableChannelGreeting,
+          greetingMessage: inboxDetails.greeting_message || prev.greetingMessage,
+          welcomeHeading: inboxDetails.welcome_title || prev.welcomeHeading,
+          welcomeTagline: inboxDetails.welcome_tagline || prev.welcomeTagline,
+          
+          // Map other relevant fields from API
+          launcherTitle: inboxDetails.welcome_title || prev.launcherTitle,
+          widgetBubbleLauncherTitle: inboxDetails.welcome_title || prev.widgetBubbleLauncherTitle,
+        }));
+      }
+      
       setLoading(false);
     };
     
     loadConfig();
-  }, [inboxId]);
+  }, [inboxId, inboxDetails]);
 
   const updateConfigData = (field: keyof WebsiteConfigData, value: any) => {
     setConfigData(prev => ({ ...prev, [field]: value }));
@@ -215,4 +233,3 @@ export const useWebsiteConfig = (inboxId: string) => {
     saveConfiguration
   };
 };
-
