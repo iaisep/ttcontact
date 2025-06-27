@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X } from 'lucide-react';
+import { chatwootApi } from '@/services/chatwootApi';
 
 interface Agent {
   id: string;
@@ -25,14 +26,35 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
   saving = false
 }) => {
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
+  const [availableAgents, setAvailableAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock agents data - this would come from your actual data source
-  const availableAgents: Agent[] = [
-    { id: '1', name: 'Maikel Guzman', email: 'maikel@company.com' },
-    { id: '2', name: 'Agent Smith', email: 'smith@company.com' },
-    { id: '3', name: 'Agent Johnson', email: 'johnson@company.com' },
-    { id: '4', name: 'Agent Brown', email: 'brown@company.com' }
-  ];
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const agents = await chatwootApi.getAgents();
+        
+        // Transform Chatwoot agent data to our Agent interface
+        const transformedAgents: Agent[] = agents.map(agent => ({
+          id: agent.id.toString(),
+          name: agent.name || agent.available_name || 'Unnamed Agent',
+          email: agent.email
+        }));
+        
+        setAvailableAgents(transformedAgents);
+      } catch (err) {
+        console.error('Failed to fetch agents:', err);
+        setError('Failed to load agents. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAgents();
+  }, []);
 
   const handleAddAgent = () => {
     if (selectedAgentId && !selectedAgents.includes(selectedAgentId)) {
@@ -53,6 +75,43 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
   const getAvailableAgents = () => {
     return availableAgents.filter(agent => !selectedAgents.includes(agent.id));
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div>
+          <Label>Agents</Label>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            Loading agents...
+          </p>
+          <div className="animate-pulse">
+            <div className="h-10 bg-gray-200 rounded mb-2"></div>
+            <div className="h-8 bg-gray-200 rounded w-20"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <div>
+          <Label>Agents</Label>
+          <p className="text-sm text-red-600 mb-3">
+            {error}
+          </p>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.reload()}
+            size="sm"
+          >
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
