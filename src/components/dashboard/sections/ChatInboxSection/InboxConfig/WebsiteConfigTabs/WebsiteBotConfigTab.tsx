@@ -148,7 +148,7 @@ const WebsiteBotConfigTab: React.FC<WebsiteBotConfigTabProps> = ({
         })
       });
 
-      if !response.ok) {
+      if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Failed to set agent bot: ${response.status} - ${errorText}`);
       }
