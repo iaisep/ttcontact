@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { useChatwootInboxManager } from './ChatInboxSection/useChatwootInboxManager';
+import { useInboxDetails } from './ChatInboxSection/InboxConfig/useInboxDetails';
 import InboxHeader from './ChatInboxSection/InboxHeader';
 import InboxList from './ChatInboxSection/InboxList';
 import type { ChatInboxSectionProps } from './ChatInboxSection/types';
@@ -19,6 +21,9 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
     deleteInbox,
   } = useChatwootInboxManager(onInboxCreated);
 
+  // Hook para obtener detalles del inbox seleccionado
+  const { inboxDetails, loading: detailsLoading } = useInboxDetails(selectedInbox?.id || null);
+
   const handleAddInbox = () => {
     if (onNavigateToAddInbox) {
       onNavigateToAddInbox();
@@ -26,6 +31,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
   };
 
   const handleConfigureInbox = (inbox: Inbox) => {
+    console.log('Configuring inbox:', inbox);
     setSelectedInbox(inbox);
   };
 
@@ -47,6 +53,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
   if (selectedInbox) {
     const platform = selectedInbox.platform.toLowerCase();
     console.log('Selected inbox platform:', platform, 'Full inbox:', selectedInbox);
+    console.log('Inbox details from API:', inboxDetails);
     
     // Verificar múltiples variaciones posibles de WhatsApp
     if (platform === 'whatsapp' || platform === 'whats app' || platform.includes('whatsapp') || selectedInbox.platform === 'WhatsApp') {
@@ -69,6 +76,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
         }>
           <WhatsAppConfigSection 
             inboxId={selectedInbox.id}
+            inboxDetails={inboxDetails}
             onBack={handleBackFromConfig}
           />
         </React.Suspense>
@@ -95,6 +103,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
         }>
           <TelegramConfigSection 
             inboxId={selectedInbox.id}
+            inboxDetails={inboxDetails}
             onBack={handleBackFromConfig}
           />
         </React.Suspense>
@@ -121,6 +130,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
         }>
           <WebsiteConfigSection 
             inboxId={selectedInbox.id}
+            inboxDetails={inboxDetails}
             onBack={handleBackFromConfig}
           />
         </React.Suspense>
