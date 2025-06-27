@@ -115,7 +115,7 @@ export const useWebsiteConfig = (inboxId: string) => {
       const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${inboxId}`, {
         method: 'GET',
         headers: {
-          'api_access_token': 'YZEKfqAJsnEWoshpdRCq9yZn',
+          'api_access_token': 'wmDtJ0t2DgxjIEguvQEPRQ',
           'Content-Type': 'application/json',
         },
       });
@@ -143,6 +143,12 @@ export const useWebsiteConfig = (inboxId: string) => {
         greetingMessage: inboxData.greeting_message || '',
         channelAvatar: inboxData.avatar_url || '',
         messengerScript: inboxData.web_widget_script || '',
+        // Map sender name configuration
+        senderName: {
+          type: inboxData.sender_name_type || 'friendly',
+          friendlyName: inboxData.business_name || 'Singh Chatwoot',
+          professionalName: inboxData.business_name || 'Chatwoot',
+        },
       }));
       
       toast.success('Inbox configuration loaded successfully');
@@ -222,7 +228,7 @@ export const useWebsiteConfig = (inboxId: string) => {
       formData.append('portal_id', 'null');
       formData.append('lock_to_single_conversation', (!configData.enableConversationContinuity).toString());
       formData.append('sender_name_type', configData.senderName.type);
-      formData.append('business_name', 'null');
+      formData.append('business_name', configData.senderName.type === 'professional' ? configData.senderName.professionalName : configData.senderName.friendlyName);
       
       // Channel feature flags - add all selected features
       if (configData.features.displayFilePicker) {
