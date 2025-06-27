@@ -143,6 +143,11 @@ export const useWebsiteConfig = (inboxId: string) => {
         greetingMessage: inboxData.greeting_message || '',
         channelAvatar: inboxData.avatar_url || '',
         messengerScript: inboxData.web_widget_script || '',
+        // Map sender_name_type from API
+        senderName: {
+          ...prev.senderName,
+          type: inboxData.sender_name_type || 'friendly'
+        }
       }));
       
       toast.success('Inbox configuration loaded successfully');

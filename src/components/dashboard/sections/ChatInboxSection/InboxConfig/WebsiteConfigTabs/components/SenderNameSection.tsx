@@ -30,8 +30,9 @@ const SenderNameSection: React.FC<SenderNameSectionProps> = ({
               type="radio"
               id="friendly"
               name="senderType"
+              value="friendly"
               checked={configData.senderName.type === 'friendly'}
-              onChange={() => updateSenderName('type', 'friendly')}
+              onChange={(e) => updateSenderName('type', e.target.value)}
             />
             <Label htmlFor="friendly">Friendly</Label>
           </div>
@@ -52,8 +53,9 @@ const SenderNameSection: React.FC<SenderNameSectionProps> = ({
               type="radio"
               id="professional"
               name="senderType"
+              value="professional"
               checked={configData.senderName.type === 'professional'}
-              onChange={() => updateSenderName('type', 'professional')}
+              onChange={(e) => updateSenderName('type', e.target.value)}
             />
             <Label htmlFor="professional">Professional</Label>
           </div>
