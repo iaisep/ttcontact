@@ -85,13 +85,20 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
       return;
     }
 
+    if (!inboxId) {
+      console.error('Inbox ID is required but not provided', { inboxId });
+      setError('Inbox ID is required to set agent bot');
+      return;
+    }
+
     // Use the bot ID from the selected bot data
     const botId = selectedBotData.id;
     
     console.log('Using bot ID from selected bot:', {
       selectedBotName: configData.selectedBot,
       botId: botId,
-      selectedBotData
+      selectedBotData,
+      inboxId
     });
 
     try {
@@ -101,11 +108,12 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
       console.log('Setting agent bot for Telegram inbox:', { 
         botId,
         selectedBot: configData.selectedBot,
-        agentBotId: botId 
+        agentBotId: botId,
+        inboxId 
       });
       
-      // Make the API call to set the agent bot using the bot ID from the variable
-      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/23/set_agent_bot`, {
+      // Make the API call to set the agent bot using the inbox ID from props
+      const response = await fetch(`https://chatwoot.totalcontact.com.mx/api/v1/accounts/1/inboxes/${inboxId}/set_agent_bot`, {
         method: 'POST',
         headers: {
           'accept': 'application/json, text/plain, */*',
@@ -132,12 +140,13 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
     }
   };
 
-  // Button should only be disabled if loading or no bot selected
-  const isButtonDisabled = setBotLoading || !configData.selectedBot;
+  // Button should only be disabled if loading or no bot selected or no inbox ID
+  const isButtonDisabled = setBotLoading || !configData.selectedBot || !inboxId;
   
   console.log('Button disabled check:', {
     setBotLoading,
     hasSelectedBot: !!configData.selectedBot,
+    hasInboxId: !!inboxId,
     isDisabled: isButtonDisabled
   });
 
