@@ -4,12 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X } from 'lucide-react';
-
-interface Agent {
-  id: string;
-  name: string;
-  email?: string;
-}
+import { useAgentsAndBots } from '@/hooks/useAgentsAndBots';
 
 interface AgentSelectorProps {
   selectedAgents: string[];
@@ -25,14 +20,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
   saving = false
 }) => {
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
-
-  // Mock agents data - this would come from your actual data source
-  const availableAgents: Agent[] = [
-    { id: '1', name: 'Maikel Guzman', email: 'maikel@company.com' },
-    { id: '2', name: 'Agent Smith', email: 'smith@company.com' },
-    { id: '3', name: 'Agent Johnson', email: 'johnson@company.com' },
-    { id: '4', name: 'Agent Brown', email: 'brown@company.com' }
-  ];
+  const { agents, loading } = useAgentsAndBots();
 
   const handleAddAgent = () => {
     if (selectedAgentId && !selectedAgents.includes(selectedAgentId)) {
@@ -46,13 +34,25 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
   };
 
   const getAgentName = (agentId: string) => {
-    const agent = availableAgents.find(a => a.id === agentId);
+    const agent = agents.find(a => a.id.toString() === agentId);
     return agent?.name || agentId;
   };
 
   const getAvailableAgents = () => {
-    return availableAgents.filter(agent => !selectedAgents.includes(agent.id));
+    return agents.filter(agent => !selectedAgents.includes(agent.id.toString()));
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <Label>Agents</Label>
+        <div className="animate-pulse">
+          <div className="h-10 bg-gray-200 rounded mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -69,7 +69,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({
             </SelectTrigger>
             <SelectContent>
               {getAvailableAgents().map((agent) => (
-                <SelectItem key={agent.id} value={agent.id}>
+                <SelectItem key={agent.id} value={agent.id.toString()}>
                   {agent.name} {agent.email && `(${agent.email})`}
                 </SelectItem>
               ))}

@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Bot } from 'lucide-react';
+import { useAgentsAndBots } from '@/hooks/useAgentsAndBots';
 import type { TelegramConfigData } from '../TelegramConfigTypes';
 
 interface TelegramBotConfigTabProps {
@@ -20,12 +21,21 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
   saving,
   onSave
 }) => {
-  const availableBots = [
-    'Agente_mensajeria_telegram_agente de ventas nuevo',
-    'Customer_Support_Bot',
-    'Sales_Assistant_Bot',
-    'Technical_Support_Bot'
-  ];
+  const { agentBots, loading } = useAgentsAndBots();
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
+          <div className="animate-pulse">
+            <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/3 mb-6"></div>
+            <div className="h-10 bg-gray-200 rounded mb-4"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -46,11 +56,11 @@ const TelegramBotConfigTab: React.FC<TelegramBotConfigTabProps> = ({
                 <SelectValue placeholder="Choose a bot for this inbox" />
               </SelectTrigger>
               <SelectContent>
-                {availableBots.map((bot) => (
-                  <SelectItem key={bot} value={bot}>
+                {agentBots.map((bot) => (
+                  <SelectItem key={bot.id} value={bot.name}>
                     <div className="flex items-center space-x-2">
                       <Bot className="h-4 w-4" />
-                      <span>{bot}</span>
+                      <span>{bot.name}</span>
                     </div>
                   </SelectItem>
                 ))}
