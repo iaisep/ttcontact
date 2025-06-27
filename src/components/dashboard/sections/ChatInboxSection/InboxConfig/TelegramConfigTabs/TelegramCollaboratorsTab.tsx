@@ -11,13 +11,15 @@ interface TelegramCollaboratorsTabProps {
   updateConfigData: (field: keyof TelegramConfigData, value: any) => void;
   saving: boolean;
   onSave: () => void;
+  inboxId: number;
 }
 
 const TelegramCollaboratorsTab: React.FC<TelegramCollaboratorsTabProps> = ({
   configData,
   updateConfigData,
   saving,
-  onSave
+  onSave,
+  inboxId
 }) => {
   const handleAgentsChange = (agents: string[]) => {
     updateConfigData('agents', agents);
@@ -33,7 +35,7 @@ const TelegramCollaboratorsTab: React.FC<TelegramCollaboratorsTabProps> = ({
           onAgentsChange={handleAgentsChange}
           onSave={onSave}
           saving={saving}
-          inboxId={1} // Default value since we don't need the actual inboxId
+          inboxId={inboxId}
         />
 
         <div className="mt-8 border-t pt-6">
