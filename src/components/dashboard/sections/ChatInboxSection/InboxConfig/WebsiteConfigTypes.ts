@@ -1,4 +1,3 @@
-
 export interface WebsiteConfigData {
   // Basic settings
   websiteName: string;
@@ -102,4 +101,10 @@ export interface WebsiteConfigData {
     type: string;
   };
   selectedBot: string;
+}
+
+export interface WebsiteConfigSectionProps {
+  inboxId: string | number;
+  inboxDetails?: any;
+  onBack: () => void;
 }
