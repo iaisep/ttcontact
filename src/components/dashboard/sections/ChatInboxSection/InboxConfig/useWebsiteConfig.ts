@@ -6,7 +6,7 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
   const inboxContext = useInboxContext();
   const [activeTab, setActiveTab] = useState('settings');
   
-  // Initialize with minimal default data - will be replaced with real data
+  // Initialize with empty data - will be replaced with real data
   const [configData, setConfigData] = useState<WebsiteConfigData>({
     websiteName: '',
     websiteUrl: '',
@@ -92,14 +92,25 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
   const isInitialized = useRef(false);
   const lastSyncTimestamp = useRef<number>(0);
 
+  // Helper function to get day name from number
+  const getDayNameFromNumber = (dayNumber: number): string | null => {
+    const dayMap: Record<number, string> = {
+      0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday',
+      4: 'thursday', 5: 'friday', 6: 'saturday'
+    };
+    return dayMap[dayNumber] || null;
+  };
+
   // Transform real API data to UI format
   const transformInboxDetailsToConfig = useCallback((details: any): WebsiteConfigData => {
-    if (!details) {
-      console.log('useWebsiteConfig - No details provided, returning empty config');
+    console.log('useWebsiteConfig - transformInboxDetailsToConfig called with:', details);
+    console.log('useWebsiteConfig - Details type:', typeof details);
+    console.log('useWebsiteConfig - Details keys:', details ? Object.keys(details) : 'null');
+    
+    if (!details || typeof details !== 'object') {
+      console.log('useWebsiteConfig - Invalid details provided, returning empty config');
       return configData;
     }
-
-    console.log('useWebsiteConfig - Transforming API data:', details);
 
     // Handle channel data if present
     const channelData = details.channel || {};
@@ -147,7 +158,7 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     const preChatFields = preChatOptions.pre_chat_fields || [];
     
     const transformedConfig: WebsiteConfigData = {
-      // Map real API fields to UI fields
+      // Direct mapping from API fields
       websiteName: details.name || '',
       websiteUrl: websiteUrl,
       websiteDomain: websiteDomain,
@@ -255,15 +266,6 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     return transformedConfig;
   }, [configData]);
 
-  // Helper function to get day name from number
-  const getDayNameFromNumber = (dayNumber: number): string | null => {
-    const dayMap: Record<number, string> = {
-      0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday',
-      4: 'thursday', 5: 'friday', 6: 'saturday'
-    };
-    return dayMap[dayNumber] || null;
-  };
-
   // Main effect for loading and syncing data
   useEffect(() => {
     const loadAndSyncData = async () => {
@@ -288,7 +290,8 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
           console.log('useWebsiteConfig - API data loaded:', details);
         }
         
-        if (details) {
+        if (details && typeof details === 'object' && Object.keys(details).length > 0) {
+          console.log('useWebsiteConfig - Processing valid details:', details);
           const newConfigData = transformInboxDetailsToConfig(details);
           setConfigData(newConfigData);
           
@@ -299,7 +302,7 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
           
           console.log('useWebsiteConfig - Config data updated with real API data');
         } else {
-          console.log('useWebsiteConfig - No details available after loading');
+          console.error('useWebsiteConfig - No valid details available after loading:', details);
         }
       } catch (error) {
         console.error('useWebsiteConfig - Error loading config:', error);

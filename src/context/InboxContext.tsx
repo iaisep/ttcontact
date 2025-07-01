@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { chatwootApi } from '@/services/chatwootApi';
 import { toast } from 'sonner';
@@ -214,14 +213,23 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       console.log('InboxContext - Loading inbox details for ID:', inboxId);
       
       const details = await chatwootApi.getInboxDetails(inboxId);
-      console.log('InboxContext - Loaded inbox details:', details);
+      console.log('InboxContext - Raw API response:', details);
+      console.log('InboxContext - Details type:', typeof details, 'Keys:', Object.keys(details || {}));
+      
+      if (!details) {
+        console.error('InboxContext - No details received from API');
+        throw new Error('No inbox details received from API');
+      }
       
       // Cache with timestamp
       inboxCache.set(inboxId, { data: details, timestamp: Date.now() });
       setInboxDetails(details);
+      
+      console.log('InboxContext - Successfully loaded and cached inbox details');
     } catch (error) {
       console.error('InboxContext - Failed to load inbox details:', error);
       toast.error('Failed to load inbox details');
+      throw error;
     } finally {
       setLoading(false);
     }

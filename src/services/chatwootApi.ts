@@ -64,10 +64,13 @@ class ChatwootApiService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Chatwout API error: ${response.status} - ${errorText}`);
+        console.error('Chatwoot API error response:', errorText);
+        throw new Error(`Chatwoot API error: ${response.status} - ${errorText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log('Chatwoot API response data:', data);
+      return data;
     } catch (error) {
       console.error('Chatwoot API request failed:', error);
       throw error;
@@ -105,10 +108,20 @@ class ChatwootApiService {
     });
   }
 
-  // Get inbox details
+  // Get inbox details - Fixed to handle response properly
   async getInboxDetails(inboxId: number): Promise<ChatwootInbox> {
+    console.log('Getting inbox details for ID:', inboxId);
     const response = await this.makeRequest(`/inboxes/${inboxId}`);
-    return response.payload;
+    
+    // Check if response has payload property, otherwise return response directly
+    const inboxData = response.payload || response;
+    console.log('Processed inbox data:', inboxData);
+    
+    if (!inboxData || (typeof inboxData === 'object' && Object.keys(inboxData).length === 0)) {
+      throw new Error(`No inbox data found for ID: ${inboxId}`);
+    }
+    
+    return inboxData;
   }
 
   // Get agents for an inbox
