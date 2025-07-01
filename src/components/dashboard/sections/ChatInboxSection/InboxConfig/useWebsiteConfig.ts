@@ -5,17 +5,19 @@ import type { WebsiteConfigData } from './WebsiteConfigTypes';
 export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
   const inboxContext = useInboxContext();
   const [activeTab, setActiveTab] = useState('settings');
+  
+  // Initialize with minimal default data - will be replaced with real data
   const [configData, setConfigData] = useState<WebsiteConfigData>({
-    websiteName: 'Website Chat',
-    websiteUrl: 'https://example.com',
-    websiteDomain: 'example.com',
+    websiteName: '',
+    websiteUrl: '',
+    websiteDomain: '',
     channelAvatar: '',
     enableChannelGreeting: false,
     greetingType: 'disabled',
     greetingMessage: '',
     helpCenter: 'none',
-    welcomeHeading: 'Welcome to our website',
-    welcomeTagline: 'How can we help you today?',
+    welcomeHeading: '',
+    welcomeTagline: '',
     setReplyTime: 'In a few minutes',
     enableEmailCollectBox: true,
     allowMessagesAfterResolved: true,
@@ -42,72 +44,47 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     },
     preChatFormEnabled: false,
     enablePreChatForm: false,
-    preChatMessage: 'Please provide your contact details',
-    requireEmail: true,
-    requireFullName: true,
+    preChatMessage: '',
+    requireEmail: false,
+    requireFullName: false,
     requirePhoneNumber: false,
-    preChatFormFields: [
-      {
-        key: 'fullName',
-        name: 'fullName',
-        placeholder: 'Full Name',
-        type: 'text',
-        required: true,
-        enabled: true,
-        field_type: 'standard',
-        label: 'Full Name',
-        values: []
-      },
-      {
-        key: 'emailAddress',
-        name: 'emailAddress',
-        placeholder: 'Email Address',
-        type: 'email',
-        required: true,
-        enabled: true,  
-        field_type: 'standard',
-        label: 'Email Address',
-        values: []
-      }
-    ],
-    agents: ['Maikel Guzman'],
-    enableAutoAssignment: true,
-    autoAssignmentLimit: 10,
-    enableBusinessAvailability: true,
+    preChatFormFields: [],
+    agents: [],
+    enableAutoAssignment: false,
+    autoAssignmentLimit: 0,
+    enableBusinessAvailability: false,
     unavailableMessage: '',
-    timezone: 'Pacific Time (US & Canada) (GMT-07:00)',
+    timezone: '',
     weeklyHours: {
       sunday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' },
-      monday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
-      tuesday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
-      wednesday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
-      thursday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
-      friday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
+      monday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' },
+      tuesday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' },
+      wednesday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' },
+      thursday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' },
+      friday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' },
       saturday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' }
     },
     enableCSAT: false,
     displayType: 'emoji',
-    csatMessage: 'Please enter a message to show users with the form',
+    csatMessage: '',
     surveyRule: {
       condition: 'contains',
       labels: []
     },
     widgetColor: '#1f93ff',
     position: 'right',
-    launcherTitle: 'Chat with us',
+    launcherTitle: '',
     widgetStyle: 'standard',
     widgetBubblePosition: 'right',
     widgetBubbleType: 'standard',
-    widgetBubbleLauncherTitle: 'Chat with us',
-    userIdentityValidation: 'HzPShsUbLrckiXnUQzMSWr35',
+    widgetBubbleLauncherTitle: '',
+    userIdentityValidation: '',
     enforceUserIdentityValidation: false,
-    senderNames: [
-      { name: 'Support Team', email: 'support@example.com' }
-    ],
+    senderNames: [],
     senderName: {
       type: 'friendly'
     },
-    selectedBot: 'Agente_mensajeria_telegram_agente de ventas nuevo'
+    selectedBot: ''
   });
 
   // Refs to track state and prevent duplicate loads
@@ -115,27 +92,18 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
   const isInitialized = useRef(false);
   const lastSyncTimestamp = useRef<number>(0);
 
-  // FIXED: Direct mapping from API response to UI fields
+  // Transform real API data to UI format
   const transformInboxDetailsToConfig = useCallback((details: any): WebsiteConfigData => {
-    if (!details) return configData;
+    if (!details) {
+      console.log('useWebsiteConfig - No details provided, returning empty config');
+      return configData;
+    }
 
-    console.log('useWebsiteConfig - Raw API Response for field mapping:', {
-      id: details.id,
-      name: details.name,
-      website_url: details.website_url,
-      welcome_title: details.welcome_title,
-      welcome_tagline: details.welcome_tagline,
-      widget_color: details.widget_color,
-      greeting_enabled: details.greeting_enabled,
-      greeting_message: details.greeting_message,
-      reply_time: details.reply_time,
-      channel: details.channel
-    });
+    console.log('useWebsiteConfig - Transforming API data:', details);
 
     // Handle channel data if present
     const channelData = details.channel || {};
-    console.log('useWebsiteConfig - Channel data:', channelData);
-
+    
     // Reply time mapping
     const replyTimeMap: Record<string, string> = {
       'in_a_few_minutes': 'In a few minutes',
@@ -144,7 +112,7 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     };
 
     // Extract website URL and derive domain
-    const websiteUrl = details.website_url || channelData.website_url || configData.websiteUrl;
+    const websiteUrl = details.website_url || channelData.website_url || '';
     const websiteDomain = websiteUrl ? 
       (() => {
         try {
@@ -152,7 +120,7 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
         } catch {
           return websiteUrl.replace(/^https?:\/\//, '');
         }
-      })() : configData.websiteDomain;
+      })() : '';
 
     // Handle business hours transformation
     const transformedWeeklyHours = { ...configData.weeklyHours };
@@ -176,97 +144,104 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
 
     // Handle pre-chat form fields
     const preChatOptions = details.pre_chat_form_options || {};
-    const preChatFields = preChatOptions.pre_chat_fields || configData.preChatFormFields;
+    const preChatFields = preChatOptions.pre_chat_fields || [];
     
-    const transformedConfig = {
-      // FIXED: Direct field mapping for name -> websiteName
-      websiteName: details.name || configData.websiteName,
-      
-      // FIXED: Direct field mapping for website_url -> websiteUrl
+    const transformedConfig: WebsiteConfigData = {
+      // Map real API fields to UI fields
+      websiteName: details.name || '',
       websiteUrl: websiteUrl,
       websiteDomain: websiteDomain,
+      channelAvatar: details.avatar_url || '',
       
-      channelAvatar: details.avatar_url || configData.channelAvatar,
+      // Welcome messages
+      welcomeHeading: details.welcome_title || channelData.welcome_title || '',
+      welcomeTagline: details.welcome_tagline || channelData.welcome_tagline || '',
       
-      // FIXED: Direct field mapping for welcome_title -> welcomeHeading
-      welcomeHeading: details.welcome_title || channelData.welcome_title || configData.welcomeHeading,
+      // Widget settings
+      widgetColor: details.widget_color || channelData.widget_color || '#1f93ff',
       
-      // FIXED: Direct field mapping for welcome_tagline -> welcomeTagline
-      welcomeTagline: details.welcome_tagline || channelData.welcome_tagline || configData.welcomeTagline,
-      
-      // FIXED: Direct field mapping for widget_color -> widgetColor
-      widgetColor: details.widget_color || channelData.widget_color || configData.widgetColor,
-      
-      // FIXED: Direct field mapping for greeting_enabled -> enableChannelGreeting
+      // Greeting settings
       enableChannelGreeting: Boolean(details.greeting_enabled || channelData.greeting_enabled),
       greetingType: (details.greeting_enabled || channelData.greeting_enabled) ? 'custom' as const : 'disabled' as const,
+      greetingMessage: details.greeting_message || channelData.greeting_message || '',
       
-      // FIXED: Direct field mapping for greeting_message -> greetingMessage
-      greetingMessage: details.greeting_message || channelData.greeting_message || configData.greetingMessage,
+      // Reply time
+      setReplyTime: replyTimeMap[details.reply_time || channelData.reply_time] || 'In a few minutes',
       
-      // FIXED: Direct field mapping for reply_time -> setReplyTime
-      setReplyTime: replyTimeMap[details.reply_time || channelData.reply_time] || configData.setReplyTime,
+      // Launcher settings
+      launcherTitle: details.welcome_title || channelData.welcome_title || 'Chat with us',
+      widgetBubbleLauncherTitle: details.welcome_title || channelData.welcome_title || 'Chat with us',
       
-      launcherTitle: details.welcome_title || channelData.welcome_title || configData.launcherTitle,
-      widgetBubbleLauncherTitle: details.welcome_title || channelData.welcome_title || configData.widgetBubbleLauncherTitle,
-      
-      // Static settings (preserve existing values)
-      helpCenter: configData.helpCenter,
-      enableEmailCollectBox: configData.enableEmailCollectBox,
-      allowMessagesAfterResolved: configData.allowMessagesAfterResolved,
-      enableConversationContinuity: configData.enableConversationContinuity,
+      // Other settings from API or defaults
+      helpCenter: 'none',
+      enableEmailCollectBox: Boolean(details.enable_email_collect),
+      allowMessagesAfterResolved: Boolean(details.allow_messages_after_resolved),
+      enableConversationContinuity: Boolean(details.enable_conversation_continuity),
       
       // Features
       features: {
-        ...configData.features,
-        enableFileUpload: details.enable_file_upload ?? configData.features.enableFileUpload,
-        enableBusinessHours: details.working_hours_enabled ?? configData.features.enableBusinessHours,
-        enableCSAT: details.csat_survey_enabled ?? configData.features.enableCSAT,
-        enablePreChatForm: details.pre_chat_form_enabled ?? configData.features.enablePreChatForm,
+        enableFileUpload: Boolean(details.enable_file_upload),
+        enableConversationNoteEmail: Boolean(details.enable_conversation_note_email),
+        enableCSATSubtitle: Boolean(details.enable_csat_subtitle),
+        enableTypingIndicator: Boolean(details.enable_typing_indicator),
+        enableBusinessHours: Boolean(details.working_hours_enabled),
+        enableCSAT: Boolean(details.csat_survey_enabled),
+        enablePreChatForm: Boolean(details.pre_chat_form_enabled),
+        enablePreChatMessage: Boolean(details.enable_pre_chat_message),
+        enableReplyTime: Boolean(details.enable_reply_time),
+        enableConversationContinuity: Boolean(details.enable_conversation_continuity),
+        enableContactInformation: Boolean(details.enable_contact_information),
+        enableEmailCollect: Boolean(details.enable_email_collect),
+        enablePhoneNumberCollect: Boolean(details.enable_phone_number_collect),
+        enableFullNameCollect: Boolean(details.enable_full_name_collect),
+        displayFilePicker: Boolean(details.display_file_picker),
+        displayEmojiPicker: Boolean(details.display_emoji_picker),
+        allowUsersToEndConversation: Boolean(details.allow_users_to_end_conversation),
+        useInboxNameAndAvatar: Boolean(details.use_inbox_name_and_avatar),
       },
       
       // Pre-chat form
       preChatFormEnabled: Boolean(details.pre_chat_form_enabled),
       enablePreChatForm: Boolean(details.pre_chat_form_enabled),
-      preChatMessage: preChatOptions.pre_chat_message || configData.preChatMessage,
-      requireEmail: configData.requireEmail,
-      requireFullName: configData.requireFullName,
-      requirePhoneNumber: configData.requirePhoneNumber,
-      preChatFormFields: Array.isArray(preChatFields) ? preChatFields : configData.preChatFormFields,
+      preChatMessage: preChatOptions.pre_chat_message || '',
+      requireEmail: Boolean(preChatOptions.require_email),
+      requireFullName: Boolean(preChatOptions.require_full_name),
+      requirePhoneNumber: Boolean(preChatOptions.require_phone_number),
+      preChatFormFields: Array.isArray(preChatFields) ? preChatFields : [],
       
-      // Agent settings (preserve existing)
-      agents: configData.agents,
-      enableAutoAssignment: configData.enableAutoAssignment,
-      autoAssignmentLimit: configData.autoAssignmentLimit,
+      // Agent settings
+      agents: details.agents || [],
+      enableAutoAssignment: Boolean(details.enable_auto_assignment),
+      autoAssignmentLimit: details.auto_assignment_limit || 0,
       
       // Business hours
       enableBusinessAvailability: Boolean(details.working_hours_enabled),
-      unavailableMessage: details.out_of_office_message || configData.unavailableMessage,
-      timezone: details.timezone || configData.timezone,
+      unavailableMessage: details.out_of_office_message || '',
+      timezone: details.timezone || '',
       weeklyHours: transformedWeeklyHours,
       
-      // CSAT - FIXED: Ensure displayType is only valid values
+      // CSAT
       enableCSAT: Boolean(details.csat_survey_enabled),
       displayType: (csatConfig.display_type === 'thumbs' ? 'thumbs' : 'emoji') as 'emoji' | 'thumbs',
-      csatMessage: csatConfig.message || configData.csatMessage,
+      csatMessage: csatConfig.message || '',
       surveyRule: {
-        condition: surveyRules.operator || configData.surveyRule.condition,
-        labels: surveyRules.values || configData.surveyRule.labels
+        condition: surveyRules.operator || 'contains',
+        labels: surveyRules.values || []
       },
       
-      // Widget settings (preserve existing)
-      position: configData.position,
-      widgetStyle: configData.widgetStyle,
-      widgetBubblePosition: configData.widgetBubblePosition,
-      widgetBubbleType: configData.widgetBubbleType,
-      userIdentityValidation: configData.userIdentityValidation,
-      enforceUserIdentityValidation: configData.enforceUserIdentityValidation,
-      senderNames: configData.senderNames,
-      senderName: configData.senderName,
-      selectedBot: configData.selectedBot
+      // Widget appearance
+      position: details.widget_position || 'right',
+      widgetStyle: details.widget_style || 'standard',
+      widgetBubblePosition: details.widget_bubble_position || 'right',
+      widgetBubbleType: details.widget_bubble_type || 'standard',
+      userIdentityValidation: details.user_identity_validation || '',
+      enforceUserIdentityValidation: Boolean(details.enforce_user_identity_validation),
+      senderNames: details.sender_names || [],
+      senderName: details.sender_name || { type: 'friendly' },
+      selectedBot: details.selected_bot || ''
     };
 
-    console.log('useWebsiteConfig - Transformed config for UI:', {
+    console.log('useWebsiteConfig - Transformed config result:', {
       websiteName: transformedConfig.websiteName,
       websiteUrl: transformedConfig.websiteUrl,
       welcomeHeading: transformedConfig.welcomeHeading,
@@ -297,7 +272,7 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
         return;
       }
 
-      console.log('useWebsiteConfig - Loading data for inbox:', inboxId);
+      console.log('useWebsiteConfig - Loading real data for inbox:', inboxId);
       
       try {
         let details = inboxDetails;
@@ -305,9 +280,12 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
         // Load from context if available, otherwise fetch from API
         if (!details && inboxContext.inboxDetails && inboxContext.inboxDetails.id === parseInt(inboxId)) {
           details = inboxContext.inboxDetails;
+          console.log('useWebsiteConfig - Using context data:', details);
         } else if (!details) {
+          console.log('useWebsiteConfig - Loading from API...');
           await inboxContext.loadInboxDetails(parseInt(inboxId));
           details = inboxContext.inboxDetails;
+          console.log('useWebsiteConfig - API data loaded:', details);
         }
         
         if (details) {
@@ -318,6 +296,10 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
           loadedInboxRef.current = inboxId;
           isInitialized.current = true;
           lastSyncTimestamp.current = Date.now();
+          
+          console.log('useWebsiteConfig - Config data updated with real API data');
+        } else {
+          console.log('useWebsiteConfig - No details available after loading');
         }
       } catch (error) {
         console.error('useWebsiteConfig - Error loading config:', error);
@@ -326,24 +308,6 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     
     loadAndSyncData();
   }, [inboxId, inboxDetails, inboxContext.inboxDetails, transformInboxDetailsToConfig]);
-
-  // Effect to sync with context updates (for real-time updates after saves)
-  useEffect(() => {
-    if (
-      inboxContext.inboxDetails && 
-      inboxContext.inboxDetails.id === parseInt(inboxId) &&
-      isInitialized.current
-    ) {
-      const currentTimestamp = Date.now();
-      // Only sync if enough time has passed or it's a different dataset
-      if (currentTimestamp - lastSyncTimestamp.current > 1000) {
-        console.log('useWebsiteConfig - Syncing with context updates');
-        const newConfigData = transformInboxDetailsToConfig(inboxContext.inboxDetails);
-        setConfigData(newConfigData);
-        lastSyncTimestamp.current = currentTimestamp;
-      }
-    }
-  }, [inboxContext.inboxDetails, inboxId, transformInboxDetailsToConfig]);
 
   // Reset state when inbox changes
   useEffect(() => {
