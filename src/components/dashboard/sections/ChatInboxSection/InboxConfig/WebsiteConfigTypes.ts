@@ -1,7 +1,6 @@
 
-
 export interface WebsiteConfigData {
-  // Settings
+  // Basic settings
   websiteName: string;
   websiteUrl: string;
   websiteDomain: string;
@@ -10,8 +9,6 @@ export interface WebsiteConfigData {
   greetingType: 'disabled' | 'custom';
   greetingMessage: string;
   helpCenter: string;
-
-  // Additional widget settings
   welcomeHeading: string;
   welcomeTagline: string;
   setReplyTime: string;
@@ -41,7 +38,7 @@ export interface WebsiteConfigData {
     useInboxNameAndAvatar: boolean;
   };
 
-  // Pre Chat Form
+  // Pre-chat form
   preChatFormEnabled: boolean;
   enablePreChatForm: boolean;
   preChatMessage: string;
@@ -57,15 +54,15 @@ export interface WebsiteConfigData {
     enabled: boolean;
     field_type: string;
     label: string;
-    values: any[];
+    values: string[];
   }>;
 
-  // Agents/Collaborators
+  // Agents
   agents: string[];
   enableAutoAssignment: boolean;
   autoAssignmentLimit: number;
 
-  // Business Hours  
+  // Business hours
   enableBusinessAvailability: boolean;
   unavailableMessage: string;
   timezone: string;
@@ -87,34 +84,22 @@ export interface WebsiteConfigData {
     labels: string[];
   };
 
-  // Appearance/Widget Builder
+  // Widget settings
   widgetColor: string;
-  position: 'left' | 'right';
+  position: string;
   launcherTitle: string;
-  widgetStyle: 'standard' | 'expanded_bubble';
-  widgetBubblePosition: 'left' | 'right';
-  widgetBubbleType: 'standard' | 'expanded';
+  widgetStyle: string;
+  widgetBubblePosition: string;
+  widgetBubbleType: string;
   widgetBubbleLauncherTitle: string;
-
-  // Configuration
   userIdentityValidation: string;
   enforceUserIdentityValidation: boolean;
-
-  // Sender Names
   senderNames: Array<{
     name: string;
     email: string;
   }>;
   senderName: {
-    type: 'friendly' | 'professional';
+    type: string;
   };
-
-  // Bot Configuration
-  selectedBot?: string;
-}
-
-export interface WebsiteConfigSectionProps {
-  inboxId: string;
-  inboxDetails?: any;
-  onBack: () => void;
+  selectedBot: string;
 }

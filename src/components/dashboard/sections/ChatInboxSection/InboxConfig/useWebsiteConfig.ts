@@ -219,9 +219,9 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
       timezone: details.timezone || configData.timezone,
       weeklyHours: transformedWeeklyHours,
       
-      // CSAT
+      // CSAT - Fix the displayType to only use valid values
       enableCSAT: Boolean(details.csat_survey_enabled),
-      displayType: csatConfig.display_type as 'emoji' | 'thumbs_up_down' || configData.displayType,
+      displayType: csatConfig.display_type === 'thumbs' ? 'thumbs' : 'emoji',
       csatMessage: csatConfig.message || configData.csatMessage,
       surveyRule: {
         condition: surveyRules.operator || configData.surveyRule.condition,

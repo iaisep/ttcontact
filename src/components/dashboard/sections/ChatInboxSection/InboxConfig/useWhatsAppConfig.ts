@@ -1,72 +1,131 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useInboxContext } from '@/context/InboxContext';
+import type { WhatsAppConfigData } from './types';
 
 export const useWhatsAppConfig = (inboxId: string, inboxDetails?: any) => {
   const inboxContext = useInboxContext();
   const [activeTab, setActiveTab] = useState('settings');
-  const [configData, setConfigData] = useState({
-    // WhatsApp specific default configuration
-    name: 'WhatsApp Channel',
-    phoneNumber: '',
-    provider: 'whatsapp_cloud',
-    welcomeMessage: 'Hello! How can we help you today?',
-    enableBusinessHours: false,
-    enableCSAT: false,
-    enablePreChatForm: false,
+  const [configData, setConfigData] = useState<WhatsAppConfigData>({
+    // Settings tab
+    inboxName: 'WhatsApp Channel',
+    channelAvatar: '',
+    apiProvider: 'whatsapp_cloud',
+    enableChannelGreeting: false,
+    helpCenter: 'none',
+    lockToSingleConversation: false,
+
+    // Collaborators tab
     agents: [],
-    businessHours: {
-      enabled: false,
-      timezone: 'UTC',
-      weeklyHours: {
-        monday: { enabled: true, startTime: '09:00', endTime: '17:00' },
-        tuesday: { enabled: true, startTime: '09:00', endTime: '17:00' },
-        wednesday: { enabled: true, startTime: '09:00', endTime: '17:00' },
-        thursday: { enabled: true, startTime: '09:00', endTime: '17:00' },
-        friday: { enabled: true, startTime: '09:00', endTime: '17:00' },
-        saturday: { enabled: false, startTime: '09:00', endTime: '17:00' },
-        sunday: { enabled: false, startTime: '09:00', endTime: '17:00' }
-      }
+    enableAutoAssignment: false,
+    autoAssignmentLimit: 10,
+
+    // Business Hours tab
+    enableBusinessAvailability: false,
+    unavailableMessage: '',
+    timezone: 'UTC',
+    weeklyHours: {
+      monday: { enabled: true, allDay: false, startTime: '09:00', endTime: '17:00' },
+      tuesday: { enabled: true, allDay: false, startTime: '09:00', endTime: '17:00' },
+      wednesday: { enabled: true, allDay: false, startTime: '09:00', endTime: '17:00' },
+      thursday: { enabled: true, allDay: false, startTime: '09:00', endTime: '17:00' },
+      friday: { enabled: true, allDay: false, startTime: '09:00', endTime: '17:00' },
+      saturday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' },
+      sunday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' }
     },
-    csat: {
-      enabled: false,
-      displayType: 'emoji',
-      message: 'Please rate your experience'
-    }
+
+    // CSAT tab
+    enableCSAT: false,
+    displayType: 'emoji',
+    csatMessage: 'Please rate your experience',
+    surveyRule: {
+      condition: 'contains',
+      labels: []
+    },
+
+    // Configuration tab
+    webhookVerificationToken: '',
+    apiKey: '',
+
+    // Bot Configuration tab
+    selectedBot: ''
   });
 
   const loadedInboxRef = useRef<string | null>(null);
   const isInitialized = useRef(false);
   const lastSyncTimestamp = useRef<number>(0);
 
-  const transformInboxDetailsToConfig = useCallback((details: any) => {
+  const transformInboxDetailsToConfig = useCallback((details: any): WhatsAppConfigData => {
     if (!details) return configData;
 
     console.log('useWhatsAppConfig - Transforming details for UI:', details);
 
+    // Handle business hours transformation
+    const transformedWeeklyHours = { ...configData.weeklyHours };
+    if (details.working_hours && Array.isArray(details.working_hours)) {
+      details.working_hours.forEach((wh: any) => {
+        const dayName = getDayNameFromNumber(wh.day_of_week);
+        if (dayName) {
+          transformedWeeklyHours[dayName] = {
+            enabled: true,
+            allDay: wh.closed_all_day === false,
+            startTime: `${String(wh.open_hour).padStart(2, '0')}:${String(wh.open_minutes).padStart(2, '0')}`,
+            endTime: `${String(wh.close_hour).padStart(2, '0')}:${String(wh.close_minutes).padStart(2, '0')}`
+          };
+        }
+      });
+    }
+
+    // Handle CSAT configuration
+    const csatConfig = details.csat_config || {};
+    const surveyRules = csatConfig.survey_rules || {};
+
     return {
-      ...configData,
-      name: details.name || configData.name,
-      phoneNumber: details.phone_number || configData.phoneNumber,
-      provider: details.provider || configData.provider,
-      welcomeMessage: details.greeting_message || configData.welcomeMessage,
-      enableBusinessHours: Boolean(details.working_hours_enabled),
+      // Settings tab
+      inboxName: details.name || configData.inboxName,
+      channelAvatar: details.avatar_url || configData.channelAvatar,
+      apiProvider: details.provider_config?.api_provider || details.provider || configData.apiProvider,
+      enableChannelGreeting: Boolean(details.greeting_enabled),
+      helpCenter: configData.helpCenter,
+      lockToSingleConversation: configData.lockToSingleConversation,
+
+      // Collaborators tab
+      agents: configData.agents,
+      enableAutoAssignment: configData.enableAutoAssignment,
+      autoAssignmentLimit: configData.autoAssignmentLimit,
+
+      // Business Hours tab
+      enableBusinessAvailability: Boolean(details.working_hours_enabled),
+      unavailableMessage: details.out_of_office_message || configData.unavailableMessage,
+      timezone: details.timezone || configData.timezone,
+      weeklyHours: transformedWeeklyHours,
+
+      // CSAT tab
       enableCSAT: Boolean(details.csat_survey_enabled),
-      enablePreChatForm: Boolean(details.pre_chat_form_enabled),
-      // Transform business hours if available
-      businessHours: {
-        ...configData.businessHours,
-        enabled: Boolean(details.working_hours_enabled),
-        timezone: details.timezone || configData.businessHours.timezone
+      displayType: csatConfig.display_type === 'star' ? 'star' : 'emoji',
+      csatMessage: csatConfig.message || configData.csatMessage,
+      surveyRule: {
+        condition: surveyRules.operator || configData.surveyRule.condition,
+        labels: surveyRules.values || configData.surveyRule.labels
       },
-      csat: {
-        ...configData.csat,
-        enabled: Boolean(details.csat_survey_enabled),
-        displayType: details.csat_config?.display_type || configData.csat.displayType,
-        message: details.csat_config?.message || configData.csat.message
-      }
+
+      // Configuration tab
+      webhookVerificationToken: details.provider_config?.webhook_verification_token || configData.webhookVerificationToken,
+      apiKey: details.provider_config?.api_key || configData.apiKey,
+
+      // Bot Configuration tab
+      selectedBot: configData.selectedBot
     };
   }, [configData]);
+
+  // Helper function to get day name from number
+  const getDayNameFromNumber = (dayNumber: number): string | null => {
+    const dayMap: Record<number, string> = {
+      0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday',
+      4: 'thursday', 5: 'friday', 6: 'saturday'
+    };
+    return dayMap[dayNumber] || null;
+  };
 
   // Main effect for loading and syncing data
   useEffect(() => {
@@ -131,9 +190,19 @@ export const useWhatsAppConfig = (inboxId: string, inboxDetails?: any) => {
     }
   }, [inboxId]);
 
-  const updateConfigData = useCallback((field: string, value: any) => {
+  const updateConfigData = useCallback((field: keyof WhatsAppConfigData, value: any) => {
     console.log('useWhatsAppConfig - Updating field:', field, 'with value:', value);
     setConfigData(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  const updateWeeklyHours = useCallback((day: string, hours: any) => {
+    setConfigData(prev => ({
+      ...prev,
+      weeklyHours: {
+        ...prev.weeklyHours,
+        [day]: hours
+      }
+    }));
   }, []);
 
   const saveConfiguration = useCallback(async () => {
@@ -170,6 +239,7 @@ export const useWhatsAppConfig = (inboxId: string, inboxDetails?: any) => {
     setActiveTab,
     configData,
     updateConfigData,
+    updateWeeklyHours,
     saveConfiguration
   };
 };
