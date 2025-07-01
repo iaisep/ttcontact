@@ -8,50 +8,42 @@ export const useInboxDetails = (inboxId: string | number | null) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!inboxId) {
-      setInboxDetails(null);
-      return;
-    }
+    const loadInboxDetails = async () => {
+      if (!inboxId) {
+        setInboxDetails(null);
+        return;
+      }
 
-    const fetchInboxDetails = async () => {
+      setLoading(true);
+      setError(null);
+      
       try {
-        setLoading(true);
-        setError(null);
-        console.log('Fetching inbox details for ID:', inboxId);
+        console.log('useInboxDetails - Loading details for inbox:', inboxId);
+        const numericInboxId = typeof inboxId === 'string' ? parseInt(inboxId) : inboxId;
         
-        const details = await chatwootApi.getInboxDetails(parseInt(inboxId.toString()));
-        console.log('Inbox details fetched:', details);
+        if (isNaN(numericInboxId)) {
+          throw new Error('Invalid inbox ID');
+        }
+
+        const details = await chatwootApi.getInboxDetails(numericInboxId);
+        console.log('useInboxDetails - Loaded details:', details);
+        
         setInboxDetails(details);
       } catch (err) {
-        console.error('Failed to fetch inbox details:', err);
-        setError('Failed to load inbox details');
+        console.error('useInboxDetails - Error loading details:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load inbox details');
+        setInboxDetails(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchInboxDetails();
+    loadInboxDetails();
   }, [inboxId]);
 
   return {
     inboxDetails,
     loading,
-    error,
-    refetchInboxDetails: () => {
-      if (inboxId) {
-        const fetchDetails = async () => {
-          try {
-            setLoading(true);
-            const details = await chatwootApi.getInboxDetails(parseInt(inboxId.toString()));
-            setInboxDetails(details);
-          } catch (err) {
-            setError('Failed to reload inbox details');
-          } finally {
-            setLoading(false);
-          }
-        };
-        fetchDetails();
-      }
-    }
+    error
   };
 };
