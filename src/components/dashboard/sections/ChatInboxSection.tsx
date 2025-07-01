@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { useChatwootInboxManager } from './ChatInboxSection/useChatwootInboxManager';
 import { useInboxDetails } from './ChatInboxSection/InboxConfig/useInboxDetails';
+import { InboxContextProvider } from '@/context/InboxContext';
 import InboxHeader from './ChatInboxSection/InboxHeader';
 import InboxList from './ChatInboxSection/InboxList';
 import type { ChatInboxSectionProps } from './ChatInboxSection/types';
@@ -62,24 +62,26 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
       );
       
       return (
-        <React.Suspense fallback={
-          <div className="p-6">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-              <div className="h-10 bg-gray-200 rounded mb-4"></div>
-              <div className="space-y-4">
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <InboxContextProvider>
+          <React.Suspense fallback={
+            <div className="p-6">
+              <div className="animate-pulse">
+                <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div className="h-10 bg-gray-200 rounded mb-4"></div>
+                <div className="space-y-4">
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
               </div>
             </div>
-          </div>
-        }>
-          <WhatsAppConfigSection 
-            inboxId={selectedInbox.id}
-            inboxDetails={inboxDetails}
-            onBack={handleBackFromConfig}
-          />
-        </React.Suspense>
+          }>
+            <WhatsAppConfigSection 
+              inboxId={selectedInbox.id}
+              inboxDetails={inboxDetails}
+              onBack={handleBackFromConfig}
+            />
+          </React.Suspense>
+        </InboxContextProvider>
       );
     }
 
@@ -89,24 +91,26 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
       );
       
       return (
-        <React.Suspense fallback={
-          <div className="p-6">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-              <div className="h-10 bg-gray-200 rounded mb-4"></div>
-              <div className="space-y-4">
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <InboxContextProvider>
+          <React.Suspense fallback={
+            <div className="p-6">
+              <div className="animate-pulse">
+                <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div className="h-10 bg-gray-200 rounded mb-4"></div>
+                <div className="space-y-4">
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
               </div>
             </div>
-          </div>
-        }>
-          <TelegramConfigSection 
-            inboxId={selectedInbox.id}
-            inboxDetails={inboxDetails}
-            onBack={handleBackFromConfig}
-          />
-        </React.Suspense>
+          }>
+            <TelegramConfigSection 
+              inboxId={selectedInbox.id}
+              inboxDetails={inboxDetails}
+              onBack={handleBackFromConfig}
+            />
+          </React.Suspense>
+        </InboxContextProvider>
       );
     }
 
@@ -116,24 +120,26 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
       );
       
       return (
-        <React.Suspense fallback={
-          <div className="p-6">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-              <div className="h-10 bg-gray-200 rounded mb-4"></div>
-              <div className="space-y-4">
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <InboxContextProvider>
+          <React.Suspense fallback={
+            <div className="p-6">
+              <div className="animate-pulse">
+                <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div className="h-10 bg-gray-200 rounded mb-4"></div>
+                <div className="space-y-4">
+                  <div className="h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
               </div>
             </div>
-          </div>
-        }>
-          <WebsiteConfigSection 
-            inboxId={selectedInbox.id}
-            inboxDetails={inboxDetails}
-            onBack={handleBackFromConfig}
-          />
-        </React.Suspense>
+          }>
+            <WebsiteConfigSection 
+              inboxId={selectedInbox.id}
+              inboxDetails={inboxDetails}
+              onBack={handleBackFromConfig}
+            />
+          </React.Suspense>
+        </InboxContextProvider>
       );
     }
     
