@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useInboxContext } from '@/context/InboxContext';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
@@ -246,9 +245,9 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
       timezone: details.timezone || configData.timezone,
       weeklyHours: transformedWeeklyHours,
       
-      // CSAT - Fix the displayType to only use valid values
+      // CSAT - FIXED: Ensure displayType is only valid values
       enableCSAT: Boolean(details.csat_survey_enabled),
-      displayType: csatConfig.display_type === 'thumbs' ? 'thumbs' : 'emoji',
+      displayType: (csatConfig.display_type === 'thumbs' ? 'thumbs' : 'emoji') as 'emoji' | 'thumbs',
       csatMessage: csatConfig.message || configData.csatMessage,
       surveyRule: {
         condition: surveyRules.operator || configData.surveyRule.condition,
