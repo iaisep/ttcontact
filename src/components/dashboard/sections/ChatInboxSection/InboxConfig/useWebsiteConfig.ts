@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useInboxContext } from '@/context/InboxContext';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
@@ -115,18 +116,44 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
   const isInitialized = useRef(false);
   const lastSyncTimestamp = useRef<number>(0);
 
-  // Enhanced transform function with better data handling - FIXED mapping
+  // FIXED: Direct mapping from API response to UI fields
   const transformInboxDetailsToConfig = useCallback((details: any): WebsiteConfigData => {
     if (!details) return configData;
 
-    console.log('useWebsiteConfig - Raw API Response:', details);
+    console.log('useWebsiteConfig - Raw API Response for field mapping:', {
+      id: details.id,
+      name: details.name,
+      website_url: details.website_url,
+      welcome_title: details.welcome_title,
+      welcome_tagline: details.welcome_tagline,
+      widget_color: details.widget_color,
+      greeting_enabled: details.greeting_enabled,
+      greeting_message: details.greeting_message,
+      reply_time: details.reply_time,
+      channel: details.channel
+    });
 
-    // Extract reply_time mapping
+    // Handle channel data if present
+    const channelData = details.channel || {};
+    console.log('useWebsiteConfig - Channel data:', channelData);
+
+    // Reply time mapping
     const replyTimeMap: Record<string, string> = {
       'in_a_few_minutes': 'In a few minutes',
       'in_an_hour': 'In an hour',
       'in_a_day': 'In a day'
     };
+
+    // Extract website URL and derive domain
+    const websiteUrl = details.website_url || channelData.website_url || configData.websiteUrl;
+    const websiteDomain = websiteUrl ? 
+      (() => {
+        try {
+          return new URL(websiteUrl).hostname;
+        } catch {
+          return websiteUrl.replace(/^https?:\/\//, '');
+        }
+      })() : configData.websiteDomain;
 
     // Handle business hours transformation
     const transformedWeeklyHours = { ...configData.weeklyHours };
@@ -152,34 +179,37 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     const preChatOptions = details.pre_chat_form_options || {};
     const preChatFields = preChatOptions.pre_chat_fields || configData.preChatFormFields;
     
-    return {
-      // FIXED: Direct mapping from API response fields
+    const transformedConfig = {
+      // FIXED: Direct field mapping for name -> websiteName
       websiteName: details.name || configData.websiteName,
-      websiteUrl: details.website_url || configData.websiteUrl,
-      websiteDomain: details.website_url ? 
-        (() => {
-          try {
-            return new URL(details.website_url).hostname;
-          } catch {
-            return details.website_url.replace(/^https?:\/\//, '');
-          }
-        })() : configData.websiteDomain,
+      
+      // FIXED: Direct field mapping for website_url -> websiteUrl
+      websiteUrl: websiteUrl,
+      websiteDomain: websiteDomain,
+      
       channelAvatar: details.avatar_url || configData.channelAvatar,
       
-      // FIXED: Direct mapping for greeting settings
-      enableChannelGreeting: Boolean(details.greeting_enabled),
-      greetingType: details.greeting_enabled ? 'custom' as const : 'disabled' as const,
-      greetingMessage: details.greeting_message || configData.greetingMessage,
+      // FIXED: Direct field mapping for welcome_title -> welcomeHeading
+      welcomeHeading: details.welcome_title || channelData.welcome_title || configData.welcomeHeading,
       
-      // FIXED: Direct mapping for widget appearance from API response
-      welcomeHeading: details.welcome_title || configData.welcomeHeading,
-      welcomeTagline: details.welcome_tagline || configData.welcomeTagline,
-      widgetColor: details.widget_color || configData.widgetColor,
-      launcherTitle: details.welcome_title || configData.launcherTitle,
-      widgetBubbleLauncherTitle: details.welcome_title || configData.widgetBubbleLauncherTitle,
+      // FIXED: Direct field mapping for welcome_tagline -> welcomeTagline
+      welcomeTagline: details.welcome_tagline || channelData.welcome_tagline || configData.welcomeTagline,
       
-      // FIXED: Direct mapping for reply time
-      setReplyTime: replyTimeMap[details.reply_time] || configData.setReplyTime,
+      // FIXED: Direct field mapping for widget_color -> widgetColor
+      widgetColor: details.widget_color || channelData.widget_color || configData.widgetColor,
+      
+      // FIXED: Direct field mapping for greeting_enabled -> enableChannelGreeting
+      enableChannelGreeting: Boolean(details.greeting_enabled || channelData.greeting_enabled),
+      greetingType: (details.greeting_enabled || channelData.greeting_enabled) ? 'custom' as const : 'disabled' as const,
+      
+      // FIXED: Direct field mapping for greeting_message -> greetingMessage
+      greetingMessage: details.greeting_message || channelData.greeting_message || configData.greetingMessage,
+      
+      // FIXED: Direct field mapping for reply_time -> setReplyTime
+      setReplyTime: replyTimeMap[details.reply_time || channelData.reply_time] || configData.setReplyTime,
+      
+      launcherTitle: details.welcome_title || channelData.welcome_title || configData.launcherTitle,
+      widgetBubbleLauncherTitle: details.welcome_title || channelData.welcome_title || configData.widgetBubbleLauncherTitle,
       
       // Static settings (preserve existing values)
       helpCenter: configData.helpCenter,
@@ -236,6 +266,19 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
       senderName: configData.senderName,
       selectedBot: configData.selectedBot
     };
+
+    console.log('useWebsiteConfig - Transformed config for UI:', {
+      websiteName: transformedConfig.websiteName,
+      websiteUrl: transformedConfig.websiteUrl,
+      welcomeHeading: transformedConfig.welcomeHeading,
+      welcomeTagline: transformedConfig.welcomeTagline,
+      widgetColor: transformedConfig.widgetColor,
+      enableChannelGreeting: transformedConfig.enableChannelGreeting,
+      greetingMessage: transformedConfig.greetingMessage,
+      setReplyTime: transformedConfig.setReplyTime
+    });
+
+    return transformedConfig;
   }, [configData]);
 
   // Helper function to get day name from number
@@ -270,16 +313,6 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
         
         if (details) {
           const newConfigData = transformInboxDetailsToConfig(details);
-          console.log('useWebsiteConfig - Applying transformed config:', {
-            websiteName: newConfigData.websiteName,
-            websiteUrl: newConfigData.websiteUrl,
-            welcomeHeading: newConfigData.welcomeHeading,
-            welcomeTagline: newConfigData.welcomeTagline,
-            widgetColor: newConfigData.widgetColor,
-            enableChannelGreeting: newConfigData.enableChannelGreeting,
-            greetingMessage: newConfigData.greetingMessage,
-            setReplyTime: newConfigData.setReplyTime
-          });
           setConfigData(newConfigData);
           
           // Mark as loaded and initialized
