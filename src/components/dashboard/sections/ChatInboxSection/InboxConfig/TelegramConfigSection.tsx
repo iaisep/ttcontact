@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -11,18 +12,7 @@ import TelegramBotConfigTab from './TelegramConfigTabs/TelegramBotConfigTab';
 import type { TelegramConfigSectionProps } from './TelegramConfigTypes';
 
 const TelegramConfigSection: React.FC<TelegramConfigSectionProps> = ({ inboxId, onBack }) => {
-  const {
-    loading,
-    saving,
-    activeTab,
-    setActiveTab,
-    configData,
-    updateConfigData,
-    updateWeeklyHours,
-    saveConfiguration
-  } = useTelegramConfig(inboxId);
-
-  // Convert inboxId to number and validate it
+  // Convert and validate inboxId early
   const numericInboxId = typeof inboxId === 'string' ? parseInt(inboxId) : inboxId;
   const validInboxId = !isNaN(numericInboxId) ? numericInboxId : undefined;
 
@@ -32,6 +22,35 @@ const TelegramConfigSection: React.FC<TelegramConfigSectionProps> = ({ inboxId, 
     valid: validInboxId,
     isValid: !!validInboxId
   });
+
+  // Early return if invalid inbox ID
+  if (!validInboxId) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center space-x-4 mb-6">
+          <Button variant="ghost" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <div className="text-red-600">Invalid inbox ID</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Convert back to string for the hook (since it expects string)
+  const stringInboxId = validInboxId.toString();
+
+  const {
+    loading,
+    saving,
+    activeTab,
+    setActiveTab,
+    configData,
+    updateConfigData,
+    updateWeeklyHours,
+    saveConfiguration
+  } = useTelegramConfig(stringInboxId);
 
   if (loading) {
     return (
