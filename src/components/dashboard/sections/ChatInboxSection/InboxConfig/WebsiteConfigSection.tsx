@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -41,9 +40,7 @@ const WebsiteConfigContent: React.FC<WebsiteConfigSectionProps> = ({ inboxId, in
     original: inboxId, 
     parsed: numericInboxId,
     valid: validInboxId,
-    isValid: !!validInboxId,
-    inboxDetails: inboxDetails,
-    configData: configData
+    isValid: !!validInboxId
   });
 
   if (loading) {
@@ -78,7 +75,6 @@ const WebsiteConfigContent: React.FC<WebsiteConfigSectionProps> = ({ inboxId, in
           </Button>
           <div>
             <h1 className="text-2xl font-bold">{configData.websiteName}</h1>
-            <p className="text-sm text-gray-500">Website: {configData.websiteUrl}</p>
           </div>
         </div>
       </div>
