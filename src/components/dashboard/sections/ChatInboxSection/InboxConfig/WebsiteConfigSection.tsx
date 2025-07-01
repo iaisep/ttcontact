@@ -15,6 +15,9 @@ import TelegramCSATTab from './TelegramConfigTabs/TelegramCSATTab';
 import type { WebsiteConfigSectionProps } from './WebsiteConfigTypes';
 
 const WebsiteConfigContent: React.FC<WebsiteConfigSectionProps> = ({ inboxId, inboxDetails, onBack }) => {
+  // Convert inboxId to string for the hook
+  const inboxIdString = typeof inboxId === 'string' ? inboxId : inboxId.toString();
+  
   const {
     loading,
     saving,
@@ -27,7 +30,7 @@ const WebsiteConfigContent: React.FC<WebsiteConfigSectionProps> = ({ inboxId, in
     updateFeature,
     updateSenderName,
     saveConfiguration
-  } = useWebsiteConfig(inboxId, inboxDetails);
+  } = useWebsiteConfig(inboxIdString, inboxDetails);
 
   // Convert inboxId to number and validate it
   const numericInboxId = typeof inboxId === 'string' ? parseInt(inboxId) : inboxId;
