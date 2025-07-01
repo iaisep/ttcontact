@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useInboxContext } from '@/context/InboxContext';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
@@ -133,7 +134,7 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
           greeting_message: details.greeting_message
         });
         
-        const newConfigData = {
+        const newConfigData: WebsiteConfigData = {
           websiteName: details.name || 'Website Chat',
           websiteUrl: details.website_url || 'https://example.com',
           websiteDomain: details.website_url ? 
@@ -152,7 +153,7 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
           widgetColor: details.widget_color || details.color || '#1f93ff',
           launcherTitle: details.welcome_title || 'Chat with us',
           widgetBubbleLauncherTitle: details.welcome_title || 'Chat with us',
-          greetingType: details.greeting_enabled ? 'enabled' : 'disabled',
+          greetingType: details.greeting_enabled ? 'custom' : 'disabled',
           helpCenter: 'none',
           setReplyTime: 'In a few minutes',
           enableEmailCollectBox: true,
