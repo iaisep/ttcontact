@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { chatwootApi } from '@/services/chatwootApi';
 import { toast } from 'sonner';
 
@@ -24,6 +24,9 @@ interface InboxContextType {
 }
 
 const InboxContext = createContext<InboxContextType | undefined>(undefined);
+
+// Cache for inbox details to avoid repeated API calls
+const inboxCache = new Map<number, any>();
 
 // Data transformers - UI to API format
 const transformSettingsToFormData = (data: any): FormData => {
@@ -170,13 +173,24 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     return response.json();
   };
 
-  const loadInboxDetails = async (inboxId: number) => {
+  const loadInboxDetails = useCallback(async (inboxId: number) => {
+    // Check cache first
+    if (inboxCache.has(inboxId)) {
+      console.log('InboxContext - Using cached data for inbox:', inboxId);
+      const cachedData = inboxCache.get(inboxId);
+      setInboxDetails(cachedData);
+      return;
+    }
+
     try {
       setLoading(true);
       console.log('InboxContext - Loading inbox details for ID:', inboxId);
       
       const details = await chatwootApi.getInboxDetails(inboxId);
       console.log('InboxContext - Loaded inbox details:', details);
+      
+      // Cache the result
+      inboxCache.set(inboxId, details);
       setInboxDetails(details);
     } catch (error) {
       console.error('InboxContext - Failed to load inbox details:', error);
@@ -184,9 +198,9 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateInboxSettings = async (inboxId: number, data: any) => {
+  const updateInboxSettings = useCallback(async (inboxId: number, data: any) => {
     try {
       setSaving(true);
       console.log('InboxContext - Updating settings for inbox:', inboxId, data);
@@ -201,6 +215,9 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       });
       
       console.log('InboxContext - Settings updated:', response);
+      
+      // Update cache and state
+      inboxCache.set(inboxId, response);
       setInboxDetails(response);
       toast.success('Settings updated successfully');
     } catch (error) {
@@ -210,9 +227,9 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setSaving(false);
     }
-  };
+  }, []);
 
-  const updateBusinessHours = async (inboxId: number, data: any) => {
+  const updateBusinessHours = useCallback(async (inboxId: number, data: any) => {
     try {
       setSaving(true);
       console.log('InboxContext - Updating business hours for inbox:', inboxId, data);
@@ -227,6 +244,9 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       });
       
       console.log('InboxContext - Business hours updated:', response);
+      
+      // Update cache and state
+      inboxCache.set(inboxId, response);
       setInboxDetails(response);
       toast.success('Business hours updated successfully');
     } catch (error) {
@@ -236,9 +256,9 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setSaving(false);
     }
-  };
+  }, []);
 
-  const updateCSATConfig = async (inboxId: number, data: any) => {
+  const updateCSATConfig = useCallback(async (inboxId: number, data: any) => {
     try {
       setSaving(true);
       console.log('InboxContext - Updating CSAT config for inbox:', inboxId, data);
@@ -253,6 +273,9 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       });
       
       console.log('InboxContext - CSAT config updated:', response);
+      
+      // Update cache and state
+      inboxCache.set(inboxId, response);
       setInboxDetails(response);
       toast.success('CSAT configuration updated successfully');
     } catch (error) {
@@ -262,9 +285,9 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setSaving(false);
     }
-  };
+  }, []);
 
-  const updatePreChatForm = async (inboxId: number, data: any) => {
+  const updatePreChatForm = useCallback(async (inboxId: number, data: any) => {
     try {
       setSaving(true);
       console.log('InboxContext - Updating pre-chat form for inbox:', inboxId, data);
@@ -279,6 +302,9 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       });
       
       console.log('InboxContext - Pre-chat form updated:', response);
+      
+      // Update cache and state
+      inboxCache.set(inboxId, response);
       setInboxDetails(response);
       toast.success('Pre-chat form updated successfully');
     } catch (error) {
@@ -288,9 +314,9 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setSaving(false);
     }
-  };
+  }, []);
 
-  const updateWidgetConfig = async (inboxId: number, data: any) => {
+  const updateWidgetConfig = useCallback(async (inboxId: number, data: any) => {
     try {
       setSaving(true);
       console.log('InboxContext - Updating widget config for inbox:', inboxId, data);
@@ -305,6 +331,9 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       });
       
       console.log('InboxContext - Widget config updated:', response);
+      
+      // Update cache and state
+      inboxCache.set(inboxId, response);
       setInboxDetails(response);
       toast.success('Widget configuration updated successfully');
     } catch (error) {
@@ -314,7 +343,7 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setSaving(false);
     }
-  };
+  }, []);
 
   const value: InboxContextType = {
     inboxDetails,
