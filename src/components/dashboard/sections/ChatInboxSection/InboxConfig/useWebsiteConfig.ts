@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useInboxContext } from '@/context/InboxContext';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
@@ -111,27 +110,57 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     selectedBot: 'Agente_mensajeria_telegram_agente de ventas nuevo'
   });
 
-  // Ref to track if we've already loaded data for this inbox
+  // Refs to track state and prevent duplicate loads
   const loadedInboxRef = useRef<string | null>(null);
   const isInitialized = useRef(false);
+  const lastSyncTimestamp = useRef<number>(0);
 
-  // Transform inbox details to config data
+  // Enhanced transform function with better data handling
   const transformInboxDetailsToConfig = useCallback((details: any): WebsiteConfigData => {
     if (!details) return configData;
 
-    console.log('useWebsiteConfig - Transforming inbox details:', {
+    console.log('useWebsiteConfig - Transforming details for UI:', {
+      id: details.id,
       name: details.name,
       website_url: details.website_url,
       welcome_title: details.welcome_title,
       welcome_tagline: details.welcome_tagline,
       widget_color: details.widget_color,
       greeting_enabled: details.greeting_enabled,
-      greeting_message: details.greeting_message
+      greeting_message: details.greeting_message,
+      working_hours_enabled: details.working_hours_enabled,
+      csat_survey_enabled: details.csat_survey_enabled,
+      pre_chat_form_enabled: details.pre_chat_form_enabled
     });
+
+    // Handle business hours transformation
+    const transformedWeeklyHours = { ...configData.weeklyHours };
+    if (details.working_hours && Array.isArray(details.working_hours)) {
+      details.working_hours.forEach((wh: any) => {
+        const dayName = getDayNameFromNumber(wh.day_of_week);
+        if (dayName) {
+          transformedWeeklyHours[dayName] = {
+            enabled: true,
+            allDay: wh.closed_all_day === false,
+            startTime: `${String(wh.open_hour).padStart(2, '0')}:${String(wh.open_minutes).padStart(2, '0')}`,
+            endTime: `${String(wh.close_hour).padStart(2, '0')}:${String(wh.close_minutes).padStart(2, '0')}`
+          };
+        }
+      });
+    }
+
+    // Handle CSAT configuration
+    const csatConfig = details.csat_config || {};
+    const surveyRules = csatConfig.survey_rules || {};
+
+    // Handle pre-chat form fields
+    const preChatOptions = details.pre_chat_form_options || {};
+    const preChatFields = preChatOptions.pre_chat_fields || configData.preChatFormFields;
     
     return {
-      websiteName: details.name || 'Website Chat',
-      websiteUrl: details.website_url || 'https://example.com',
+      // Basic settings
+      websiteName: details.name || configData.websiteName,
+      websiteUrl: details.website_url || configData.websiteUrl,
       websiteDomain: details.website_url ? 
         (() => {
           try {
@@ -139,170 +168,152 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
           } catch {
             return details.website_url.replace(/^https?:\/\//, '');
           }
-        })() : 'example.com',
-      channelAvatar: details.avatar_url || '',
+        })() : configData.websiteDomain,
+      channelAvatar: details.avatar_url || configData.channelAvatar,
+      
+      // Greeting settings
       enableChannelGreeting: Boolean(details.greeting_enabled),
-      greetingMessage: details.greeting_message || '',
-      welcomeHeading: details.welcome_title || details.widget_config?.welcome_title || 'Welcome to our website',
-      welcomeTagline: details.welcome_tagline || details.widget_config?.welcome_tagline || 'How can we help you today?',
-      widgetColor: details.widget_color || details.color || '#1f93ff',
-      launcherTitle: details.welcome_title || 'Chat with us',
-      widgetBubbleLauncherTitle: details.welcome_title || 'Chat with us',
-      greetingType: details.greeting_enabled ? 'custom' : 'disabled',
-      helpCenter: 'none',
-      setReplyTime: 'In a few minutes',
-      enableEmailCollectBox: true,
-      allowMessagesAfterResolved: true,
-      enableConversationContinuity: true,
+      greetingType: details.greeting_enabled ? 'custom' as const : 'disabled' as const,
+      greetingMessage: details.greeting_message || configData.greetingMessage,
+      
+      // Widget appearance
+      welcomeHeading: details.welcome_title || details.widget_config?.welcome_title || configData.welcomeHeading,
+      welcomeTagline: details.welcome_tagline || details.widget_config?.welcome_tagline || configData.welcomeTagline,
+      widgetColor: details.widget_color || details.color || configData.widgetColor,
+      launcherTitle: details.welcome_title || configData.launcherTitle,
+      widgetBubbleLauncherTitle: details.welcome_title || configData.widgetBubbleLauncherTitle,
+      
+      // Static settings (preserve existing values)
+      helpCenter: configData.helpCenter,
+      setReplyTime: configData.setReplyTime,
+      enableEmailCollectBox: configData.enableEmailCollectBox,
+      allowMessagesAfterResolved: configData.allowMessagesAfterResolved,
+      enableConversationContinuity: configData.enableConversationContinuity,
+      
+      // Features
       features: {
-        enableFileUpload: details.enable_file_upload ?? true,
-        enableConversationNoteEmail: true,
-        enableCSATSubtitle: false,
-        enableTypingIndicator: true,
-        enableBusinessHours: details.enable_business_hours ?? true,
-        enableCSAT: details.enable_csat ?? false,
-        enablePreChatForm: details.enable_pre_chat_form ?? false,
-        enablePreChatMessage: false,
-        enableReplyTime: true,
-        enableConversationContinuity: true,
-        enableContactInformation: true,
-        enableEmailCollect: true,
-        enablePhoneNumberCollect: true,
-        enableFullNameCollect: true,
-        displayFilePicker: true,
-        displayEmojiPicker: true,
-        allowUsersToEndConversation: false,
-        useInboxNameAndAvatar: false,
+        ...configData.features,
+        enableFileUpload: details.enable_file_upload ?? configData.features.enableFileUpload,
+        enableBusinessHours: details.working_hours_enabled ?? configData.features.enableBusinessHours,
+        enableCSAT: details.csat_survey_enabled ?? configData.features.enableCSAT,
+        enablePreChatForm: details.pre_chat_form_enabled ?? configData.features.enablePreChatForm,
       },
-      preChatFormEnabled: false,
-      enablePreChatForm: false,
-      preChatMessage: 'Please provide your contact details',
-      requireEmail: true,
-      requireFullName: true,
-      requirePhoneNumber: false,
-      preChatFormFields: [
-        {
-          key: 'fullName',
-          name: 'fullName',
-          placeholder: 'Full Name',
-          type: 'text',
-          required: true,
-          enabled: true,
-          field_type: 'standard',
-          label: 'Full Name',
-          values: []
-        },
-        {
-          key: 'emailAddress',
-          name: 'emailAddress',
-          placeholder: 'Email Address',
-          type: 'email',
-          required: true,
-          enabled: true,  
-          field_type: 'standard',
-          label: 'Email Address',
-          values: []
-        }
-      ],
-      agents: ['Maikel Guzman'],
-      enableAutoAssignment: true,
-      autoAssignmentLimit: 10,
-      enableBusinessAvailability: true,
-      unavailableMessage: '',
-      timezone: 'Pacific Time (US & Canada) (GMT-07:00)',
-      weeklyHours: {
-        sunday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' },
-        monday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
-        tuesday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
-        wednesday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
-        thursday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
-        friday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
-        saturday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' }
-      },
-      enableCSAT: false,
-      displayType: 'emoji' as const,
-      csatMessage: 'Please enter a message to show users with the form',
+      
+      // Pre-chat form
+      preChatFormEnabled: Boolean(details.pre_chat_form_enabled),
+      enablePreChatForm: Boolean(details.pre_chat_form_enabled),
+      preChatMessage: preChatOptions.pre_chat_message || configData.preChatMessage,
+      requireEmail: configData.requireEmail,
+      requireFullName: configData.requireFullName,
+      requirePhoneNumber: configData.requirePhoneNumber,
+      preChatFormFields: Array.isArray(preChatFields) ? preChatFields : configData.preChatFormFields,
+      
+      // Agent settings (preserve existing)
+      agents: configData.agents,
+      enableAutoAssignment: configData.enableAutoAssignment,
+      autoAssignmentLimit: configData.autoAssignmentLimit,
+      
+      // Business hours
+      enableBusinessAvailability: Boolean(details.working_hours_enabled),
+      unavailableMessage: details.out_of_office_message || configData.unavailableMessage,
+      timezone: details.timezone || configData.timezone,
+      weeklyHours: transformedWeeklyHours,
+      
+      // CSAT
+      enableCSAT: Boolean(details.csat_survey_enabled),
+      displayType: csatConfig.display_type as 'emoji' | 'thumbs_up_down' || configData.displayType,
+      csatMessage: csatConfig.message || configData.csatMessage,
       surveyRule: {
-        condition: 'contains',
-        labels: []
+        condition: surveyRules.operator || configData.surveyRule.condition,
+        labels: surveyRules.values || configData.surveyRule.labels
       },
-      position: 'right' as const,
-      widgetStyle: 'standard' as const,
-      widgetBubblePosition: 'right' as const,
-      widgetBubbleType: 'standard' as const,
-      userIdentityValidation: 'HzPShsUbLrckiXnUQzMSWr35',
-      enforceUserIdentityValidation: false,
-      senderNames: [
-        { name: 'Support Team', email: 'support@example.com' }
-      ],
-      senderName: {
-        type: 'friendly' as const
-      },
-      selectedBot: 'Agente_mensajeria_telegram_agente de ventas nuevo'
+      
+      // Widget settings (preserve existing)
+      position: configData.position,
+      widgetStyle: configData.widgetStyle,
+      widgetBubblePosition: configData.widgetBubblePosition,
+      widgetBubbleType: configData.widgetBubbleType,
+      userIdentityValidation: configData.userIdentityValidation,
+      enforceUserIdentityValidation: configData.enforceUserIdentityValidation,
+      senderNames: configData.senderNames,
+      senderName: configData.senderName,
+      selectedBot: configData.selectedBot
     };
   }, [configData]);
 
-  // Single effect to handle data loading
+  // Helper function to get day name from number
+  const getDayNameFromNumber = (dayNumber: number): string | null => {
+    const dayMap: Record<number, string> = {
+      0: 'sunday', 1: 'monday', 2: 'tuesday', 3: 'wednesday',
+      4: 'thursday', 5: 'friday', 6: 'saturday'
+    };
+    return dayMap[dayNumber] || null;
+  };
+
+  // Main effect for loading and syncing data
   useEffect(() => {
-    const loadConfig = async () => {
-      // Avoid duplicate loading for the same inbox
-      if (loadedInboxRef.current === inboxId && isInitialized.current) {
-        console.log('useWebsiteConfig - Skipping duplicate load for inbox:', inboxId);
+    const loadAndSyncData = async () => {
+      // Skip if no inboxId or already loaded the same inbox recently
+      if (!inboxId || loadedInboxRef.current === inboxId) {
         return;
       }
 
-      console.log('useWebsiteConfig - Loading config for inbox:', inboxId);
+      console.log('useWebsiteConfig - Loading data for inbox:', inboxId);
       
       try {
         let details = inboxDetails;
         
-        // Only load from API if we don't have details and haven't loaded from context
-        if (!details && inboxId && inboxId !== loadedInboxRef.current) {
-          // Check if we already have details in context
-          if (inboxContext.inboxDetails && inboxContext.inboxDetails.id === parseInt(inboxId)) {
-            details = inboxContext.inboxDetails;
-          } else {
-            // Load from API as last resort
-            await inboxContext.loadInboxDetails(parseInt(inboxId));
-            details = inboxContext.inboxDetails;
-          }
+        // Load from context if available, otherwise fetch from API
+        if (!details && inboxContext.inboxDetails && inboxContext.inboxDetails.id === parseInt(inboxId)) {
+          details = inboxContext.inboxDetails;
+        } else if (!details) {
+          await inboxContext.loadInboxDetails(parseInt(inboxId));
+          details = inboxContext.inboxDetails;
         }
         
         if (details) {
           const newConfigData = transformInboxDetailsToConfig(details);
-          console.log('useWebsiteConfig - Setting new config data:', newConfigData);
+          console.log('useWebsiteConfig - Applying transformed config:', newConfigData);
           setConfigData(newConfigData);
           
-          // Mark this inbox as loaded
+          // Mark as loaded and initialized
           loadedInboxRef.current = inboxId;
           isInitialized.current = true;
+          lastSyncTimestamp.current = Date.now();
         }
       } catch (error) {
         console.error('useWebsiteConfig - Error loading config:', error);
       }
     };
     
-    // Only load if we have an inboxId and haven't loaded it yet
-    if (inboxId && (loadedInboxRef.current !== inboxId || !isInitialized.current)) {
-      loadConfig();
-    }
+    loadAndSyncData();
   }, [inboxId, inboxDetails, inboxContext.inboxDetails, transformInboxDetailsToConfig]);
 
-  // Sync with context updates
+  // Effect to sync with context updates (for real-time updates after saves)
   useEffect(() => {
-    if (inboxContext.inboxDetails && inboxContext.inboxDetails.id === parseInt(inboxId)) {
-      const newConfigData = transformInboxDetailsToConfig(inboxContext.inboxDetails);
-      setConfigData(newConfigData);
-      console.log('useWebsiteConfig - Synced with context updates');
+    if (
+      inboxContext.inboxDetails && 
+      inboxContext.inboxDetails.id === parseInt(inboxId) &&
+      isInitialized.current
+    ) {
+      const currentTimestamp = Date.now();
+      // Only sync if enough time has passed or it's a different dataset
+      if (currentTimestamp - lastSyncTimestamp.current > 1000) {
+        console.log('useWebsiteConfig - Syncing with context updates');
+        const newConfigData = transformInboxDetailsToConfig(inboxContext.inboxDetails);
+        setConfigData(newConfigData);
+        lastSyncTimestamp.current = currentTimestamp;
+      }
     }
   }, [inboxContext.inboxDetails, inboxId, transformInboxDetailsToConfig]);
 
-  // Reset when inbox changes
+  // Reset state when inbox changes
   useEffect(() => {
     if (loadedInboxRef.current && loadedInboxRef.current !== inboxId) {
       console.log('useWebsiteConfig - Inbox changed, resetting state');
       loadedInboxRef.current = null;
       isInitialized.current = false;
+      lastSyncTimestamp.current = 0;
     }
   }, [inboxId]);
 

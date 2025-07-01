@@ -21,12 +21,14 @@ interface InboxContextType {
   updatePreChatForm: (inboxId: number, data: any) => Promise<void>;
   updateWidgetConfig: (inboxId: number, data: any) => Promise<void>;
   loadInboxDetails: (inboxId: number) => Promise<void>;
+  refreshInboxDetails: (inboxId: number) => Promise<void>;
 }
 
 const InboxContext = createContext<InboxContextType | undefined>(undefined);
 
-// Cache for inbox details to avoid repeated API calls
-const inboxCache = new Map<number, any>();
+// Enhanced cache with timestamp tracking
+const inboxCache = new Map<number, { data: any; timestamp: number }>();
+const CACHE_TTL = 30000; // 30 seconds
 
 // Data transformers - UI to API format
 const transformSettingsToFormData = (data: any): FormData => {
@@ -139,6 +141,13 @@ const getAuthHeaders = (): AuthHeaders => ({
   'token-type': 'Bearer'
 });
 
+// Check if cache is still valid
+const isCacheValid = (inboxId: number): boolean => {
+  const cached = inboxCache.get(inboxId);
+  if (!cached) return false;
+  return Date.now() - cached.timestamp < CACHE_TTL;
+};
+
 export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [inboxDetails, setInboxDetails] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -155,7 +164,6 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     if (options.contentType === 'json') {
       headers['Content-Type'] = 'application/json';
     }
-    // For form-data, don't set Content-Type header - browser will set it with boundary
 
     const response = await fetch(url, {
       ...options,
@@ -173,11 +181,30 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     return response.json();
   };
 
+  const refreshInboxDetails = useCallback(async (inboxId: number) => {
+    try {
+      setLoading(true);
+      console.log('InboxContext - Force refreshing inbox details for ID:', inboxId);
+      
+      const details = await chatwootApi.getInboxDetails(inboxId);
+      console.log('InboxContext - Refreshed inbox details:', details);
+      
+      // Update cache with timestamp
+      inboxCache.set(inboxId, { data: details, timestamp: Date.now() });
+      setInboxDetails(details);
+    } catch (error) {
+      console.error('InboxContext - Failed to refresh inbox details:', error);
+      toast.error('Failed to refresh inbox details');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const loadInboxDetails = useCallback(async (inboxId: number) => {
     // Check cache first
-    if (inboxCache.has(inboxId)) {
+    if (isCacheValid(inboxId)) {
       console.log('InboxContext - Using cached data for inbox:', inboxId);
-      const cachedData = inboxCache.get(inboxId);
+      const cachedData = inboxCache.get(inboxId)!.data;
       setInboxDetails(cachedData);
       return;
     }
@@ -189,8 +216,8 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       const details = await chatwootApi.getInboxDetails(inboxId);
       console.log('InboxContext - Loaded inbox details:', details);
       
-      // Cache the result
-      inboxCache.set(inboxId, details);
+      // Cache with timestamp
+      inboxCache.set(inboxId, { data: details, timestamp: Date.now() });
       setInboxDetails(details);
     } catch (error) {
       console.error('InboxContext - Failed to load inbox details:', error);
@@ -216,9 +243,8 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       
       console.log('InboxContext - Settings updated:', response);
       
-      // Update cache and state
-      inboxCache.set(inboxId, response);
-      setInboxDetails(response);
+      // Force refresh after update to ensure data consistency
+      await refreshInboxDetails(inboxId);
       toast.success('Settings updated successfully');
     } catch (error) {
       console.error('InboxContext - Failed to update settings:', error);
@@ -227,7 +253,7 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setSaving(false);
     }
-  }, []);
+  }, [refreshInboxDetails]);
 
   const updateBusinessHours = useCallback(async (inboxId: number, data: any) => {
     try {
@@ -245,9 +271,8 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       
       console.log('InboxContext - Business hours updated:', response);
       
-      // Update cache and state
-      inboxCache.set(inboxId, response);
-      setInboxDetails(response);
+      // Force refresh after update
+      await refreshInboxDetails(inboxId);
       toast.success('Business hours updated successfully');
     } catch (error) {
       console.error('InboxContext - Failed to update business hours:', error);
@@ -256,7 +281,7 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setSaving(false);
     }
-  }, []);
+  }, [refreshInboxDetails]);
 
   const updateCSATConfig = useCallback(async (inboxId: number, data: any) => {
     try {
@@ -274,9 +299,8 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       
       console.log('InboxContext - CSAT config updated:', response);
       
-      // Update cache and state
-      inboxCache.set(inboxId, response);
-      setInboxDetails(response);
+      // Force refresh after update
+      await refreshInboxDetails(inboxId);
       toast.success('CSAT configuration updated successfully');
     } catch (error) {
       console.error('InboxContext - Failed to update CSAT config:', error);
@@ -285,7 +309,7 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setSaving(false);
     }
-  }, []);
+  }, [refreshInboxDetails]);
 
   const updatePreChatForm = useCallback(async (inboxId: number, data: any) => {
     try {
@@ -303,9 +327,8 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       
       console.log('InboxContext - Pre-chat form updated:', response);
       
-      // Update cache and state
-      inboxCache.set(inboxId, response);
-      setInboxDetails(response);
+      // Force refresh after update
+      await refreshInboxDetails(inboxId);
       toast.success('Pre-chat form updated successfully');
     } catch (error) {
       console.error('InboxContext - Failed to update pre-chat form:', error);
@@ -314,7 +337,7 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setSaving(false);
     }
-  }, []);
+  }, [refreshInboxDetails]);
 
   const updateWidgetConfig = useCallback(async (inboxId: number, data: any) => {
     try {
@@ -332,9 +355,8 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
       
       console.log('InboxContext - Widget config updated:', response);
       
-      // Update cache and state
-      inboxCache.set(inboxId, response);
-      setInboxDetails(response);
+      // Force refresh after update
+      await refreshInboxDetails(inboxId);
       toast.success('Widget configuration updated successfully');
     } catch (error) {
       console.error('InboxContext - Failed to update widget config:', error);
@@ -343,7 +365,7 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     } finally {
       setSaving(false);
     }
-  }, []);
+  }, [refreshInboxDetails]);
 
   const value: InboxContextType = {
     inboxDetails,
@@ -355,6 +377,7 @@ export const InboxContextProvider: React.FC<{ children: ReactNode }> = ({ childr
     updatePreChatForm,
     updateWidgetConfig,
     loadInboxDetails,
+    refreshInboxDetails,
   };
 
   return (
