@@ -115,23 +115,18 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
   const isInitialized = useRef(false);
   const lastSyncTimestamp = useRef<number>(0);
 
-  // Enhanced transform function with better data handling
+  // Enhanced transform function with better data handling - FIXED mapping
   const transformInboxDetailsToConfig = useCallback((details: any): WebsiteConfigData => {
     if (!details) return configData;
 
-    console.log('useWebsiteConfig - Transforming details for UI:', {
-      id: details.id,
-      name: details.name,
-      website_url: details.website_url,
-      welcome_title: details.welcome_title,
-      welcome_tagline: details.welcome_tagline,
-      widget_color: details.widget_color,
-      greeting_enabled: details.greeting_enabled,
-      greeting_message: details.greeting_message,
-      working_hours_enabled: details.working_hours_enabled,
-      csat_survey_enabled: details.csat_survey_enabled,
-      pre_chat_form_enabled: details.pre_chat_form_enabled
-    });
+    console.log('useWebsiteConfig - Raw API Response:', details);
+
+    // Extract reply_time mapping
+    const replyTimeMap: Record<string, string> = {
+      'in_a_few_minutes': 'In a few minutes',
+      'in_an_hour': 'In an hour',
+      'in_a_day': 'In a day'
+    };
 
     // Handle business hours transformation
     const transformedWeeklyHours = { ...configData.weeklyHours };
@@ -158,7 +153,7 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     const preChatFields = preChatOptions.pre_chat_fields || configData.preChatFormFields;
     
     return {
-      // Basic settings
+      // FIXED: Direct mapping from API response fields
       websiteName: details.name || configData.websiteName,
       websiteUrl: details.website_url || configData.websiteUrl,
       websiteDomain: details.website_url ? 
@@ -171,21 +166,23 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
         })() : configData.websiteDomain,
       channelAvatar: details.avatar_url || configData.channelAvatar,
       
-      // Greeting settings
+      // FIXED: Direct mapping for greeting settings
       enableChannelGreeting: Boolean(details.greeting_enabled),
       greetingType: details.greeting_enabled ? 'custom' as const : 'disabled' as const,
       greetingMessage: details.greeting_message || configData.greetingMessage,
       
-      // Widget appearance
-      welcomeHeading: details.welcome_title || details.widget_config?.welcome_title || configData.welcomeHeading,
-      welcomeTagline: details.welcome_tagline || details.widget_config?.welcome_tagline || configData.welcomeTagline,
-      widgetColor: details.widget_color || details.color || configData.widgetColor,
+      // FIXED: Direct mapping for widget appearance from API response
+      welcomeHeading: details.welcome_title || configData.welcomeHeading,
+      welcomeTagline: details.welcome_tagline || configData.welcomeTagline,
+      widgetColor: details.widget_color || configData.widgetColor,
       launcherTitle: details.welcome_title || configData.launcherTitle,
       widgetBubbleLauncherTitle: details.welcome_title || configData.widgetBubbleLauncherTitle,
       
+      // FIXED: Direct mapping for reply time
+      setReplyTime: replyTimeMap[details.reply_time] || configData.setReplyTime,
+      
       // Static settings (preserve existing values)
       helpCenter: configData.helpCenter,
-      setReplyTime: configData.setReplyTime,
       enableEmailCollectBox: configData.enableEmailCollectBox,
       allowMessagesAfterResolved: configData.allowMessagesAfterResolved,
       enableConversationContinuity: configData.enableConversationContinuity,
@@ -273,7 +270,16 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
         
         if (details) {
           const newConfigData = transformInboxDetailsToConfig(details);
-          console.log('useWebsiteConfig - Applying transformed config:', newConfigData);
+          console.log('useWebsiteConfig - Applying transformed config:', {
+            websiteName: newConfigData.websiteName,
+            websiteUrl: newConfigData.websiteUrl,
+            welcomeHeading: newConfigData.welcomeHeading,
+            welcomeTagline: newConfigData.welcomeTagline,
+            widgetColor: newConfigData.widgetColor,
+            enableChannelGreeting: newConfigData.enableChannelGreeting,
+            greetingMessage: newConfigData.greetingMessage,
+            setReplyTime: newConfigData.setReplyTime
+          });
           setConfigData(newConfigData);
           
           // Mark as loaded and initialized
