@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { InboxContextProvider } from '@/context/InboxContext';
 import { useWebsiteConfig } from './useWebsiteConfig';
 import WebsiteSettingsTab from './WebsiteConfigTabs/WebsiteSettingsTab';
 import WebsitePreChatFormTab from './WebsiteConfigTabs/WebsitePreChatFormTab';
@@ -13,7 +14,7 @@ import TelegramBusinessHoursTab from './TelegramConfigTabs/TelegramBusinessHours
 import TelegramCSATTab from './TelegramConfigTabs/TelegramCSATTab';
 import type { WebsiteConfigSectionProps } from './WebsiteConfigTypes';
 
-const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = ({ inboxId, inboxDetails, onBack }) => {
+const WebsiteConfigContent: React.FC<WebsiteConfigSectionProps> = ({ inboxId, inboxDetails, onBack }) => {
   const {
     loading,
     saving,
@@ -168,6 +169,14 @@ const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = ({ inboxId, in
         </div>
       </Tabs>
     </div>
+  );
+};
+
+const WebsiteConfigSection: React.FC<WebsiteConfigSectionProps> = (props) => {
+  return (
+    <InboxContextProvider>
+      <WebsiteConfigContent {...props} />
+    </InboxContextProvider>
   );
 };
 

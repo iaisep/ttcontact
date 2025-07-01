@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useInboxContext } from '@/context/InboxContext';
 import type { WebsiteConfigData } from './WebsiteConfigTypes';
 
 export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const inboxContext = useInboxContext();
   const [activeTab, setActiveTab] = useState('settings');
   const [configData, setConfigData] = useState<WebsiteConfigData>({
-    // Settings
     websiteName: 'Website Chat',
     websiteUrl: 'https://example.com',
     websiteDomain: 'example.com',
@@ -15,16 +14,12 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     greetingType: 'disabled',
     greetingMessage: '',
     helpCenter: 'none',
-
-    // Additional widget settings
     welcomeHeading: 'Welcome to our website',
     welcomeTagline: 'How can we help you today?',
     setReplyTime: 'In a few minutes',
     enableEmailCollectBox: true,
     allowMessagesAfterResolved: true,
     enableConversationContinuity: true,
-
-    // Features
     features: {
       enableFileUpload: true,
       enableConversationNoteEmail: true,
@@ -45,8 +40,6 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
       allowUsersToEndConversation: false,
       useInboxNameAndAvatar: false,
     },
-
-    // Pre Chat Form
     preChatFormEnabled: false,
     enablePreChatForm: false,
     preChatMessage: 'Please provide your contact details',
@@ -77,13 +70,9 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
         values: []
       }
     ],
-
-    // Collaborators
     agents: ['Maikel Guzman'],
     enableAutoAssignment: true,
     autoAssignmentLimit: 10,
-
-    // Business Hours
     enableBusinessAvailability: true,
     unavailableMessage: '',
     timezone: 'Pacific Time (US & Canada) (GMT-07:00)',
@@ -96,8 +85,6 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
       friday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
       saturday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' }
     },
-
-    // CSAT
     enableCSAT: false,
     displayType: 'emoji',
     csatMessage: 'Please enter a message to show users with the form',
@@ -105,8 +92,6 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
       condition: 'contains',
       labels: []
     },
-
-    // Widget Builder
     widgetColor: '#1f93ff',
     position: 'right',
     launcherTitle: 'Chat with us',
@@ -114,81 +99,73 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
     widgetBubblePosition: 'right',
     widgetBubbleType: 'standard',
     widgetBubbleLauncherTitle: 'Chat with us',
-
-    // Configuration
     userIdentityValidation: 'HzPShsUbLrckiXnUQzMSWr35',
     enforceUserIdentityValidation: false,
-
-    // Sender Names
     senderNames: [
       { name: 'Support Team', email: 'support@example.com' }
     ],
     senderName: {
       type: 'friendly'
     },
-
-    // Bot Configuration
     selectedBot: 'Agente_mensajeria_telegram_agente de ventas nuevo'
   });
 
   useEffect(() => {
     const loadConfig = async () => {
-      setLoading(true);
-      
       console.log('useWebsiteConfig - Raw inboxDetails received:', inboxDetails);
       
-      // Si tenemos datos de la API, usarlos para poblar el estado
-      if (inboxDetails) {
+      // Load inbox details using context if not provided
+      if (!inboxDetails && inboxId) {
+        await inboxContext.loadInboxDetails(parseInt(inboxId));
+      }
+      
+      // Use inboxDetails from context if available
+      const details = inboxDetails || inboxContext.inboxDetails;
+      
+      if (details) {
         console.log('useWebsiteConfig - Processing inbox details:', {
-          name: inboxDetails.name,
-          website_url: inboxDetails.website_url,
-          welcome_title: inboxDetails.welcome_title,
-          welcome_tagline: inboxDetails.welcome_tagline,
-          widget_color: inboxDetails.widget_color,
-          greeting_enabled: inboxDetails.greeting_enabled,
-          greeting_message: inboxDetails.greeting_message
+          name: details.name,
+          website_url: details.website_url,
+          welcome_title: details.welcome_title,
+          welcome_tagline: details.welcome_tagline,
+          widget_color: details.widget_color,
+          greeting_enabled: details.greeting_enabled,
+          greeting_message: details.greeting_message
         });
         
         const newConfigData = {
-          // Settings - Direct API field mapping
-          websiteName: inboxDetails.name || 'Website Chat',
-          websiteUrl: inboxDetails.website_url || 'https://example.com',
-          websiteDomain: inboxDetails.website_url ? 
+          websiteName: details.name || 'Website Chat',
+          websiteUrl: details.website_url || 'https://example.com',
+          websiteDomain: details.website_url ? 
             (() => {
               try {
-                return new URL(inboxDetails.website_url).hostname;
+                return new URL(details.website_url).hostname;
               } catch {
-                return inboxDetails.website_url.replace(/^https?:\/\//, '');
+                return details.website_url.replace(/^https?:\/\//, '');
               }
             })() : 'example.com',
-          channelAvatar: inboxDetails.avatar_url || '',
-          enableChannelGreeting: Boolean(inboxDetails.greeting_enabled),
-          greetingMessage: inboxDetails.greeting_message || '',
-          
-          // Widget settings - Check multiple possible API fields
-          welcomeHeading: inboxDetails.welcome_title || inboxDetails.widget_config?.welcome_title || 'Welcome to our website',
-          welcomeTagline: inboxDetails.welcome_tagline || inboxDetails.widget_config?.welcome_tagline || 'How can we help you today?',
-          widgetColor: inboxDetails.widget_color || inboxDetails.color || '#1f93ff',
-          launcherTitle: inboxDetails.welcome_title || 'Chat with us',
-          widgetBubbleLauncherTitle: inboxDetails.welcome_title || 'Chat with us',
-
-          // Keep existing values for other fields
-          greetingType: inboxDetails.greeting_enabled ? 'enabled' : 'disabled',
+          channelAvatar: details.avatar_url || '',
+          enableChannelGreeting: Boolean(details.greeting_enabled),
+          greetingMessage: details.greeting_message || '',
+          welcomeHeading: details.welcome_title || details.widget_config?.welcome_title || 'Welcome to our website',
+          welcomeTagline: details.welcome_tagline || details.widget_config?.welcome_tagline || 'How can we help you today?',
+          widgetColor: details.widget_color || details.color || '#1f93ff',
+          launcherTitle: details.welcome_title || 'Chat with us',
+          widgetBubbleLauncherTitle: details.welcome_title || 'Chat with us',
+          greetingType: details.greeting_enabled ? 'enabled' : 'disabled',
           helpCenter: 'none',
           setReplyTime: 'In a few minutes',
           enableEmailCollectBox: true,
           allowMessagesAfterResolved: true,
           enableConversationContinuity: true,
-
-          // Features
           features: {
-            enableFileUpload: inboxDetails.enable_file_upload ?? true,
+            enableFileUpload: details.enable_file_upload ?? true,
             enableConversationNoteEmail: true,
             enableCSATSubtitle: false,
             enableTypingIndicator: true,
-            enableBusinessHours: inboxDetails.enable_business_hours ?? true,
-            enableCSAT: inboxDetails.enable_csat ?? false,
-            enablePreChatForm: inboxDetails.enable_pre_chat_form ?? false,
+            enableBusinessHours: details.enable_business_hours ?? true,
+            enableCSAT: details.enable_csat ?? false,
+            enablePreChatForm: details.enable_pre_chat_form ?? false,
             enablePreChatMessage: false,
             enableReplyTime: true,
             enableConversationContinuity: true,
@@ -201,8 +178,6 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
             allowUsersToEndConversation: false,
             useInboxNameAndAvatar: false,
           },
-
-          // Keep existing values for complex objects
           preChatFormEnabled: false,
           enablePreChatForm: false,
           preChatMessage: 'Please provide your contact details',
@@ -233,11 +208,9 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
               values: []
             }
           ],
-
           agents: ['Maikel Guzman'],
           enableAutoAssignment: true,
           autoAssignmentLimit: 10,
-
           enableBusinessAvailability: true,
           unavailableMessage: '',
           timezone: 'Pacific Time (US & Canada) (GMT-07:00)',
@@ -250,7 +223,6 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
             friday: { enabled: true, allDay: true, startTime: '09:00', endTime: '17:00' },
             saturday: { enabled: false, allDay: false, startTime: '09:00', endTime: '17:00' }
           },
-
           enableCSAT: false,
           displayType: 'emoji' as const,
           csatMessage: 'Please enter a message to show users with the form',
@@ -258,36 +230,29 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
             condition: 'contains',
             labels: []
           },
-
           position: 'right' as const,
           widgetStyle: 'standard' as const,
           widgetBubblePosition: 'right' as const,
           widgetBubbleType: 'standard' as const,
-
           userIdentityValidation: 'HzPShsUbLrckiXnUQzMSWr35',
           enforceUserIdentityValidation: false,
-
           senderNames: [
             { name: 'Support Team', email: 'support@example.com' }
           ],
           senderName: {
             type: 'friendly' as const
           },
-
           selectedBot: 'Agente_mensajeria_telegram_agente de ventas nuevo'
         };
 
         console.log('useWebsiteConfig - Setting new config data:', newConfigData);
         setConfigData(newConfigData);
       }
-      
-      setLoading(false);
     };
     
     loadConfig();
-  }, [inboxId, inboxDetails]);
+  }, [inboxId, inboxDetails, inboxContext.inboxDetails]);
 
-  // Log current configData for debugging
   useEffect(() => {
     console.log('useWebsiteConfig - Current configData state:', {
       websiteName: configData.websiteName,
@@ -344,21 +309,42 @@ export const useWebsiteConfig = (inboxId: string, inboxDetails?: any) => {
   };
 
   const saveConfiguration = async () => {
-    setSaving(true);
+    if (!inboxId) return;
+    
+    const numericInboxId = parseInt(inboxId);
+    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Website configuration saved:', configData);
+      switch (activeTab) {
+        case 'settings':
+          await inboxContext.updateInboxSettings(numericInboxId, configData);
+          break;
+        case 'business-hours':
+          await inboxContext.updateBusinessHours(numericInboxId, configData);
+          break;
+        case 'csat':
+          await inboxContext.updateCSATConfig(numericInboxId, configData);
+          break;
+        case 'pre-chat-form':
+          await inboxContext.updatePreChatForm(numericInboxId, configData);
+          break;
+        case 'widget-builder':
+          await inboxContext.updateWidgetConfig(numericInboxId, configData);
+          break;
+        default:
+          // For other tabs, use settings as default
+          await inboxContext.updateInboxSettings(numericInboxId, configData);
+      }
+      
+      console.log('Website configuration saved successfully');
     } catch (error) {
       console.error('Error saving configuration:', error);
-    } finally {
-      setSaving(false);
+      throw error;
     }
   };
 
   return {
-    loading,
-    saving,
+    loading: inboxContext.loading,
+    saving: inboxContext.saving,
     activeTab,
     setActiveTab,
     configData,
