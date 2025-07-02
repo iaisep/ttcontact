@@ -3,7 +3,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://supabasuna.universidadisep.com/";
+const SUPABASE_URL = "https://supabase.totalcontact.com.mx/";
 const SUPABASE_PUBLISHABLE_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc0OTI0MDg0MCwiZXhwIjo0OTA0OTE0NDQwLCJyb2xlIjoiYW5vbiJ9.xc_ZGQt1RtsRZSSqxhScWmtwOzZgoSUBy0BCPQ-3MQU";
 
 // Import the supabase client like this:
