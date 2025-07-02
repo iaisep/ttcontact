@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 // Add your Supabase URL and anon key here
 // These should be replaced with your actual Supabase project credentials
-const supabaseUrl = 'https://supabasuna.universidadisep.com/';
+const supabaseUrl = 'https://supabase.totalcontact.com.mx/';
 const supabaseKey = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc0OTI0MDg0MCwiZXhwIjo0OTA0OTE0NDQwLCJyb2xlIjoiYW5vbiJ9.xc_ZGQt1RtsRZSSqxhScWmtwOzZgoSUBy0BCPQ-3MQU';
 
 // Create Supabase client
