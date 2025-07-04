@@ -1,4 +1,3 @@
-
 const CHATWOOT_API_KEY = 'YZEKfqAJsnEWoshpdRCq9yZn';
 const CHATWOOT_BASE_URL = 'https://chatwoot.totalcontact.com.mx/api/v1/accounts/1'; // Replace 1 with actual account ID
 
@@ -26,6 +25,7 @@ interface CreateInboxRequest {
     phone_number?: string;
     provider?: string;
     provider_config?: any;
+    bot_token?: string;
   };
 }
 
@@ -203,20 +203,61 @@ class ChatwootApiService {
     return this.createInbox(requestBody);
   }
 
-  // Create Telegram inbox
+  // Validate Telegram bot token by creating a test inbox
+  async validateTelegramBotToken(botToken: string): Promise<boolean> {
+    try {
+      console.log('Validating Telegram bot token:', botToken);
+      
+      const requestBody = {
+        name: `temp_validation_${Date.now()}`, // Temporary name for validation
+        channel: {
+          type: 'telegram' as const,
+          bot_token: botToken,
+        },
+      };
+
+      console.log('Telegram validation request body:', JSON.stringify(requestBody, null, 2));
+      
+      // Try to create the inbox - if it succeeds, token is valid
+      const response = await this.makeRequest('/inboxes', {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+      });
+
+      // If we get here, the token is valid
+      // Delete the temporary inbox
+      if (response.payload?.id) {
+        try {
+          await this.deleteInbox(response.payload.id);
+        } catch (deleteError) {
+          console.warn('Failed to delete temporary validation inbox:', deleteError);
+        }
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Telegram bot token validation failed:', error);
+      return false;
+    }
+  }
+
+  // Create Telegram inbox - Updated to use correct structure
   async createTelegramInbox(data: {
     name: string;
     bot_token: string;
   }): Promise<ChatwootInbox> {
-    return this.createInbox({
+    console.log('Creating Telegram inbox with data:', data);
+    
+    const requestBody = {
       name: data.name,
       channel: {
-        type: 'telegram',
-        provider_config: {
-          bot_token: data.bot_token,
-        },
+        type: 'telegram' as const,
+        bot_token: data.bot_token,
       },
-    });
+    };
+
+    console.log('Telegram inbox request body:', JSON.stringify(requestBody, null, 2));
+    return this.createInbox(requestBody);
   }
 
   // Create Website inbox

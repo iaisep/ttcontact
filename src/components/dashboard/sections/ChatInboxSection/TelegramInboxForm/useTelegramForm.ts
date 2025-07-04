@@ -1,23 +1,19 @@
 
 import { useState } from 'react';
+import { chatwootApi } from '@/services/chatwootApi';
+import { toast } from 'sonner';
 import type { FormData, Agent, FormErrors } from './types';
 
 export const useTelegramForm = () => {
   const [currentStep, setCurrentStep] = useState(2);
   const [isCreating, setIsCreating] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     inboxName: '',
     botToken: ''
   });
   const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
   const [errors, setErrors] = useState<FormErrors>({});
-
-  // Mock agents data
-  const agents: Agent[] = [
-    { id: '1', name: 'Agent Smith', email: 'smith@company.com' },
-    { id: '2', name: 'Agent Johnson', email: 'johnson@company.com' },
-    { id: '3', name: 'Agent Brown', email: 'brown@company.com' }
-  ];
 
   const validateStep2 = () => {
     const newErrors: FormErrors = {};
@@ -43,10 +39,31 @@ export const useTelegramForm = () => {
     }
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (currentStep === 2) {
-      if (validateStep2()) {
-        setCurrentStep(3);
+      if (!validateStep2()) {
+        return;
+      }
+
+      // Validate bot token with Chatwoot API
+      setIsValidating(true);
+      try {
+        console.log('Validating Telegram bot token...');
+        const isValid = await chatwootApi.validateTelegramBotToken(formData.botToken);
+        
+        if (isValid) {
+          console.log('Bot token is valid, proceeding to next step');
+          setCurrentStep(3);
+        } else {
+          console.log('Bot token is invalid');
+          toast.error('The bot token is incorrect. Please check your token and try again.');
+          setErrors(prev => ({ ...prev, botToken: 'Invalid bot token' }));
+        }
+      } catch (error) {
+        console.error('Error validating bot token:', error);
+        toast.error('Failed to validate bot token. Please try again.');
+      } finally {
+        setIsValidating(false);
       }
     } else if (currentStep === 3) {
       setCurrentStep(4);
@@ -58,22 +75,32 @@ export const useTelegramForm = () => {
     try {
       console.log('Creating Telegram inbox with data:', { formData, selectedAgents });
       
-      // Use the Chatwoot API to create the inbox
-      if ((window as any).createTelegramInbox) {
-        await (window as any).createTelegramInbox({
-          name: formData.inboxName,
-          botToken: formData.botToken,
-        });
-        
-        console.log('Telegram inbox created successfully');
-        onComplete();
-      } else {
-        console.error('createTelegramInbox function not found on window');
-        throw new Error('Telegram inbox creation function not available');
+      // Create the inbox using Chatwoot API
+      const newInbox = await chatwootApi.createTelegramInbox({
+        name: formData.inboxName,
+        bot_token: formData.botToken,
+      });
+
+      console.log('Telegram inbox created successfully:', newInbox);
+
+      // If agents are selected, add them to the inbox
+      if (selectedAgents.length > 0) {
+        try {
+          const agentIds = selectedAgents.map(id => parseInt(id));
+          await chatwootApi.addAgentToInbox(newInbox.id, agentIds);
+          console.log('Agents added to inbox successfully');
+        } catch (agentError) {
+          console.error('Error adding agents to inbox:', agentError);
+          toast.error('Inbox created but failed to add agents');
+        }
       }
+
+      toast.success('Telegram inbox created successfully!');
+      onComplete();
       
     } catch (error) {
       console.error('Error creating Telegram inbox:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create Telegram inbox');
       throw error;
     } finally {
       setIsCreating(false);
@@ -84,11 +111,11 @@ export const useTelegramForm = () => {
     currentStep,
     setCurrentStep,
     isCreating,
+    isValidating,
     formData,
     selectedAgents,
     setSelectedAgents,
     errors,
-    agents,
     handleInputChange,
     handleNextStep,
     handleCreateTelegramChannel

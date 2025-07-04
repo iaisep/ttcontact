@@ -12,11 +12,11 @@ const TelegramInboxForm: React.FC<TelegramInboxFormProps> = ({ onBack, onComplet
     currentStep,
     setCurrentStep,
     isCreating,
+    isValidating,
     formData,
     selectedAgents,
     setSelectedAgents,
     errors,
-    agents,
     handleInputChange,
     handleNextStep,
     handleCreateTelegramChannel
@@ -29,6 +29,7 @@ const TelegramInboxForm: React.FC<TelegramInboxFormProps> = ({ onBack, onComplet
           <TelegramFormFields
             formData={formData}
             errors={errors}
+            isValidating={isValidating}
             onInputChange={handleInputChange}
             onBack={onBack}
             onNext={handleNextStep}
@@ -37,7 +38,6 @@ const TelegramInboxForm: React.FC<TelegramInboxFormProps> = ({ onBack, onComplet
       case 3:
         return (
           <AgentsSelectionStep
-            agents={agents}
             selectedAgents={selectedAgents}
             onAgentSelect={setSelectedAgents}
             onBack={() => setCurrentStep(2)}

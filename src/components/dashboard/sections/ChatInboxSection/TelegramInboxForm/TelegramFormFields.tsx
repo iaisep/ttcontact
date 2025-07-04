@@ -3,12 +3,13 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import type { FormData, FormErrors } from './types';
 
 interface TelegramFormFieldsProps {
   formData: FormData;
   errors: FormErrors;
+  isValidating?: boolean;
   onInputChange: (field: keyof FormData, value: string) => void;
   onBack: () => void;
   onNext: () => void;
@@ -17,10 +18,13 @@ interface TelegramFormFieldsProps {
 const TelegramFormFields: React.FC<TelegramFormFieldsProps> = ({
   formData,
   errors,
+  isValidating = false,
   onInputChange,
   onBack,
   onNext
 }) => {
+  const isFormValid = formData.inboxName.trim() && formData.botToken.trim();
+
   return (
     <div className="space-y-6">
       <div>
@@ -69,8 +73,16 @@ const TelegramFormFields: React.FC<TelegramFormFieldsProps> = ({
         <Button 
           onClick={onNext}
           className="bg-blue-600 hover:bg-blue-700"
+          disabled={!isFormValid || isValidating}
         >
-          Create Telegram Channel
+          {isValidating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Validating Token...
+            </>
+          ) : (
+            'Create Telegram Channel'
+          )}
         </Button>
       </div>
     </div>

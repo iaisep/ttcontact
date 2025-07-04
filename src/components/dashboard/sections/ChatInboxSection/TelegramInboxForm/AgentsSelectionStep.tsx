@@ -1,38 +1,82 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { chatwootApi } from '@/services/chatwootApi';
+import { toast } from 'sonner';
 
 interface Agent {
   id: string;
   name: string;
   email: string;
+  role?: string;
+  thumbnail?: string;
+  availability_status?: string;
 }
 
 interface AgentsSelectionStepProps {
-  agents: Agent[];
   selectedAgents: string[];
   onAgentSelect: (agentIds: string[]) => void;
-  onBack?: () => void; // Make onBack optional
+  onBack?: () => void;
   onNext: () => void;
   loading?: boolean;
 }
 
 const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
-  agents,
   selectedAgents,
   onAgentSelect,
   onBack,
   onNext,
-  loading = false
 }) => {
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchAgents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('Fetching agents from Chatwoot API...');
+      
+      const apiAgents = await chatwootApi.getAgents();
+      console.log('Received agents:', apiAgents);
+      
+      // Transform API agents to our format
+      const transformedAgents: Agent[] = apiAgents.map(agent => ({
+        id: agent.id.toString(),
+        name: agent.name,
+        email: agent.email,
+        role: agent.role,
+        thumbnail: agent.thumbnail,
+        availability_status: agent.availability_status
+      }));
+      
+      setAgents(transformedAgents);
+      console.log('Transformed agents:', transformedAgents);
+    } catch (error) {
+      console.error('Error fetching agents:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load agents');
+      toast.error('Failed to load agents');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAgents();
+  }, []);
+
   const handleAgentToggle = (agentId: string) => {
     if (selectedAgents.includes(agentId)) {
       onAgentSelect(selectedAgents.filter(id => id !== agentId));
     } else {
       onAgentSelect([...selectedAgents, agentId]);
     }
+  };
+
+  const handleRetry = () => {
+    fetchAgents();
   };
 
   if (loading) {
@@ -46,7 +90,8 @@ const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
         </div>
 
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-6 w-6 animate-spin mr-2" />
+          <span>Loading agents...</span>
         </div>
 
         <div className="flex justify-between">
@@ -56,7 +101,43 @@ const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
               Back
             </Button>
           )}
-          {!onBack && <div />} {/* Empty div to maintain spacing */}
+          {!onBack && <div />}
+          <Button disabled>
+            Continue
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Add agents</h2>
+          <p className="text-gray-600 mb-4">Failed to load agents</p>
+        </div>
+        
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center mb-2">
+            <AlertCircle className="h-4 w-4 text-red-600 mr-2" />
+            <h3 className="text-red-800 font-medium">Error loading agents</h3>
+          </div>
+          <p className="text-red-600 text-sm mb-4">{error}</p>
+          <Button onClick={handleRetry} size="sm" variant="outline">
+            Try Again
+          </Button>
+        </div>
+
+        <div className="flex justify-between">
+          {onBack && (
+            <Button variant="outline" onClick={onBack}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          )}
+          {!onBack && <div />}
           <Button disabled>
             Continue
             <ArrowRight className="ml-2 h-4 w-4" />
@@ -89,13 +170,23 @@ const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
                 onCheckedChange={() => handleAgentToggle(agent.id)}
               />
               <div className="flex-1">
-                <label
-                  htmlFor={`agent-${agent.id}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  {agent.name}
-                </label>
-                <p className="text-sm text-gray-500">{agent.email}</p>
+                <div className="flex items-center space-x-2">
+                  {agent.thumbnail && (
+                    <img src={agent.thumbnail} alt={agent.name} className="w-6 h-6 rounded-full" />
+                  )}
+                  <div>
+                    <label
+                      htmlFor={`agent-${agent.id}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {agent.name}
+                    </label>
+                    <p className="text-sm text-gray-500">{agent.email}</p>
+                    {agent.role && (
+                      <span className="text-blue-600 text-xs">{agent.role}</span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           ))
@@ -109,7 +200,7 @@ const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
             Back
           </Button>
         )}
-        {!onBack && <div />} {/* Empty div to maintain spacing when no back button */}
+        {!onBack && <div />}
         <Button 
           onClick={onNext}
           className="bg-blue-600 hover:bg-blue-700"
