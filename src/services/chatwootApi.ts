@@ -241,15 +241,13 @@ class ChatwootApiService {
     }
   }
 
-  // Create Telegram inbox - Updated to use correct structure
+  // Create Telegram inbox - Updated to not include name field
   async createTelegramInbox(data: {
-    name: string;
     bot_token: string;
   }): Promise<ChatwootInbox> {
     console.log('Creating Telegram inbox with data:', data);
     
     const requestBody = {
-      name: data.name,
       channel: {
         type: 'telegram' as const,
         bot_token: data.bot_token,

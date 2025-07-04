@@ -47,9 +47,8 @@ export const useTelegramForm = () => {
       try {
         console.log('Creating Telegram inbox with bot token validation...');
         
-        // Create the inbox using Chatwoot API
+        // Create the inbox using Chatwoot API without name field
         const newInbox = await chatwootApi.createTelegramInbox({
-          name: formData.inboxName,
           bot_token: formData.botToken,
         });
 
