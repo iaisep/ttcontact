@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Loader2 } from 'lucide-react';
 import type { FormData } from './types';
 
 interface CompletionStepProps {
@@ -26,7 +26,7 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
       <div>
         <h2 className="text-2xl font-semibold mb-2">Voilà!</h2>
         <p className="text-gray-600 mb-6">
-          You are all set to go! Your WhatsApp inbox has been created successfully.
+          You are all set to go! Your WhatsApp inbox will be created when you click the button below.
         </p>
       </div>
 
@@ -34,7 +34,7 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
         <h3 className="font-medium mb-2">Inbox Details:</h3>
         <p><strong>Name:</strong> {formData.inboxName}</p>
         <p><strong>Phone:</strong> {formData.phoneNumber}</p>
-        <p><strong>Agents:</strong> {selectedAgents.length} assigned</p>
+        <p><strong>Agents:</strong> {selectedAgents.length} selected</p>
       </div>
 
       <Button 
@@ -42,7 +42,14 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
         className="bg-blue-600 hover:bg-blue-700"
         disabled={isCreating}
       >
-        {isCreating ? 'Creating Inbox...' : 'Go to Inboxes'}
+        {isCreating ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Creating Inbox...
+          </>
+        ) : (
+          'Create Inbox & Go to Inboxes'
+        )}
       </Button>
     </div>
   );

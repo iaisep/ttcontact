@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useChatwootInboxManager } from './ChatInboxSection/useChatwootInboxManager';
 import { useInboxDetails } from './ChatInboxSection/InboxConfig/useInboxDetails';
@@ -10,6 +11,15 @@ import type { Inbox } from './ChatInboxSection/types';
 const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbox, onInboxCreated }) => {
   const [selectedInbox, setSelectedInbox] = useState<Inbox | null>(null);
   
+  // Handle inbox creation callback
+  const handleInboxCreated = (inbox: Inbox) => {
+    console.log('New inbox created:', inbox);
+    // The inbox is already added to the list by useChatwootInboxManager
+    if (onInboxCreated) {
+      onInboxCreated(inbox);
+    }
+  };
+
   const {
     searchQuery,
     setSearchQuery,
@@ -19,7 +29,7 @@ const ChatInboxSection: React.FC<ChatInboxSectionProps> = ({ onNavigateToAddInbo
     error,
     loadInboxes,
     deleteInbox,
-  } = useChatwootInboxManager(onInboxCreated);
+  } = useChatwootInboxManager(handleInboxCreated);
 
   // Hook para obtener detalles del inbox seleccionado
   const { inboxDetails, loading: detailsLoading } = useInboxDetails(selectedInbox?.id || null);

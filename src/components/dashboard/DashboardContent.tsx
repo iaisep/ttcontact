@@ -21,6 +21,11 @@ interface DashboardContentProps {
 }
 
 const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection, setActiveSection }) => {
+  const handleInboxCreated = () => {
+    // Navigate back to chat-inbox section after creating an inbox
+    setActiveSection('chat-inbox');
+  };
+
   const renderContent = () => {
     switch (activeSection) {
       case 'agents':
@@ -31,13 +36,14 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection, setA
         return (
           <ChatInboxSection 
             onNavigateToAddInbox={() => setActiveSection('add-inbox')}
+            onInboxCreated={handleInboxCreated}
           />
         );
       case 'add-inbox':
         return (
           <AddInboxSection 
             onBack={() => setActiveSection('chat-inbox')}
-            onComplete={() => setActiveSection('chat-inbox')}
+            onComplete={handleInboxCreated}
           />
         );
       case 'knowledge-base':
@@ -55,7 +61,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({ activeSection, setA
       case 'api-keys':
         return <ApiKeysSection />;
       case 'webhooks':
-        return <WebhooksSection />;
+        return <WebhooksSection />;  
       case 'account-info':
         return <AccountInfoSection />;
       case 'help-center':

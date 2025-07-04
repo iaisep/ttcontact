@@ -1,3 +1,4 @@
+
 const CHATWOOT_API_KEY = 'YZEKfqAJsnEWoshpdRCq9yZn';
 const CHATWOOT_BASE_URL = 'https://chatwoot.totalcontact.com.mx/api/v1/accounts/1'; // Replace 1 with actual account ID
 
@@ -175,22 +176,31 @@ class ChatwootApiService {
     return Array.isArray(response) ? response : (response.payload || []);
   }
 
-  // Create WhatsApp inbox
+  // Create WhatsApp inbox - FIXED with correct structure
   async createWhatsAppInbox(data: {
     name: string;
     phone_number: string;
     provider?: string;
     provider_config?: any;
   }): Promise<ChatwootInbox> {
-    return this.createInbox({
+    console.log('Creating WhatsApp inbox with data:', data);
+    
+    const requestBody = {
       name: data.name,
       channel: {
-        type: 'whatsapp',
+        type: 'whatsapp' as const,
         phone_number: data.phone_number,
-        provider: data.provider,
-        provider_config: data.provider_config,
+        provider: 'whatsapp_cloud', // Fixed provider value
+        provider_config: {
+          api_key: data.provider_config?.api_key,
+          phone_number_id: data.provider_config?.phone_number_id,
+          business_account_id: data.provider_config?.business_account_id,
+        },
       },
-    });
+    };
+
+    console.log('WhatsApp inbox request body:', JSON.stringify(requestBody, null, 2));
+    return this.createInbox(requestBody);
   }
 
   // Create Telegram inbox

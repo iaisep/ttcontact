@@ -1,5 +1,7 @@
 
 import { useState } from 'react';
+import { chatwootApi } from '@/services/chatwootApi';
+import { toast } from 'sonner';
 import type { FormData } from './types';
 
 export const useWhatsAppForm = () => {
@@ -92,28 +94,38 @@ export const useWhatsAppForm = () => {
     try {
       console.log('Creating WhatsApp inbox with data:', { formData, selectedAgents });
       
-      // Use the Chatwoot API to create the inbox
-      if ((window as any).createWhatsAppInbox) {
-        await (window as any).createWhatsAppInbox({
-          name: formData.inboxName,
-          phoneNumber: formData.phoneNumber,
-          provider: formData.apiProvider,
-          providerConfig: {
-            phone_number_id: formData.phoneNumberId,
-            business_account_id: formData.businessAccountId,
-            api_key: formData.apiKey,
-          }
-        });
-        
-        console.log('WhatsApp inbox created successfully');
-        onComplete();
-      } else {
-        console.error('createWhatsAppInbox function not found on window');
-        throw new Error('WhatsApp inbox creation function not available');
+      // Create the inbox using the API
+      const newInbox = await chatwootApi.createWhatsAppInbox({
+        name: formData.inboxName,
+        phone_number: formData.phoneNumber,
+        provider: 'whatsapp_cloud',
+        provider_config: {
+          phone_number_id: formData.phoneNumberId,
+          business_account_id: formData.businessAccountId,
+          api_key: formData.apiKey,
+        }
+      });
+
+      console.log('WhatsApp inbox created successfully:', newInbox);
+
+      // If agents are selected, add them to the inbox
+      if (selectedAgents.length > 0) {
+        try {
+          const agentIds = selectedAgents.map(id => parseInt(id));
+          await chatwootApi.addAgentToInbox(newInbox.id, agentIds);
+          console.log('Agents added to inbox successfully');
+        } catch (agentError) {
+          console.error('Error adding agents to inbox:', agentError);
+          toast.error('Inbox created but failed to add agents');
+        }
       }
+
+      toast.success('WhatsApp inbox created successfully!');
+      onComplete();
       
     } catch (error) {
       console.error('Error creating WhatsApp inbox:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create WhatsApp inbox');
       throw error;
     } finally {
       setIsCreating(false);

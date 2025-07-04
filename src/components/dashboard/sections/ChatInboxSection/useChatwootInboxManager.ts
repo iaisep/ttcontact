@@ -212,19 +212,7 @@ export const useChatwootInboxManager = (onInboxCreated?: (inbox: Inbox) => void)
     loadInboxes();
   }, []);
 
-  // Expose global functions for forms
-  useEffect(() => {
-    (window as any).createWhatsAppInbox = createWhatsAppInbox;
-    (window as any).createTelegramInbox = createTelegramInbox;
-    (window as any).createWebsiteInbox = createWebsiteInbox;
-    
-    return () => {
-      delete (window as any).createWhatsAppInbox;
-      delete (window as any).createTelegramInbox;
-      delete (window as any).createWebsiteInbox;
-    };
-  }, []);
-
+  // Return the functions for forms to use
   return {
     searchQuery,
     setSearchQuery,
