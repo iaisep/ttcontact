@@ -21,6 +21,7 @@ interface AgentsSelectionStepProps {
   onBack?: () => void;
   onNext: () => void;
   loading?: boolean;
+  agents?: Agent[]; // Optional agents prop for external data
 }
 
 const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
@@ -28,12 +29,18 @@ const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
   onAgentSelect,
   onBack,
   onNext,
+  agents: externalAgents,
 }) => {
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [internalAgents, setInternalAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(!externalAgents); // Don't load if external agents provided
   const [error, setError] = useState<string | null>(null);
 
+  // Use external agents if provided, otherwise use internal agents
+  const agents = externalAgents || internalAgents;
+
   const fetchAgents = async () => {
+    if (externalAgents) return; // Skip fetching if external agents are provided
+    
     try {
       setLoading(true);
       setError(null);
@@ -52,7 +59,7 @@ const AgentsSelectionStep: React.FC<AgentsSelectionStepProps> = ({
         availability_status: agent.availability_status
       }));
       
-      setAgents(transformedAgents);
+      setInternalAgents(transformedAgents);
       console.log('Transformed agents:', transformedAgents);
     } catch (error) {
       console.error('Error fetching agents:', error);
