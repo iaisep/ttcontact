@@ -8,6 +8,7 @@ export const useTelegramForm = () => {
   const [currentStep, setCurrentStep] = useState(2);
   const [isCreating, setIsCreating] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
+  const [createdInboxId, setCreatedInboxId] = useState<number | null>(null);
   const [formData, setFormData] = useState<FormData>({
     inboxName: '',
     botToken: ''
@@ -45,23 +46,26 @@ export const useTelegramForm = () => {
         return;
       }
 
-      // Validate bot token with Chatwoot API
+      // Create the Telegram inbox during validation
       setIsValidating(true);
       try {
-        console.log('Validating Telegram bot token...');
-        const isValid = await chatwootApi.validateTelegramBotToken(formData.botToken);
+        console.log('Creating Telegram inbox with bot token validation...');
         
-        if (isValid) {
-          console.log('Bot token is valid, proceeding to next step');
-          setCurrentStep(3);
-        } else {
-          console.log('Bot token is invalid');
-          toast.error('The bot token is incorrect. Please check your token and try again.');
-          setErrors(prev => ({ ...prev, botToken: 'Invalid bot token' }));
-        }
+        // Create the inbox using Chatwoot API
+        const newInbox = await chatwootApi.createTelegramInbox({
+          name: formData.inboxName,
+          bot_token: formData.botToken,
+        });
+
+        console.log('Telegram inbox created successfully:', newInbox);
+        setCreatedInboxId(newInbox.id);
+        toast.success('Bot token validated and inbox created!');
+        setCurrentStep(3);
+        
       } catch (error) {
-        console.error('Error validating bot token:', error);
-        toast.error('Failed to validate bot token. Please try again.');
+        console.error('Error creating Telegram inbox:', error);
+        toast.error('The bot token is incorrect or failed to create inbox. Please check your token and try again.');
+        setErrors(prev => ({ ...prev, botToken: 'Invalid bot token or creation failed' }));
       } finally {
         setIsValidating(false);
       }
@@ -71,36 +75,33 @@ export const useTelegramForm = () => {
   };
 
   const handleCreateTelegramChannel = async (onComplete: () => void) => {
+    if (!createdInboxId) {
+      toast.error('No inbox found to assign agents');
+      return;
+    }
+
     setIsCreating(true);
     try {
-      console.log('Creating Telegram inbox with data:', { formData, selectedAgents });
-      
-      // Create the inbox using Chatwoot API
-      const newInbox = await chatwootApi.createTelegramInbox({
-        name: formData.inboxName,
-        bot_token: formData.botToken,
-      });
-
-      console.log('Telegram inbox created successfully:', newInbox);
-
-      // If agents are selected, add them to the inbox
+      // If agents are selected, add them to the already created inbox
       if (selectedAgents.length > 0) {
         try {
           const agentIds = selectedAgents.map(id => parseInt(id));
-          await chatwootApi.addAgentToInbox(newInbox.id, agentIds);
+          await chatwootApi.addAgentToInbox(createdInboxId, agentIds);
           console.log('Agents added to inbox successfully');
+          toast.success('Agents assigned successfully!');
         } catch (agentError) {
           console.error('Error adding agents to inbox:', agentError);
-          toast.error('Inbox created but failed to add agents');
+          toast.error('Failed to assign agents to inbox');
         }
+      } else {
+        toast.success('Telegram inbox is ready!');
       }
 
-      toast.success('Telegram inbox created successfully!');
       onComplete();
       
     } catch (error) {
-      console.error('Error creating Telegram inbox:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to create Telegram inbox');
+      console.error('Error completing Telegram inbox setup:', error);
+      toast.error('Failed to complete inbox setup');
       throw error;
     } finally {
       setIsCreating(false);

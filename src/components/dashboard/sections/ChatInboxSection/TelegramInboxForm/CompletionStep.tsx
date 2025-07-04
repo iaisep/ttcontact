@@ -26,7 +26,7 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
       <div>
         <h2 className="text-2xl font-semibold mb-2">Voilà!</h2>
         <p className="text-gray-600 mb-6">
-          You are all set to go! Your Telegram inbox will be created when you click the button below.
+          Your Telegram inbox has been created successfully! Click the button below to go to your inboxes.
         </p>
       </div>
 
@@ -45,10 +45,10 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
         {isCreating ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Creating Inbox...
+            Processing...
           </>
         ) : (
-          'Create Inbox & Go to Inboxes'
+          'Go to Inboxes'
         )}
       </Button>
     </div>

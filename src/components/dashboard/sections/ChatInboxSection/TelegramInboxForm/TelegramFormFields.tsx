@@ -78,10 +78,10 @@ const TelegramFormFields: React.FC<TelegramFormFieldsProps> = ({
           {isValidating ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Validating Token...
+              Creating Inbox...
             </>
           ) : (
-            'Create Telegram Channel'
+            'Create Telegram Inbox'
           )}
         </Button>
       </div>
