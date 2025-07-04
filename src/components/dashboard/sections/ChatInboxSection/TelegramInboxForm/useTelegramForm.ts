@@ -10,7 +10,7 @@ export const useTelegramForm = () => {
   const [isValidating, setIsValidating] = useState(false);
   const [createdInboxId, setCreatedInboxId] = useState<number | null>(null);
   const [formData, setFormData] = useState<FormData>({
-    inboxName: '',
+    inboxName: 'Telegram Inbox', // Default name since field is hidden
     botToken: ''
   });
   const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
@@ -18,10 +18,6 @@ export const useTelegramForm = () => {
 
   const validateStep2 = () => {
     const newErrors: FormErrors = {};
-
-    if (!formData.inboxName.trim()) {
-      newErrors.inboxName = 'Please enter a valid inbox name';
-    }
 
     if (!formData.botToken.trim()) {
       newErrors.botToken = 'Please enter a valid bot token';

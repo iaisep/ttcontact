@@ -23,7 +23,7 @@ const TelegramFormFields: React.FC<TelegramFormFieldsProps> = ({
   onBack,
   onNext
 }) => {
-  const isFormValid = formData.inboxName.trim() && formData.botToken.trim();
+  const isFormValid = formData.botToken.trim();
 
   return (
     <div className="space-y-6">
@@ -33,20 +33,6 @@ const TelegramFormFields: React.FC<TelegramFormFieldsProps> = ({
       </div>
 
       <div className="space-y-4">
-        <div>
-          <Label htmlFor="inboxName">Inbox Name</Label>
-          <Input
-            id="inboxName"
-            value={formData.inboxName}
-            onChange={(e) => onInputChange('inboxName', e.target.value)}
-            placeholder="Please enter an inbox name"
-            className={errors.inboxName ? 'border-red-500' : ''}
-          />
-          {errors.inboxName && (
-            <p className="text-red-500 text-sm mt-1">{errors.inboxName}</p>
-          )}
-        </div>
-
         <div>
           <Label htmlFor="botToken">Bot Token</Label>
           <Input
