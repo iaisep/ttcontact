@@ -132,11 +132,14 @@ class ChatwootApiService {
     return response.payload || [];
   }
 
-  // Add agent to inbox
+  // Add agent to inbox - FIXED to use correct endpoint and payload structure
   async addAgentToInbox(inboxId: number, agentIds: number[]): Promise<void> {
-    await this.makeRequest(`/inboxes/${inboxId}/agents`, {
+    await this.makeRequest('/inbox_members', {
       method: 'POST',
-      body: JSON.stringify({ agent_ids: agentIds }),
+      body: JSON.stringify({ 
+        inbox_id: inboxId.toString(), 
+        user_ids: agentIds 
+      }),
     });
   }
 
