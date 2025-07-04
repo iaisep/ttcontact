@@ -84,13 +84,14 @@ class ChatwootApiService {
     return response.payload || [];
   }
 
-  // Create a new inbox
+  // Create a new inbox - Fixed to handle direct response for inbox creation
   async createInbox(data: CreateInboxRequest): Promise<ChatwootInbox> {
     const response = await this.makeRequest('/inboxes', {
       method: 'POST',
       body: JSON.stringify(data),
     });
-    return response.payload;
+    // For inbox creation, the API returns the inbox data directly, not wrapped in payload
+    return response;
   }
 
   // Update an inbox
@@ -226,9 +227,9 @@ class ChatwootApiService {
 
       // If we get here, the token is valid
       // Delete the temporary inbox
-      if (response.payload?.id) {
+      if (response?.id) {
         try {
-          await this.deleteInbox(response.payload.id);
+          await this.deleteInbox(response.id);
         } catch (deleteError) {
           console.warn('Failed to delete temporary validation inbox:', deleteError);
         }
