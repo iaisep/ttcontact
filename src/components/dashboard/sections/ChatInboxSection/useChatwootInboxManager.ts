@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { chatwootApi, type ChatwootInbox } from '@/services/chatwootApi';
 import { toast } from 'sonner';
@@ -102,14 +101,12 @@ export const useChatwootInboxManager = (onInboxCreated?: (inbox: Inbox) => void)
 
   // Create a new Telegram inbox
   const createTelegramInbox = async (data: {
-    name: string;
     botToken: string;
   }) => {
     try {
       console.log('Creating Telegram inbox:', data);
       
       const chatwootInbox = await chatwootApi.createTelegramInbox({
-        name: data.name,
         bot_token: data.botToken,
       });
       

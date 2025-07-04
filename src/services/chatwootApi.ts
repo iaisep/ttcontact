@@ -16,7 +16,7 @@ interface ChatwootInbox {
 }
 
 interface CreateInboxRequest {
-  name: string;
+  name?: string; // Made optional since Telegram doesn't require it
   channel: {
     type: 'web_widget' | 'whatsapp' | 'telegram';
     website_url?: string;
@@ -247,7 +247,7 @@ class ChatwootApiService {
   }): Promise<ChatwootInbox> {
     console.log('Creating Telegram inbox with data:', data);
     
-    const requestBody = {
+    const requestBody: CreateInboxRequest = {
       channel: {
         type: 'telegram' as const,
         bot_token: data.bot_token,
